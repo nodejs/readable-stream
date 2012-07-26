@@ -149,10 +149,13 @@ FSReadable.prototype._read = function() {
 FSReadable.prototype.read = function(n) {
   if (this._bufferLength === 0) return null;
 
+  if (isNaN(n) || n <= 0) n = this._bufferLength;
+
   var ret;
   if (n >= this._bufferLength) {
     ret = Buffer.concat(this._buffer);
     this._bufferLength = 0;
+    this._buffer.length = 0;
   } else {
     // read just some of it.
     if (n === this._buffer[0].length) {

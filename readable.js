@@ -113,6 +113,7 @@ Readable.prototype.wrap = function(stream) {
       // read it all
       ret = Buffer.concat(this._buffer);
       this._bufferLength = 0;
+      this._buffer.length = 0;
     } else {
       // read just some of it.
       if (n < this._buffer[0].length) {
