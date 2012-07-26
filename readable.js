@@ -15,8 +15,12 @@ Readable.prototype.read = function(n) {
   return null;
 };
 
-Readable.prototype.pipe = function(dest) {
-  this.on('end', dest.end.bind(dest));
+Readable.prototype.pipe = function(dest, opt) {
+  if (!(opt && opt.end === false || dest === process.stdout ||
+        dest === process.stderr)) {
+    this.on('end', dest.end.bind(dest));
+  }
+
   flow.call(this);
 
   function flow() {
@@ -39,6 +43,15 @@ Readable.prototype.wrap = function(stream) {
   this._buffer = [];
   this._bufferLength = 0;
   var paused = false;
+  var ended = false;
+
+  stream.on('end', function() {
+    ended = true;
+    if (this._bufferLength === 0) {
+      this.emit('end');
+    }
+  }.bind(this));
+
   stream.on('data', function(chunk) {
     this._buffer.push(chunk);
     this._bufferLength += chunk.length;
@@ -46,7 +59,7 @@ Readable.prototype.wrap = function(stream) {
     // if not consumed, then pause the stream.
     if (this._bufferLength > 0 && !paused) {
       paused = true;
-      this._stream.pause();
+      stream.pause();
     }
   }.bind(this));
 
@@ -89,9 +102,14 @@ Readable.prototype.wrap = function(stream) {
       this._bufferLength -= n;
     }
 
-    if (this._bufferLength === 0 && paused) {
-      this._stream.resume();
-      paused = false;
+    if (this._bufferLength === 0) {
+      if (paused) {
+        stream.resume();
+        paused = false;
+      }
+      if (ended) {
+        process.nextTick(this.emit.bind(this, 'end'));
+      }
     }
     return ret;
   };
