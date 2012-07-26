@@ -21,6 +21,8 @@ Readable.prototype.pipe = function(dest, opt) {
     this.on('end', dest.end.bind(dest));
   }
 
+  dest.emit('pipe', this);
+
   flow.call(this);
 
   function flow() {
