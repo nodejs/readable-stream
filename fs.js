@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = FSReadable;
 
 // This uses the existing bindings in Node's FS module to
