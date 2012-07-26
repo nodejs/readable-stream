@@ -102,6 +102,23 @@ Readable.prototype.wrap = function(stream) {
     }
   }.bind(this));
 
+  // proxy all the other methods.
+  // important when wrapping filters and duplexes.
+  for (var i in stream) {
+    if (typeof stream[i] === 'function' &&
+        typeof this[i] === 'undefined') {
+      this[i] = function(method) { return function() {
+        return stream[method].apply(stream, arguments);
+      }}(i);
+    }
+  }
+
+  // proxy certain important events.
+  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
+  events.forEach(function(ev) {
+    stream.on(ev, this.emit.bind(this, ev));
+  }.bind(this));
+
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
   this.read = function(n) {
