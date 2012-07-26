@@ -38,7 +38,44 @@ Readable.prototype.pipe = function(dest, opt) {
   }
 };
 
-// wrap a 'data'/pause()/resume() style stream
+// kludge for on('data', fn) consumers.  Sad.
+// This is *not* part of the new readable stream interface.
+// It is an ugly unfortunate mess of history.
+Readable.prototype.on = function(ev, fn) {
+  if (ev === 'data') emitDataEvents(this);
+  return Stream.prototype.on.call(this, ev, fn);
+};
+Readable.prototype.addListener = Readable.prototype.on;
+
+function emitDataEvents(stream) {
+  var paused = false;
+  var readable = false;
+
+  // convert to an old-style stream.
+  stream.readable = true;
+  stream.pipe = Stream.prototype.pipe;
+  stream.on = stream.addEventListener = Stream.prototype.on;
+
+  stream.on('readable', function() {
+    readable = true;
+    var c;
+    while (!paused && (c = stream.read())) {
+      stream.emit('data', c);
+    }
+    if (c === null) readable = false;
+  });
+
+  stream.pause = function() {
+    paused = true;
+  };
+
+  stream.resume = function() {
+    paused = false;
+    if (readable) stream.emit('readable');
+  };
+}
+
+// wrap an old-style stream
 // This is *not* part of the readable stream interface.
 // It is an ugly unfortunate mess of history.
 Readable.prototype.wrap = function(stream) {
