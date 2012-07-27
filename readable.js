@@ -18,12 +18,64 @@ Readable.prototype.read = function(n) {
 };
 
 Readable.prototype.pipe = function(dest, opt) {
+
+  var source = this;
+
+  var didOnEnd = false;
+  function onend() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.end();
+  }
+
   if (!(opt && opt.end === false || dest === process.stdout ||
         dest === process.stderr)) {
-    this.on('end', dest.end.bind(dest));
+    this.on('end', onend);
   }
 
   dest.emit('pipe', this);
+
+  function onclose() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.destroy();
+  }
+
+  // don't leave dangling pipes when there are errors.
+  function onerror(er) {
+    cleanup();
+    if (this.listeners('error').length === 0) {
+      throw er; // Unhandled stream error in pipe.
+    }
+  }
+
+  source.on('error', onerror);
+  dest.on('error', onerror);
+
+  // remove all the event listeners that were added.
+  function cleanup() {
+    source.removeListener('end', onend);
+    source.removeListener('close', onclose);
+
+    source.removeListener('error', onerror);
+    dest.removeListener('error', onerror);
+
+    source.removeListener('end', cleanup);
+    source.removeListener('close', cleanup);
+
+    dest.removeListener('end', cleanup);
+    dest.removeListener('close', cleanup);
+  }
+
+  source.on('end', cleanup);
+  source.on('close', cleanup);
+
+  dest.on('end', cleanup);
+  dest.on('close', cleanup);
+
+  dest.emit('pipe', source);
 
   flow.call(this);
 
@@ -31,13 +83,15 @@ Readable.prototype.pipe = function(dest, opt) {
     var chunk;
     while (chunk = this.read()) {
       var written = dest.write(chunk);
-      if (!written) {
+      if (!written === false) {
         dest.once('drain', flow.bind(this));
         return;
       }
     }
     this.once('readable', flow);
   }
+
+  return dest;
 };
 
 // kludge for on('data', fn) consumers.  Sad.
