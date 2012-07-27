@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 module.exports = FSReadable;
 
@@ -20,6 +20,7 @@ var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
 var assert = require('assert');
 
+var fromList = require('./from-list.js');
 
 // a very basic memory pool.  this optimization helps revent lots
 // of allocations when there are many fs readable streams happening
@@ -153,38 +154,8 @@ FSReadable.prototype.read = function(n) {
 
   if (isNaN(n) || n <= 0) n = this._bufferLength;
 
-  var ret;
-  if (n >= this._bufferLength) {
-    ret = Buffer.concat(this._buffer);
-    this._bufferLength = 0;
-    this._buffer.length = 0;
-  } else {
-    // read just some of it.
-    if (n === this._buffer[0].length) {
-      // first buffer is a perfect match
-      ret = this._buffer.shift();
-    } else if (n < this._buffer[0].length) {
-      // just take a part of the first buffer.
-      var buf = this._buffer[0];
-      ret = buf.slice(0, n);
-      this._buffer[0] = buf.slice(n);
-    } else {
-      // complex case.
-      ret = new Buffer(n);
-      var c = 0;
-      for (var i = 0; i < this._buffer.length && c < n; i++) {
-        var buf = this._buffer[i];
-        var cpy = Math.min(n - c, buf.length);
-        buf.copy(ret, c, 0, cpy);
-        if (cpy < buf.length) {
-          this._buffer[i] = buf.slice(cpy);
-          this._buffer = this._buffer.slice(i);
-        }
-        n -= cpy;
-      }
-    }
-    this._bufferLength -= n;
-  }
+  var ret = fromList(n, this._buffer, this._bufferLength);
+  this._bufferLength = Math.max(0, this._bufferLength - n);
 
   if (this._bufferLength === 0 && this.ended) {
     process.nextTick(this.emit.bind(this, 'end'));

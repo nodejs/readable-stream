@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 module.exports = Readable;
 
@@ -124,42 +124,12 @@ Readable.prototype.wrap = function(stream) {
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
   this.read = function(n) {
-    var ret;
+    if (this._bufferLength === 0) return null;
 
-    if (this._bufferLength === 0) {
-      ret = null;
-    } else if (!n || n >= this._bufferLength) {
-      // read it all
-      ret = Buffer.concat(this._buffer);
-      this._bufferLength = 0;
-      this._buffer.length = 0;
-    } else {
-      // read just some of it.
-      if (n < this._buffer[0].length) {
-        // just take a part of the first buffer.
-        var buf = this._buffer[0];
-        ret = buf.slice(0, n);
-        this._buffer[0] = buf.slice(n);
-      } else if (n === this._buffer[0].length) {
-        // first buffer is a perfect match
-        ret = this._buffer.shift();
-      } else {
-        // complex case.
-        ret = new Buffer(n);
-        var c = 0;
-        for (var i = 0; i < this._buffer.length && c < n; i++) {
-          var buf = this._buffer[i];
-          var cpy = Math.min(n - c, buf.length);
-          buf.copy(ret, c, 0, cpy);
-          if (cpy < buf.length) {
-            this._buffer[i] = buf.slice(cpy);
-            this._buffer = this._buffer.slice(i);
-          }
-          n -= cpy;
-        }
-      }
-      this._bufferLength -= n;
-    }
+    if (isNaN(n) || n <= 0) n = this._bufferLength;
+
+    var ret = fromList(n, this._buffer, this._bufferLength);
+    this._bufferLength = Math.max(0, this._bufferLength - n);
 
     if (this._bufferLength === 0) {
       if (paused) {
