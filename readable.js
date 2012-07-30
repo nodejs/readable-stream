@@ -38,6 +38,8 @@ Readable.prototype.pipe = function(dest, opt) {
     }
     this.once('readable', flow);
   }
+
+  return dest;
 };
 
 // kludge for on('data', fn) consumers.  Sad.
