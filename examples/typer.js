@@ -1,7 +1,8 @@
 var fs = require('fs');
 var fst = fs.createReadStream(__filename);
 var Readable = require('../readable.js');
-var rst = new Readable(fst);
+var rst = new Readable();
+rst.wrap(fst);
 
 rst.on('end', function() {
   process.stdin.pause();

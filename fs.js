@@ -20,8 +20,6 @@ var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
 var assert = require('assert');
 
-var fromList = require('./from-list.js');
-
 // a very basic memory pool.  this optimization helps revent lots
 // of allocations when there are many fs readable streams happening
 // concurrently.
@@ -36,18 +34,16 @@ function allocNewPool() {
 util.inherits(FSReadable, Readable);
 
 function FSReadable(path, options) {
-  Readable.apply(this);
-
   if (!options) options = {};
 
-  this._buffer = [];
-  this._bufferLength = 0;
+  Readable.apply(this, options);
 
   this.path = path;
   this.flags = 'r';
   this.mode = 438; //=0666
   this.fd = null;
   this.bufferSize = 64 * 1024;
+  this.lowWaterMark = 16 * 1024;
 
   Object.keys(options).forEach(function(k) {
     this[k] = options[k];
@@ -91,12 +87,14 @@ FSReadable.prototype.open = function() {
 
     this.fd = fd;
     this.emit('open', fd);
-    this._read();
   }.bind(this));
 }
 
-FSReadable.prototype._read = function() {
-  assert(typeof this.fd === 'number');
+FSReadable.prototype._read = function(n, cb) {
+  if (this.fd === null) {
+    this.once('open', this._read.bind(this, n, cb));
+    return;
+  }
 
   if (this.reading || this.ended || this.destroyed) return;
   this.reading = true;
@@ -109,7 +107,7 @@ FSReadable.prototype._read = function() {
   }
 
   var thisPool = pool;
-  var toRead = Math.min(pool.length - pool.used, this.bufferSize);
+  var toRead = Math.min(pool.length - pool.used, n);
   var start = pool.used;
 
   if (this.pos !== undefined) {
@@ -122,59 +120,28 @@ FSReadable.prototype._read = function() {
     return;
   }
 
-  fs.read(this.fd, pool, pool.used, toRead, this.pos, afterRead.bind(this));
+  fs.read(this.fd, pool, pool.used, toRead, this.pos, onread.bind(this));
 
-  function afterRead(er, bytesRead) {
+  function onread(er, bytesRead) {
     this.reading = false;
 
     if (er) {
       this.destroy();
-      this.emit('error', er);
-      return;
+      return cb(er);
     }
 
-    if (bytesRead === 0) {
-      this.ended = true;
-      if (this._bufferLength === 0) this.emit('end');
-      this.close();
-      return;
+    var b = null;
+    if (bytesRead > 0) {
+      b = thisPool.slice(start, start + bytesRead);
     }
-
-    var b = thisPool.slice(start, start + bytesRead);
-
-    var needReadableEvent = this._bufferLength === 0;
-    this._bufferLength += bytesRead;
-    this._buffer.push(b);
-    if (needReadableEvent) this.emit('readable');
+    cb(null, b);
   }
 }
 
-FSReadable.prototype.read = function(n) {
-  if (this._bufferLength === 0) return null;
-
-  if (isNaN(n) || n <= 0) n = this._bufferLength;
-
-  var ret = fromList(n, this._buffer, this._bufferLength);
-  this._bufferLength = Math.max(0, this._bufferLength - n);
-
-  if (this._bufferLength === 0 && this.ended) {
-    process.nextTick(this.emit.bind(this, 'end'));
-    this.close();
-  }
-
-  // if we've consumed below the desired threshold, pull in more bytes.
-  if (this._bufferLength < this.bufferSize) {
-    this._read();
-  }
-
-  if (this._decoder) ret = this._decoder.write(ret);
-
-  return ret;
-};
-
 FSReadable.prototype.close = function(cb) {
   if (cb) this.once('close', cb);
-  if (this.closed) {
+  if (this.closed || this.fd === null) {
+    if (this.fd === null) this.once('open', this.destroy);
     return process.nextTick(this.emit.bind(this, 'close'));
   }
   this.closed = true;
