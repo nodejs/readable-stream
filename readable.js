@@ -4,17 +4,56 @@ module.exports = Readable;
 
 var Stream = require('stream');
 var util = require('util');
+var fromList = require('./from-list.js');
 
 util.inherits(Readable, Stream);
 
-function Readable(stream) {
-  if (stream) this.wrap(stream);
+function Readable(options) {
+  options = options || {};
+  this.bufferSize = options.bufferSize || 16 * 1024;
+  this.lowWaterMark = options.lowWaterMark || 1024;
+  this.buffer = [];
+  this.length = 0;
   Stream.apply(this);
 }
 
-// override this method.
+// you can override either this method, or _read(n, cb) below.
 Readable.prototype.read = function(n) {
-  return null;
+  if (this.length === 0 && this.ended) {
+    process.nextTick(this.emit.bind(this, 'end'));
+    return null;
+  }
+
+  if (isNaN(n) || n <= 0) n = this.length;
+  n = Math.min(n, this.length);
+
+  var ret = n > 0 ? fromList(n, this.buffer, this.length) : null;
+  this.length -= n;
+
+  if (!this.ended && this.length < this.lowWaterMark) {
+    this._read(this.bufferSize, function onread(er, chunk) {
+      if (er) return this.emit('error', er);
+
+      if (!chunk || !chunk.length) {
+        this.ended = true;
+        if (this.length === 0) this.emit('end');
+        return;
+      }
+
+      this.length += chunk.length;
+      this.buffer.push(chunk);
+      if (this.length < this.lowWaterMark) {
+        this._read(this.bufferSize, onread.bind(this));
+      }
+      this.emit('readable');
+    }.bind(this));
+  }
+
+  return ret;
+};
+
+Readable.prototype._read = function(n, cb) {
+  process.nextTick(cb.bind(this, new Error('not implemented')));
 };
 
 Readable.prototype.pipe = function(dest, opt) {
@@ -83,24 +122,24 @@ function emitDataEvents(stream) {
 // This is *not* part of the readable stream interface.
 // It is an ugly unfortunate mess of history.
 Readable.prototype.wrap = function(stream) {
-  this._buffer = [];
-  this._bufferLength = 0;
+  this.buffer = [];
+  this.length = 0;
   var paused = false;
   var ended = false;
 
   stream.on('end', function() {
     ended = true;
-    if (this._bufferLength === 0) {
+    if (this.length === 0) {
       this.emit('end');
     }
   }.bind(this));
 
   stream.on('data', function(chunk) {
-    this._buffer.push(chunk);
-    this._bufferLength += chunk.length;
+    this.buffer.push(chunk);
+    this.length += chunk.length;
     this.emit('readable');
     // if not consumed, then pause the stream.
-    if (this._bufferLength > 0 && !paused) {
+    if (this.length > this.lowWaterMark && !paused) {
       paused = true;
       stream.pause();
     }
@@ -126,21 +165,20 @@ Readable.prototype.wrap = function(stream) {
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
   this.read = function(n) {
-    if (this._bufferLength === 0) return null;
+    if (this.length === 0) return null;
 
-    if (isNaN(n) || n <= 0) n = this._bufferLength;
+    if (isNaN(n) || n <= 0) n = this.length;
 
-    var ret = fromList(n, this._buffer, this._bufferLength);
-    this._bufferLength = Math.max(0, this._bufferLength - n);
+    var ret = fromList(n, this.buffer, this.length);
+    this.length = Math.max(0, this.length - n);
 
-    if (this._bufferLength === 0) {
-      if (paused) {
-        stream.resume();
-        paused = false;
-      }
-      if (ended) {
-        process.nextTick(this.emit.bind(this, 'end'));
-      }
+    if (this.length < this.lowWaterMark && paused) {
+      stream.resume();
+      paused = false;
+    }
+
+    if (this.length === 0 && ended) {
+      process.nextTick(this.emit.bind(this, 'end'));
     }
     return ret;
   };
