@@ -14,6 +14,7 @@ function Readable(options) {
   this.lowWaterMark = options.lowWaterMark || 1024;
   this.buffer = [];
   this.length = 0;
+  this._dest = null;
   Stream.apply(this);
 }
 
@@ -57,28 +58,48 @@ Readable.prototype._read = function(n, cb) {
 };
 
 Readable.prototype.pipe = function(dest, opt) {
-  if (!(opt && opt.end === false || dest === process.stdout ||
-        dest === process.stderr)) {
-    this.on('end', dest.end.bind(dest));
-  }
+  if (this._dest) this.unpipe();
 
-  dest.emit('pipe', this);
+  this._dest = dest;
+  if (opt) this._pipeOpt = opt;
 
-  flow.call(this);
-
-  function flow() {
-    var chunk;
-    while (chunk = this.read()) {
-      var written = dest.write(chunk);
-      if (false === written) {
-        dest.once('drain', flow.bind(this));
-        return;
+  if (!this._pipeEndAdded) {
+    this._pipeEndAdded = true;
+    this.on('end', function() {
+      var dest = this._dest;
+      if (dest &&
+          (!this._pipeOpt || this._pipeOpt.end !== false) &&
+          dest !== process.stdout &&
+          dest !== process.stderr) {
+        dest.end();
       }
-    }
-    this.once('readable', flow);
+    });
   }
 
+  this._dest.emit('pipe', this);
+  flow.call(this);
   return dest;
+};
+
+function flow() {
+  var chunk;
+  var dest;
+  while ((dest = this._dest) && (chunk = this.read())) {
+    var written = dest.write(chunk);
+    if (false === written && this._dest) {
+      this._dest.once('drain', flow.bind(this));
+      return;
+    }
+  }
+  this.once('readable', flow);
+}
+
+Readable.prototype.unpipe = function() {
+  if (!this._dest) return this;
+  var dest = this._dest;
+  this._dest = null;
+  dest.emit('unpipe', this);
+  return this;
 };
 
 // kludge for on('data', fn) consumers.  Sad.

@@ -2,6 +2,7 @@ var tap = require('tap');
 var R = require('../readable');
 
 var util = require('util');
+var EE = require('events').EventEmitter;
 
 function TestReader(n) {
   R.apply(this);
@@ -14,16 +15,22 @@ function TestReader(n) {
 util.inherits(TestReader, R);
 
 TestReader.prototype.read = function(n) {
-  var toRead = Math.min(n, this._buffer.length - this._pos);
+  var max = this._buffer.length - this._pos;
+  n = n || max;
+  n = Math.max(n, 0);
+  var toRead = Math.min(n, max);
   if (toRead === 0) {
     // simulate the read buffer filling up with some more bytes some time
     // in the future.
     setTimeout(function() {
       this._pos = 0;
       this._bufs -= 1;
-      if (this._bufs === 0) {
+      if (this._bufs <= 0) {
         // read them all!
-        this.emit('end');
+        if (!this.ended) {
+          this.emit('end');
+          this.ended = true;
+        }
       } else {
         this.emit('readable');
       }
@@ -35,6 +42,34 @@ TestReader.prototype.read = function(n) {
   this._pos += toRead;
   return ret;
 };
+
+/////
+
+function TestWriter() {
+  EE.apply(this);
+  this.received = [];
+  this.flush = false;
+}
+
+util.inherits(TestWriter, EE);
+
+TestWriter.prototype.write = function(c) {
+  this.received.push(c.toString());
+  this.emit('write', c);
+  return true;
+
+  // flip back and forth between immediate acceptance and not.
+  this.flush = !this.flush;
+  if (!this.flush) setTimeout(this.emit.bind(this, 'drain'), 10);
+  return this.flush;
+};
+
+TestWriter.prototype.end = function(c) {
+  if (c) this.write(c);
+  this.emit('end', this.received);
+};
+
+////////
 
 tap.test('a most basic test', function(t) {
   var r = new TestReader(20);
@@ -76,4 +111,78 @@ tap.test('a most basic test', function(t) {
   }
 
   flow();
+});
+
+tap.test('pipe', function(t) {
+  var r = new TestReader(5);
+
+  var expect = [ 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx' ]
+
+  var EE = require('events').EventEmitter;
+  var w = new TestWriter;
+  var flush = true;
+  w.on('end', function(received) {
+    t.same(received, expect);
+    t.end();
+  });
+
+  r.pipe(w);
+});
+
+
+
+[1,2,3,4,5,6,7,8,9].forEach(function(SPLIT) {
+  tap.test('unpipe', function(t) {
+    var r = new TestReader(5);
+
+    // unpipe after 3 writes, then write to another stream instead.
+    var expect = [ 'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx' ];
+    expect = [ expect.slice(0, SPLIT), expect.slice(SPLIT) ];
+
+    var EE = require('events').EventEmitter;
+    var w = [ new TestWriter(), new TestWriter() ];
+
+    var writes = SPLIT;
+    w[0].on('write', function() {
+      if (--writes === 0) {
+        r.unpipe();
+        w[0].end();
+        r.pipe(w[1]);
+      }
+    });
+
+    var ended = 0;
+
+    w[0].on('end', function(results) {
+      ended++;
+      t.same(results, expect[0]);
+    });
+
+    w[1].on('end', function(results) {
+      ended++;
+      t.equal(ended, 2);
+      t.same(results, expect[1]);
+      t.end();
+    });
+
+    r.pipe(w[0]);
+  });
 });
