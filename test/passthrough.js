@@ -60,3 +60,22 @@ test('passthrough reordered', function(t) {
   t.equal(emits, 2);
   t.end();
 });
+
+test('passthrough facaded', function(t) {
+  var pt = new PassThrough;
+  var datas = [];
+  pt.on('data', function(chunk) {
+    datas.push(chunk.toString());
+  });
+
+  pt.on('end', function() {
+    t.same(datas, ['foog', 'bark', 'bazy', 'kuel']);
+    t.end();
+  });
+
+  pt.write(new Buffer('foog'));
+  pt.write(new Buffer('bark'));
+  pt.write(new Buffer('bazy'));
+  pt.write(new Buffer('kuel'));
+  pt.end();
+});

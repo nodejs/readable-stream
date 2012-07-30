@@ -39,8 +39,9 @@ PassThrough.prototype.write = function(c) {
 };
 
 PassThrough.prototype.end = function(c) {
-  if (c) this.write(c);
   this.ended = true;
+  if (c && c.length) this.write(c);
+  else if (!this.length) this.emit('end');
 };
 
 PassThrough.prototype.read = function(n) {
