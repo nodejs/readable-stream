@@ -36,7 +36,7 @@ util.inherits(FSReadable, Readable);
 function FSReadable(path, options) {
   if (!options) options = {};
 
-  Readable.apply(this, options);
+  Readable.call(this, options);
 
   this.path = path;
   this.flags = 'r';
