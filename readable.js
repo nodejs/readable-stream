@@ -91,7 +91,6 @@ function flow() {
       return;
     }
   }
-
   this.once('readable', flow);
 }
 
