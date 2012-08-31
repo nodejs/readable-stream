@@ -31,7 +31,7 @@ Readable.prototype.pipe = function(dest, opt) {
     var chunk;
     while (chunk = this.read()) {
       var written = dest.write(chunk);
-      if (!written) {
+      if (written === false) {
         dest.once('drain', flow.bind(this));
         return;
       }
