@@ -14,7 +14,8 @@ function Readable(options) {
   this.lowWaterMark = options.lowWaterMark || 1024;
   this.buffer = [];
   this.length = 0;
-  this._dest = null;
+  this._pipes = [];
+  this._flowing = false;
   Stream.apply(this);
 }
 
@@ -53,52 +54,74 @@ Readable.prototype.read = function(n) {
   return ret;
 };
 
+// abstract method.  to be overridden in specific implementation classes.
 Readable.prototype._read = function(n, cb) {
   process.nextTick(cb.bind(this, new Error('not implemented')));
 };
 
 Readable.prototype.pipe = function(dest, opt) {
-  if (this._dest) this.unpipe();
-
-  this._dest = dest;
-  if (opt) this._pipeOpt = opt;
-
-  if (!this._pipeEndAdded) {
-    this._pipeEndAdded = true;
-    this.on('end', function() {
-      var dest = this._dest;
-      if (dest &&
-          (!this._pipeOpt || this._pipeOpt.end !== false) &&
-          dest !== process.stdout &&
-          dest !== process.stderr) {
-        dest.end();
+  var src = this;
+  src._pipes.push(dest);
+  if ((!opt || opt.end !== false) &&
+      dest !== process.stdout && 
+      dest !== process.stderr) {
+    src.once('end', onend);
+    dest.on('unpipe', function(readable) {
+      if (readable === src) {
+        src.removeListener('end', onend);
       }
     });
   }
 
-  this._dest.emit('pipe', this);
-  flow.call(this);
+  dest.emit('pipe', src);
+  if (!src._flowing) process.nextTick(flow.bind(src));
   return dest;
+
+  function onend() {
+    dest.end();
+  }
 };
 
-function flow() {
+function flow(src) {
+  if (!src) src = this;
   var chunk;
   var dest;
-  while ((dest = this._dest) && (chunk = this.read())) {
-    var written = dest.write(chunk);
-    if (false === written && this._dest) {
-      this._dest.once('drain', flow.bind(this));
-      return;
+  var needDrain = 0;
+  while (chunk = src.read()) {
+    src._pipes.forEach(function(dest, i, list) {
+      var written = dest.write(chunk);
+      if (false === written) {
+        needDrain++;
+        dest.once('drain', ondrain);
+      }
+    });
+    if (needDrain > 0) return;
+  }
+
+  src.once('readable', flow);
+
+  function ondrain() {
+    needDrain--;
+    if (needDrain === 0) {
+      flow(src);
     }
   }
-  this.once('readable', flow);
 }
 
-Readable.prototype.unpipe = function() {
-  if (!this._dest) return this;
-  var dest = this._dest;
-  this._dest = null;
-  dest.emit('unpipe', this);
+Readable.prototype.unpipe = function(dest) {
+  if (!dest) {
+    // remove all of them.
+    this._pipes.forEach(function(dest, i, list) {
+      dest.emit('unpipe', this);
+    }, this);
+    this._pipes.length = 0;
+  } else {
+    var i = this._pipes.indexOf(dest);
+    if (i !== -1) {
+      dest.emit('unpipe', this);
+      this._pipes.splice(i, 1);
+    }
+  }
   return this;
 };
 

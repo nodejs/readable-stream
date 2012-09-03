@@ -127,7 +127,6 @@ tap.test('pipe', function(t) {
                  'xxxxx',
                  'xxxxx' ]
 
-  var EE = require('events').EventEmitter;
   var w = new TestWriter;
   var flush = true;
   w.on('end', function(received) {
@@ -157,7 +156,6 @@ tap.test('pipe', function(t) {
                    'xxxxx' ];
     expect = [ expect.slice(0, SPLIT), expect.slice(SPLIT) ];
 
-    var EE = require('events').EventEmitter;
     var w = [ new TestWriter(), new TestWriter() ];
 
     var writes = SPLIT;
@@ -184,5 +182,84 @@ tap.test('pipe', function(t) {
     });
 
     r.pipe(w[0]);
+  });
+});
+
+
+// both writers should get the same exact data.
+tap.test('multipipe', function(t) {
+  var r = new TestReader(5);
+  var w = [ new TestWriter, new TestWriter ];
+
+  var expect = [ 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx',
+                 'xxxxx' ];
+
+  var c = 2;
+  w[0].on('end', function(received) {
+    t.same(received, expect, 'first');
+    if (--c === 0) t.end();
+  });
+  w[1].on('end', function(received) {
+    t.same(received, expect, 'second');
+    if (--c === 0) t.end();
+  });
+
+  r.pipe(w[0]);
+  r.pipe(w[1]);
+});
+
+
+[1,2,3,4,5,6,7,8,9].forEach(function(SPLIT) {
+  tap.test('multi-unpipe', function(t) {
+    var r = new TestReader(5);
+
+    // unpipe after 3 writes, then write to another stream instead.
+    var expect = [ 'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx',
+                   'xxxxx' ];
+    expect = [ expect.slice(0, SPLIT), expect.slice(SPLIT) ];
+
+    var w = [ new TestWriter(), new TestWriter(), new TestWriter() ];
+
+    var writes = SPLIT;
+    w[0].on('write', function() {
+      if (--writes === 0) {
+        r.unpipe();
+        w[0].end();
+        r.pipe(w[1]);
+      }
+    });
+
+    var ended = 0;
+
+    w[0].on('end', function(results) {
+      ended++;
+      t.same(results, expect[0]);
+    });
+
+    w[1].on('end', function(results) {
+      ended++;
+      t.equal(ended, 2);
+      t.same(results, expect[1]);
+      t.end();
+    });
+
+    r.pipe(w[0]);
+    r.pipe(w[2]);
   });
 });
