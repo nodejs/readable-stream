@@ -26,7 +26,7 @@ function fromList(n, list, length) {
     ret = null;
   } else if (!n || n >= length) {
     // read it all, truncate the array.
-    ret = Buffer.concat(list);
+    ret = Buffer.concat(list, length);
     list.length = 0;
   } else {
     // read just some of it.
@@ -44,11 +44,13 @@ function fromList(n, list, length) {
       ret = new Buffer(n);
       var c = 0;
       for (var i = 0, l = list.length; i < l && c < n; i++) {
-        var buf = list.shift();
+        var buf = list[0];
         var cpy = Math.min(n - c, buf.length);
         buf.copy(ret, c, 0, cpy);
         if (cpy < buf.length) {
-          list.unshift(buf.slice(cpy));
+          list[0] = buf.slice(cpy);
+        } else {
+          list.shift();
         }
         c += cpy;
       }
