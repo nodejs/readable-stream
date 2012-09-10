@@ -87,7 +87,7 @@ function flow(src) {
   var chunk;
   var dest;
   var needDrain = 0;
-  while (chunk = src.read()) {
+  while (null !== (chunk = src.read())) {
     src._pipes.forEach(function(dest, i, list) {
       var written = dest.write(chunk);
       if (false === written) {
