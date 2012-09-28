@@ -9,7 +9,7 @@ var fromList = require('./from-list.js');
 util.inherits(Readable, Stream);
 
 function ReadableOptions(options, stream) {
-  options = util._extend({}, options);
+  options = options || {};
   this.bufferSize = options.bufferSize || 16 * 1024;
   this.lowWaterMark = options.lowWaterMark || 1024;
   this.buffer = [];
