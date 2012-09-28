@@ -29,7 +29,6 @@ function ReadableState(options, stream) {
 
 function Readable(options) {
   this._readableState = new ReadableState(options, this);
-  console.error(this.constructor.name, this._readableState, options)
   Stream.apply(this);
 }
 
