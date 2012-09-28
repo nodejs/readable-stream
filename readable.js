@@ -5,12 +5,18 @@ module.exports = Readable;
 var Stream = require('stream');
 var util = require('util');
 var fromList = require('./from-list.js');
+var assert = require('assert');
 
 util.inherits(Readable, Stream);
 
 function ReadableState(options, stream) {
   options = options || {};
+
   this.bufferSize = options.bufferSize || 16 * 1024;
+  assert(typeof this.bufferSize === 'number');
+  // cast to an int
+  this.bufferSize = ~~this.bufferSize;
+
   this.lowWaterMark = options.lowWaterMark || 1024;
   this.buffer = [];
   this.length = 0;
@@ -18,10 +24,12 @@ function ReadableState(options, stream) {
   this.flowing = false;
   this.ended = false;
   this.stream = stream;
+  this.reading = false;
 }
 
 function Readable(options) {
   this._readableState = new ReadableState(options, this);
+  console.error(this.constructor.name, this._readableState, options)
   Stream.apply(this);
 }
 
@@ -35,12 +43,21 @@ Readable.prototype.read = function(n) {
   }
 
   if (isNaN(n) || n <= 0)
-    n = state.bufferSize || state.length;
+    n = state.length
 
   // XXX: controversial.
   // don't have that much.  return null, unless we've ended.
+  // However, if the low water mark is lower than the number of bytes,
+  // then we still need to return what we have, or else it won't kick
+  // off another _read() call.  For example,
+  // lwm=5
+  // len=9
+  // read(10)
+  // We don't have that many bytes, so it'd be tempting to return null,
+  // but then it won't ever cause _read to be called, so in that case,
+  // we just return what we have, and let the programmer deal with it.
   if (n > state.length) {
-    if (!state.ended)
+    if (!state.ended && state.length < state.lowWaterMark)
       return null;
     else
       n = state.length;
@@ -49,9 +66,13 @@ Readable.prototype.read = function(n) {
   var ret = n > 0 ? fromList(n, state.buffer, state.length) : null;
   state.length -= n;
 
-  if (!state.ended && state.length < state.lowWaterMark) {
+  if (!state.ended &&
+      state.length < state.lowWaterMark &&
+      !state.reading) {
+    state.reading = true;
     // call internal read method
-    this._read(this.bufferSize, function onread(er, chunk) {
+    this._read(state.bufferSize, function onread(er, chunk) {
+      state.reading = false;
       if (er)
         return this.emit('error', er);
 
@@ -289,7 +310,7 @@ Readable.prototype.wrap = function(stream) {
       return null;
 
     if (isNaN(n) || n <= 0)
-      n = state.bufferSize || state.length;
+      n = state.length;
 
     if (n > state.length) {
       if (!state.ended)
