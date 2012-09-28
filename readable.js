@@ -8,7 +8,7 @@ var fromList = require('./from-list.js');
 
 util.inherits(Readable, Stream);
 
-function ReadableOptions(options, stream) {
+function ReadableState(options, stream) {
   options = options || {};
   this.bufferSize = options.bufferSize || 16 * 1024;
   this.lowWaterMark = options.lowWaterMark || 1024;
@@ -22,51 +22,51 @@ function ReadableOptions(options, stream) {
 }
 
 function Readable(options) {
-  this._readableOptions = new ReadableOptions(options, this);
+  this._readableState = new ReadableState(options, this);
   Stream.apply(this);
 }
 
 // you can override either this method, or _read(n, cb) below.
 Readable.prototype.read = function(n) {
-  var opt = this._readableOptions;
+  var state = this._readableState;
 
-  if (opt.length === 0 && opt.ended) {
+  if (state.length === 0 && state.ended) {
     process.nextTick(this.emit.bind(this, 'end'));
     return null;
   }
 
   if (isNaN(n) || n <= 0)
-    n = opt.bufferSize || opt.length;
+    n = state.bufferSize || state.length;
 
   // XXX: controversial.
   // don't have that much.  return null, unless we've ended.
-  if (n > opt.length) {
-    if (!opt.ended)
+  if (n > state.length) {
+    if (!state.ended)
       return null;
     else
-      n = opt.length;
+      n = state.length;
   }
 
-  var ret = n > 0 ? fromList(n, opt.buffer, opt.length) : null;
-  opt.length -= n;
+  var ret = n > 0 ? fromList(n, state.buffer, state.length) : null;
+  state.length -= n;
 
-  if (!opt.ended && opt.length < opt.lowWaterMark) {
+  if (!state.ended && state.length < state.lowWaterMark) {
     // call internal read method
     this._read(this.bufferSize, function onread(er, chunk) {
       if (er)
         return this.emit('error', er);
 
       if (!chunk || !chunk.length) {
-        opt.ended = true;
-        if (opt.length === 0)
+        state.ended = true;
+        if (state.length === 0)
           this.emit('end');
         return;
       }
 
-      opt.length += chunk.length;
-      opt.buffer.push(chunk);
-      if (opt.length < opt.lowWaterMark) {
-        this._read(opt.bufferSize, onread.bind(this));
+      state.length += chunk.length;
+      state.buffer.push(chunk);
+      if (state.length < state.lowWaterMark) {
+        this._read(state.bufferSize, onread.bind(this));
       }
       // now we have something to call this.read() to get.
       this.emit('readable');
@@ -86,8 +86,8 @@ Readable.prototype._read = function(n, cb) {
 
 Readable.prototype.pipe = function(dest, pipeOpts) {
   var src = this;
-  var opt = this._readableOptions;
-  opt.pipes.push(dest);
+  var state = this._readableState;
+  state.pipes.push(dest);
 
   if ((!pipeOpts || pipeOpts.end !== false) &&
       dest !== process.stdout && 
@@ -106,7 +106,7 @@ Readable.prototype.pipe = function(dest, pipeOpts) {
   dest.emit('pipe', src);
 
   // start the flow.
-  if (!opt.flowing)
+  if (!state.flowing)
     process.nextTick(flow.bind(src));
 
   return dest;
@@ -116,7 +116,7 @@ function flow(src) {
   if (!src)
     src = this;
 
-  var opt = src._readableOptions;
+  var state = src._readableState;
   var chunk;
   var dest;
   var needDrain = 0;
@@ -127,9 +127,9 @@ function flow(src) {
       flow(src);
   }
 
-  while (opt.pipes.length &&
+  while (state.pipes.length &&
          null !== (chunk = src.read())) {
-    opt.pipes.forEach(function(dest, i, list) {
+    state.pipes.forEach(function(dest, i, list) {
       var written = dest.write(chunk);
       if (false === written) {
         needDrain++;
@@ -147,8 +147,8 @@ function flow(src) {
   // function, or in the while loop, then stop flowing.
   //
   // NB: This is a pretty rare edge case.
-  if (opt.pipes.length === 0) {
-    opt.flowing = false;
+  if (state.pipes.length === 0) {
+    state.flowing = false;
 
     // if there were data event listeners added, then switch to old mode.
     if (this.listeners('data').length)
@@ -162,18 +162,18 @@ function flow(src) {
 }
 
 Readable.prototype.unpipe = function(dest) {
-  var opt = this._readableOptions;
+  var state = this._readableState;
   if (!dest) {
     // remove all of them.
-    opt.pipes.forEach(function(dest, i, list) {
+    state.pipes.forEach(function(dest, i, list) {
       dest.emit('unpipe', this);
     }, this);
-    opt.pipes.length = 0;
+    state.pipes.length = 0;
   } else {
-    var i = opt.pipes.indexOf(dest);
+    var i = state.pipes.indexOf(dest);
     if (i !== -1) {
       dest.emit('unpipe', this);
-      opt.pipes.splice(i, 1);
+      state.pipes.splice(i, 1);
     }
   }
   return this;
@@ -185,7 +185,7 @@ Readable.prototype.unpipe = function(dest) {
 Readable.prototype.on = function(ev, fn) {
   // https://github.com/isaacs/readable-stream/issues/16
   // if we're already flowing, then no need to set up data events.
-  if (ev === 'data' && !this._readableOptions.flowing)
+  if (ev === 'data' && !this._readableState.flowing)
     emitDataEvents(this);
 
   return Stream.prototype.on.call(this, ev, fn);
@@ -205,9 +205,9 @@ Readable.prototype.pause = function() {
 };
 
 function emitDataEvents(stream) {
-  var opt = stream._readableOptions;
+  var state = stream._readableState;
 
-  if (opt.flowing) {
+  if (state.flowing) {
     // https://github.com/isaacs/readable-stream/issues/16
     throw new Error('Cannot switch to old mode now.');
   }
@@ -245,22 +245,22 @@ function emitDataEvents(stream) {
 // This is *not* part of the readable stream interface.
 // It is an ugly unfortunate mess of history.
 Readable.prototype.wrap = function(stream) {
-  var opt = this._readableOptions;
+  var state = this._readableState;
   var paused = false;
 
   stream.on('end', function() {
-    opt.ended = true;
-    if (opt.length === 0)
+    state.ended = true;
+    if (state.length === 0)
       this.emit('end');
   }.bind(this));
 
   stream.on('data', function(chunk) {
-    opt.buffer.push(chunk);
-    opt.length += chunk.length;
+    state.buffer.push(chunk);
+    state.length += chunk.length;
     this.emit('readable');
 
     // if not consumed, then pause the stream.
-    if (opt.length > opt.lowWaterMark && !paused) {
+    if (state.length > state.lowWaterMark && !paused) {
       paused = true;
       stream.pause();
     }
@@ -286,28 +286,28 @@ Readable.prototype.wrap = function(stream) {
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
   this.read = function(n) {
-    if (opt.length === 0)
+    if (state.length === 0)
       return null;
 
     if (isNaN(n) || n <= 0)
-      n = opt.bufferSize || opt.length;
+      n = state.bufferSize || state.length;
 
-    if (n > opt.length) {
-      if (!opt.ended)
+    if (n > state.length) {
+      if (!state.ended)
         return null;
       else
-        n = opt.length;
+        n = state.length;
     }
 
-    var ret = fromList(n, opt.buffer, opt.length);
-    opt.length -= n;
+    var ret = fromList(n, state.buffer, state.length);
+    state.length -= n;
 
-    if (opt.length < opt.lowWaterMark && paused) {
+    if (state.length < state.lowWaterMark && paused) {
       stream.resume();
       paused = false;
     }
 
-    if (opt.length === 0 && ended)
+    if (state.length === 0 && ended)
       process.nextTick(this.emit.bind(this, 'end'));
 
     return ret;
