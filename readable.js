@@ -17,7 +17,6 @@ function ReadableState(options, stream) {
   this.pipes = [];
   this.flowing = false;
   this.ended = false;
-  this.bufferSize = 0;
   this.stream = stream;
 }
 
