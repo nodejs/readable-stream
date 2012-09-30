@@ -66,7 +66,8 @@ Writable.prototype.write = function(chunk) {
     state.length -= l;
 
     if (state.length === 0 && state.ended) {
-      this.emit('end');
+      // one last drain at the very end.
+      this.emit('drain');
       return;
     }
 
