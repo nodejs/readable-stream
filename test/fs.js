@@ -43,9 +43,12 @@ test('fs test', function(t) {
     console.error(res, w.length);
     t.equal(w.length, size);
     var l = 0;
-    t.same(res.map(function (c) { return c.length; }), expectLengths);
+    t.same(res.map(function (c) {
+      return c.length;
+    }), expectLengths);
     t.end();
   });
 
-  r.pipe(w);
+  r.pipe(w, { chunkSize: 10 });
+
 });
