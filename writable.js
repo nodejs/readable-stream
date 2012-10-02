@@ -12,10 +12,12 @@ var Stream = require('stream');
 util.inherits(Writable, Stream);
 
 function WritableState(options) {
+  options = options || {};
   this.highWaterMark = options.highWaterMark || 16 * 1024;
   this.lowWaterMark = options.lowWaterMark || 1024;
   this.needDrain = false;
   this.ended = false;
+  this.ending = false;
 
   // not an actual buffer we keep track of, but a measurement
   // of how much we're waiting to get pushed to some underlying
@@ -66,8 +68,8 @@ Writable.prototype.write = function(chunk) {
     state.length -= l;
 
     if (state.length === 0 && state.ended) {
-      // one last drain at the very end.
-      this.emit('drain');
+      // emit 'finish' at the very end.
+      this.emit('finish');
       return;
     }
 
@@ -94,7 +96,9 @@ Writable.prototype._write = function(chunk, cb) {
 };
 
 Writable.prototype.end = function(chunk) {
+  var state = this._writableState;
+  state.ending = true;
   if (chunk)
     this.write(chunk);
-  this._writableState.ended = true;
+  state.ended = true;
 };
