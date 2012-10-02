@@ -349,7 +349,7 @@ Readable.prototype.wrap = function(stream) {
       paused = false;
     }
 
-    if (state.length === 0 && ended)
+    if (state.length === 0 && state.ended)
       process.nextTick(this.emit.bind(this, 'end'));
 
     return ret;
