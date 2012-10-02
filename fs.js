@@ -4,15 +4,6 @@ module.exports = FSReadable;
 
 // This uses the existing bindings in Node's FS module to
 // implement a read-method style readable stream.
-//
-// In a perfect world, some of this dancing and buffering would
-// not be necessary; we could just open the file using async IO,
-// and then read() synchronously until we raise EWOULDBLOCK.
-//
-// It a just-slightly-less imperfect world, FS readable streams
-// would be the *only* stream that implements this kind of buffering
-// behavior, since TCP and pipes can be reliably implemented in this
-// fashion at a much lower level.
 
 var Readable = require('./readable.js');
 var util = require('util');
