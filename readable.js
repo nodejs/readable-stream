@@ -68,6 +68,10 @@ Readable.prototype.read = function(n) {
   }
 
   var ret = n > 0 ? fromList(n, state.buffer, state.length) : null;
+
+  if (ret === null || ret.length === 0)
+    state.needReadable = true;
+
   state.length -= n;
 
   if (!state.ended &&
