@@ -9,7 +9,7 @@ This is an abstract class designed to be extended.  It also provides a
 streams that have the "readable stream" interface of Node 0.8 and
 before.
 
-Note that Transform, Writable, and PassThrough streams are also
+Note that Duplex, Transform, Writable, and PassThrough streams are also
 provided as base classes.  See the full API details below.
 
 ## Justification
@@ -378,6 +378,41 @@ This is particularly handy if you want to know when it is safe to shut
 down a socket or close a file descriptor.  At this time, the writable
 stream may be safely disposed.  Its mission in life has been
 accomplished.
+
+## Class: Duplex
+
+A base class for Duplex streams (ie, streams that are both readable
+and writable).
+
+Since JS doesn't have multiple prototypal inheritance, this class
+prototypally inherits from Readable, and then parasitically from
+Writable.  It is thus up to the user to implement both the lowlevel
+`_read(n,cb)` method as well as the lowlevel `_write(chunk,cb)`
+method on extension duplex classes.
+
+For cases where the written data is transformed into the output, it
+may be simpler to use the `Transform` class instead.
+
+### new Duplex(options)
+
+* `options` {Object}  Passed to both the Writable and Readable
+  constructors.
+
+Make sure to call the `Duplex` constructor in your extension
+classes, or else the stream will not be properly initialized.
+
+If `options.allowHalfOpen` is set to the value `false`, then the
+stream will automatically end the readable side when the writable
+side ends, and vice versa.
+
+### duplex.allowHalfOpen
+
+* {Boolean} Default = `true`
+
+Set this flag to either `true` or `false` to determine whether or not
+to automatically close the writable side when the readable side ends,
+and vice versa.
+
 
 ## Class: Transform
 

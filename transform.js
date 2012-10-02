@@ -13,22 +13,12 @@
 
 module.exports = Transform;
 
-var Readable = require('./readable.js');
-var Writable = require('./writable.js');
-
+var Duplex = require('./duplex.js');
 var util = require('util');
-
-util.inherits(Transform, Readable);
-
-// parasitic inheritance.
-Object.keys(Writable.prototype).forEach(function(method) {
-  if (!Transform.prototype[method])
-    Transform.prototype[method] = Writable.prototype[method];
-});
+util.inherits(Transform, Duplex);
 
 function Transform(options) {
-  Readable.call(this, options);
-  Writable.call(this, options);
+  Duplex.call(this, options);
 
   // bind output so that it can be passed around as a regular function.
   this._output = this._output.bind(this);
