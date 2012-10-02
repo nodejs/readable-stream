@@ -26,7 +26,7 @@ function ReadableState(options, stream) {
   this.stream = stream;
   this.reading = false;
 
-  // whenever we return false, then we set a flag to say
+  // whenever we return null, then we set a flag to say
   // that we're awaiting a 'readable' event emission.
   this.needReadable = false;
 }

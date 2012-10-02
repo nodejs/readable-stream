@@ -58,7 +58,14 @@ Transform.prototype._transform = function(chunk, output, cb) {
 
 
 Transform.prototype._write = function(chunk, cb) {
-  this._transform(chunk, this._output, cb);
+  // Must force callback to be called on nextTick, so that we don't
+  // emit 'drain' before the write() consumer gets the 'false' return
+  // value, and has a chance to attach a 'drain' listener.
+  this._transform(chunk, this._output, function(er) {
+    process.nextTick(function() {
+      cb(er);
+    });
+  });
 };
 
 Transform.prototype._read = function(n, cb) {
