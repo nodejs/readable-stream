@@ -85,8 +85,15 @@ Writable.prototype.write = function(chunk, encoding) {
     }
 
     if (state.length < state.lowWaterMark && state.needDrain) {
-      state.needDrain = false;
-      this.emit('drain');
+      // Must force callback to be called on nextTick, so that we don't
+      // emit 'drain' before the write() consumer gets the 'false' return
+      // value, and has a chance to attach a 'drain' listener.
+      process.nextTick(function() {
+        if (!state.needDrain)
+          return;
+        state.needDrain = false;
+        this.emit('drain');
+      }.bind(this));
     }
 
   }.bind(this));
