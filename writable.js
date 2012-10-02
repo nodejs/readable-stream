@@ -67,7 +67,7 @@ Writable.prototype.write = function(chunk) {
     }
     state.length -= l;
 
-    if (state.length === 0 && state.ended) {
+    if (state.length === 0 && (state.ended || state.ending)) {
       // emit 'finish' at the very end.
       this.emit('finish');
       return;
@@ -100,5 +100,7 @@ Writable.prototype.end = function(chunk) {
   state.ending = true;
   if (chunk)
     this.write(chunk);
+  else if (state.length === 0)
+    this.emit('finish');
   state.ended = true;
 };
