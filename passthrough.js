@@ -1,56 +1,20 @@
 'use strict';
 // a passthrough stream.
-// whatever you .write(), you can then .read() later.
-// this is not very useful on its own, but it's a handy
-// base class for certain sorts of simple filters and
-// transforms.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
 
 module.exports = PassThrough;
 
-var Readable = require('./readable.js');
+var Transform = require('./transform.js');
+
 var util = require('util');
+util.inherits(PassThrough, Transform);
 
-util.inherits(PassThrough, Readable);
-
-var fromList = require('./from-list.js');
-
-function PassThrough() {
-  Readable.apply(this);
-
-  this.buffer = [];
-  this.length = 0;
+function PassThrough(options) {
+  Transform.call(this, options);
 }
 
-// override this:
-PassThrough.prototype.transform = function(c) {
-  return c;
-};
-
-PassThrough.prototype.write = function(c) {
-  var needEmitReadable = this.length === 0;
-
-  c = this.transform(c);
-  if (!c || !c.length) return true;
-
-  this.buffer.push(c);
-  this.length += c.length;
-  if (needEmitReadable) this.emit('readable');
-  return (this.length === 0);
-};
-
-PassThrough.prototype.end = function(c) {
-  this.ended = true;
-  if (c && c.length) this.write(c);
-  else if (!this.length) this.emit('end');
-};
-
-PassThrough.prototype.read = function(n) {
-  if (!n || n >= this.length) n = this.length;
-  var ret = fromList(n, this.buffer, this.length);
-  this.length = Math.max(this.length - n, 0);
-  if (this.length === 0) {
-    var ev = this.ended ? 'end' : 'drain';
-    process.nextTick(this.emit.bind(this, ev));
-  }
-  return ret;
+PassThrough.prototype._transform = function(chunk, output, cb) {
+  output(chunk);
+  cb();
 };
