@@ -25,6 +25,10 @@ function ReadableState(options, stream) {
   this.ended = false;
   this.stream = stream;
   this.reading = false;
+
+  // whenever we return false, then we set a flag to say
+  // that we're awaiting a 'readable' event emission.
+  this.needReadable = false;
 }
 
 function Readable(options) {
@@ -56,9 +60,10 @@ Readable.prototype.read = function(n) {
   // but then it won't ever cause _read to be called, so in that case,
   // we just return what we have, and let the programmer deal with it.
   if (n > state.length) {
-    if (!state.ended && state.length < state.lowWaterMark)
-      return null;
-    else
+    if (!state.ended && state.length < state.lowWaterMark) {
+      state.needReadable = true;
+      n = 0;
+    } else
       n = state.length;
   }
 
@@ -77,18 +82,23 @@ Readable.prototype.read = function(n) {
 
       if (!chunk || !chunk.length) {
         state.ended = true;
-        if (state.length === 0)
-          this.emit('end');
+        // if we've ended and we have some data left, then emit
+        // 'readable' now to make sure it gets picked up.
+        if (state.length > 0)
+          this.emit('readable');
         return;
       }
 
       state.length += chunk.length;
       state.buffer.push(chunk);
-      if (state.length < state.lowWaterMark) {
+      if (state.length < state.lowWaterMark)
         this._read(state.bufferSize, onread.bind(this));
-      }
+
       // now we have something to call this.read() to get.
-      this.emit('readable');
+      if (state.needReadable) {
+        state.needReadable = false;
+        this.emit('readable');
+      }
     }.bind(this));
   }
 
@@ -106,6 +116,8 @@ Readable.prototype._read = function(n, cb) {
 Readable.prototype.pipe = function(dest, pipeOpts) {
   var src = this;
   var state = this._readableState;
+  if (!pipeOpts)
+    pipeOpts = {};
   state.pipes.push(dest);
 
   if ((!pipeOpts || pipeOpts.end !== false) &&
@@ -126,15 +138,12 @@ Readable.prototype.pipe = function(dest, pipeOpts) {
 
   // start the flow.
   if (!state.flowing)
-    process.nextTick(flow.bind(src));
+    process.nextTick(flow.bind(null, src, pipeOpts));
 
   return dest;
 };
 
-function flow(src) {
-  if (!src)
-    src = this;
-
+function flow(src, pipeOpts) {
   var state = src._readableState;
   var chunk;
   var dest;
@@ -143,11 +152,11 @@ function flow(src) {
   function ondrain() {
     needDrain--;
     if (needDrain === 0)
-      flow(src);
+      flow(src, pipeOpts);
   }
 
   while (state.pipes.length &&
-         null !== (chunk = src.read())) {
+         null !== (chunk = src.read(pipeOpts.chunkSize))) {
     state.pipes.forEach(function(dest, i, list) {
       var written = dest.write(chunk);
       if (false === written) {
@@ -177,7 +186,7 @@ function flow(src) {
 
   // at this point, no one needed a drain, so we just ran out of data
   // on the next readable event, start it over again.
-  src.once('readable', flow);
+  src.once('readable', flow.bind(null, src, pipeOpts));
 }
 
 Readable.prototype.unpipe = function(dest) {
@@ -242,11 +251,13 @@ function emitDataEvents(stream) {
   stream.on('readable', function() {
     readable = true;
     var c;
-    while (!paused && (c = stream.read())) {
+    while (!paused && (null !== (c = stream.read())))
       stream.emit('data', c);
-    }
-    if (c === null)
+
+    if (c === null) {
       readable = false;
+      stream._readableState.needReadable = true;
+    }
   });
 
   stream.pause = function() {
@@ -258,6 +269,11 @@ function emitDataEvents(stream) {
     if (readable)
       stream.emit('readable');
   };
+
+  // now make it start, just in case it hadn't already.
+  process.nextTick(function() {
+    stream.emit('readable');
+  });
 }
 
 // wrap an old-style stream as the async data source.
@@ -305,16 +321,19 @@ Readable.prototype.wrap = function(stream) {
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
   this.read = function(n) {
-    if (state.length === 0)
+    if (state.length === 0) {
+      state.needReadable = true;
       return null;
+    }
 
     if (isNaN(n) || n <= 0)
       n = state.length;
 
     if (n > state.length) {
-      if (!state.ended)
+      if (!state.ended) {
+        state.needReadable = true;
         return null;
-      else
+      } else
         n = state.length;
     }
 
