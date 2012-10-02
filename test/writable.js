@@ -28,7 +28,7 @@ test('write fast', function(t) {
     highWaterMark: 100
   });
 
-  tw.on('end', function() {
+  tw.on('finish', function() {
     t.same(tw.buffer, chunks, 'got chunks in the right order');
     t.end();
   });
@@ -46,7 +46,7 @@ test('write slow', function(t) {
     highWaterMark: 100
   });
 
-  tw.on('end', function() {
+  tw.on('finish', function() {
     t.same(tw.buffer, chunks, 'got chunks in the right order');
     t.end();
   });
@@ -67,7 +67,7 @@ test('write backpressure', function(t) {
     highWaterMark: 100
   });
 
-  tw.on('end', function() {
+  tw.on('finish', function() {
     t.same(tw.buffer, chunks, 'got chunks in the right order');
     t.end();
   });
