@@ -39,12 +39,15 @@ function Writable(options) {
 
 // Override this method for sync streams
 // override the _write(chunk, cb) method for async streams
-Writable.prototype.write = function(chunk) {
+Writable.prototype.write = function(chunk, encoding) {
   var state = this._writableState;
   if (state.ended) {
     this.emit('error', new Error('write after end'));
     return;
   }
+
+  if (typeof chunk === 'string' && encoding)
+    chunk = new Buffer(chunk, encoding);
 
   var ret = state.length >= state.highWaterMark;
   if (ret === false)
@@ -95,11 +98,11 @@ Writable.prototype._write = function(chunk, cb) {
   process.nextTick(cb.bind(this, new Error('not implemented')));
 };
 
-Writable.prototype.end = function(chunk) {
+Writable.prototype.end = function(chunk, encoding) {
   var state = this._writableState;
   state.ending = true;
   if (chunk)
-    this.write(chunk);
+    this.write(chunk, encoding);
   else if (state.length === 0)
     this.emit('finish');
   state.ended = true;
