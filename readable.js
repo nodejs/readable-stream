@@ -193,8 +193,10 @@ Readable.prototype.pipe = function(dest, pipeOpts) {
   dest.emit('pipe', src);
 
   // start the flow.
-  if (!state.flowing)
+  if (!state.flowing) {
+    state.flowing = true;
     process.nextTick(flow.bind(null, src, pipeOpts));
+  }
 
   return dest;
 };
@@ -202,7 +204,6 @@ Readable.prototype.pipe = function(dest, pipeOpts) {
 function flow(src, pipeOpts) {
   var state = src._readableState;
   var chunk;
-  var dest;
   var needDrain = 0;
 
   function ondrain() {
