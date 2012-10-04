@@ -1,10 +1,30 @@
-'use strict';
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module.exports = Readable;
 
 var Stream = require('stream');
 var util = require('util');
 var assert = require('assert');
+var StringDecoder;
 
 util.inherits(Readable, Stream);
 
@@ -29,12 +49,26 @@ function ReadableState(options, stream) {
   // whenever we return null, then we set a flag to say
   // that we're awaiting a 'readable' event emission.
   this.needReadable = false;
+
+  this.decoder = null;
+  if (options.encoding) {
+    if (!StringDecoder)
+      StringDecoder = require('string_decoder').StringDecoder;
+    this.decoder = new StringDecoder(options.encoding);
+  }
 }
 
 function Readable(options) {
   this._readableState = new ReadableState(options, this);
   Stream.apply(this);
 }
+
+// backwards compatibility.
+Readable.prototype.setEncoding = function(enc) {
+  if (!StringDecoder)
+    StringDecoder = require('string_decoder').StringDecoder;
+  this._readableState.decoder = new StringDecoder(enc);
+};
 
 // you can override either this method, or _read(n, cb) below.
 Readable.prototype.read = function(n) {
@@ -67,7 +101,12 @@ Readable.prototype.read = function(n) {
       n = state.length;
   }
 
-  var ret = n > 0 ? fromList(n, state.buffer, state.length) : null;
+
+  var ret;
+  if (n > 0)
+    ret = fromList(n, state.buffer, state.length, !!state.decoder);
+  else
+    ret = null;
 
   if (ret === null || ret.length === 0)
     state.needReadable = true;
@@ -92,9 +131,11 @@ Readable.prototype.read = function(n) {
           this.emit('readable');
         else
           endReadable(this);
-
         return;
       }
+
+      if (state.decoder)
+        chunk = state.decoder.write(chunk);
 
       state.length += chunk.length;
       state.buffer.push(chunk);
@@ -352,7 +393,7 @@ Readable.prototype.wrap = function(stream) {
         n = state.length;
     }
 
-    var ret = fromList(n, state.buffer, state.length);
+    var ret = fromList(n, state.buffer, state.length, !!state.decoder);
     state.length -= n;
 
     if (state.length < state.lowWaterMark && paused) {
@@ -374,7 +415,7 @@ Readable._fromList = fromList;
 
 // Pluck off n bytes from an array of buffers.
 // Length is the combined lengths of all the buffers in the list.
-function fromList(n, list, length) {
+function fromList(n, list, length, stringMode) {
   var ret;
 
   // nothing in the list, definitely empty.
@@ -386,7 +427,10 @@ function fromList(n, list, length) {
     ret = null;
   else if (!n || n >= length) {
     // read it all, truncate the array.
-    ret = Buffer.concat(list, length);
+    if (stringMode)
+      ret = list.join('');
+    else
+      ret = Buffer.concat(list, length);
     list.length = 0;
   } else {
     // read just some of it.
@@ -402,14 +446,20 @@ function fromList(n, list, length) {
     } else {
       // complex case.
       // we have enough to cover it, but it spans past the first buffer.
-      ret = new Buffer(n);
+      if (stringMode)
+        ret = '';
+      else
+        ret = new Buffer(n);
 
       var c = 0;
       for (var i = 0, l = list.length; i < l && c < n; i++) {
         var buf = list[0];
         var cpy = Math.min(n - c, buf.length);
 
-        buf.copy(ret, c, 0, cpy);
+        if (stringMode)
+          ret += buf.slice(0, cpy);
+        else
+          buf.copy(ret, c, 0, cpy);
 
         if (cpy < buf.length)
           list[0] = buf.slice(cpy);
