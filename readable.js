@@ -4,7 +4,6 @@ module.exports = Readable;
 
 var Stream = require('stream');
 var util = require('util');
-var fromList = require('./from-list.js');
 var assert = require('assert');
 
 util.inherits(Readable, Stream);
@@ -355,3 +354,60 @@ Readable.prototype.wrap = function(stream) {
     return ret;
   };
 };
+
+
+
+// exposed for testing purposes only.
+Readable._fromList = fromList;
+
+// Pluck off n bytes from an array of buffers.
+// Length is the combined lengths of all the buffers in the list.
+function fromList(n, list, length) {
+  var ret;
+
+  // nothing in the list, definitely empty.
+  if (list.length === 0) {
+    return null;
+  }
+
+  if (length === 0)
+    ret = null;
+  else if (!n || n >= length) {
+    // read it all, truncate the array.
+    ret = Buffer.concat(list, length);
+    list.length = 0;
+  } else {
+    // read just some of it.
+    if (n < list[0].length) {
+      // just take a part of the first list item.
+      // slice is the same for buffers and strings.
+      var buf = list[0];
+      ret = buf.slice(0, n);
+      list[0] = buf.slice(n);
+    } else if (n === list[0].length) {
+      // first list is a perfect match
+      ret = list.shift();
+    } else {
+      // complex case.
+      // we have enough to cover it, but it spans past the first buffer.
+      ret = new Buffer(n);
+
+      var c = 0;
+      for (var i = 0, l = list.length; i < l && c < n; i++) {
+        var buf = list[0];
+        var cpy = Math.min(n - c, buf.length);
+
+        buf.copy(ret, c, 0, cpy);
+
+        if (cpy < buf.length)
+          list[0] = buf.slice(cpy);
+        else
+          list.shift();
+
+        c += cpy;
+      }
+    }
+  }
+
+  return ret;
+}

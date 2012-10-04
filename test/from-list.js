@@ -1,5 +1,5 @@
 var test = require('tap').test;
-var fromList = require('../from-list.js');
+var fromList = require('../readable.js')._fromList;
 
 test('with length', function(t) {
   // have a length
