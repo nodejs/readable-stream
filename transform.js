@@ -48,7 +48,12 @@ Transform.prototype._transform = function(chunk, output, cb) {
 
 
 Transform.prototype._write = function(chunk, cb) {
-  this._transform(chunk, this._output, cb);
+  var output = this._output;
+  this._transform(chunk, output, function(er, data) {
+    if (data)
+      output(data);
+    cb(er);
+  });
 };
 
 Transform.prototype._read = function(n, cb) {
