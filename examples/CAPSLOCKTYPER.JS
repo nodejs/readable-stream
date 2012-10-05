@@ -3,7 +3,10 @@ var inherits = require('util').inherits;
 
 // subclass
 function MyStream () {
-  Transform.call(this);
+  Transform.call(this, {
+    lowWaterMark: 0,
+    encoding: 'utf8'
+  });
 }
 inherits(MyStream, Transform);
 
