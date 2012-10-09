@@ -27,13 +27,17 @@ module.exports = Writable;
 
 var util = require('util');
 var Stream = require('stream');
+var Duplex = require('./duplex.js');
 
 util.inherits(Writable, Stream);
 
 function WritableState(options) {
   options = options || {};
   this.highWaterMark = options.highWaterMark || 16 * 1024;
-  this.lowWaterMark = options.lowWaterMark || 1024;
+  this.highWaterMark = options.hasOwnProperty('highWaterMark') ?
+      options.highWaterMark : 16 * 1024;
+  this.lowWaterMark = options.hasOwnProperty('lowWaterMark') ?
+      options.lowWaterMark : 1024;
   this.needDrain = false;
   this.ended = false;
   this.ending = false;
@@ -48,6 +52,11 @@ function WritableState(options) {
 }
 
 function Writable(options) {
+  // Writable ctor is applied to Duplexes, though they're not
+  // instanceof Writable, they're instanceof Readable.
+  if (!(this instanceof Writable) && !(this instanceof Duplex))
+    return new Writable(options);
+
   this._writableState = new WritableState(options);
 
   // legacy.
@@ -65,15 +74,15 @@ Writable.prototype.write = function(chunk, encoding) {
     return;
   }
 
-  if (typeof chunk === 'string')
-    chunk = new Buffer(chunk, encoding);
-
-  var ret = state.length >= state.highWaterMark;
-  if (ret === false)
-    state.needDrain = true;
+  if (typeof chunk === 'string' || encoding)
+    chunk = new Buffer(chunk + '', encoding);
 
   var l = chunk.length;
   state.length += l;
+
+  var ret = state.length < state.highWaterMark;
+  if (ret === false)
+    state.needDrain = true;
 
   if (state.writing) {
     state.buffer.push(chunk);
@@ -103,7 +112,7 @@ Writable.prototype.write = function(chunk, encoding) {
       this._write(chunk, writecb.bind(this));
     }
 
-    if (state.length < state.lowWaterMark && state.needDrain) {
+    if (state.length <= state.lowWaterMark && state.needDrain) {
       // Must force callback to be called on nextTick, so that we don't
       // emit 'drain' before the write() consumer gets the 'false' return
       // value, and has a chance to attach a 'drain' listener.

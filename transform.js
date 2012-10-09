@@ -77,6 +77,9 @@ function TransformState() {
 }
 
 function Transform(options) {
+  if (!(this instanceof Transform))
+    return new Transform(options);
+
   Duplex.call(this, options);
 
   // bind output so that it can be passed around as a regular function.
@@ -110,13 +113,28 @@ Transform.prototype._transform = function(chunk, output, cb) {
 
 Transform.prototype._write = function(chunk, cb) {
   var ts = this._transformState;
+  var rs = this._readableState;
   ts.buffer.push([chunk, cb]);
 
+  // no need for auto-pull if already in the midst of one.
+  if (ts.transforming)
+    return;
+
   // now we have something to transform, if we were waiting for it.
-  if (ts.pendingReadCb && !ts.transforming) {
+  // kick off a _read to pull it in.
+  if (ts.pendingReadCb) {
     var readcb = ts.pendingReadCb;
     ts.pendingReadCb = null;
-    this._read(-1, readcb);
+    this._read(0, readcb);
+  }
+
+  // if we weren't waiting for it, but nothing is queued up, then
+  // still kick off a transform, just so it's there when the user asks.
+  var doRead = rs.needReadable || rs.length <= rs.lowWaterMark;
+  if (doRead && !rs.reading) {
+    var ret = this.read(0);
+    if (ret !== null)
+      return cb(new Error('invalid stream transform state'));
   }
 };
 
