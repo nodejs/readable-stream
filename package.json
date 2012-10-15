@@ -1,6 +1,6 @@
 {
   "name": "readable-stream",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An exploration of a new kind of readable streams for Node.js",
   "main": "readable.js",
   "dependencies": {},
