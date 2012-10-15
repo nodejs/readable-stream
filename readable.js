@@ -28,6 +28,12 @@ var StringDecoder;
 
 util.inherits(Readable, Stream);
 
+Readable.wrap = wrap
+
+function wrap(source) {
+  return new Readable().wrap(source);
+}
+
 function ReadableState(options) {
   options = options || {};
 
@@ -460,6 +466,8 @@ Readable.prototype.wrap = function(stream) {
 
     return ret;
   };
+
+  return this;
 };
 
 
