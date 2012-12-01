@@ -8,7 +8,7 @@
     "tap": "~0.2.6"
   },
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "tap test/simple/*.js"
   },
   "repository": {
     "type": "git",
