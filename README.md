@@ -2,7 +2,7 @@
 
     Stability: 1 - Experimental
 
-An exploration of a new kind of readable streams for Node.js
+A new kind of readable streams for Node.js
 
 This is an abstract class designed to be extended.  It also provides a
 `wrap` method that you can use to provide the simpler readable API for
@@ -81,8 +81,8 @@ problems of data events happening while paused are alleviated.
 
 <!-- misc -->
 
-It's not particularly difficult to wrap older-style streams in this
-new interface, or to wrap this type of stream in the older-style
+It's not particularly difficult to wrap old-style streams in this
+new interface, or to wrap this type of stream in the old-style
 interface.
 
 The `Readable` class provides a `wrap(oldStream)` method that takes an
@@ -99,7 +99,7 @@ r.wrap(oldReadableStream);
 // its 'data' events.
 ```
 
-In order to work with programs that use the older interface, some
+In order to work with programs that use the old interface, some
 magic is unfortunately required.  At some point in the future, this
 magic will be removed.
 
@@ -192,25 +192,25 @@ flow();
 
 * `options` {Object}
   * `lowWaterMark` {Number} The minimum number of bytes before the
-    stream is considered 'readable'.  Default = `1024`
+    stream is considered 'readable'.  Default = `0`
   * `bufferSize` {Number} The number of bytes to try to read from the
     underlying `_read` function.  Default = `16 * 1024`
 
 Make sure to call the `Readable` constructor in your extension
 classes, or else the stream will not be properly initialized.
 
-### readable.read([n])
+### readable.read([size])
 
-* `n` {Number} Optional number of bytes to read.  If not provided,
+* `size` {Number} Optional number of bytes to read.  If not provided,
   then return however many bytes are available.
 * Returns: {Buffer | null}
 
 Pulls the requested number of bytes out of the internal buffer.  If
 that many bytes are not available, then it returns `null`.
 
-### readable.\_read(n, callback)
+### readable.\_read(size, callback)
 
-* `n` {Number} Number of bytes to read from the underlying
+* `size` {Number} Number of bytes to read from the underlying
   asynchronous data source.
 * `callback` {Function} Callback function
   * `error` {Error Object}
@@ -228,6 +228,11 @@ This method is prefixed with an underscore because it is internal to
 the class that defines it, and should not be called directly by user
 programs.  However, you **are** expected to override this method in
 your own extension classes.
+
+The `size` argument is purely advisory.  You may call the callback
+with more or fewer bytes.  However, if you call the callback with
+`null`, or an empty buffer, then it will assume that the end of the
+data was reached.
 
 ### readable.pipe(destination)
 
