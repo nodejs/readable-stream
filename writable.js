@@ -29,6 +29,7 @@ Writable.WritableState = WritableState;
 var util = require('util');
 var assert = require('assert');
 var Stream = require('stream');
+var Duplex = require('./duplex.js');
 
 util.inherits(Writable, Stream);
 
@@ -98,7 +99,7 @@ function WritableState(options, stream) {
 function Writable(options) {
   // Writable ctor is applied to Duplexes, though they're not
   // instanceof Writable, they're instanceof Readable.
-  if (!(this instanceof Writable) && !(this instanceof Stream.Duplex))
+  if (!(this instanceof Writable) && !(this instanceof Duplex))
     return new Writable(options);
 
   this._writableState = new WritableState(options, this);
