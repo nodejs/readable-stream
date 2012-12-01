@@ -20,6 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module.exports = Readable;
+Readable.ReadableState = ReadableState;
 
 var Stream = require('stream');
 var util = require('util');
@@ -28,27 +29,62 @@ var StringDecoder;
 
 util.inherits(Readable, Stream);
 
-function ReadableState(options) {
+function ReadableState(options, stream) {
   options = options || {};
 
-  this.bufferSize = options.bufferSize || 16 * 1024;
-  assert(typeof this.bufferSize === 'number');
   // cast to an int
   this.bufferSize = ~~this.bufferSize;
 
+  // the argument passed to this._read(n,cb)
+  this.bufferSize = options.hasOwnProperty('bufferSize') ?
+      options.bufferSize : 16 * 1024;
+
+  // the point at which it stops calling _read() to fill the buffer
+  this.highWaterMark = options.hasOwnProperty('highWaterMark') ?
+      options.highWaterMark : 16 * 1024;
+
+  // the minimum number of bytes to buffer before emitting 'readable'
+  // default to pushing everything out as fast as possible.
   this.lowWaterMark = options.hasOwnProperty('lowWaterMark') ?
-      options.lowWaterMark : 1024;
+      options.lowWaterMark : 0;
+
+  // cast to ints.
+  assert(typeof this.bufferSize === 'number');
+  assert(typeof this.lowWaterMark === 'number');
+  assert(typeof this.highWaterMark === 'number');
+  this.bufferSize = ~~this.bufferSize;
+  this.lowWaterMark = ~~this.lowWaterMark;
+  this.highWaterMark = ~~this.highWaterMark;
+  assert(this.bufferSize >= 0);
+  assert(this.lowWaterMark >= 0);
+  assert(this.highWaterMark >= this.lowWaterMark,
+         this.highWaterMark + '>=' + this.lowWaterMark);
+
   this.buffer = [];
   this.length = 0;
-  this.pipes = [];
+  this.pipes = null;
+  this.pipesCount = 0;
   this.flowing = false;
   this.ended = false;
   this.endEmitted = false;
   this.reading = false;
+  this.sync = false;
+  this.onread = function(er, data) {
+    onread(stream, er, data);
+  };
 
   // whenever we return null, then we set a flag to say
   // that we're awaiting a 'readable' event emission.
   this.needReadable = false;
+  this.emittedReadable = false;
+
+  // when piping, we only care about 'readable' events that happen
+  // after read()ing all the bytes and not getting any pushback.
+  this.ranOut = false;
+
+  // the number of writers that are awaiting a drain event in .pipe()s
+  this.awaitDrain = 0;
+  this.pipeChunkSize = null;
 
   this.decoder = null;
   if (options.encoding) {
@@ -63,6 +99,10 @@ function Readable(options) {
     return new Readable(options);
 
   this._readableState = new ReadableState(options, this);
+
+  // legacy
+  this.readable = true;
+
   Stream.apply(this);
 }
 
@@ -78,7 +118,7 @@ function howMuchToRead(n, state) {
   if (state.length === 0 && state.ended)
     return 0;
 
-  if (isNaN(n))
+  if (isNaN(n) || n === null)
     return state.length;
 
   if (n <= 0)
@@ -100,6 +140,9 @@ function howMuchToRead(n, state) {
 Readable.prototype.read = function(n) {
   var state = this._readableState;
   var nOrig = n;
+
+  if (typeof n !== 'number' || n > 0)
+    state.emittedReadable = false;
 
   n = howMuchToRead(n, state);
 
@@ -133,9 +176,16 @@ Readable.prototype.read = function(n) {
 
   // if we need a readable event, then we need to do some reading.
   var doRead = state.needReadable;
-  // if we currently have less than the lowWaterMark, then also read some
-  if (state.length - n <= state.lowWaterMark)
+
+  // if we currently have less than the highWaterMark, then also read some
+  if (state.length - n <= state.highWaterMark)
     doRead = true;
+
+  // if we currently have *nothing*, then always try to get *something*
+  // no matter what the high water mark says.
+  if (state.length === 0)
+    doRead = true;
+
   // however, if we've ended, then there's no point, and if we're already
   // reading, then it's unnecessary.
   if (state.ended || state.reading)
@@ -144,52 +194,10 @@ Readable.prototype.read = function(n) {
   if (doRead) {
     var sync = true;
     state.reading = true;
+    state.sync = true;
     // call internal read method
-    this._read(state.bufferSize, function onread(er, chunk) {
-      state.reading = false;
-      if (er)
-        return this.emit('error', er);
-
-      if (!chunk || !chunk.length) {
-        // eof
-        state.ended = true;
-        // if we've ended and we have some data left, then emit
-        // 'readable' now to make sure it gets picked up.
-        if (!sync) {
-          if (state.length > 0)
-            this.emit('readable');
-          else
-            endReadable(this);
-        }
-        return;
-      }
-
-      if (state.decoder)
-        chunk = state.decoder.write(chunk);
-
-      // update the buffer info.
-      if (chunk) {
-        state.length += chunk.length;
-        state.buffer.push(chunk);
-      }
-
-      // if we haven't gotten enough to pass the lowWaterMark,
-      // and we haven't ended, then don't bother telling the user
-      // that it's time to read more data.  Otherwise, that'll
-      // probably kick off another stream.read(), which can trigger
-      // another _read(n,cb) before this one returns!
-      if (state.length <= state.lowWaterMark) {
-        state.reading = true;
-        this._read(state.bufferSize, onread.bind(this));
-        return;
-      }
-
-      if (state.needReadable && !sync) {
-        state.needReadable = false;
-        this.emit('readable');
-      }
-    }.bind(this));
-    sync = false;
+    this._read(state.bufferSize, state.onread);
+    state.sync = false;
   }
 
   // If _read called its callback synchronously, then `reading`
@@ -214,20 +222,94 @@ Readable.prototype.read = function(n) {
   return ret;
 };
 
+function onread(stream, er, chunk) {
+  var state = stream._readableState;
+  var sync = state.sync;
+
+  state.reading = false;
+  if (er)
+    return stream.emit('error', er);
+
+  if (!chunk || !chunk.length) {
+    // eof
+    state.ended = true;
+    if (state.decoder) {
+      chunk = state.decoder.end();
+      if (chunk && chunk.length) {
+        state.buffer.push(chunk);
+        state.length += chunk.length;
+      }
+    }
+    // if we've ended and we have some data left, then emit
+    // 'readable' now to make sure it gets picked up.
+    if (!sync) {
+      if (state.length > 0) {
+        state.needReadable = false;
+        if (!state.emittedReadable) {
+          state.emittedReadable = true;
+          stream.emit('readable');
+        }
+      } else
+        endReadable(stream);
+    }
+    return;
+  }
+
+  if (state.decoder)
+    chunk = state.decoder.write(chunk);
+
+  // update the buffer info.
+  if (chunk) {
+    state.length += chunk.length;
+    state.buffer.push(chunk);
+  }
+
+  // if we haven't gotten enough to pass the lowWaterMark,
+  // and we haven't ended, then don't bother telling the user
+  // that it's time to read more data.  Otherwise, emitting 'readable'
+  // probably will trigger another stream.read(), which can trigger
+  // another _read(n,cb) before this one returns!
+  if (state.length <= state.lowWaterMark) {
+    state.reading = true;
+    stream._read(state.bufferSize, state.onread);
+    return;
+  }
+
+  if (state.needReadable && !sync) {
+    state.needReadable = false;
+    if (!state.emittedReadable) {
+      state.emittedReadable = true;
+      stream.emit('readable');
+    }
+  }
+}
+
 // abstract method.  to be overridden in specific implementation classes.
 // call cb(er, data) where data is <= n in length.
 // for virtual (non-string, non-buffer) streams, "length" is somewhat
 // arbitrary, and perhaps not very meaningful.
 Readable.prototype._read = function(n, cb) {
-  process.nextTick(cb.bind(this, new Error('not implemented')));
+  process.nextTick(function() {
+    cb(new Error('not implemented'));
+  });
 };
 
 Readable.prototype.pipe = function(dest, pipeOpts) {
   var src = this;
   var state = this._readableState;
-  if (!pipeOpts)
-    pipeOpts = {};
-  state.pipes.push(dest);
+
+  switch (state.pipesCount) {
+    case 0:
+      state.pipes = dest;
+      break;
+    case 1:
+      state.pipes = [ state.pipes, dest ];
+      break;
+    default:
+      state.pipes.push(dest);
+      break;
+  }
+  state.pipesCount += 1;
 
   if ((!pipeOpts || pipeOpts.end !== false) &&
       dest !== process.stdout &&
@@ -239,45 +321,105 @@ Readable.prototype.pipe = function(dest, pipeOpts) {
     });
   }
 
+  if (pipeOpts && pipeOpts.chunkSize)
+    state.pipeChunkSize = pipeOpts.chunkSize;
+
   function onend() {
     dest.end();
   }
 
+  // when the dest drains, it reduces the awaitDrain counter
+  // on the source.  This would be more elegant with a .once()
+  // handler in flow(), but adding and removing repeatedly is
+  // too slow.
+  var ondrain = pipeOnDrain(src);
+  dest.on('drain', ondrain);
+  dest.on('unpipe', function(readable) {
+    if (readable === src)
+      dest.removeListener('drain', ondrain);
+
+    // if the reader is waiting for a drain event from this
+    // specific writer, then it would cause it to never start
+    // flowing again.
+    // So, if this is awaiting a drain, then we just call it now.
+    // If we don't know, then assume that we are waiting for one.
+    if (!dest._writableState || dest._writableState.needDrain)
+      ondrain();
+  });
+
+  // if the dest has an error, then stop piping into it.
+  // however, don't suppress the throwing behavior for this.
+  dest.once('error', function(er) {
+    unpipe();
+    if (dest.listeners('error').length === 0)
+      dest.emit('error', er);
+  });
+
+  // if the dest emits close, then presumably there's no point writing
+  // to it any more.
+  dest.on('close', unpipe);
+  dest.on('finish', function() {
+    dest.removeListener('close', unpipe);
+  });
+
+  function unpipe() {
+    src.unpipe(dest);
+  }
+
+  // tell the dest that it's being piped to
   dest.emit('pipe', src);
 
-  // start the flow.
+  // start the flow if it hasn't been started already.
   if (!state.flowing) {
+    // the handler that waits for readable events after all
+    // the data gets sucked out in flow.
+    // This would be easier to follow with a .once() handler
+    // in flow(), but that is too slow.
+    this.on('readable', pipeOnReadable);
+
     state.flowing = true;
-    process.nextTick(flow.bind(null, src, pipeOpts));
+    process.nextTick(function() {
+      flow(src);
+    });
   }
 
   return dest;
 };
 
-function flow(src, pipeOpts) {
+function pipeOnDrain(src) {
+  return function() {
+    var dest = this;
+    var state = src._readableState;
+    state.awaitDrain --;
+    if (state.awaitDrain === 0)
+      flow(src);
+  };
+}
+
+function flow(src) {
   var state = src._readableState;
   var chunk;
-  var needDrain = 0;
+  state.awaitDrain = 0;
 
-  function ondrain() {
-    needDrain--;
-    if (needDrain === 0)
-      flow(src, pipeOpts);
+  function write(dest, i, list) {
+    var written = dest.write(chunk);
+    if (false === written) {
+      state.awaitDrain++;
+    }
   }
 
-  while (state.pipes.length &&
-         null !== (chunk = src.read(pipeOpts.chunkSize))) {
-    state.pipes.forEach(function(dest, i, list) {
-      var written = dest.write(chunk);
-      if (false === written) {
-        needDrain++;
-        dest.once('drain', ondrain);
-      }
-    });
+  while (state.pipesCount &&
+         null !== (chunk = src.read(state.pipeChunkSize))) {
+
+    if (state.pipesCount === 1)
+      write(state.pipes, 0, null);
+    else
+      state.pipes.forEach(write);
+
     src.emit('data', chunk);
 
     // if anyone needs a drain, then we have to wait for that.
-    if (needDrain > 0)
+    if (state.awaitDrain > 0)
       return;
   }
 
@@ -285,35 +427,80 @@ function flow(src, pipeOpts) {
   // function, or in the while loop, then stop flowing.
   //
   // NB: This is a pretty rare edge case.
-  if (state.pipes.length === 0) {
+  if (state.pipesCount === 0) {
     state.flowing = false;
 
     // if there were data event listeners added, then switch to old mode.
-    if (this.listeners('data').length)
-      emitDataEvents(this);
+    if (src.listeners('data').length)
+      emitDataEvents(src);
     return;
   }
 
   // at this point, no one needed a drain, so we just ran out of data
   // on the next readable event, start it over again.
-  src.once('readable', flow.bind(null, src, pipeOpts));
+  state.ranOut = true;
 }
+
+function pipeOnReadable() {
+  if (this._readableState.ranOut) {
+    this._readableState.ranOut = false;
+    flow(this);
+  }
+}
+
 
 Readable.prototype.unpipe = function(dest) {
   var state = this._readableState;
-  if (!dest) {
-    // remove all of them.
-    state.pipes.forEach(function(dest, i, list) {
+
+  // if we're not piping anywhere, then do nothing.
+  if (state.pipesCount === 0)
+    return this;
+
+  // just one destination.  most common case.
+  if (state.pipesCount === 1) {
+    // passed in one, but it's not the right one.
+    if (dest && dest !== state.pipes)
+      return this;
+
+    if (!dest)
+      dest = state.pipes;
+
+    // got a match.
+    state.pipes = null;
+    state.pipesCount = 0;
+    this.removeListener('readable', pipeOnReadable);
+    if (dest)
       dest.emit('unpipe', this);
-    }, this);
-    state.pipes.length = 0;
-  } else {
-    var i = state.pipes.indexOf(dest);
-    if (i !== -1) {
-      dest.emit('unpipe', this);
-      state.pipes.splice(i, 1);
-    }
+    return this;
   }
+
+  // slow case. multiple pipe destinations.
+
+  if (!dest) {
+    // remove all.
+    var dests = state.pipes;
+    var len = state.pipesCount;
+    state.pipes = null;
+    state.pipesCount = 0;
+    this.removeListener('readable', pipeOnReadable);
+
+    for (var i = 0; i < len; i++)
+      dests[i].emit('unpipe', this);
+    return this;
+  }
+
+  // try to find the right one.
+  var i = state.pipes.indexOf(dest);
+  if (i === -1)
+    return this;
+
+  state.pipes.splice(i, 1);
+  state.pipesCount -= 1;
+  if (state.pipesCount === 1)
+    state.pipes = state.pipes[0];
+
+  dest.emit('unpipe', this);
+
   return this;
 };
 
@@ -393,23 +580,39 @@ Readable.prototype.wrap = function(stream) {
   var state = this._readableState;
   var paused = false;
 
+  var self = this;
   stream.on('end', function() {
     state.ended = true;
-    if (state.length === 0)
-      endReadable(this);
-  }.bind(this));
+    if (state.decoder) {
+      var chunk = state.decoder.end();
+      if (chunk && chunk.length) {
+        state.buffer.push(chunk);
+        state.length += chunk.length;
+      }
+    }
+
+    if (state.length > 0)
+      self.emit('readable');
+    else
+      endReadable(self);
+  });
 
   stream.on('data', function(chunk) {
+    if (state.decoder)
+      chunk = state.decoder.write(chunk);
+    if (!chunk || !chunk.length)
+      return;
+
     state.buffer.push(chunk);
     state.length += chunk.length;
-    this.emit('readable');
+    self.emit('readable');
 
     // if not consumed, then pause the stream.
     if (state.length > state.lowWaterMark && !paused) {
       paused = true;
       stream.pause();
     }
-  }.bind(this));
+  });
 
   // proxy all the other methods.
   // important when wrapping filters and duplexes.
@@ -425,8 +628,8 @@ Readable.prototype.wrap = function(stream) {
   // proxy certain important events.
   var events = ['error', 'close', 'destroy', 'pause', 'resume'];
   events.forEach(function(ev) {
-    stream.on(ev, this.emit.bind(this, ev));
-  }.bind(this));
+    stream.on(ev, self.emit.bind(self, ev));
+  });
 
   // consume some bytes.  if not all is consumed, then
   // pause the underlying stream.
@@ -534,5 +737,7 @@ function endReadable(stream) {
     return;
   state.ended = true;
   state.endEmitted = true;
-  process.nextTick(stream.emit.bind(stream, 'end'));
+  process.nextTick(function() {
+    stream.emit('end');
+  });
 }
