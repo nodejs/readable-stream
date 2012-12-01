@@ -1,9 +1,56 @@
-var PassThrough = require('../passthrough.js');
-var Transform = require('../transform.js');
-var test = require('tap').test;
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var assert = require('assert');
+var common = require('../common.js');
+var PassThrough = require('../../passthrough');
+var Transform = require('../../transform');
+
+// tiny node-tap lookalike.
+var tests = [];
+function test(name, fn) {
+  tests.push([name, fn]);
+}
+
+function run() {
+  var next = tests.shift();
+  if (!next)
+    return console.log('ok');
+
+  var name = next[0];
+  var fn = next[1];
+  console.log('# %s', name);
+  fn({
+    same: assert.deepEqual,
+    equal: assert.equal,
+    end: run
+  });
+}
+
+process.nextTick(run);
+
+/////
 
 test('passthrough', function(t) {
-  var pt = new PassThrough;
+  var pt = new PassThrough();
 
   pt.write(new Buffer('foog'));
   pt.write(new Buffer('bark'));
@@ -93,7 +140,7 @@ test('assymetric transform (expand)', function(t) {
     t.equal(pt.read(5).toString(), 'uelku');
     t.equal(pt.read(5).toString(), 'el');
     t.end();
-  }, 100);
+  }, 200);
 });
 
 test('assymetric transform (compress)', function(t) {
@@ -110,7 +157,6 @@ test('assymetric transform (compress)', function(t) {
     setTimeout(function() {
       this.state += s.charAt(0);
       if (this.state.length === 3) {
-        console.error('call output!')
         output(new Buffer(this.state));
         this.state = '';
       }
@@ -155,7 +201,53 @@ test('assymetric transform (compress)', function(t) {
 });
 
 
-test('passthrough reordered', function(t) {
+test('passthrough event emission', function(t) {
+  var pt = new PassThrough({
+    lowWaterMark: 0
+  });
+  var emits = 0;
+  pt.on('readable', function() {
+    var state = pt._readableState;
+    console.error('>>> emit readable %d', emits);
+    emits++;
+  });
+
+  var i = 0;
+
+  pt.write(new Buffer('foog'));
+  pt.write(new Buffer('bark'));
+
+  t.equal(pt.read(5).toString(), 'foogb');
+  t.equal(pt.read(5) + '', 'null');
+
+  console.error('need emit 0');
+
+  pt.write(new Buffer('bazy'));
+  console.error('should have emitted, but not again');
+  pt.write(new Buffer('kuel'));
+
+  console.error('should have emitted readable now 1 === %d', emits);
+  t.equal(emits, 1);
+
+  t.equal(pt.read(5).toString(), 'arkba');
+  t.equal(pt.read(5).toString(), 'zykue');
+  t.equal(pt.read(5), null);
+
+  console.error('need emit 1');
+
+  pt.end();
+
+  t.equal(emits, 2);
+
+  t.equal(pt.read(5).toString(), 'l');
+  t.equal(pt.read(5), null);
+
+  console.error('should not have emitted again');
+  t.equal(emits, 2);
+  t.end();
+});
+
+test('passthrough event emission reordered', function(t) {
   var pt = new PassThrough;
   var emits = 0;
   pt.on('readable', function() {
@@ -170,23 +262,27 @@ test('passthrough reordered', function(t) {
   t.equal(pt.read(5), null);
 
   console.error('need emit 0');
+  pt.once('readable', function() {
+    t.equal(pt.read(5).toString(), 'arkba');
+
+    t.equal(pt.read(5), null);
+
+    console.error('need emit 1');
+    pt.once('readable', function() {
+      t.equal(pt.read(5).toString(), 'zykue');
+      t.equal(pt.read(5), null);
+      pt.once('readable', function() {
+        t.equal(pt.read(5).toString(), 'l');
+        t.equal(pt.read(5), null);
+        t.equal(emits, 3);
+        t.end();
+      });
+      pt.end();
+    });
+    pt.write(new Buffer('kuel'));
+  });
 
   pt.write(new Buffer('bazy'));
-  pt.write(new Buffer('kuel'));
-
-  t.equal(pt.read(5).toString(), 'arkba');
-  t.equal(pt.read(5).toString(), 'zykue');
-  t.equal(pt.read(5), null);
-
-  console.error('need emit 1');
-
-  pt.end();
-
-  t.equal(pt.read(5).toString(), 'l');
-  t.equal(pt.read(5), null);
-
-  t.equal(emits, 2);
-  t.end();
 });
 
 test('passthrough facaded', function(t) {
