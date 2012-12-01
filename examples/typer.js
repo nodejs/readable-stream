@@ -10,8 +10,8 @@ rst.on('end', function() {
 
 process.stdin.setRawMode(true);
 process.stdin.on('data', function() {
-  var c = rst.read(1);
-  if (!c) return;
+  var c = rst.read(3);
+  if (!c) return setTimeout(process.exit, 500)
   process.stdout.write(c);
 });
 process.stdin.resume();
