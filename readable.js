@@ -600,7 +600,7 @@ Readable.prototype.wrap = function(stream) {
   stream.on('data', function(chunk) {
     if (state.decoder)
       chunk = state.decoder.write(chunk);
-    if (!chunk || !chunk.length)
+    if (!chunk)
       return;
 
     state.buffer.push(chunk);
