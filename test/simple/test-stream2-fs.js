@@ -24,7 +24,7 @@ var common = require('../common.js');
 var R = require('../../readable');
 var assert = require('assert');
 
-var fs = require('fs');
+var fs = require('../../fs');
 var FSReadable = fs.ReadStream;
 
 var path = require('path');
