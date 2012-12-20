@@ -23,7 +23,7 @@ var common = require('../common.js');
 var R = require('../../readable');
 var assert = require('assert');
 
-var readable = new R({ bufferSize: 64 });
+var readable = new R({ bufferSize: 100 });
 
 var fs = require('fs');
 var path = require('path');
@@ -32,7 +32,7 @@ var file = path.resolve(common.fixturesDir, 'x1024.txt');
 var size = fs.statSync(file).size;
 var readBytes = 0;
 
-readable.wrap(fs.createReadStream(file));
+readable.wrap(fs.createReadStream(file, { bufferSize: 100 }));
 
 function countBytes(data) {
   readBytes += data.length;
@@ -42,7 +42,7 @@ readable.on('readable', function () {
   var data = ''
   while (data !== null) {
     countBytes(data);
-    data = readable.read(10);
+    data = readable.read(32);
   }
 });
 
