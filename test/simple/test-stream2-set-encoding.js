@@ -34,7 +34,7 @@ function test(name, fn) {
 function run() {
   var next = tests.shift();
   if (!next)
-    return console.log('ok');
+    return console.error('ok');
 
   var name = next[0];
   var fn = next[1];
