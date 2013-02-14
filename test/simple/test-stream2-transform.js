@@ -26,7 +26,10 @@ var Transform = require('../../transform');
 
 // tiny node-tap lookalike.
 var tests = [];
+var count = 0;
+
 function test(name, fn) {
+  count++;
   tests.push([name, fn]);
 }
 
@@ -41,13 +44,49 @@ function run() {
   fn({
     same: assert.deepEqual,
     equal: assert.equal,
-    end: run
+    ok: assert,
+    end: function () {
+      count--;
+      run();
+    }
   });
 }
+
+// ensure all tests have run
+process.on("exit", function () {
+  assert.equal(count, 0);
+});
 
 process.nextTick(run);
 
 /////
+
+test('writable side consumption', function(t) {
+  var tx = new Transform({
+    highWaterMark: 10
+  });
+
+  var transformed = 0;
+  tx._transform = function(chunk, output, cb) {
+    transformed += chunk.length;
+    output(chunk);
+    cb();
+  };
+
+  for (var i = 1; i <= 10; i++) {
+    tx.write(new Buffer(i));
+  }
+  tx.end();
+
+  t.equal(tx._readableState.length, 10);
+  t.equal(transformed, 10);
+  t.equal(tx._transformState.writechunk.length, 5);
+  t.same(tx._writableState.buffer.map(function(c) {
+    return c[0].length;
+  }), [6, 7, 8, 9, 10]);
+
+  t.end();
+});
 
 test('passthrough', function(t) {
   var pt = new PassThrough();
@@ -319,4 +358,84 @@ test('passthrough facaded', function(t) {
       }, 10);
     }, 10);
   }, 10);
+});
+
+test('object transform (json parse)', function(t) {
+  console.error('json parse stream');
+  var jp = new Transform({ objectMode: true });
+  jp._transform = function(data, output, cb) {
+    try {
+      output(JSON.parse(data));
+      cb();
+    } catch (er) {
+      cb(er);
+    }
+  };
+
+  // anything except null/undefined is fine.
+  // those are "magic" in the stream API, because they signal EOF.
+  var objects = [
+    { foo: 'bar' },
+    100,
+    "string",
+    { nested: { things: [ { foo: 'bar' }, 100, "string" ] } }
+  ];
+
+  var ended = false;
+  jp.on('end', function() {
+    ended = true;
+  });
+
+  objects.forEach(function(obj) {
+    jp.write(JSON.stringify(obj));
+    var res = jp.read();
+    t.same(res, obj);
+  });
+
+  jp.end();
+
+  process.nextTick(function() {
+    t.ok(ended);
+    t.end();
+  })
+});
+
+test('object transform (json stringify)', function(t) {
+  console.error('json parse stream');
+  var js = new Transform({ objectMode: true });
+  js._transform = function(data, output, cb) {
+    try {
+      output(JSON.stringify(data));
+      cb();
+    } catch (er) {
+      cb(er);
+    }
+  };
+
+  // anything except null/undefined is fine.
+  // those are "magic" in the stream API, because they signal EOF.
+  var objects = [
+    { foo: 'bar' },
+    100,
+    "string",
+    { nested: { things: [ { foo: 'bar' }, 100, "string" ] } }
+  ];
+
+  var ended = false;
+  js.on('end', function() {
+    ended = true;
+  });
+
+  objects.forEach(function(obj) {
+    js.write(obj);
+    var res = js.read();
+    t.equal(res, JSON.stringify(obj));
+  });
+
+  js.end();
+
+  process.nextTick(function() {
+    t.ok(ended);
+    t.end();
+  })
 });
