@@ -19,58 +19,24 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 var common = require('../common.js');
-var R = require('../../readable');
-var assert = require('assert');
+var Readable = require('../../readable');
+var Writable = require('../../writable')
+var Buffer = require('buffer').Buffer;
 
-var fs = require('../../fs');
-var FSReadable = fs.ReadStream;
-
-var path = require('path');
-var file = path.resolve(common.fixturesDir, 'x1024.txt');
-
-var size = fs.statSync(file).size;
-
-// expect to see chunks no more than 10 bytes each.
-var expectLengths = [];
-for (var i = size; i > 0; i -= 10) {
-  expectLengths.push(Math.min(i, 10));
-}
-
-var util = require('util');
-var Stream = require('stream');
-
-util.inherits(TestWriter, Stream);
-
-function TestWriter() {
-  Stream.apply(this);
-  this.buffer = [];
-  this.length = 0;
-}
-
-TestWriter.prototype.write = function(c) {
-  this.buffer.push(c.toString());
-  this.length += c.length;
-  return true;
+var R = new Readable();
+R._read = function(size, cb) {
+  cb(null, new Buffer(size));
 };
 
-TestWriter.prototype.end = function(c) {
-  if (c) this.buffer.push(c.toString());
-  this.emit('results', this.buffer);
-}
+var W = new Writable();
+W._write = function(data, cb) {
+  cb(null);
+};
 
-var r = new FSReadable(file, { bufferSize: 10 });
-var w = new TestWriter();
+R.pipe(W);
 
-w.on('results', function(res) {
-  console.error(res, w.length);
-  assert.equal(w.length, size);
-  var l = 0;
-  assert.deepEqual(res.map(function (c) {
-    return c.length;
-  }), expectLengths);
-  console.log('ok');
-});
-
-r.pipe(w, { chunkSize: 10 });
+// This might sound unrealistic, but it happens in net.js. When
+// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
+// ends the writable side of net.Socket.
+W.end();
