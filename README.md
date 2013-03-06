@@ -132,12 +132,12 @@ r.on('end', function() {
 ## Class: Readable
 
 A base class for implementing Readable streams.  Override the
-`_read(n,cb)` method to fetch data asynchronously and take advantage
+`_read(n)` method to fetch data asynchronously and take advantage
 of the buffering built into the Readable class.
 
 ### Example
 
-Extend the Readable class, and provide a `_read(n,cb)` implementation
+Extend the Readable class, and provide a `_read(n)` implementation
 method.
 
 ```javascript
@@ -150,10 +150,9 @@ function MyReadable(options) {
   Readable.call(this, options);
 }
 
-MyReadable.prototype._read = function(n, cb) {
+MyReadable.prototype._read = function(n) {
   // your magic goes here.
-  // call the cb at some time in the future with either up to n bytes,
-  // or an error, like cb(err, resultData)
+  // call push() at some time in the future with some data.
   //
   // The code in the Readable class will call this to keep an internal
   // buffer at a healthy level, as the user calls var chunk=stream.read(n)
@@ -208,29 +207,25 @@ classes, or else the stream will not be properly initialized.
 Pulls the requested number of bytes out of the internal buffer.  If
 that many bytes are not available, then it returns `null`.
 
-### readable.\_read(size, callback)
+### readable.\_read(size)
 
 * `size` {Number} Number of bytes to read from the underlying
   asynchronous data source.
-* `callback` {Function} Callback function
-  * `error` {Error Object}
-  * `data` {Buffer | null}
 
 **Note: This function is not implemented in the Readable base class.**
 Rather, it is up to you to implement `_read` in your extension
 classes.
 
-`_read` should fetch the specified number of bytes, and call the
-provided callback with `cb(error, data)`, where `error` is any error
-encountered, and `data` is the returned data.
+`_read` should fetch the specified number of bytes, and call 
+`this.push(data)`, where `data` is the returned data.
 
 This method is prefixed with an underscore because it is internal to
 the class that defines it, and should not be called directly by user
 programs.  However, you **are** expected to override this method in
 your own extension classes.
 
-The `size` argument is purely advisory.  You may call the callback
-with more or fewer bytes.  However, if you call the callback with
+The `size` argument is purely advisory.  You may call `push()`
+with more or fewer bytes.  However, if you call `push()` with
 `null`, or an empty buffer, then it will assume that the end of the
 data was reached.
 
@@ -392,7 +387,7 @@ and writable).
 Since JS doesn't have multiple prototypal inheritance, this class
 prototypally inherits from Readable, and then parasitically from
 Writable.  It is thus up to the user to implement both the lowlevel
-`_read(n,cb)` method as well as the lowlevel `_write(chunk,cb)`
+`_read(n)` method as well as the lowlevel `_write(chunk,cb)`
 method on extension duplex classes.
 
 For cases where the written data is transformed into the output, it
