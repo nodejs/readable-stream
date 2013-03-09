@@ -20,23 +20,22 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common.js');
-var Readable = require('../../readable');
-var Writable = require('../../writable')
+var stream = require('../../readable');
 var Buffer = require('buffer').Buffer;
 
-var R = new Readable();
-R._read = function(size, cb) {
-  cb(null, new Buffer(size));
+var r = new stream.Readable();
+r._read = function(size) {
+  r.push(new Buffer(size));
 };
 
-var W = new Writable();
-W._write = function(data, cb) {
+var w = new stream.Writable();
+w._write = function(data, encoding, cb) {
   cb(null);
 };
 
-R.pipe(W);
+r.pipe(w);
 
 // This might sound unrealistic, but it happens in net.js. When
 // `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
 // ends the writable side of net.Socket.
-W.end();
+w.end();

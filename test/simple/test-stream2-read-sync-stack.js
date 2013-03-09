@@ -21,7 +21,7 @@
 
 var common = require('../common');
 var assert = require('assert');
-var Readable = require('../../readable');
+var Readable = require('../../readable').Readable;
 var r = new Readable();
 var N = 256 * 1024;
 
@@ -30,9 +30,9 @@ var N = 256 * 1024;
 process.maxTickDepth = N + 2;
 
 var reads = 0;
-r._read = function(n, cb) {
+r._read = function(n) {
   var chunk = reads++ === N ? null : new Buffer(1);
-  cb(null, chunk);
+  r.push(chunk);
 };
 
 r.on('readable', function onReadable() {

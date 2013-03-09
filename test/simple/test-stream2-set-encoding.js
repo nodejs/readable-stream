@@ -22,7 +22,7 @@
 
 var common = require('../common.js');
 var assert = require('assert');
-var R = require('../../readable');
+var R = require('../../lib/_stream_readable');
 var util = require('util');
 
 // tiny node-tap lookalike.
@@ -64,33 +64,31 @@ process.nextTick(run);
 util.inherits(TestReader, R);
 
 function TestReader(n, opts) {
-  R.call(this, util._extend({
-    bufferSize: 5
-  }, opts));
+  R.call(this, opts);
 
   this.pos = 0;
   this.len = n || 100;
 }
 
-TestReader.prototype._read = function(n, cb) {
+TestReader.prototype._read = function(n) {
   setTimeout(function() {
 
     if (this.pos >= this.len) {
-      return cb();
+      return this.push(null);
     }
 
     n = Math.min(n, this.len - this.pos);
     if (n <= 0) {
-      return cb();
+      return this.push(null);
     }
 
     this.pos += n;
     var ret = new Buffer(n);
     ret.fill('a');
 
-    console.log("cb(null, ret)", ret)
+    console.log("this.push(ret)", ret)
 
-    return cb(null, ret);
+    return this.push(ret);
   }.bind(this), 1);
 };
 

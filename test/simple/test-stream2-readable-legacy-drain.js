@@ -22,14 +22,14 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Readable = require('../../readable');
-var Stream = require('stream');
+var Stream = require('../../readable');
+var Readable = Stream.Readable;
 
 var r = new Readable();
 var N = 256;
 var reads = 0;
-r._read = function(n, cb) {
-  return cb(null, ++reads === N ? null : new Buffer(1));
+r._read = function(n) {
+  return r.push(++reads === N ? null : new Buffer(1));
 };
 
 var rended = false;

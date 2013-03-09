@@ -20,7 +20,8 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common.js');
-var W = require('../../writable');
+var W = require('../../lib/_stream_writable');
+var D = require('../../lib/_stream_duplex');
 var assert = require('assert');
 
 var util = require('util');
@@ -32,7 +33,7 @@ function TestWriter() {
   this.written = 0;
 }
 
-TestWriter.prototype._write = function(chunk, cb) {
+TestWriter.prototype._write = function(chunk, encoding, cb) {
   // simulate a small unpredictable latency
   setTimeout(function() {
     this.buffer.push(chunk.toString());
@@ -82,7 +83,6 @@ process.nextTick(run);
 
 test('write fast', function(t) {
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 100
   });
 
@@ -100,7 +100,6 @@ test('write fast', function(t) {
 
 test('write slow', function(t) {
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 100
   });
 
@@ -121,7 +120,6 @@ test('write slow', function(t) {
 
 test('write backpressure', function(t) {
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 50
   });
 
@@ -154,7 +152,6 @@ test('write backpressure', function(t) {
 
 test('write bufferize', function(t) {
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 100
   });
 
@@ -185,16 +182,14 @@ test('write bufferize', function(t) {
 
 test('write no bufferize', function(t) {
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 100,
     decodeStrings: false
   });
 
-  tw._write = function(chunk, cb) {
-    assert(Array.isArray(chunk));
-    assert(typeof chunk[0] === 'string');
-    chunk = new Buffer(chunk[0], chunk[1]);
-    return TestWriter.prototype._write.call(this, chunk, cb);
+  tw._write = function(chunk, encoding, cb) {
+    assert(typeof chunk === 'string');
+    chunk = new Buffer(chunk, encoding);
+    return TestWriter.prototype._write.call(this, chunk, encoding, cb);
   };
 
   var encodings =
@@ -234,7 +229,6 @@ test('write callbacks', function (t) {
   callbacks._called = [];
 
   var tw = new TestWriter({
-    lowWaterMark: 5,
     highWaterMark: 100
   });
 
@@ -284,10 +278,51 @@ test('end callback after .write() call', function (t) {
 test('encoding should be ignored for buffers', function(t) {
   var tw = new W();
   var hex = '018b5e9a8f6236ffe30e31baf80d2cf6eb';
-  tw._write = function(chunk, cb) {
+  tw._write = function(chunk, encoding, cb) {
     t.equal(chunk.toString('hex'), hex);
     t.end();
   };
   var buf = new Buffer(hex, 'hex');
   tw.write(buf, 'binary');
+});
+
+test('writables are not pipable', function(t) {
+  var w = new W();
+  w._write = function() {};
+  var gotError = false;
+  w.on('error', function(er) {
+    gotError = true;
+  });
+  w.pipe(process.stdout);
+  assert(gotError);
+  t.end();
+});
+
+test('duplexes are pipable', function(t) {
+  var d = new D();
+  d._read = function() {};
+  d._write = function() {};
+  var gotError = false;
+  d.on('error', function(er) {
+    gotError = true;
+  });
+  d.pipe(process.stdout);
+  assert(!gotError);
+  t.end();
+});
+
+test('end(chunk) two times is an error', function(t) {
+  var w = new W();
+  w._write = function() {};
+  var gotError = false;
+  w.on('error', function(er) {
+    gotError = true;
+    t.equal(er.message, 'write after end');
+  });
+  w.end('this is the end');
+  w.end('and so is this');
+  process.nextTick(function() {
+    assert(gotError);
+    t.end();
+  });
 });

@@ -21,7 +21,7 @@
 
 
 var common = require('../common.js');
-var R = require('../../readable');
+var R = require('../../lib/_stream_readable');
 var assert = require('assert');
 
 var util = require('util');
@@ -38,6 +38,7 @@ function TestReader(n) {
 util.inherits(TestReader, R);
 
 TestReader.prototype.read = function(n) {
+  if (n === 0) return null;
   var max = this._buffer.length - this._pos;
   n = n || max;
   n = Math.max(n, 0);
@@ -80,11 +81,6 @@ TestWriter.prototype.write = function(c) {
   this.received.push(c.toString());
   this.emit('write', c);
   return true;
-
-  // flip back and forth between immediate acceptance and not.
-  this.flush = !this.flush;
-  if (!this.flush) setTimeout(this.emit.bind(this, 'drain'), 10);
-  return this.flush;
 };
 
 TestWriter.prototype.end = function(c) {
@@ -113,6 +109,7 @@ function run() {
   console.log('# %s', name);
   fn({
     same: assert.deepEqual,
+    ok: assert,
     equal: assert.equal,
     end: function () {
       count--;
@@ -187,6 +184,7 @@ test('pipe', function(t) {
 
   var w = new TestWriter;
   var flush = true;
+
   w.on('end', function(received) {
     t.same(received, expect);
     t.end();
@@ -333,14 +331,14 @@ test('multipipe', function(t) {
 test('back pressure respected', function (t) {
   function noop() {}
 
-  var r = new R();
+  var r = new R({ objectMode: true });
+  r._read = noop;
   var counter = 0;
   r.push(["one"]);
   r.push(["two"]);
   r.push(["three"]);
   r.push(["four"]);
   r.push(null);
-  r._read = noop;
 
   var w1 = new R();
   w1.write = function (chunk) {
@@ -406,7 +404,7 @@ test('read(0) for ended streams', function (t) {
   var r = new R();
   var written = false;
   var ended = false;
-  r._read = function () {};
+  r._read = function (n) {};
 
   r.push(new Buffer("foo"));
   r.push(null);
@@ -435,8 +433,8 @@ test('read(0) for ended streams', function (t) {
 test('sync _read ending', function (t) {
   var r = new R();
   var called = false;
-  r._read = function (n, cb) {
-    cb(null, null);
+  r._read = function (n) {
+    r.push(null);
   };
 
   r.once('end', function () {
@@ -451,17 +449,27 @@ test('sync _read ending', function (t) {
   })
 });
 
-assert.throws(function() {
-  var bad = new R({
-    highWaterMark: 10,
-    lowWaterMark: 1000
-  });
-});
+test('adding readable triggers data flow', function(t) {
+  var r = new R({ highWaterMark: 5 });
+  var onReadable = false;
+  var readCalled = 0;
 
-assert.throws(function() {
-  var W = require('stream').Writable;
-  var bad = new W({
-    highWaterMark: 10,
-    lowWaterMark: 1000
+  r._read = function(n) {
+    if (readCalled++ === 2)
+      r.push(null);
+    else
+      r.push(new Buffer('asdf'));
+  };
+
+  var called = false;
+  r.on('readable', function() {
+    onReadable = true;
+    r.read();
+  });
+
+  r.on('end', function() {
+    t.equal(readCalled, 3);
+    t.ok(onReadable);
+    t.end();
   });
 });

@@ -21,8 +21,8 @@
 
 
 var common = require('../common.js');
-var Readable = require('../../readable');
-var Writable = require('../../writable');
+var Readable = require('../../lib/_stream_readable');
+var Writable = require('../../lib/_stream_writable');
 var assert = require('assert');
 
 // tiny node-tap lookalike.
@@ -60,7 +60,7 @@ process.on('exit', function() {
 process.nextTick(run);
 
 function toArray(callback) {
-  var stream = new Writable();
+  var stream = new Writable({ objectMode: true });
   var list = [];
   stream.write = function(chunk) {
     list.push(chunk);
@@ -74,12 +74,12 @@ function toArray(callback) {
 }
 
 function fromArray(list) {
-  var r = new Readable();
+  var r = new Readable({ objectMode: true });
+  r._read = noop;
   list.forEach(function(chunk) {
     r.push(chunk);
   });
   r.push(null);
-  r._read = noop;
 
   return r;
 }
@@ -124,11 +124,11 @@ test('read(n) is ignored', function(t) {
 });
 
 test('can read objects from _read (sync)', function(t) {
-  var r = new Readable();
+  var r = new Readable({ objectMode: true });
   var list = [{ one: '1'}, { two: '2' }];
-  r._read = function(n, cb) {
+  r._read = function(n) {
     var item = list.shift();
-    cb(null, item || null);
+    r.push(item || null);
   };
 
   r.pipe(toArray(function(list) {
@@ -142,12 +142,12 @@ test('can read objects from _read (sync)', function(t) {
 });
 
 test('can read objects from _read (async)', function(t) {
-  var r = new Readable();
+  var r = new Readable({ objectMode: true });
   var list = [{ one: '1'}, { two: '2' }];
-  r._read = function(n, cb) {
+  r._read = function(n) {
     var item = list.shift();
     process.nextTick(function() {
-      cb(null, item || null);
+      r.push(item || null);
     });
   };
 
@@ -215,42 +215,15 @@ test('falsey values', function(t) {
   }));
 });
 
-test('low watermark _read', function(t) {
-  var r = new Readable({
-    lowWaterMark: 2,
-    highWaterMark: 6,
-    objectMode: true
-  });
-
-  var calls = 0;
-
-  r._read = function(n, cb) {
-    calls++;
-    cb(null, 'foo');
-  };
-
-  // touch to cause it
-  r.read(0);
-
-  r.push(null);
-
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, ['foo', 'foo', 'foo']);
-
-    t.end();
-  }));
-});
-
 test('high watermark _read', function(t) {
   var r = new Readable({
-    lowWaterMark: 0,
     highWaterMark: 6,
     objectMode: true
   });
   var calls = 0;
   var list = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-  r._read = function() {
+  r._read = function(n) {
     calls++;
   };
 
@@ -276,7 +249,7 @@ test('high watermark push', function(t) {
     highWaterMark: 6,
     objectMode: true
   });
-  r._read = function() {};
+  r._read = function(n) {};
   for (var i = 0; i < 6; i++) {
     var bool = r.push(i);
     assert.equal(bool, i === 5 ? false : true);
@@ -285,119 +258,10 @@ test('high watermark push', function(t) {
   t.end();
 });
 
-test('low watermark push', function(t) {
-  var r = new Readable({
-    lowWaterMark: 2,
-    highWaterMark: 4,
-    objectMode: true
-  });
-  var l = console.log;
-
-  var called = 0;
-  var reading = false;
-
-  r._read = function() {
-    called++;
-
-    if (reading) {
-      assert.equal(r.push(42), false);
-    }
-  }
-
-  assert.equal(called, 0);
-  assert.equal(r.push(0), true);
-  assert.equal(called, 1);
-  assert.equal(r.push(1), true);
-  assert.equal(called, 2);
-  assert.equal(r.push(2), true);
-  assert.equal(called, 2);
-  assert.equal(r.push(3), false);
-  assert.equal(called, 2);
-  assert.equal(r.push(4), false);
-  assert.equal(called, 2);
-  assert.equal(r.push(5), false);
-  assert.equal(called, 2);
-  assert.deepEqual(r._readableState.buffer, [0, 1, 2, 3, 4, 5]);
-
-  reading = true;
-
-  assert.equal(r.read(), 0);
-  assert.equal(called, 2);
-  assert.equal(r.read(), 1);
-  assert.equal(called, 3);
-  assert.equal(r.read(), 2);
-  assert.equal(called, 4);
-  assert.equal(r.read(), 3);
-  assert.equal(called, 5);
-  assert.equal(r.read(), 4);
-  assert.equal(called, 6);
-  r.push(null);
-
-  r.pipe(toArray(function(array) {
-    assert.deepEqual(array, [5, 42, 42, 42, 42]);
-
-    t.end();
-  }));
-});
-
-test('stream of buffers converted to object halfway through', function(t) {
-  var r = new Readable();
-  r._read = noop;
-
-  r.push(new Buffer('fus'));
-  r.push(new Buffer('do'));
-  r.push(new Buffer('rah'));
-
-  var str = r.read(4);
-
-  assert.equal(str, 'fusd');
-
-  r.push({ foo: 'bar' });
-  r.push(null);
-
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, [
-      new Buffer('o'),
-      new Buffer('rah'),
-      { foo: 'bar'}
-    ]);
-
-    t.end();
-  }));
-});
-
-test('stream of strings converted to objects halfway through', function(t) {
-  var r = new Readable({
-    encoding: 'utf8'
-  });
-  r._read = noop;
-
-  r.push('fus');
-  r.push('do');
-  r.push('rah');
-
-  var str = r.read(4);
-
-  assert.equal(str, 'fusd');
-
-  r.push({ foo: 'bar' });
-  r.push(null);
-
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, [
-      'o',
-      'rah',
-      { foo: 'bar'}
-    ]);
-
-    t.end();
-  }));
-});
-
 test('can write objects to stream', function(t) {
-  var w = new Writable();
+  var w = new Writable({ objectMode: true });
 
-  w._write = function(chunk, cb) {
+  w._write = function(chunk, encoding, cb) {
     assert.deepEqual(chunk, { foo: 'bar' });
     cb();
   };
@@ -411,10 +275,10 @@ test('can write objects to stream', function(t) {
 });
 
 test('can write multiple objects to stream', function(t) {
-  var w = new Writable();
+  var w = new Writable({ objectMode: true });
   var list = [];
 
-  w._write = function(chunk, cb) {
+  w._write = function(chunk, encoding, cb) {
     list.push(chunk);
     cb();
   };
@@ -439,7 +303,7 @@ test('can write strings as objects', function(t) {
   });
   var list = [];
 
-  w._write = function(chunk, cb) {
+  w._write = function(chunk, encoding, cb) {
     list.push(chunk);
     process.nextTick(cb);
   };
@@ -464,7 +328,7 @@ test('buffers finish until cb is called', function(t) {
   });
   var called = false;
 
-  w._write = function(chunk, cb) {
+  w._write = function(chunk, encoding, cb) {
     assert.equal(chunk, 'foo');
 
     process.nextTick(function() {

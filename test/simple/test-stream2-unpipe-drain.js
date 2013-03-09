@@ -22,18 +22,17 @@
 
 var common = require('../common.js');
 var assert = require('assert');
-var Writable = require('../../writable');
-var Readable = require('../../readable');
+var stream = require('../../readable');
 var crypto = require('crypto');
 
 var util = require('util');
 
 function TestWriter() {
-    Writable.call(this);
+    stream.Writable.call(this);
 }
-util.inherits(TestWriter, Writable);
+util.inherits(TestWriter, stream.Writable);
 
-TestWriter.prototype._write = function (buffer, callback) {
+TestWriter.prototype._write = function (buffer, encoding, callback) {
   console.log('write called');
   // super slow write stream (callback never called)
 };
@@ -41,14 +40,14 @@ TestWriter.prototype._write = function (buffer, callback) {
 var dest = new TestWriter();
 
 function TestReader(id) {
-    Readable.call(this);
+    stream.Readable.call(this);
     this.reads = 0;
 }
-util.inherits(TestReader, Readable);
+util.inherits(TestReader, stream.Readable);
 
-TestReader.prototype._read = function (size, callback) {
+TestReader.prototype._read = function (size) {
   this.reads += 1;
-  crypto.randomBytes(size, callback);
+  this.push(crypto.randomBytes(size));
 };
 
 var src1 = new TestReader();
