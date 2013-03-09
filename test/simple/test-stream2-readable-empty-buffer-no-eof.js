@@ -25,7 +25,7 @@ var assert = require('assert');
 var Readable = require('../../readable').Readable;
 
 test1();
-test2();
+if (!/v0\.8\./.test(process.version)) test2();
 
 function test1() {
   var r = new Readable();
