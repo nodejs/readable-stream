@@ -30,7 +30,7 @@ var PUSHSIZE = 20;
 var PUSHCOUNT = 1000;
 var HWM = 50;
 
-var Readable = require('../../readable').Readable;
+var Readable = require('stream').Readable;
 var r = new Readable({
   highWaterMark: HWM
 });

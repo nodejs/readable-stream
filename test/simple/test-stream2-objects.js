@@ -21,8 +21,8 @@
 
 
 var common = require('../common.js');
-var Readable = require('../../lib/_stream_readable');
-var Writable = require('../../lib/_stream_writable');
+var Readable = require('_stream_readable');
+var Writable = require('_stream_writable');
 var assert = require('assert');
 
 // tiny node-tap lookalike.

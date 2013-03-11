@@ -20,7 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common.js');
-var stream = require('../../readable');
+var stream = require('stream');
 var Buffer = require('buffer').Buffer;
 
 var r = new stream.Readable();

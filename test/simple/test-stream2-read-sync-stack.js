@@ -21,7 +21,7 @@
 
 var common = require('../common');
 var assert = require('assert');
-var Readable = require('../../readable').Readable;
+var Readable = require('stream').Readable;
 var r = new Readable();
 var N = 256 * 1024;
 
