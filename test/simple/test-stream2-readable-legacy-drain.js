@@ -22,7 +22,7 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Stream = require('stream');
+var Stream = require('../../readable');
 var Readable = Stream.Readable;
 
 var r = new Readable();

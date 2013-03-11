@@ -22,7 +22,7 @@
 
 var common = require('../common.js');
 var assert = require('assert');
-var stream = require('stream');
+var stream = require('../../readable');
 
 var chunk = new Buffer('hallo');
 

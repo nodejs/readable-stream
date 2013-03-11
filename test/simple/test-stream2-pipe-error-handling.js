@@ -21,7 +21,7 @@
 
 var common = require('../common');
 var assert = require('assert');
-var stream = require('stream');
+var stream = require('../../readable');
 
 (function testErrorListenerCatches() {
   var count = 1000;
