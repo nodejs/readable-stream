@@ -22,7 +22,7 @@
 var common = require('../common');
 var assert = require('assert');
 
-var stream = require('stream');
+var stream = require('../../');
 
 var queue = [];
 for (var decode = 0; decode < 2; decode++) {

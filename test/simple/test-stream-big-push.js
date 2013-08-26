@@ -21,7 +21,7 @@
 
 var common = require('../common');
 var assert = require('assert');
-var stream = require('stream');
+var stream = require('../../');
 var str = 'asdfasdfasdfasdfasdf';
 
 var r = new stream.Readable({

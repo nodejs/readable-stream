@@ -25,7 +25,7 @@ var gotEnd = false;
 
 // Make sure we don't miss the end event for paused 0-length streams
 
-var Readable = require('stream').Readable;
+var Readable = require('../../').Readable;
 var stream = new Readable();
 var calledRead = false;
 stream._read = function() {

@@ -21,8 +21,8 @@
 
 var assert = require('assert');
 var common = require('../common.js');
-var PassThrough = require('_stream_passthrough');
-var Transform = require('_stream_transform');
+var PassThrough = require('../../').PassThrough;
+var Transform = require('../../').Transform;
 
 // tiny node-tap lookalike.
 var tests = [];

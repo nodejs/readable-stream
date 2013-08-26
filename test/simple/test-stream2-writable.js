@@ -20,8 +20,8 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common.js');
-var W = require('_stream_writable');
-var D = require('_stream_duplex');
+var W = require('../../').Writable;
+var D = require('../../').Duplex;
 var assert = require('assert');
 
 var util = require('util');
