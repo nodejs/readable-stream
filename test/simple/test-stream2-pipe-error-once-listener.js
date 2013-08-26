@@ -19,23 +19,46 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 var common = require('../common.js');
+var assert = require('assert');
+
+var util = require('util');
 var stream = require('stream');
-var Buffer = require('buffer').Buffer;
 
-var r = new stream.Readable();
-r._read = function(size) {
-  r.push(new Buffer(size));
+
+var Read = function() {
+  stream.Readable.call(this);
+};
+util.inherits(Read, stream.Readable);
+
+Read.prototype._read = function(size) {
+  this.push('x');
+  this.push(null);
 };
 
-var w = new stream.Writable();
-w._write = function(data, encoding, cb) {
-  cb(null);
+
+var Write = function() {
+  stream.Writable.call(this);
+};
+util.inherits(Write, stream.Writable);
+
+Write.prototype._write = function(buffer, encoding, cb) {
+  this.emit('error', new Error('boom'));
+  this.emit('alldone');
 };
 
-r.pipe(w);
+var read = new Read();
+var write = new Write();
 
-// This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
-w.end();
+write.once('error', function(err) {});
+write.once('alldone', function(err) {
+  console.log('ok');
+});
+
+process.on('exit', function(c) {
+  console.error('error thrown even with listener');
+});
+
+read.pipe(write);
+

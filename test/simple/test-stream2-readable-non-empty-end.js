@@ -21,7 +21,7 @@
 
 var assert = require('assert');
 var common = require('../common.js');
-var Readable = require('../../lib/_stream_readable');
+var Readable = require('_stream_readable');
 
 var len = 0;
 var chunks = new Array(10);

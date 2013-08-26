@@ -19,23 +19,54 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 var common = require('../common.js');
-var stream = require('stream');
-var Buffer = require('buffer').Buffer;
+var R = require('_stream_readable');
+var assert = require('assert');
 
-var r = new stream.Readable();
-r._read = function(size) {
-  r.push(new Buffer(size));
+var fs = require('fs');
+var FSReadable = fs.ReadStream;
+
+var path = require('path');
+var file = path.resolve(common.fixturesDir, 'x1024.txt');
+
+var size = fs.statSync(file).size;
+
+var expectLengths = [1024];
+
+var util = require('util');
+var Stream = require('stream');
+
+util.inherits(TestWriter, Stream);
+
+function TestWriter() {
+  Stream.apply(this);
+  this.buffer = [];
+  this.length = 0;
+}
+
+TestWriter.prototype.write = function(c) {
+  this.buffer.push(c.toString());
+  this.length += c.length;
+  return true;
 };
 
-var w = new stream.Writable();
-w._write = function(data, encoding, cb) {
-  cb(null);
-};
+TestWriter.prototype.end = function(c) {
+  if (c) this.buffer.push(c.toString());
+  this.emit('results', this.buffer);
+}
+
+var r = new FSReadable(file);
+var w = new TestWriter();
+
+w.on('results', function(res) {
+  console.error(res, w.length);
+  assert.equal(w.length, size);
+  var l = 0;
+  assert.deepEqual(res.map(function (c) {
+    return c.length;
+  }), expectLengths);
+  console.log('ok');
+});
 
 r.pipe(w);
-
-// This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
-w.end();

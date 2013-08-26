@@ -21,8 +21,8 @@
 
 
 var common = require('../common.js');
-var Readable = require('../../lib/_stream_readable');
-var Writable = require('../../lib/_stream_writable');
+var Readable = require('_stream_readable');
+var Writable = require('_stream_writable');
 var assert = require('assert');
 
 // tiny node-tap lookalike.
@@ -237,9 +237,12 @@ test('high watermark _read', function(t) {
   assert.equal(v, '1');
 
   var v2 = r.read();
+  assert.equal(v2, '2');
+
+  var v3 = r.read();
+  assert.equal(v3, '3');
 
   assert.equal(calls, 1);
-  assert.equal(v2, '2');
 
   t.end();
 });

@@ -21,7 +21,7 @@
 
 
 var common = require('../common.js');
-var R = require('../../lib/_stream_readable');
+var R = require('_stream_readable');
 var assert = require('assert');
 
 var util = require('util');
@@ -47,4 +47,7 @@ TestReader.prototype._read = function(n) {
 };
 
 var reader = new TestReader();
-assert.equal(ondataCalled, 1);
+setImmediate(function() {
+  assert.equal(ondataCalled, 1);
+  console.log('ok');
+});

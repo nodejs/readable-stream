@@ -20,8 +20,8 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common.js');
-var W = require('../../lib/_stream_writable');
-var D = require('../../lib/_stream_duplex');
+var W = require('_stream_writable');
+var D = require('_stream_duplex');
 var assert = require('assert');
 
 var util = require('util');
@@ -275,6 +275,18 @@ test('end callback after .write() call', function (t) {
   });
 });
 
+test('end callback called after write callback', function (t) {
+  var tw = new TestWriter();
+  var writeCalledback = false;
+  tw.write(new Buffer('hello world'),  function() {
+    writeCalledback = true;
+  });
+  tw.end(function () {
+    t.equal(writeCalledback, true);
+    t.end();
+  });
+});
+
 test('encoding should be ignored for buffers', function(t) {
   var tw = new W();
   var hex = '018b5e9a8f6236ffe30e31baf80d2cf6eb';
@@ -325,4 +337,57 @@ test('end(chunk) two times is an error', function(t) {
     assert(gotError);
     t.end();
   });
+});
+
+test('dont end while writing', function(t) {
+  var w = new W();
+  var wrote = false;
+  w._write = function(chunk, e, cb) {
+    assert(!this.writing);
+    wrote = true;
+    this.writing = true;
+    setTimeout(function() {
+      this.writing = false;
+      cb();
+    });
+  };
+  w.on('finish', function() {
+    assert(wrote);
+    t.end();
+  });
+  w.write(Buffer(0));
+  w.end();
+});
+
+test('finish does not come before write cb', function(t) {
+  var w = new W();
+  var writeCb = false;
+  w._write = function(chunk, e, cb) {
+    setTimeout(function() {
+      writeCb = true;
+      cb();
+    }, 10);
+  };
+  w.on('finish', function() {
+    assert(writeCb);
+    t.end();
+  });
+  w.write(Buffer(0));
+  w.end();
+});
+
+test('finish does not come before sync _write cb', function(t) {
+  var w = new W();
+  var writeCb = false;
+  w._write = function(chunk, e, cb) {
+    cb();
+  };
+  w.on('finish', function() {
+    assert(writeCb);
+    t.end();
+  });
+  w.write(Buffer(0), function(er) {
+    writeCb = true;
+  });
+  w.end();
 });

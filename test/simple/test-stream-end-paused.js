@@ -19,64 +19,35 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common.js');
+var common = require('../common');
 var assert = require('assert');
+var gotEnd = false;
 
-// If everything aligns so that you do a read(n) of exactly the
-// remaining buffer, then make sure that 'end' still emits.
-
-var READSIZE = 100;
-var PUSHSIZE = 20;
-var PUSHCOUNT = 1000;
-var HWM = 50;
+// Make sure we don't miss the end event for paused 0-length streams
 
 var Readable = require('stream').Readable;
-var r = new Readable({
-  highWaterMark: HWM
+var stream = new Readable();
+var calledRead = false;
+stream._read = function() {
+  assert(!calledRead);
+  calledRead = true;
+  this.push(null);
+};
+
+stream.on('data', function() {
+  throw new Error('should not ever get data');
 });
-var rs = r._readableState;
+stream.pause();
 
-r._read = push;
-
-r.on('readable', function() {
-  console.error('>> readable');
-  do {
-    console.error('  > read(%d)', READSIZE);
-    var ret = r.read(READSIZE);
-    console.error('  < %j (%d remain)', ret && ret.length, rs.length);
-  } while (ret && ret.length === READSIZE);
-
-  console.error('<< after read()',
-                ret && ret.length,
-                rs.needReadable,
-                rs.length);
+setTimeout(function() {
+  stream.on('end', function() {
+    gotEnd = true;
+  });
+  stream.resume();
 });
-
-var endEmitted = false;
-r.on('end', function() {
-  endEmitted = true;
-  console.error('end');
-});
-
-var pushes = 0;
-function push() {
-  if (pushes > PUSHCOUNT)
-    return;
-
-  if (pushes++ === PUSHCOUNT) {
-    console.error('   push(EOF)');
-    return r.push(null);
-  }
-
-  console.error('   push #%d', pushes);
-  if (r.push(new Buffer(PUSHSIZE)))
-    setTimeout(push);
-}
-
-// start the flow
-var ret = r.read(0);
 
 process.on('exit', function() {
-  assert.equal(pushes, PUSHCOUNT + 1);
-  assert(endEmitted);
+  assert(gotEnd);
+  assert(calledRead);
+  console.log('ok');
 });

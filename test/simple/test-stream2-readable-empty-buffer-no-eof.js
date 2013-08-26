@@ -22,11 +22,10 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Readable = require('../../readable').Readable;
+var Readable = require('stream').Readable;
 
 test1();
-if (!/^v0\.[0-8]\./.test(process.version))
-  test2();
+test2();
 
 function test1() {
   var r = new Readable();

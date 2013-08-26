@@ -22,7 +22,7 @@
 
 var common = require('../common.js');
 var assert = require('assert');
-var stream = require('../../readable');
+var stream = require('stream');
 
 var chunk = new Buffer('hallo');
 
@@ -68,7 +68,8 @@ assert.equal(dest.listeners('finish').length, 0);
 
 console.error(src._readableState);
 process.on('exit', function() {
-  assert(src._readableState.length >= src._readableState.highWaterMark);
   src._readableState.buffer.length = 0;
   console.error(src._readableState);
+  assert(src._readableState.length >= src._readableState.highWaterMark);
+  console.log('ok');
 });
