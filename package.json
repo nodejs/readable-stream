@@ -22,5 +22,8 @@
     "pipe"
   ],
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
-  "license": "BSD"
+  "license": "BSD",
+  "optionalDependencies": {
+    "debuglog": "0.0.2"
+  }
 }
