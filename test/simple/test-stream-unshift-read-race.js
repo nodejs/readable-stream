@@ -29,7 +29,7 @@ var assert = require('assert');
 // 3. push() after the EOF signaling null is an error.
 // 4. _read() is not called after pushing the EOF null chunk.
 
-var stream = require('stream');
+var stream = require('../../');
 var hwm = 10;
 var r = stream.Readable({ highWaterMark: hwm });
 var chunks = 10;
@@ -51,7 +51,14 @@ r._read = function(n) {
 
   function push(fast) {
     assert(!pushedNull, 'push() after null push');
-    var c = pos >= data.length ? null : data.slice(pos, pos + n);
+    var c;
+    if (pos >= data.length)
+      c = null;
+    else {
+      if (n + pos > data.length)
+        n = data.length - pos;
+      c = data.slice(pos, pos + n);
+    }
     pushedNull = c === null;
     if (fast) {
       pos += n;

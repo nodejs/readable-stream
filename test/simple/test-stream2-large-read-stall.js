@@ -30,7 +30,7 @@ var PUSHSIZE = 20;
 var PUSHCOUNT = 1000;
 var HWM = 50;
 
-var Readable = require('stream').Readable;
+var Readable = require('../../').Readable;
 var r = new Readable({
   highWaterMark: HWM
 });
@@ -39,23 +39,23 @@ var rs = r._readableState;
 r._read = push;
 
 r.on('readable', function() {
-  console.error('>> readable');
+  //console.error('>> readable');
   do {
-    console.error('  > read(%d)', READSIZE);
+    //console.error('  > read(%d)', READSIZE);
     var ret = r.read(READSIZE);
-    console.error('  < %j (%d remain)', ret && ret.length, rs.length);
+    //console.error('  < %j (%d remain)', ret && ret.length, rs.length);
   } while (ret && ret.length === READSIZE);
 
-  console.error('<< after read()',
-                ret && ret.length,
-                rs.needReadable,
-                rs.length);
+  //console.error('<< after read()',
+  //              ret && ret.length,
+  //              rs.needReadable,
+  //              rs.length);
 });
 
 var endEmitted = false;
 r.on('end', function() {
   endEmitted = true;
-  console.error('end');
+  //console.error('end');
 });
 
 var pushes = 0;
@@ -64,11 +64,11 @@ function push() {
     return;
 
   if (pushes++ === PUSHCOUNT) {
-    console.error('   push(EOF)');
+    //console.error('   push(EOF)');
     return r.push(null);
   }
 
-  console.error('   push #%d', pushes);
+  //console.error('   push #%d', pushes);
   if (r.push(new Buffer(PUSHSIZE)))
     setTimeout(push);
 }

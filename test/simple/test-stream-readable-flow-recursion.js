@@ -27,7 +27,7 @@ var assert = require('assert');
 // more data continuously, but without triggering a nextTick
 // warning or RangeError.
 
-var Readable = require('stream').Readable;
+var Readable = require('../../').Readable;
 
 // throw an error if we trigger a nextTick warning.
 process.throwDeprecation = true;

@@ -22,8 +22,8 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Readable = require('_stream_readable');
-var Writable = require('_stream_writable');
+var Readable = require('../../lib/_stream_readable');
+var Writable = require('../../lib/_stream_writable');
 var util = require('util');
 
 util.inherits(TestReadable, Readable);

@@ -22,7 +22,7 @@
 var common = require('../common');
 var assert = require('assert');
 
-var stream = require('stream');
+var stream = require('../../');
 var Readable = stream.Readable;
 var Writable = stream.Writable;
 

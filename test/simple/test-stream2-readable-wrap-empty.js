@@ -22,7 +22,7 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Readable = require('_stream_readable');
+var Readable = require('../../lib/_stream_readable');
 var EE = require('events').EventEmitter;
 
 var oldStream = new EE();

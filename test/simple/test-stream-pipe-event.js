@@ -20,7 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var common = require('../common');
-var stream = require('stream');
+var stream = require('../../');
 var assert = require('assert');
 var util = require('util');
 

@@ -24,7 +24,7 @@ var common = require('../common.js');
 var assert = require('assert');
 
 var util = require('util');
-var stream = require('stream');
+var stream = require('../../');
 
 
 var Read = function() {

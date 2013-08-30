@@ -24,7 +24,7 @@ var assert = require('assert');
 
 // This test verifies that stream.unshift(Buffer(0)) or 
 // stream.unshift('') does not set state.reading=false.
-var Readable = require('stream').Readable;
+var Readable = require('../../').Readable;
 
 var r = new Readable();
 var nChunks = 10;

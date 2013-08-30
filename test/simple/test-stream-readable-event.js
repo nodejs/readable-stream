@@ -22,7 +22,7 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Readable = require('stream').Readable;
+var Readable = require('../../').Readable;
 
 (function first() {
   // First test, not reading when the readable is added.

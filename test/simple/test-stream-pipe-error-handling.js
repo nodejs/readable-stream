@@ -21,7 +21,7 @@
 
 var common = require('../common');
 var assert = require('assert');
-var Stream = require('stream').Stream;
+var Stream = require('../../').Stream;
 
 (function testErrorListenerCatches() {
   var source = new Stream();
