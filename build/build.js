@@ -50,6 +50,9 @@ function processTestFile (file) {
     , url          = testsrcurl + file
     , out          = path.join(testourroot, file)
 
+  if (testReplace[file])
+    replacements = replacements.concat(testReplace[file])
+
   processFile(url, out, replacements)
 }
 
