@@ -6,6 +6,7 @@
   "dependencies": {
     "bl": "~0.6.0",
     "hyperzip": "0.0.0",
-    "hyperdirect": "0.0.0"
+    "hyperdirect": "0.0.0",
+    "cheerio": "~0.13.1"
   }
 }

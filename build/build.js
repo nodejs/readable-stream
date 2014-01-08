@@ -1,22 +1,23 @@
 #!/usr/bin/env node
 
-//_stream_duplex.js
+const hyperquest  = require('hyperzip')(require('hyperdirect'))
+    , bl          = require('bl')
+    , fs          = require('fs')
+    , path        = require('path')
+    , cheerio     = require('cheerio')
 
-const hyperquest = require('hyperzip')(require('hyperdirect'))
-    , bl         = require('bl')
-    , fs         = require('fs')
-    , path       = require('path')
+    , files       = require('./files')
+    , testReplace = require('./test-replacements')
 
-const urlprefix  = 'https://raw.github.com/joyent/node/v' + process.argv[2] + '-release/lib/'
-    , outroot    = path.join(__dirname, '../lib/')
-    , files      = require('./files')
+    , srcurlpfx   = 'https://raw.github.com/joyent/node/v' + process.argv[2] + '-release/'
+    , libsrcurl   = srcurlpfx + 'lib/'
+    , testsrcurl  = srcurlpfx + 'test/simple/'
+    , testlisturl = 'https://github.com/joyent/node/tree/v' + process.argv[2] + '-release/test/simple'
+    , libourroot  = path.join(__dirname, '../lib/')
+    , testourroot = path.join(__dirname, '../test/simple/')
 
 
-function processFile (file) {
-  var replacements = files[file]
-    , url          = urlprefix + file
-    , out          = path.join(outroot, file)
-
+function processFile (url, out, replacements) {
   hyperquest(url).pipe(bl(function (err, data) {
     if (err)
       throw err
@@ -35,10 +36,52 @@ function processFile (file) {
   }))
 }
 
+function processLibFile (file) {
+  var replacements = files[file]
+    , url          = libsrcurl + file
+    , out          = path.join(libourroot, file)
+
+  processFile(url, out, replacements)
+}
+
+
+function processTestFile (file) {
+  var replacements = testReplace.all
+    , url          = testsrcurl + file
+    , out          = path.join(testourroot, file)
+
+  processFile(url, out, replacements)
+}
+
 
 if (!/0\.1\d\.\d+/.test(process.argv[2])) {
   console.log('Usage: build.js <node version>')
   return process.exit(-1)
 }
 
-Object.keys(files).forEach(processFile)
+
+//--------------------------------------------------------------------
+// Grab & process files in ../lib/
+
+Object.keys(files).forEach(processLibFile)
+
+//--------------------------------------------------------------------
+// Discover, grab and process all test-stream* files on joyent/node
+
+hyperquest(testlisturl).pipe(bl(function (err, data) {
+  if (err)
+    throw err
+
+  var $ = cheerio.load(data.toString())
+
+  $('table.files .js-directory-link').each(function () {
+    var file = $(this).text()
+    if (/^test-stream/.test(file) || file == 'common.js')
+      processTestFile(file)
+  })
+}))
+
+//--------------------------------------------------------------------
+// Grab the joyent/node test/common.js
+
+processFile(testsrcurl + '../common.js', path.join(testourroot, '../common.js'), [])
