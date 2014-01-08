@@ -22,54 +22,60 @@
 var common = require('../common');
 var assert = require('assert');
 
-var Stream = require('../../');
-var Readable = Stream.Readable;
+// This test verifies that stream.unshift(Buffer(0)) or 
+// stream.unshift('') does not set state.reading=false.
+var Readable = require('../../').Readable;
 
 var r = new Readable();
-var N = 256;
-var reads = 0;
+var nChunks = 10;
+var chunk = new Buffer(10);
+chunk.fill('x');
+
 r._read = function(n) {
-  return r.push(++reads === N ? null : new Buffer(1));
+  setTimeout(function() {
+    r.push(--nChunks === 0 ? null : chunk);
+  });
 };
 
-var rended = false;
-r.on('end', function() {
-  rended = true;
-});
-
-var w = new Stream();
-w.writable = true;
-var writes = 0;
-var buffered = 0;
-w.write = function(c) {
-  writes += c.length;
-  buffered += c.length;
-  process.nextTick(drain);
-  return false;
-};
-
-function drain() {
-  assert(buffered <= 2);
-  buffered = 0;
-  w.emit('drain');
-}
-
-
-var wended = false;
-w.end = function() {
-  wended = true;
-};
-
-// Just for kicks, let's mess with the drain count.
-// This verifies that even if it gets negative in the
-// pipe() cleanup function, we'll still function properly.
+var readAll = false;
+var seen = [];
 r.on('readable', function() {
-  w.emit('drain');
+  var chunk;
+  while (chunk = r.read()) {
+    seen.push(chunk.toString());
+    // simulate only reading a certain amount of the data,
+    // and then putting the rest of the chunk back into the
+    // stream, like a parser might do.  We just fill it with
+    // 'y' so that it's easy to see which bits were touched,
+    // and which were not.
+    var putBack = new Buffer(readAll ? 0 : 5);
+    putBack.fill('y');
+    readAll = !readAll;
+    r.unshift(putBack);
+  }
 });
 
-r.pipe(w);
-process.on('exit', function() {
-  assert(rended);
-  assert(wended);
-  console.error('ok');
+var expect =
+  [ 'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy',
+    'xxxxxxxxxx',
+    'yyyyy' ];
+
+r.on('end', function() {
+  assert.deepEqual(seen, expect);
+  console.log('ok');
 });

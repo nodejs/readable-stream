@@ -22,7 +22,7 @@
 
 var common = require('../common.js');
 var assert = require('assert');
-var stream = require('../../readable');
+var stream = require('../../');
 var crypto = require('crypto');
 
 var util = require('util');

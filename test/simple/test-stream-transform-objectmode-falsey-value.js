@@ -19,23 +19,35 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common.js');
+var common = require('../common');
+var assert = require('assert');
+
 var stream = require('../../');
-var Buffer = require('buffer').Buffer;
+var PassThrough = stream.PassThrough;
 
-var r = new stream.Readable();
-r._read = function(size) {
-  r.push(new Buffer(size));
-};
+var src = new PassThrough({ objectMode: true });
+var tx = new PassThrough({ objectMode: true });
+var dest = new PassThrough({ objectMode: true });
 
-var w = new stream.Writable();
-w._write = function(data, encoding, cb) {
-  cb(null);
-};
+var expect = [ -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+var results = [];
+process.on('exit', function() {
+  assert.deepEqual(results, expect);
+  console.log('ok');
+});
 
-r.pipe(w);
+dest.on('data', function(x) {
+  results.push(x);
+});
 
-// This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
-w.end();
+src.pipe(tx).pipe(dest);
+
+var i = -1;
+var int = setInterval(function() {
+  if (i > 10) {
+    src.end();
+    clearInterval(int);
+  } else {
+    src.write(i++);
+  }
+});

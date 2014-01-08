@@ -19,23 +19,48 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common.js');
-var stream = require('../../');
-var Buffer = require('buffer').Buffer;
+var common = require('../common');
+var assert = require('assert');
 
-var r = new stream.Readable();
-r._read = function(size) {
-  r.push(new Buffer(size));
+var Readable = require('../../').Readable;
+var util = require('util');
+
+util.inherits(MyStream, Readable);
+function MyStream(options) {
+  Readable.call(this, options);
+  this._chunks = 3;
+}
+
+MyStream.prototype._read = function(n) {
+  switch (this._chunks--) {
+    case 0:
+      return this.push(null);
+    case 1:
+      return setTimeout(function() {
+        this.push('last chunk');
+      }.bind(this), 100);
+    case 2:
+      return this.push('second to last chunk');
+    case 3:
+      return process.nextTick(function() {
+        this.push('first chunk');
+      }.bind(this));
+    default:
+      throw new Error('?');
+  }
 };
 
-var w = new stream.Writable();
-w._write = function(data, encoding, cb) {
-  cb(null);
-};
+var ms = new MyStream();
+var results = [];
+ms.on('readable', function() {
+  var chunk;
+  while (null !== (chunk = ms.read()))
+    results.push(chunk + '');
+});
 
-r.pipe(w);
-
-// This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
-w.end();
+var expect = [ 'first chunksecond to last chunk', 'last chunk' ];
+process.on('exit', function() {
+  assert.equal(ms._chunks, -1);
+  assert.deepEqual(results, expect);
+  console.log('ok');
+});

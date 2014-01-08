@@ -21,55 +21,64 @@
 
 var common = require('../common');
 var assert = require('assert');
+var stream = require('../../');
+var str = 'asdfasdfasdfasdfasdf';
 
-var Stream = require('../../');
-var Readable = Stream.Readable;
+var r = new stream.Readable({
+  highWaterMark: 5,
+  encoding: 'utf8'
+});
 
-var r = new Readable();
-var N = 256;
 var reads = 0;
+var eofed = false;
+var ended = false;
+
 r._read = function(n) {
-  return r.push(++reads === N ? null : new Buffer(1));
+  if (reads === 0) {
+    setTimeout(function() {
+      r.push(str);
+    });
+    reads++;
+  } else if (reads === 1) {
+    var ret = r.push(str);
+    assert.equal(ret, false);
+    reads++;
+  } else {
+    assert(!eofed);
+    eofed = true;
+    r.push(null);
+  }
 };
 
-var rended = false;
 r.on('end', function() {
-  rended = true;
+  ended = true;
 });
 
-var w = new Stream();
-w.writable = true;
-var writes = 0;
-var buffered = 0;
-w.write = function(c) {
-  writes += c.length;
-  buffered += c.length;
-  process.nextTick(drain);
-  return false;
-};
+// push some data in to start.
+// we've never gotten any read event at this point.
+var ret = r.push(str);
+// should be false.  > hwm
+assert(!ret);
+var chunk = r.read();
+assert.equal(chunk, str);
+chunk = r.read();
+assert.equal(chunk, null);
 
-function drain() {
-  assert(buffered <= 2);
-  buffered = 0;
-  w.emit('drain');
-}
+r.once('readable', function() {
+  // this time, we'll get *all* the remaining data, because
+  // it's been added synchronously, as the read WOULD take
+  // us below the hwm, and so it triggered a _read() again,
+  // which synchronously added more, which we then return.
+  chunk = r.read();
+  assert.equal(chunk, str + str);
 
-
-var wended = false;
-w.end = function() {
-  wended = true;
-};
-
-// Just for kicks, let's mess with the drain count.
-// This verifies that even if it gets negative in the
-// pipe() cleanup function, we'll still function properly.
-r.on('readable', function() {
-  w.emit('drain');
+  chunk = r.read();
+  assert.equal(chunk, null);
 });
 
-r.pipe(w);
 process.on('exit', function() {
-  assert(rended);
-  assert(wended);
-  console.error('ok');
+  assert(eofed);
+  assert(ended);
+  assert.equal(reads, 2);
+  console.log('ok');
 });

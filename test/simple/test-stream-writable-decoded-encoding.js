@@ -19,23 +19,42 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common.js');
+var common = require('../common');
+var assert = require('assert');
+
 var stream = require('../../');
-var Buffer = require('buffer').Buffer;
+var util = require('util');
 
-var r = new stream.Readable();
-r._read = function(size) {
-  r.push(new Buffer(size));
+function MyWritable(fn, options) {
+  stream.Writable.call(this, options);
+  this.fn = fn;
 };
 
-var w = new stream.Writable();
-w._write = function(data, encoding, cb) {
-  cb(null);
+util.inherits(MyWritable, stream.Writable);
+
+MyWritable.prototype._write = function (chunk, encoding, callback) {
+  this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
+  callback();
 };
 
-r.pipe(w);
+;(function decodeStringsTrue() {
+  var m = new MyWritable(function(isBuffer, type, enc) {
+    assert(isBuffer);
+    assert.equal(type, 'object');
+    assert.equal(enc, 'buffer');
+    console.log('ok - decoded string is decoded');
+  }, { decodeStrings: true });
+  m.write('some-text', 'utf8');
+  m.end();
+})();
 
-// This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
-w.end();
+;(function decodeStringsFalse() {
+  var m = new MyWritable(function(isBuffer, type, enc) {
+    assert(!isBuffer);
+    assert.equal(type, 'string');
+    assert.equal(enc, 'utf8');
+    console.log('ok - un-decoded string is not decoded');
+  }, { decodeStrings: false });
+  m.write('some-text', 'utf8');
+  m.end();
+})();
