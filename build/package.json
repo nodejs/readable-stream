@@ -1,0 +1,11 @@
+{
+  "name": "readable-stream-build",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build.js",
+  "dependencies": {
+    "bl": "~0.6.0",
+    "hyperzip": "0.0.0",
+    "hyperdirect": "0.0.0"
+  }
+}
