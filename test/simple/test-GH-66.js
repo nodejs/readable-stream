@@ -1,7 +1,7 @@
 var assert = require('assert');
 var http = require('http');
 var net = require('net');
-var stream = require('readable-stream');
+var stream = require('../../');
 var PORT = require('../common.js').PORT;
 
 var server = http.createServer(function (req, res) {
