@@ -17,6 +17,11 @@ module.exports.all = [
       , 'require(\'../../lib/$1\')'
     ]
 
+  , [
+        /Stream.(Readable|Writable|Duplex|Transform|PassThrough)/g
+      , 'require(\'../../\').$1'
+    ]
+
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -28,8 +33,8 @@ module.exports['test-stream-pipe-multi.js'] = [
     ]
 
   , [
-        /process\.nextTick/g
-      , 'setImmediate'
+        /process\.nextTick([^\;]+);/g
+      , 'setTimeout($1, 0);'
     ]
 ]
 
@@ -38,5 +43,29 @@ module.exports['test-stream2-large-read-stall.js'] = [
     [
         /console\.error/g
       , ';false && console.error'
+    ]
+]
+
+module.exports['common.js'] = [
+    [
+        /^                      setImmediate,$/m
+      , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
+    ]
+
+  , [
+        /^                      clearImmediate,$/m
+      , '                      typeof clearImmediate == \'undefined\' ? null : clearImmediate,'
+    ]
+
+  , [
+        /^                      global];$/m
+      , '                      global].filter(Boolean);'
+    ]
+]
+
+module.exports['test-stream-pipe-cleanup.js'] = [
+    [
+        /(function Writable\(\) \{)/
+      , 'if (/^v0\.8\./.test(process.version))\n  return\n\n$1'
     ]
 ]

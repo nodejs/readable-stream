@@ -59,8 +59,8 @@ var Stream = require('stream').Stream;
 
 (function testErrorWithRemovedListenerThrows() {
   var EE = require('events').EventEmitter;
-  var R = Stream.Readable;
-  var W = Stream.Writable;
+  var R = require('../../').Readable;
+  var W = require('../../').Writable;
 
   var r = new R;
   var w = new W;
@@ -94,8 +94,8 @@ var Stream = require('stream').Stream;
 
 (function testErrorWithRemovedListenerThrows() {
   var EE = require('events').EventEmitter;
-  var R = Stream.Readable;
-  var W = Stream.Writable;
+  var R = require('../../').Readable;
+  var W = require('../../').Writable;
 
   var r = new R;
   var w = new W;

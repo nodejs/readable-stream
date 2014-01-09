@@ -46,7 +46,7 @@ FakeStream.prototype = Object.create(Stream.prototype);
 FakeStream.prototype.write = function(chunk) {
   //console.error(this.ID, 'write', this.wait);
   if (this.wait) {
-    setImmediate(this.emit.bind(this, 'drain'));
+    setTimeout((this.emit.bind(this, 'drain')), 0);
   }
   this.wait = !this.wait;
   return this.wait;
@@ -54,7 +54,7 @@ FakeStream.prototype.write = function(chunk) {
 
 FakeStream.prototype.end = function() {
   this.emit('end');
-  setImmediate(this.close.bind(this));
+  setTimeout((this.close.bind(this)), 0);
 };
 
 // noop - closes happen automatically on end.
@@ -114,8 +114,8 @@ rr.forEach(function(r) {
       return;
     }
     if (paused) return;
-    setImmediate(step);
+    setTimeout((step), 0);
   }
 
-  setImmediate(step);
+  setTimeout((step), 0);
 });

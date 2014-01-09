@@ -39,6 +39,11 @@ module.exports['_stream_readable.js'] = [
         + '};'
     ]
 
+  , [
+        /(if \(state\.decoder && !state\.ended)(\) \{)/
+      , '$1 && state.decoder.end$2'
+    ]
+
 ]
 
 module.exports['_stream_transform.js'] = [

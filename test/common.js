@@ -92,14 +92,14 @@ process.on('exit', function() {
   if (!exports.globalCheck) return;
   var knownGlobals = [setTimeout,
                       setInterval,
-                      setImmediate,
+                      typeof setImmediate == 'undefined' ? null : setImmediate,
                       clearTimeout,
                       clearInterval,
-                      clearImmediate,
+                      typeof clearImmediate == 'undefined' ? null : clearImmediate,
                       console,
                       Buffer,
                       process,
-                      global];
+                      global].filter(Boolean);
 
   if (global.gc) {
     knownGlobals.push(gc);
