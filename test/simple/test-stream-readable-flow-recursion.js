@@ -21,34 +21,56 @@
 
 var common = require('../common');
 var assert = require('assert');
+
+// this test verifies that passing a huge number to read(size)
+// will push up the highWaterMark, and cause the stream to read
+// more data continuously, but without triggering a nextTick
+// warning or RangeError.
+
 var Readable = require('../../').Readable;
-var r = new Readable();
-var N = 256 * 1024;
 
-// Go ahead and allow the pathological case for this test.
-// Yes, it's an infinite loop, that's the point.
-process.maxTickDepth = N + 2;
+// throw an error if we trigger a nextTick warning.
+process.throwDeprecation = true;
 
+var stream = new Readable({ highWaterMark: 2 });
 var reads = 0;
-r._read = function(n) {
-  var chunk = reads++ === N ? null : new Buffer(1);
-  r.push(chunk);
+var total = 5000;
+stream._read = function(size) {
+  reads++;
+  size = Math.min(size, total);
+  total -= size;
+  if (size === 0)
+    stream.push(null);
+  else
+    stream.push(new Buffer(size));
 };
 
-r.on('readable', function onReadable() {
-  if (!(r._readableState.length % 256))
-    console.error('readable', r._readableState.length);
-  r.read(N * 2);
+var depth = 0;
+
+function flow(stream, size, callback) {
+  depth += 1;
+  var chunk = stream.read(size);
+
+  if (!chunk)
+    stream.once('readable', flow.bind(null, stream, size, callback));
+  else
+    callback(chunk);
+
+  depth -= 1;
+  console.log('flow(' + depth + '): exit');
+}
+
+flow(stream, 5000, function() {
+  console.log('complete (' + depth + ')');
 });
 
-var ended = false;
-r.on('end', function onEnd() {
-  ended = true;
-});
-
-r.read(0);
-
-process.on('exit', function() {
-  assert(ended);
+process.on('exit', function(code) {
+  assert.equal(reads, 2);
+  // we pushed up the high water mark
+  assert.equal(stream._readableState.highWaterMark, 8192);
+  // length is 0 right now, because we pulled it all out.
+  assert.equal(stream._readableState.length, 0);
+  assert(!code);
+  assert.equal(depth, 0);
   console.log('ok');
 });
