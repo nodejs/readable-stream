@@ -30,6 +30,15 @@ module.exports['_stream_passthrough.js'] = [
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
+
+  , [
+        /(require\('events'\)\.EventEmitter;)/
+      ,   '$1\n'
+        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+        + '  return emitter.listeners(type).length;\n'
+        + '};'
+    ]
+
 ]
 
 module.exports['_stream_transform.js'] = [
