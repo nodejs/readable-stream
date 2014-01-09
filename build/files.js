@@ -10,11 +10,23 @@ const requireReplacement = [
           /(require\(['"])(_stream_)/g
         , '$1./$2'
       ]
+
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
             return 'instanceof require(\'./_stream_' + streamType.toLowerCase() + '\')'
           }
+      ]
+
+    , coreUtilIsReplacement = [
+          /(require\('util'\);)/
+        ,   '$1\n'
+          + 'if (!util.isUndefined) {\n'
+          + '  var utilIs = require(\'core-util-is\');\n'
+          + '  for (var f in utilIs) {\n'
+          + '    util[f] = utilIs[f];\n'
+          + '  }\n'
+          + '}'
       ]
 
 module.exports['_stream_duplex.js'] = [
@@ -30,6 +42,7 @@ module.exports['_stream_passthrough.js'] = [
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
@@ -44,17 +57,6 @@ module.exports['_stream_readable.js'] = [
         + '  return clearTimeout(i);\n'
         + '};\n'
 
-    ]
-
-  , [
-        /(require\('util'\);)/
-      ,   '$1\n'
-        + 'if (!util.isUndefined) {\n'
-        + '  var utilIs = require(\'core-util-is\');\n'
-        + '  for (var f in utilIs) {\n'
-        + '    util[f] = utilIs[f];\n'
-        + '  }\n'
-        + '}'
     ]
 
   , [
@@ -79,9 +81,11 @@ module.exports['_stream_readable.js'] = [
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
 ]
