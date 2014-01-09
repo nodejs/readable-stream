@@ -26,15 +26,15 @@ var util = require('util');
 
 function Writable() {
   this.writable = true;
-  stream.Stream.call(this);
+  require('stream').Stream.call(this);
 }
-util.inherits(Writable, stream.Stream);
+util.inherits(Writable, require('stream').Stream);
 
 function Readable() {
   this.readable = true;
-  stream.Stream.call(this);
+  require('stream').Stream.call(this);
 }
-util.inherits(Readable, stream.Stream);
+util.inherits(Readable, require('stream').Stream);
 
 var passed = false;
 

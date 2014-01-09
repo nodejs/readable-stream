@@ -19,57 +19,54 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common');
+
+var common = require('../common.js');
+var R = require('../../lib/_stream_readable');
 var assert = require('assert');
 
+var fs = require('fs');
+var FSReadable = fs.ReadStream;
+
+var path = require('path');
+var file = path.resolve(common.fixturesDir, 'x1024.txt');
+
+var size = fs.statSync(file).size;
+
+var expectLengths = [1024];
+
+var util = require('util');
 var Stream = require('../../');
-var Readable = require('../../').Readable;
 
-var r = new Readable();
-var N = 256;
-var reads = 0;
-r._read = function(n) {
-  return r.push(++reads === N ? null : new Buffer(1));
-};
+util.inherits(TestWriter, Stream);
 
-var rended = false;
-r.on('end', function() {
-  rended = true;
-});
-
-var w = new Stream();
-w.writable = true;
-var writes = 0;
-var buffered = 0;
-w.write = function(c) {
-  writes += c.length;
-  buffered += c.length;
-  process.nextTick(drain);
-  return false;
-};
-
-function drain() {
-  assert(buffered <= 2);
-  buffered = 0;
-  w.emit('drain');
+function TestWriter() {
+  Stream.apply(this);
+  this.buffer = [];
+  this.length = 0;
 }
 
-
-var wended = false;
-w.end = function() {
-  wended = true;
+TestWriter.prototype.write = function(c) {
+  this.buffer.push(c.toString());
+  this.length += c.length;
+  return true;
 };
 
-// Just for kicks, let's mess with the drain count.
-// This verifies that even if it gets negative in the
-// pipe() cleanup function, we'll still function properly.
-r.on('readable', function() {
-  w.emit('drain');
+TestWriter.prototype.end = function(c) {
+  if (c) this.buffer.push(c.toString());
+  this.emit('results', this.buffer);
+}
+
+var r = new FSReadable(file);
+var w = new TestWriter();
+
+w.on('results', function(res) {
+  console.error(res, w.length);
+  assert.equal(w.length, size);
+  var l = 0;
+  assert.deepEqual(res.map(function (c) {
+    return c.length;
+  }), expectLengths);
+  console.log('ok');
 });
 
 r.pipe(w);
-process.on('exit', function() {
-  assert(rended);
-  assert(wended);
-  console.error('ok');
-});

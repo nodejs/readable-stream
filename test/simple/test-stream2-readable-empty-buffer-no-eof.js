@@ -25,6 +25,7 @@ var assert = require('assert');
 var Readable = require('../../').Readable;
 
 test1();
+test2();
 
 function test1() {
   var r = new Readable();
@@ -84,6 +85,34 @@ function test1() {
 
   process.on('exit', function() {
     assert.deepEqual(results, [ 'xxxxx', 'xxxxx', 'EOF' ]);
+    console.log('ok');
+  });
+}
+
+function test2() {
+  var r = new Readable({ encoding: 'base64' });
+  var reads = 5;
+  r._read = function(n) {
+    if (!reads--)
+      return r.push(null); // EOF
+    else
+      return r.push(new Buffer('x'));
+  };
+
+  var results = [];
+  function flow() {
+    var chunk;
+    while (null !== (chunk = r.read()))
+      results.push(chunk + '');
+  }
+  r.on('readable', flow);
+  r.on('end', function() {
+    results.push('EOF');
+  });
+  flow();
+
+  process.on('exit', function() {
+    assert.deepEqual(results, [ 'eHh4', 'eHg=', 'EOF' ]);
     console.log('ok');
   });
 }
