@@ -30,8 +30,10 @@ exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 
 if (process.platform === 'win32') {
   exports.PIPE = '\\\\.\\pipe\\libuv-test';
+  exports.opensslCli = path.join(process.execPath, '..', 'openssl-cli.exe');
 } else {
   exports.PIPE = exports.tmpDir + '/test.sock';
+  exports.opensslCli = path.join(process.execPath, '..', 'openssl-cli');
 }
 
 var util = require('util');
@@ -97,6 +99,7 @@ process.on('exit', function() {
                       clearInterval,
                       clearImmediate,
                       console,
+                      constructor, // Enumerable in V8 3.21.
                       Buffer,
                       process,
                       global];
@@ -198,3 +201,16 @@ exports.mustCall = function(fn, expected) {
     return fn.apply(this, arguments);
   };
 };
+
+if (!util._errnoException) {
+  var uv;
+  util._errnoException = function(err, syscall) {
+    if (util.isUndefined(uv)) try { uv = process.binding('uv'); } catch (e) {}
+    var errname = uv ? uv.errname(err) : '';
+    var e = new Error(syscall + ' ' + errname);
+    e.code = errname;
+    e.errno = errname;
+    e.syscall = syscall;
+    return e;
+  };
+}

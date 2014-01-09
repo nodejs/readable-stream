@@ -87,4 +87,8 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 //--------------------------------------------------------------------
 // Grab the joyent/node test/common.js
 
-processFile(testsrcurl + '../common.js', path.join(testourroot, '../common.js'), [])
+processFile(
+    testsrcurl + '../common.js'
+  , path.join(testourroot, '../common.js')
+  , testReplace['common.js']
+)

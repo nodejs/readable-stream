@@ -19,57 +19,34 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var common = require('../common');
+var common = require('../common.js');
 var assert = require('assert');
-
-var Stream = require('../../');
-var Readable = require('../../').Readable;
-
-var r = new Readable();
-var N = 256;
-var reads = 0;
-r._read = function(n) {
-  return r.push(++reads === N ? null : new Buffer(1));
-};
-
-var rended = false;
-r.on('end', function() {
-  rended = true;
+var http = require('http');
+var msg = 'Hello';
+var readable_event = false;
+var end_event = false;
+var server = http.createServer(function(req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(msg);
+}).listen(common.PORT, function() {
+  http.get({port: common.PORT}, function(res) {
+    var data = '';
+    res.on('readable', function() {
+      console.log('readable event');
+      readable_event = true;
+      data += res.read();
+    });
+    res.on('end', function() {
+      console.log('end event');
+      end_event = true;
+      assert.strictEqual(msg, data);
+      server.close();
+    });
+  });
 });
 
-var w = new Stream();
-w.writable = true;
-var writes = 0;
-var buffered = 0;
-w.write = function(c) {
-  writes += c.length;
-  buffered += c.length;
-  process.nextTick(drain);
-  return false;
-};
-
-function drain() {
-  assert(buffered <= 2);
-  buffered = 0;
-  w.emit('drain');
-}
-
-
-var wended = false;
-w.end = function() {
-  wended = true;
-};
-
-// Just for kicks, let's mess with the drain count.
-// This verifies that even if it gets negative in the
-// pipe() cleanup function, we'll still function properly.
-r.on('readable', function() {
-  w.emit('drain');
-});
-
-r.pipe(w);
 process.on('exit', function() {
-  assert(rended);
-  assert(wended);
-  console.error('ok');
+  assert(readable_event);
+  assert(end_event);
 });
+

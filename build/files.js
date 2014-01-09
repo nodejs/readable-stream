@@ -10,11 +10,23 @@ const requireReplacement = [
           /(require\(['"])(_stream_)/g
         , '$1./$2'
       ]
+
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
             return 'instanceof require(\'./_stream_' + streamType.toLowerCase() + '\')'
           }
+      ]
+
+    , coreUtilIsReplacement = [
+          /(require\('util'\);)/
+        ,   '$1\n'
+          + 'if (!util.isUndefined) {\n'
+          + '  var utilIs = require(\'core-util-is\');\n'
+          + '  for (var f in utilIs) {\n'
+          + '    util[f] = utilIs[f];\n'
+          + '  }\n'
+          + '}'
       ]
 
 module.exports['_stream_duplex.js'] = [
@@ -30,14 +42,50 @@ module.exports['_stream_passthrough.js'] = [
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
+
+  , [
+        /(require\('events'\)\.EventEmitter;)/
+      ,   '$1\n'
+        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+        + '  return emitter.listeners(type).length;\n'
+        + '};\n\n'
+        + 'if (!global.setImmediate) global.setImmediate = function setImmediate(fn) {\n'
+        + '  return setTimeout(fn, 0);\n'
+        + '};\n'
+        + 'if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {\n'
+        + '  return clearTimeout(i);\n'
+        + '};\n'
+
+    ]
+
+  , [
+        /var debug = util\.debuglog\('stream'\);/
+      , 'var debug;\n'
+        + 'if (util.debuglog)\n'
+        + '  debug = util.debuglog(\'stream\');\n'
+        + 'else try {\n'
+        + '  debug = require(\'debuglog\')(\'stream\');\n'
+        + '} catch (er) {\n'
+        + '  debug = function() {};\n'
+        + '}'
+    ]
+
+  , [
+        /(if \(state\.decoder && !state\.ended)(\) \{)/
+      , '$1 && state.decoder.end$2'
+    ]
+
 ]
 
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
 ]
