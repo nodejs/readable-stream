@@ -38,12 +38,14 @@ const requireReplacement = [
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
+  , coreUtilIsReplacement
   , stringDecoderReplacement
 ]
 
