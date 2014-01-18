@@ -18,6 +18,12 @@ const requireReplacement = [
           }
       ]
 
+      // use the string_decoder in node_modules rather than core
+    , stringDecoderReplacement = [
+          /(require\(['"])(string_decoder)(['"]\))/g
+        , '$1$2/$3'
+      ]
+
     , coreUtilIsReplacement = [
           /(require\('util'\);)/
         ,   '$1\n'
@@ -32,17 +38,20 @@ const requireReplacement = [
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
   , coreUtilIsReplacement
+  , stringDecoderReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
@@ -82,10 +91,12 @@ module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
   , coreUtilIsReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
     requireReplacement
   , instanceofReplacement
   , coreUtilIsReplacement
+  , stringDecoderReplacement
 ]
