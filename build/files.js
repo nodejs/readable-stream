@@ -16,20 +16,27 @@ const requireReplacement = [
             return 'instanceof require(\'./_stream_' + streamType.toLowerCase() + '\')'
           }
       ]
+    , stringDecoderReplacement = [
+          /(require\(['"])string_decoder(['"]\))/g
+        , '$1core-string-decoder$2'
+      ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
@@ -49,9 +56,11 @@ module.exports['_stream_readable.js'] = [
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
     requireReplacement
   , instanceofReplacement
+  , stringDecoderReplacement
 ]

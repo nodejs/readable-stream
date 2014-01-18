@@ -3,7 +3,9 @@
   "version": "1.0.24",
   "description": "An exploration of a new kind of readable streams for Node.js",
   "main": "readable.js",
-  "dependencies": {},
+  "dependencies": {
+    "core-string-decoder": "~0.10.x"
+  },
   "devDependencies": {
     "tap": "~0.2.6"
   },
