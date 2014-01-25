@@ -23,6 +23,10 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+    , bufferReplacement = [
+        /^(var util = require\('util'\);)/m
+      , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+    ]
 
     , coreUtilIsReplacement = [
           /(require\('util'\);)/
@@ -54,6 +58,7 @@ module.exports['_stream_readable.js'] = [
   , instanceofReplacement
   , coreUtilIsReplacement
   , stringDecoderReplacement
+  , bufferReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
@@ -96,4 +101,5 @@ module.exports['_stream_writable.js'] = [
   , instanceofReplacement
   , coreUtilIsReplacement
   , stringDecoderReplacement
+  , bufferReplacement
 ]
