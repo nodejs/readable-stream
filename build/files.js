@@ -21,6 +21,10 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+    , bufferReplacement = [
+        /^(var util = require\('util'\);)/m
+      , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+    ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -38,6 +42,7 @@ module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
   , stringDecoderReplacement
+  , bufferReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
@@ -59,4 +64,5 @@ module.exports['_stream_writable.js'] = [
     requireReplacement
   , instanceofReplacement
   , stringDecoderReplacement
+  , bufferReplacement
 ]
