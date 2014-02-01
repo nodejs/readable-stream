@@ -21,15 +21,48 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+
     , bufferReplacement = [
-        /^(var util = require\('util'\);)/m
-      , '$1\nvar Buffer = require(\'buffer\').Buffer;'
-    ]
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+      ]
+
+    , altForEachImplReplacement = [
+          /$/
+        ,   '\nfunction forEach (xs, f) {\n'
+          + '  for (var i = 0, l = xs.length; i < l; i++) {\n'
+          + '    f(xs[i], i);\n'
+          + '  }\n'
+          + '}\n'
+      ]
+
+    , altForEachUseReplacement = [
+          /(\s+)(.+)(\.forEach\()/gm
+        , '$1forEach($2, '
+      ]
+
+    , altIndexOfImplReplacement = [
+          /$/
+        ,   '\nfunction indexOf (xs, x) {\n'
+          + '  for (var i = 0, l = xs.length; i < l; i++) {\n'
+          + '    if (xs[i] === x) return i;\n'
+          + '  }\n'
+          + '  return -1;\n'
+          + '}\n'
+      ]
+
+    , altIndexOfUseReplacement = [
+          /(\W)([\w\.]+)(\.indexOf\()/gm
+        , '$1indexOf($2, '
+      ]
+
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
   , stringDecoderReplacement
+  , altForEachImplReplacement
+  , altForEachUseReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -43,6 +76,10 @@ module.exports['_stream_readable.js'] = [
   , instanceofReplacement
   , stringDecoderReplacement
   , bufferReplacement
+  , altForEachImplReplacement
+  , altForEachUseReplacement
+  , altIndexOfImplReplacement
+  , altIndexOfUseReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
