@@ -37,34 +37,10 @@ const requireReplacement = [
         , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
 
-    , altForEachImplReplacement = [
-          /$/
-        ,   '\nfunction forEach (xs, f) {\n'
-          + '  for (var i = 0, l = xs.length; i < l; i++) {\n'
-          + '    f(xs[i], i);\n'
-          + '  }\n'
-          + '}\n'
-      ]
-
-    , altForEachUseReplacement = [
-          /(\s+)(.+)(\.forEach\()/gm
-        , '$1forEach($2, '
-      ]
-
-    , altIndexOfImplReplacement = [
-          /$/
-        ,   '\nfunction indexOf (xs, x) {\n'
-          + '  for (var i = 0, l = xs.length; i < l; i++) {\n'
-          + '    if (xs[i] === x) return i;\n'
-          + '  }\n'
-          + '  return -1;\n'
-          + '}\n'
-      ]
-
-    , altIndexOfUseReplacement = [
-          /(\W)([\w\.]+)(\.indexOf\()/gm
-        , '$1indexOf($2, '
-      ]
+    , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
+    , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
+    , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
+    , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
 
 module.exports['_stream_duplex.js'] = [
