@@ -85,7 +85,10 @@ module.exports['test-stream2-large-read-stall.js'] = [
 ]
 
 module.exports['common.js'] = [
-    [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+
+  , [
         /^                      setImmediate,$/m
       , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
     ]
