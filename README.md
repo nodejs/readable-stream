@@ -1,5 +1,7 @@
 # readable-stream
 
+[![build status][1]][2]
+
 A new class of streams for Node.js
 
 This module provides the new Stream base classes introduced in Node
@@ -766,3 +768,6 @@ it can come in handy.
 
 
 [EventEmitter]: events.html#events_class_events_eventemitter
+
+  [1]: https://secure.travis-ci.org/isaacs/readable-stream.png
+  [2]: https://travis-ci.org/isaacs/readable-stream
