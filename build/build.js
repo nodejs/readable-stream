@@ -79,7 +79,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   $('table.files .js-directory-link').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file) || file == 'common.js')
+    if (/^test-stream/.test(file))
       processTestFile(file)
   })
 }))
@@ -88,7 +88,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 // Grab the joyent/node test/common.js
 
 processFile(
-    testsrcurl + '../common.js'
+    testsrcurl.replace(/simple\/$/, 'common.js')
   , path.join(testourroot, '../common.js')
   , testReplace['common.js']
 )
