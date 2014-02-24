@@ -14,7 +14,7 @@ const requireReplacement = [
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
-            return 'instanceof require(\'./_stream_' + streamType.toLowerCase() + '\')'
+            return 'instanceof ' + streamType
           }
       ]
 
@@ -26,6 +26,10 @@ const requireReplacement = [
     , bufferReplacement = [
         /^(var util = require\('util'\);)/m
       , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+      ]
+    , addDuplexRequire = [
+      /^(function Writable\(options\) {)/m
+    , "$1\n  var Duplex = require('./_stream_duplex');\n"
     ]
 
     , coreUtilIsReplacement = [
@@ -97,7 +101,8 @@ module.exports['_stream_transform.js'] = [
 ]
 
 module.exports['_stream_writable.js'] = [
-    requireReplacement
+    addDuplexRequire
+  , requireReplacement
   , instanceofReplacement
   , coreUtilIsReplacement
   , stringDecoderReplacement
