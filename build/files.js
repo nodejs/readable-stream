@@ -22,13 +22,13 @@ const requireReplacement = [
         , '$1$2/$3'
       ]
     , bufferReplacement = [
-        /^(var util = require\('util'\);)/m
-      , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
     , addDuplexRequire = [
-      /^(function Writable\(options\) {)/m
-    , "$1\n  var Duplex = require('./_stream_duplex');\n"
-    ]
+          /^(function Writable\(options\) \{)/m
+        , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
+      ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
