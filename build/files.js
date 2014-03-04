@@ -42,6 +42,14 @@ const requireReplacement = [
           + '  }\n'
           + '}'
       ]
+    , isArrayDefine = [
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar isArray = require(\'isarray\');'
+      ]
+    , isArray = [
+          /Array\.isArray/
+        , 'isArray'
+      ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -63,6 +71,8 @@ module.exports['_stream_readable.js'] = [
   , coreUtilIsReplacement
   , stringDecoderReplacement
   , bufferReplacement
+  , isArrayDefine
+  , isArray
 
   , [
         /(require\('events'\)\.EventEmitter;)/
