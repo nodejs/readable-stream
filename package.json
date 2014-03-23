@@ -6,7 +6,6 @@
   "dependencies": {
     "core-util-is": "~1.0.0",
     "string_decoder": "~0.10.x",
-    "debuglog": "^1.0.1",
     "inherits": "^2.0.1"
   },
   "devDependencies": {
@@ -24,6 +23,9 @@
     "stream",
     "pipe"
   ],
+  "browser": {
+    "util": false
+  },
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
   "license": "MIT"
 }

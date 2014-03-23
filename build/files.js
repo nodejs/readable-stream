@@ -39,8 +39,13 @@ const requireReplacement = [
 
       ]
     , debugLogReplacement = [
-      /(var debug =) util\.debuglog(\('stream'\);)/
-      ,   '$1 require(\'debuglog\')$2'
+      /var debug = util.debuglog\('stream'\);/
+      ,   'var debug = require(\'util\');\n'
+        + 'if (debug && debug.debuglog) {\n'
+        + '  debug = debug.debuglog(\'stream\');\n'
+        + '} else {\n'
+        + '  debug = function () {};\n'
+        + '}\n'
     ], eventEmittterReplacement = [
         /(require\('events'\)\.EventEmitter;)/
       ,   '$1\n'
