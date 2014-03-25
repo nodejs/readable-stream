@@ -23,10 +23,12 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+
     , bufferReplacement = [
           /^(var util = require\('util'\);)/m
         , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
+
     , addDuplexRequire = [
           /^(function Writable\(options\) \{)/m
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
@@ -38,15 +40,18 @@ const requireReplacement = [
           + 'util.inherits = require(\'inherits\');\n'
 
       ]
+
     , debugLogReplacement = [
-      /var debug = util.debuglog\('stream'\);/
+          /var debug = util.debuglog\('stream'\);/
       ,   'var debug = require(\'util\');\n'
         + 'if (debug && debug.debuglog) {\n'
         + '  debug = debug.debuglog(\'stream\');\n'
         + '} else {\n'
         + '  debug = function () {};\n'
         + '}\n'
-    ], eventEmittterReplacement = [
+      ]
+
+    , eventEmittterReplacement = [
         /(require\('events'\)\.EventEmitter;)/
       ,   '$1\n'
         + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
@@ -58,7 +63,6 @@ const requireReplacement = [
         + 'if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {\n'
         + '  return clearTimeout(i);\n'
         + '};\n'
-
     ]
 
 module.exports['_stream_duplex.js'] = [
