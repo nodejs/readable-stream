@@ -5,7 +5,8 @@
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
-    "string_decoder": "~0.10.x"
+    "string_decoder": "~0.10.x",
+    "inherits": "^2.0.1"
   },
   "devDependencies": {
     "tap": "~0.2.6"
@@ -22,9 +23,9 @@
     "stream",
     "pipe"
   ],
+  "browser": {
+    "util": false
+  },
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
-  "license": "MIT",
-  "optionalDependencies": {
-    "debuglog": "0.0.2"
-  }
+  "license": "MIT"
 }

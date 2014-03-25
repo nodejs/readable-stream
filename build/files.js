@@ -23,48 +23,35 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+
     , bufferReplacement = [
           /^(var util = require\('util'\);)/m
         , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
+
     , addDuplexRequire = [
           /^(function Writable\(options\) \{)/m
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
       ]
 
-    , coreUtilIsReplacement = [
-          /(require\('util'\);)/
-        ,   '$1\n'
-          + 'if (!util.isUndefined) {\n'
-          + '  var utilIs = require(\'core-util-is\');\n'
-          + '  for (var f in utilIs) {\n'
-          + '    util[f] = utilIs[f];\n'
-          + '  }\n'
-          + '}'
+    , utilReplacement = [
+          /require\('util'\);/
+        ,   'require(\'core-util-is\');\n'
+          + 'util.inherits = require(\'inherits\');\n'
+
       ]
 
-module.exports['_stream_duplex.js'] = [
-    requireReplacement
-  , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
-]
+    , debugLogReplacement = [
+          /var debug = util.debuglog\('stream'\);/
+      ,   'var debug = require(\'util\');\n'
+        + 'if (debug && debug.debuglog) {\n'
+        + '  debug = debug.debuglog(\'stream\');\n'
+        + '} else {\n'
+        + '  debug = function () {};\n'
+        + '}\n'
+      ]
 
-module.exports['_stream_passthrough.js'] = [
-    requireReplacement
-  , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
-]
-
-module.exports['_stream_readable.js'] = [
-    requireReplacement
-  , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
-  , bufferReplacement
-
-  , [
+    , eventEmittterReplacement = [
         /(require\('events'\)\.EventEmitter;)/
       ,   '$1\n'
         + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
@@ -76,27 +63,37 @@ module.exports['_stream_readable.js'] = [
         + 'if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {\n'
         + '  return clearTimeout(i);\n'
         + '};\n'
-
     ]
 
-  , [
-        /var debug = util\.debuglog\('stream'\);/
-      , 'var debug;\n'
-        + 'if (util.debuglog)\n'
-        + '  debug = util.debuglog(\'stream\');\n'
-        + 'else try {\n'
-        + '  debug = require(\'debuglog\')(\'stream\');\n'
-        + '} catch (er) {\n'
-        + '  debug = function() {};\n'
-        + '}'
-    ]
+module.exports['_stream_duplex.js'] = [
+    requireReplacement
+  , instanceofReplacement
+  , utilReplacement
+  , stringDecoderReplacement
+]
+
+module.exports['_stream_passthrough.js'] = [
+    requireReplacement
+  , instanceofReplacement
+  , utilReplacement
+  , stringDecoderReplacement
+]
+
+module.exports['_stream_readable.js'] = [
+    requireReplacement
+  , instanceofReplacement
+  , bufferReplacement
+  , utilReplacement
+  , stringDecoderReplacement
+  , debugLogReplacement
+  , eventEmittterReplacement
 
 ]
 
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]
 
@@ -104,7 +101,7 @@ module.exports['_stream_writable.js'] = [
     addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
   , bufferReplacement
+  , utilReplacement
+  , stringDecoderReplacement
 ]
