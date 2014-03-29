@@ -59,21 +59,6 @@ module.exports['common.js'] = [
   , altForEachUseReplacement
 
   , [
-        /^                      setImmediate,$/m
-      , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
-    ]
-
-  , [
-        /^                      clearImmediate,$/m
-      , '                      typeof clearImmediate == \'undefined\' ? null : clearImmediate,'
-    ]
-
-  , [
-        /^                      global];$/m
-      , '                      global].filter(Boolean);'
-    ]
-
-  , [
         /(exports.mustCall[\s\S]*)/m
       ,   '$1\n'
         + 'if (!util._errnoException) {\n'
@@ -90,9 +75,30 @@ module.exports['common.js'] = [
         + '}\n'
     ]
 
+    // for streams2 on node 0.11
   , [
         /^(  for \(var x in global\) \{)$/m
-      , '  /*<replacement>*/\n  if (typeof constructor == \'function\') knownGlobals.push(constructor);\n  /*</replacement>*/\n\n$1'
+      ,   '  /*<replacement>*/\n'
+        + '  if (typeof constructor == \'function\')\n'
+        + '    knownGlobals.push(constructor);\n'
+        + '  /*</replacement>*/\n\n$1'
+    ]
+
+    // for node 0.8
+  , [
+        /$/
+      ,   '/*<replacement>*/'
+        + '\nif (!global.setImmediate) {\n'
+        + '  global.setImmediate = function setImmediate(fn) {\n'
+        + '    return setTimeout(fn, 0);\n'
+        + '  };\n'
+        + '}\n'
+        + 'if (!global.clearImmediate) {\n'
+        + '  global.clearImmediate = function clearImmediate(i) {\n'
+        + '  return clearTimeout(i);\n'
+        + '  };\n'
+        + '}\n'
+        + '/*</replacement>*/\n'
     ]
 ]
 
