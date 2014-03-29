@@ -68,6 +68,16 @@ const requireReplacement = [
         , 'objectKeys'
       ]
 
+    , debugLogReplacement = [
+          /var debug = util.debuglog\('stream'\);/
+      ,   'var debug = require(\'util\');\n'
+        + 'if (debug && debug.debuglog) {\n'
+        + '  debug = debug.debuglog(\'stream\');\n'
+        + '} else {\n'
+        + '  debug = function () {};\n'
+        + '}\n'
+      ]
+
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
@@ -110,6 +120,7 @@ module.exports['_stream_readable.js'] = [
         + '  debug = function() {};\n'
         + '}'
     ]
+  , debugLogReplacement
 
 ]
 
@@ -123,6 +134,6 @@ module.exports['_stream_writable.js'] = [
     addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , stringDecoderReplacement
   , bufferReplacement
+  , stringDecoderReplacement
 ]
