@@ -23,24 +23,32 @@ const requireReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+
     , bufferReplacement = [
           /^(var util = require\('util'\);)/m
         , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
+
     , addDuplexRequire = [
           /^(function Writable\(options\) \{)/m
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
       ]
 
-    , coreUtilIsReplacement = [
-          /(require\('util'\);)/
-        ,   '$1\n'
-          + 'if (!util.isUndefined) {\n'
-          + '  var utilIs = require(\'core-util-is\');\n'
-          + '  for (var f in utilIs) {\n'
-          + '    util[f] = utilIs[f];\n'
-          + '  }\n'
-          + '}'
+    , utilReplacement = [
+          /require\('util'\);/
+        ,   'require(\'core-util-is\');\n'
+          + 'util.inherits = require(\'inherits\');\n'
+
+      ]
+
+    , debugLogReplacement = [
+          /var debug = util.debuglog\('stream'\);/
+      ,   'var debug = require(\'util\');\n'
+        + 'if (debug && debug.debuglog) {\n'
+        + '  debug = debug.debuglog(\'stream\');\n'
+        + '} else {\n'
+        + '  debug = function () {};\n'
+        + '}\n'
       ]
     , isArrayDefine = [
           /^(var util = require\('util'\);)/m
@@ -63,10 +71,24 @@ const requireReplacement = [
         , 'objectKeys'
       ]
 
+    , eventEmittterReplacement = [
+        /(require\('events'\)\.EventEmitter;)/
+      ,   '$1\n'
+        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+        + '  return emitter.listeners(type).length;\n'
+        + '};\n\n'
+        + 'if (!global.setImmediate) global.setImmediate = function setImmediate(fn) {\n'
+        + '  return setTimeout(fn, 0);\n'
+        + '};\n'
+        + 'if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {\n'
+        + '  return clearTimeout(i);\n'
+        + '};\n'
+    ]
+
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
+  , utilReplacement
   , stringDecoderReplacement
   , objectKeysReplacement
   , objectKeysDefine
@@ -75,15 +97,13 @@ module.exports['_stream_duplex.js'] = [
 module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
   , bufferReplacement
   , isArrayDefine
   , isArrayReplacement
@@ -108,13 +128,17 @@ module.exports['_stream_readable.js'] = [
         + '  debug = function() {};\n'
         + '}'
     ]
+  , utilReplacement
+  , stringDecoderReplacement
+  , debugLogReplacement
+  , eventEmittterReplacement
 
 ]
 
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]
 
@@ -122,7 +146,7 @@ module.exports['_stream_writable.js'] = [
     addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , coreUtilIsReplacement
-  , stringDecoderReplacement
   , bufferReplacement
+  , utilReplacement
+  , stringDecoderReplacement
 ]
