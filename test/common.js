@@ -92,14 +92,14 @@ process.on('exit', function() {
   if (!exports.globalCheck) return;
   var knownGlobals = [setTimeout,
                       setInterval,
-                      typeof setImmediate == 'undefined' ? null : setImmediate,
+                      setImmediate,
                       clearTimeout,
                       clearInterval,
-                      typeof clearImmediate == 'undefined' ? null : clearImmediate,
+                      clearImmediate,
                       console,
                       Buffer,
                       process,
-                      global].filter(Boolean);
+                      global];
 
   if (global.gc) {
     knownGlobals.push(gc);
@@ -139,7 +139,8 @@ process.on('exit', function() {
   }
 
   /*<replacement>*/
-  if (typeof constructor == 'function') knownGlobals.push(constructor);
+  if (typeof constructor == 'function')
+    knownGlobals.push(constructor);
   /*</replacement>*/
 
   for (var x in global) {
@@ -221,3 +222,15 @@ if (!util._errnoException) {
     return e;
   };
 }
+/*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn, 0);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+  return clearTimeout(i);
+  };
+}
+/*</replacement>*/
