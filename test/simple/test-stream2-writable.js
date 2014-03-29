@@ -91,7 +91,7 @@ test('write fast', function(t) {
     t.end();
   });
 
-  chunks.forEach(function(chunk) {
+  forEach(chunks, function(chunk) {
     // screw backpressure.  Just buffer it all up.
     tw.write(chunk);
   });
@@ -172,7 +172,7 @@ test('write bufferize', function(t) {
     t.same(tw.buffer, chunks, 'got the expected chunks');
   });
 
-  chunks.forEach(function(chunk, i) {
+  forEach(chunks, function(chunk, i) {
     var enc = encodings[ i % encodings.length ];
     chunk = new Buffer(chunk);
     tw.write(chunk.toString(enc), enc);
@@ -209,7 +209,7 @@ test('write no bufferize', function(t) {
     t.same(tw.buffer, chunks, 'got the expected chunks');
   });
 
-  chunks.forEach(function(chunk, i) {
+  forEach(chunks, function(chunk, i) {
     var enc = encodings[ i % encodings.length ];
     chunk = new Buffer(chunk);
     tw.write(chunk.toString(enc), enc);
@@ -240,7 +240,7 @@ test('write callbacks', function (t) {
     });
   });
 
-  chunks.forEach(function(chunk, i) {
+  forEach(chunks, function(chunk, i) {
     tw.write(chunk, callbacks['callback-' + i]);
   });
   tw.end();
@@ -391,3 +391,9 @@ test('finish does not come before sync _write cb', function(t) {
   });
   w.end();
 });
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

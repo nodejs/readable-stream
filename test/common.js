@@ -97,15 +97,15 @@ process.on('exit', function() {
   if (!exports.globalCheck) return;
   var knownGlobals = [setTimeout,
                       setInterval,
-                      setImmediate,
+                      typeof setImmediate == 'undefined' ? null : setImmediate,
                       clearTimeout,
                       clearInterval,
-                      clearImmediate,
+                      typeof clearImmediate == 'undefined' ? null : clearImmediate,
                       console,
                       constructor, // Enumerable in V8 3.21.
                       Buffer,
                       process,
-                      global];
+                      global].filter(Boolean);
 
   if (global.gc) {
     knownGlobals.push(gc);
@@ -172,7 +172,7 @@ function runCallChecks(exitCode) {
     return context.actual !== context.expected;
   });
 
-  failed.forEach(function(context) {
+  forEach(failed, function(context) {
     console.log('Mismatched %s function calls. Expected %d, actual %d.',
                 context.name,
                 context.expected,
@@ -204,6 +204,12 @@ exports.mustCall = function(fn, expected) {
     return fn.apply(this, arguments);
   };
 };
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
 
 if (!util._errnoException) {
   var uv;

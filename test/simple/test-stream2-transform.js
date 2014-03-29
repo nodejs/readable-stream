@@ -463,7 +463,7 @@ test('object transform (json parse)', function(t) {
     ended = true;
   });
 
-  objects.forEach(function(obj) {
+  forEach(objects, function(obj) {
     jp.write(JSON.stringify(obj));
     var res = jp.read();
     t.same(res, obj);
@@ -505,7 +505,7 @@ test('object transform (json stringify)', function(t) {
     ended = true;
   });
 
-  objects.forEach(function(obj) {
+  forEach(objects, function(obj) {
     js.write(obj);
     var res = js.read();
     t.equal(res, JSON.stringify(obj));
@@ -520,3 +520,9 @@ test('object transform (json stringify)', function(t) {
     t.end();
   })
 });
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

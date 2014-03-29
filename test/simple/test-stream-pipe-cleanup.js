@@ -27,6 +27,9 @@ var stream = require('../../');
 var assert = require('assert');
 var util = require('util');
 
+if (/^v0\.8\./.test(process.version))
+  return
+
 function Writable() {
   this.writable = true;
   this.endCalls = 0;

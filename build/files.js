@@ -36,6 +36,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
       ]
 
+    , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
+    , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
+    , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
+    , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
+
     , utilReplacement = [
           /^var util = require\('util'\);/m
         ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
@@ -89,6 +94,8 @@ module.exports['_stream_duplex.js'] = [
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
+  , altForEachImplReplacement
+  , altForEachUseReplacement
   , objectKeysReplacement
   , objectKeysDefine
 ]
@@ -104,6 +111,12 @@ module.exports['_stream_readable.js'] = [
     requireReplacement
   , instanceofReplacement
   , bufferReplacement
+  , altForEachImplReplacement
+  , altForEachUseReplacement
+  , altIndexOfImplReplacement
+  , altIndexOfUseReplacement
+  , instanceofReplacement
+  , stringDecoderReplacement
   , isArrayDefine
   , isArrayReplacement
   , debugLogReplacement
