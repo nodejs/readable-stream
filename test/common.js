@@ -144,6 +144,10 @@ process.on('exit', function() {
     knownGlobals.push(DataView);
   }
 
+  /*<replacement>*/
+  if (typeof constructor == 'function') knownGlobals.push(constructor);
+  /*</replacement>*/
+
   for (var x in global) {
     var found = false;
 

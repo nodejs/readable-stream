@@ -49,8 +49,7 @@ function parent() {
 }
 
 function child0() {
-  if (/^v0\.(10|8)\./.test(process.version))
-    return console.error('child 0\nfoo\nbar\nbaz');
+  return console.error('child 0\nfoo\nbar\nbaz');
 
   // Just a very simple wrapper around TTY(2)
   // Essentially the same as stderr, but without all the net stuff.
