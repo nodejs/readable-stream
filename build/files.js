@@ -42,12 +42,34 @@ const requireReplacement = [
           + '  }\n'
           + '}'
       ]
+    , isArrayDefine = [
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar isArray = require(\'isarray\');'
+      ]
+    , isArrayReplacement = [
+          /Array\.isArray/g
+        , 'isArray'
+      ]
+    , objectKeysDefine = [
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar objectKeys = Object.keys || function (obj) {\n'
+          + '  var keys = [];\n'
+          + '  for (var key in obj) keys.push(key);\n'
+          + '  return keys;\n'
+          + '}\n'
+      ]
+    , objectKeysReplacement = [
+          /Object\.keys/g
+        , 'objectKeys'
+      ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
   , coreUtilIsReplacement
   , stringDecoderReplacement
+  , objectKeysReplacement
+  , objectKeysDefine
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -63,6 +85,8 @@ module.exports['_stream_readable.js'] = [
   , coreUtilIsReplacement
   , stringDecoderReplacement
   , bufferReplacement
+  , isArrayDefine
+  , isArrayReplacement
 
   , [
         /(require\('events'\)\.EventEmitter;)/
