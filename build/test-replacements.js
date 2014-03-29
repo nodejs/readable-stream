@@ -39,11 +39,6 @@ module.exports['test-stream2-objects.js'] = [
   , altForEachUseReplacement
 ]
 
-module.exports['test-stream2-stderr-sync.js'] = [
-    altForEachImplReplacement
-  , altForEachUseReplacement
-]
-
 module.exports['test-stream2-transform.js'] = [
     altForEachImplReplacement
   , altForEachUseReplacement
@@ -60,7 +55,25 @@ module.exports['test-stream-big-packet.js'] = [
 ]
 
 module.exports['common.js'] = [
-    [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+
+  , [
+        /^                      setImmediate,$/m
+      , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
+    ]
+
+  , [
+        /^                      clearImmediate,$/m
+      , '                      typeof clearImmediate == \'undefined\' ? null : clearImmediate,'
+    ]
+
+  , [
+        /^                      global];$/m
+      , '                      global].filter(Boolean);'
+    ]
+
+  , [
         /(exports.mustCall[\s\S]*)/m
       ,   '$1\n'
         + 'if (!util._errnoException) {\n'
@@ -102,26 +115,6 @@ module.exports['test-stream2-large-read-stall.js'] = [
     ]
 ]
 
-module.exports['common.js'] = [
-    altForEachImplReplacement
-  , altForEachUseReplacement
-
-  , [
-        /^                      setImmediate,$/m
-      , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
-    ]
-
-  , [
-        /^                      clearImmediate,$/m
-      , '                      typeof clearImmediate == \'undefined\' ? null : clearImmediate,'
-    ]
-
-  , [
-        /^                      global];$/m
-      , '                      global].filter(Boolean);'
-    ]
-]
-
 module.exports['test-stream-pipe-cleanup.js'] = [
     [
         /(function Writable\(\) \{)/
@@ -132,7 +125,9 @@ module.exports['test-stream-pipe-cleanup.js'] = [
 // 'tty_wrap' is too different to bother testing in pre-0.11
 // this bypasses it and replicates a console.error() test
 module.exports['test-stream2-stderr-sync.js'] = [
-    [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+  , [
         /(function child0\(\) \{)/
       ,   '$1\n'
         + '  if (/^v0\\.(10|8)\\./.test(process.version))\n'

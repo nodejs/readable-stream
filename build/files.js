@@ -6,17 +6,11 @@
  * strings, regexes, functions.
  */
 
-const requireReplacement = [
+const headRegexp = /(^module.exports = \w+;?)/m
+
+    , requireReplacement = [
           /(require\(['"])(_stream_)/g
         , '$1./$2'
-      ]
-
-    , eeListenerCountReplacement = [
-          /(require\('events'\)\.EventEmitter;)/
-        ,   '$1\n'
-          + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
-          + '  return emitter.listeners(type).length;\n'
-          + '};'
       ]
 
     , instanceofReplacement = [
@@ -33,8 +27,8 @@ const requireReplacement = [
       ]
 
     , bufferReplacement = [
-          /^(var util = require\('util'\);)/m
-        , '$1\nvar Buffer = require(\'buffer\').Buffer;'
+          headRegexp
+        , '$1\n\n/*<replacement>*/\nvar Buffer = require(\'buffer\').Buffer;\n/*</replacement>*/\n'
       ]
 
     , addDuplexRequire = [
@@ -47,40 +41,58 @@ const requireReplacement = [
     , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
-    , isArrayDefine = [
-          /^(var util = require\('util'\);)/m
-        , '$1\nvar isArray = require(\'isarray\');'
+    , utilReplacement = [
+          /^var util = require\('util'\);/m
+        ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+          + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
       ]
+
+    , debugLogReplacement = [
+          /var debug = util.debuglog\('stream'\);/
+      ,   '\n\n/*<replacement>*/\nvar debug = require(\'util\');\n'
+        + 'if (debug && debug.debuglog) {\n'
+        + '  debug = debug.debuglog(\'stream\');\n'
+        + '} else {\n'
+        + '  debug = function () {};\n'
+        + '}\n/*</replacement>*/\n'
+      ]
+
+    , isArrayDefine = [
+          headRegexp
+        , '$1\n\n/*<replacement>*/\nvar isArray = require(\'isarray\');\n/*</replacement>*/\n'
+      ]
+
     , isArrayReplacement = [
           /Array\.isArray/g
         , 'isArray'
       ]
+
     , objectKeysDefine = [
-          /^(var util = require\('util'\);)/m
-        , '$1\nvar objectKeys = Object.keys || function (obj) {\n'
+          headRegexp
+        , '$1\n\n/*<replacement>*/\nvar objectKeys = Object.keys || function (obj) {\n'
           + '  var keys = [];\n'
           + '  for (var key in obj) keys.push(key);\n'
           + '  return keys;\n'
-          + '}\n'
+          + '}\n/*</replacement>*/\n'
       ]
+
     , objectKeysReplacement = [
           /Object\.keys/g
         , 'objectKeys'
       ]
 
-    , debugLogReplacement = [
-          /var debug = util.debuglog\('stream'\);/
-      ,   'var debug = require(\'util\');\n'
-        + 'if (debug && debug.debuglog) {\n'
-        + '  debug = debug.debuglog(\'stream\');\n'
-        + '} else {\n'
-        + '  debug = function () {};\n'
-        + '}\n'
-      ]
+    , eventEmittterReplacement = [
+        /(require\('events'\)\.EventEmitter;)/
+      ,   '$1\n\n/*<replacement>*/\n'
+        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+        + '  return emitter.listeners(type).length;\n'
+        + '};\n/*</replacement>*/\n'
+    ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
+  , utilReplacement
   , stringDecoderReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
@@ -91,12 +103,12 @@ module.exports['_stream_duplex.js'] = [
 module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
     requireReplacement
-  , eeListenerCountReplacement
   , instanceofReplacement
   , bufferReplacement
   , altForEachImplReplacement
@@ -105,28 +117,20 @@ module.exports['_stream_readable.js'] = [
   , altIndexOfUseReplacement
   , instanceofReplacement
   , stringDecoderReplacement
-  , bufferReplacement
   , isArrayDefine
   , isArrayReplacement
-
-  , [
-        /var debug = util\.debuglog\('stream'\);/
-      , 'var debug;\n'
-        + 'if (util.debuglog)\n'
-        + '  debug = util.debuglog(\'stream\');\n'
-        + 'else try {\n'
-        + '  debug = require(\'debuglog\')(\'stream\');\n'
-        + '} catch (er) {\n'
-        + '  debug = function() {};\n'
-        + '}'
-    ]
   , debugLogReplacement
+  , utilReplacement
+  , stringDecoderReplacement
+  , debugLogReplacement
+  , eventEmittterReplacement
 
 ]
 
 module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]
 
@@ -135,5 +139,6 @@ module.exports['_stream_writable.js'] = [
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
+  , utilReplacement
   , stringDecoderReplacement
 ]

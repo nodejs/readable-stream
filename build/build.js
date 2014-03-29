@@ -17,6 +17,11 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , testourroot = path.join(__dirname, '../test/simple/')
 
 
+if (!/^0\.1\d+\.\d+$/.test(process.argv[2])) {
+  console.error('Usage: build.js xx.yy.zz')
+  return process.exit(1);
+}
+
 function processFile (url, out, replacements) {
   hyperquest(url).pipe(bl(function (err, data) {
     if (err)
