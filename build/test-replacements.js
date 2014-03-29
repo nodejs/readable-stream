@@ -1,3 +1,8 @@
+const altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
+    , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
+    , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
+    , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
+
 module.exports.all = [
     [
         /require\(['"]stream['"]\)/g
@@ -24,10 +29,43 @@ module.exports.all = [
 
 ]
 
+module.exports['test-stream2-basic.js'] = [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+]
+
+module.exports['test-stream2-objects.js'] = [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+]
+
+module.exports['test-stream2-stderr-sync.js'] = [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+]
+
+module.exports['test-stream2-transform.js'] = [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+]
+
+module.exports['test-stream2-writable.js'] = [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+]
+
+module.exports['test-stream-big-packet.js'] = [
+    altIndexOfImplReplacement
+  , altIndexOfUseReplacement
+]
+
 // this test has some trouble with the nextTick depth when run
 // to stdout, it's also very noisy so we'll quiet it
 module.exports['test-stream-pipe-multi.js'] = [
-    [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+
+  , [
         /console\.error/g
       , '//console.error'
     ]
@@ -47,7 +85,10 @@ module.exports['test-stream2-large-read-stall.js'] = [
 ]
 
 module.exports['common.js'] = [
-    [
+    altForEachImplReplacement
+  , altForEachUseReplacement
+
+  , [
         /^                      setImmediate,$/m
       , '                      typeof setImmediate == \'undefined\' ? null : setImmediate,'
     ]
@@ -66,6 +107,6 @@ module.exports['common.js'] = [
 module.exports['test-stream-pipe-cleanup.js'] = [
     [
         /(function Writable\(\) \{)/
-      , 'if (/^v0\.8\./.test(process.version))\n  return\n\n$1'
+      , 'if (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
     ]
 ]

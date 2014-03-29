@@ -10,30 +10,49 @@ const requireReplacement = [
           /(require\(['"])(_stream_)/g
         , '$1./$2'
       ]
+
+    , eeListenerCountReplacement = [
+          /(require\('events'\)\.EventEmitter;)/
+        ,   '$1\n'
+          + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+          + '  return emitter.listeners(type).length;\n'
+          + '};'
+      ]
+
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
             return 'instanceof ' + streamType
           }
       ]
+
       // use the string_decoder in node_modules rather than core
     , stringDecoderReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+
     , bufferReplacement = [
           /^(var util = require\('util'\);)/m
         , '$1\nvar Buffer = require(\'buffer\').Buffer;'
       ]
+
     , addDuplexRequire = [
           /^(function Writable\(options\) \{)/m
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
       ]
 
+    , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
+    , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
+    , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
+    , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
+
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
   , stringDecoderReplacement
+  , altForEachImplReplacement
+  , altForEachUseReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -44,18 +63,14 @@ module.exports['_stream_passthrough.js'] = [
 
 module.exports['_stream_readable.js'] = [
     requireReplacement
+  , eeListenerCountReplacement
   , instanceofReplacement
   , stringDecoderReplacement
   , bufferReplacement
-
-  , [
-        /(require\('events'\)\.EventEmitter;)/
-      ,   '$1\n'
-        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
-        + '  return emitter.listeners(type).length;\n'
-        + '};'
-    ]
-
+  , altForEachImplReplacement
+  , altForEachUseReplacement
+  , altIndexOfImplReplacement
+  , altIndexOfUseReplacement
 ]
 
 module.exports['_stream_transform.js'] = [
