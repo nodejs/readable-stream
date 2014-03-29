@@ -89,6 +89,11 @@ module.exports['common.js'] = [
         + '  };\n'
         + '}\n'
     ]
+
+  , [
+        /^(  for \(var x in global\) \{)$/m
+      , '  /*<replacement>*/\n  if (typeof constructor == \'function\') knownGlobals.push(constructor);\n  /*</replacement>*/\n\n$1'
+    ]
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -122,15 +127,14 @@ module.exports['test-stream-pipe-cleanup.js'] = [
     ]
 ]
 
-// 'tty_wrap' is too different to bother testing in pre-0.11
-// this bypasses it and replicates a console.error() test
 module.exports['test-stream2-stderr-sync.js'] = [
     altForEachImplReplacement
   , altForEachUseReplacement
   , [
+        // 'tty_wrap' is too different across node versions.
+        // this bypasses it and replicates a console.error() test
         /(function child0\(\) \{)/
       ,   '$1\n'
-        + '  if (/^v0\\.(10|8)\\./.test(process.version))\n'
-        + '    return console.error(\'child 0\\nfoo\\nbar\\nbaz\');\n'
+        + '  return console.error(\'child 0\\nfoo\\nbar\\nbaz\');\n'
     ]
 ]
