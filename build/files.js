@@ -69,12 +69,6 @@ module.exports['_stream_readable.js'] = [
       ,   '$1\n'
         + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
-        + '};\n\n'
-        + 'if (!global.setImmediate) global.setImmediate = function setImmediate(fn) {\n'
-        + '  return setTimeout(fn, 0);\n'
-        + '};\n'
-        + 'if (!global.clearImmediate) global.clearImmediate = function clearImmediate(i) {\n'
-        + '  return clearTimeout(i);\n'
         + '};\n'
 
     ]
