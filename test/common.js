@@ -166,7 +166,7 @@ function runCallChecks(exitCode) {
     return context.actual !== context.expected;
   });
 
-  failed.forEach(function(context) {
+  forEach(failed, function(context) {
     console.log('Mismatched %s function calls. Expected %d, actual %d.',
                 context.name,
                 context.expected,
@@ -198,3 +198,9 @@ exports.mustCall = function(fn, expected) {
     return fn.apply(this, arguments);
   };
 };
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

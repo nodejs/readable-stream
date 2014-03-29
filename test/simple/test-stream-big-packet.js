@@ -42,7 +42,7 @@ util.inherits(TestStream, stream.Transform);
 TestStream.prototype._transform = function (chunk, encoding, done) {
   if (!passed) {
     // Char 'a' only exists in the last write
-    passed = chunk.toString().indexOf('a') >= 0;
+    passed = indexOf(chunk.toString(), 'a') >= 0;
   }
   done();
 };
@@ -71,3 +71,10 @@ setImmediate(s1.write.bind(s1), 'later');
 process.on('exit', function () {
   assert(passed, 'Large buffer is not handled properly by Writable Stream');
 });
+
+function indexOf (xs, x) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    if (xs[i] === x) return i;
+  }
+  return -1;
+}

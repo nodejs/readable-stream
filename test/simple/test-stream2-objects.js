@@ -76,7 +76,7 @@ function toArray(callback) {
 function fromArray(list) {
   var r = new Readable({ objectMode: true });
   r._read = noop;
-  list.forEach(function(chunk) {
+  forEach(list, function(chunk) {
     r.push(chunk);
   });
   r.push(null);
@@ -167,7 +167,7 @@ test('can read strings as objects', function(t) {
   });
   r._read = noop;
   var list = ['one', 'two', 'three'];
-  list.forEach(function(str) {
+  forEach(list, function(str) {
     r.push(str);
   });
   r.push(null);
@@ -227,7 +227,7 @@ test('high watermark _read', function(t) {
     calls++;
   };
 
-  list.forEach(function(c) {
+  forEach(list, function(c) {
     r.push(c);
   });
 
@@ -346,3 +346,9 @@ test('buffers finish until cb is called', function(t) {
   w.write('foo');
   w.end();
 });
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

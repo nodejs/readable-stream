@@ -47,12 +47,35 @@ const requireReplacement = [
     , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
+    , isArrayDefine = [
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar isArray = require(\'isarray\');'
+      ]
+    , isArrayReplacement = [
+          /Array\.isArray/g
+        , 'isArray'
+      ]
+    , objectKeysDefine = [
+          /^(var util = require\('util'\);)/m
+        , '$1\nvar objectKeys = Object.keys || function (obj) {\n'
+          + '  var keys = [];\n'
+          + '  for (var key in obj) keys.push(key);\n'
+          + '  return keys;\n'
+          + '}\n'
+      ]
+    , objectKeysReplacement = [
+          /Object\.keys/g
+        , 'objectKeys'
+      ]
+
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
   , stringDecoderReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
+  , objectKeysReplacement
+  , objectKeysDefine
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -65,12 +88,29 @@ module.exports['_stream_readable.js'] = [
     requireReplacement
   , eeListenerCountReplacement
   , instanceofReplacement
-  , stringDecoderReplacement
   , bufferReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
   , altIndexOfImplReplacement
   , altIndexOfUseReplacement
+  , instanceofReplacement
+  , stringDecoderReplacement
+  , bufferReplacement
+  , isArrayDefine
+  , isArrayReplacement
+
+  , [
+        /var debug = util\.debuglog\('stream'\);/
+      , 'var debug;\n'
+        + 'if (util.debuglog)\n'
+        + '  debug = util.debuglog(\'stream\');\n'
+        + 'else try {\n'
+        + '  debug = require(\'debuglog\')(\'stream\');\n'
+        + '} catch (er) {\n'
+        + '  debug = function() {};\n'
+        + '}'
+    ]
+
 ]
 
 module.exports['_stream_transform.js'] = [

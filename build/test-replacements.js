@@ -59,20 +59,38 @@ module.exports['test-stream-big-packet.js'] = [
   , altIndexOfUseReplacement
 ]
 
+module.exports['common.js'] = [
+    [
+        /(exports.mustCall[\s\S]*)/m
+      ,   '$1\n'
+        + 'if (!util._errnoException) {\n'
+        + '  var uv;\n'
+        + '  util._errnoException = function(err, syscall) {\n'
+        + '    if (util.isUndefined(uv)) try { uv = process.binding(\'uv\'); } catch (e) {}\n'
+        + '    var errname = uv ? uv.errname(err) : \'\';\n'
+        + '    var e = new Error(syscall + \' \' + errname);\n'
+        + '    e.code = errname;\n'
+        + '    e.errno = errname;\n'
+        + '    e.syscall = syscall;\n'
+        + '    return e;\n'
+        + '  };\n'
+        + '}\n'
+    ]
+]
+
 // this test has some trouble with the nextTick depth when run
 // to stdout, it's also very noisy so we'll quiet it
 module.exports['test-stream-pipe-multi.js'] = [
     altForEachImplReplacement
   , altForEachUseReplacement
-
   , [
         /console\.error/g
       , '//console.error'
     ]
 
   , [
-        /process\.nextTick([^\;]+);/g
-      , 'setTimeout($1, 0);'
+        /process\.nextTick/g
+      , 'setImmediate'
     ]
 ]
 
@@ -108,5 +126,16 @@ module.exports['test-stream-pipe-cleanup.js'] = [
     [
         /(function Writable\(\) \{)/
       , 'if (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
+    ]
+]
+
+// 'tty_wrap' is too different to bother testing in pre-0.11
+// this bypasses it and replicates a console.error() test
+module.exports['test-stream2-stderr-sync.js'] = [
+    [
+        /(function child0\(\) \{)/
+      ,   '$1\n'
+        + '  if (/^v0\\.(10|8)\\./.test(process.version))\n'
+        + '    return console.error(\'child 0\\nfoo\\nbar\\nbaz\');\n'
     ]
 ]

@@ -46,7 +46,7 @@ FakeStream.prototype = Object.create(Stream.prototype);
 FakeStream.prototype.write = function(chunk) {
   //console.error(this.ID, 'write', this.wait);
   if (this.wait) {
-    setTimeout((this.emit.bind(this, 'drain')), 0);
+    setImmediate(this.emit.bind(this, 'drain'));
   }
   this.wait = !this.wait;
   return this.wait;
@@ -54,7 +54,7 @@ FakeStream.prototype.write = function(chunk) {
 
 FakeStream.prototype.end = function() {
   this.emit('end');
-  setTimeout((this.close.bind(this)), 0);
+  setImmediate(this.close.bind(this));
 };
 
 // noop - closes happen automatically on end.
@@ -94,7 +94,7 @@ for (var i = 0; i < cnt; i++) {
 
 // now start passing through data
 // simulate a relatively fast async stream.
-rr.forEach(function(r) {
+forEach(rr, function(r) {
   var cnt = chunks;
   var paused = false;
 
@@ -114,8 +114,14 @@ rr.forEach(function(r) {
       return;
     }
     if (paused) return;
-    setTimeout((step), 0);
+    setImmediate(step);
   }
 
-  setTimeout((step), 0);
+  setImmediate(step);
 });
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

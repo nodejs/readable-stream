@@ -195,7 +195,7 @@ test('pipe', function(t) {
 
 
 
-[1,2,3,4,5,6,7,8,9].forEach(function(SPLIT) {
+forEach([1,2,3,4,5,6,7,8,9], function(SPLIT) {
   test('unpipe', function(t) {
     var r = new TestReader(5);
 
@@ -281,7 +281,7 @@ test('multipipe', function(t) {
 });
 
 
-[1,2,3,4,5,6,7,8,9].forEach(function(SPLIT) {
+forEach([1,2,3,4,5,6,7,8,9], function(SPLIT) {
   test('multi-unpipe', function(t) {
     var r = new TestReader(5);
 
@@ -473,3 +473,9 @@ test('adding readable triggers data flow', function(t) {
     t.end();
   });
 });
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

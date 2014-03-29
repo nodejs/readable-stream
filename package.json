@@ -4,6 +4,7 @@
   "description": "An exploration of a new kind of readable streams for Node.js",
   "main": "readable.js",
   "dependencies": {
+    "isarray": "0.0.1",
     "string_decoder": "~0.10.x"
   },
   "devDependencies": {
@@ -22,5 +23,8 @@
     "pipe"
   ],
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
-  "license": "BSD"
+  "license": "MIT",
+  "optionalDependencies": {
+    "debuglog": "0.0.2"
+  }
 }
