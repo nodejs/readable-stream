@@ -204,3 +204,16 @@ function forEach (xs, f) {
     f(xs[i], i);
   }
 }
+
+if (!util._errnoException) {
+  var uv;
+  util._errnoException = function(err, syscall) {
+    if (util.isUndefined(uv)) try { uv = process.binding('uv'); } catch (e) {}
+    var errname = uv ? uv.errname(err) : '';
+    var e = new Error(syscall + ' ' + errname);
+    e.code = errname;
+    e.errno = errname;
+    e.syscall = syscall;
+    return e;
+  };
+}

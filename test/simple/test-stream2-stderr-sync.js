@@ -28,7 +28,7 @@ function parent() {
   var spawn = require('child_process').spawn;
   var assert = require('assert');
   var i = 0;
-  children.forEach(function(_, c) {
+  forEach(children, function(_, c) {
     var child = spawn(process.execPath, [__filename, '' + c]);
     var err = '';
 
@@ -130,4 +130,10 @@ if (!process.argv[2]) {
   children[process.argv[2]]();
   // immediate process.exit to kill any waiting stuff.
   process.exit();
+}
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
 }
