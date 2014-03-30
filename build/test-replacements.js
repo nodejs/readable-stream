@@ -77,7 +77,7 @@ module.exports['common.js'] = [
 
     // for streams2 on node 0.11
   , [
-        /^(  for \(var x in global\) \{)$/m
+        /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
         + '  if (typeof constructor == \'function\')\n'
         + '    knownGlobals.push(constructor);\n'
