@@ -1,7 +1,7 @@
 {
   "name": "readable-stream",
   "version": "1.0.26-2",
-  "description": "An exploration of a new kind of readable streams for Node.js",
+  "description": "Streams2, a user-land copy of the stream library from Node.js v0.10.x",
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
