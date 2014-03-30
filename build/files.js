@@ -141,4 +141,5 @@ module.exports['_stream_writable.js'] = [
   , bufferReplacement
   , utilReplacement
   , stringDecoderReplacement
+  , [ /^var assert = require\('assert'\);$/m, '' ]
 ]
