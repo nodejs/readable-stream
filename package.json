@@ -7,7 +7,7 @@
     "core-util-is": "~1.0.0",
     "isarray": "0.0.1",
     "string_decoder": "~0.10.x",
-    "inherits": "^2.0.1"
+    "inherits": "~2.0.1"
   },
   "devDependencies": {
     "tap": "~0.2.6"
