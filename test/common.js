@@ -89,80 +89,90 @@ exports.spawnPwd = function(options) {
   }
 };
 
+var knownGlobals = [setTimeout,
+                    setInterval,
+                    setImmediate,
+                    clearTimeout,
+                    clearInterval,
+                    clearImmediate,
+                    console,
+                    constructor, // Enumerable in V8 3.21.
+                    Buffer,
+                    process,
+                    global];
 
-// Turn this off if the test should not check for global leaks.
-exports.globalCheck = true;
+if (global.gc) {
+  knownGlobals.push(gc);
+}
 
-process.on('exit', function() {
-  if (!exports.globalCheck) return;
-  var knownGlobals = [setTimeout,
-                      setInterval,
-                      setImmediate,
-                      clearTimeout,
-                      clearInterval,
-                      clearImmediate,
-                      console,
-                      constructor, // Enumerable in V8 3.21.
-                      Buffer,
-                      process,
-                      global];
+if (global.DTRACE_HTTP_SERVER_RESPONSE) {
+  knownGlobals.push(DTRACE_HTTP_SERVER_RESPONSE);
+  knownGlobals.push(DTRACE_HTTP_SERVER_REQUEST);
+  knownGlobals.push(DTRACE_HTTP_CLIENT_RESPONSE);
+  knownGlobals.push(DTRACE_HTTP_CLIENT_REQUEST);
+  knownGlobals.push(DTRACE_NET_STREAM_END);
+  knownGlobals.push(DTRACE_NET_SERVER_CONNECTION);
+  knownGlobals.push(DTRACE_NET_SOCKET_READ);
+  knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
+}
 
-  if (global.gc) {
-    knownGlobals.push(gc);
-  }
+if (global.COUNTER_NET_SERVER_CONNECTION) {
+  knownGlobals.push(COUNTER_NET_SERVER_CONNECTION);
+  knownGlobals.push(COUNTER_NET_SERVER_CONNECTION_CLOSE);
+  knownGlobals.push(COUNTER_HTTP_SERVER_REQUEST);
+  knownGlobals.push(COUNTER_HTTP_SERVER_RESPONSE);
+  knownGlobals.push(COUNTER_HTTP_CLIENT_REQUEST);
+  knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
+}
 
-  if (global.DTRACE_HTTP_SERVER_RESPONSE) {
-    knownGlobals.push(DTRACE_HTTP_SERVER_RESPONSE);
-    knownGlobals.push(DTRACE_HTTP_SERVER_REQUEST);
-    knownGlobals.push(DTRACE_HTTP_CLIENT_RESPONSE);
-    knownGlobals.push(DTRACE_HTTP_CLIENT_REQUEST);
-    knownGlobals.push(DTRACE_NET_STREAM_END);
-    knownGlobals.push(DTRACE_NET_SERVER_CONNECTION);
-    knownGlobals.push(DTRACE_NET_SOCKET_READ);
-    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
-  }
-  if (global.COUNTER_NET_SERVER_CONNECTION) {
-    knownGlobals.push(COUNTER_NET_SERVER_CONNECTION);
-    knownGlobals.push(COUNTER_NET_SERVER_CONNECTION_CLOSE);
-    knownGlobals.push(COUNTER_HTTP_SERVER_REQUEST);
-    knownGlobals.push(COUNTER_HTTP_SERVER_RESPONSE);
-    knownGlobals.push(COUNTER_HTTP_CLIENT_REQUEST);
-    knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
-  }
+if (global.ArrayBuffer) {
+  knownGlobals.push(ArrayBuffer);
+  knownGlobals.push(Int8Array);
+  knownGlobals.push(Uint8Array);
+  knownGlobals.push(Uint8ClampedArray);
+  knownGlobals.push(Int16Array);
+  knownGlobals.push(Uint16Array);
+  knownGlobals.push(Int32Array);
+  knownGlobals.push(Uint32Array);
+  knownGlobals.push(Float32Array);
+  knownGlobals.push(Float64Array);
+  knownGlobals.push(DataView);
+}
 
-  if (global.ArrayBuffer) {
-    knownGlobals.push(ArrayBuffer);
-    knownGlobals.push(Int8Array);
-    knownGlobals.push(Uint8Array);
-    knownGlobals.push(Uint8ClampedArray);
-    knownGlobals.push(Int16Array);
-    knownGlobals.push(Uint16Array);
-    knownGlobals.push(Int32Array);
-    knownGlobals.push(Uint32Array);
-    knownGlobals.push(Float32Array);
-    knownGlobals.push(Float64Array);
-    knownGlobals.push(DataView);
-  }
+// Harmony features.
+if (global.Proxy) {
+  knownGlobals.push(Proxy);
+}
+
+if (global.Symbol) {
+  knownGlobals.push(Symbol);
+}
 
   /*<replacement>*/
   if (typeof constructor == 'function')
     knownGlobals.push(constructor);
   /*</replacement>*/
 
-  for (var x in global) {
-    var found = false;
+function leakedGlobals() {
+  var leaked = [];
 
-    for (var y in knownGlobals) {
-      if (global[x] === knownGlobals[y]) {
-        found = true;
-        break;
-      }
-    }
+  for (var val in global)
+    if (-1 === knownGlobals.indexOf(global[val]))
+      leaked.push(val);
 
-    if (!found) {
-      console.error('Unknown global: %s', x);
-      assert.ok(false, 'Unknown global found');
-    }
+  return leaked;
+};
+exports.leakedGlobals = leakedGlobals;
+
+// Turn this off if the test should not check for global leaks.
+exports.globalCheck = true;
+
+process.on('exit', function() {
+  if (!exports.globalCheck) return;
+  var leaked = leakedGlobals();
+  if (leaked.length > 0) {
+    console.error('Unknown globals: %s', leaked);
+    assert.ok(false, 'Unknown global found');
   }
 });
 
@@ -208,6 +218,11 @@ exports.mustCall = function(fn, expected) {
     context.actual++;
     return fn.apply(this, arguments);
   };
+};
+
+exports.checkSpawnSyncRet = function(ret) {
+  assert.strictEqual(ret.status, 0);
+  assert.strictEqual(ret.error, undefined);
 };
 
 function forEach (xs, f) {
