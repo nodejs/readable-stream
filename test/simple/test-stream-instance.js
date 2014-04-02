@@ -35,18 +35,12 @@ var assert = require('assert');
   // Make sure that Stream.Readable is instanceof the
   // node version stream
   assert(new Stream.Readable() instanceof PlatformStream);
-  if(PlatformStream.Readable) {
-    assert(new Stream.Readable() instanceof PlatformStream.Readable);
-  }
 })();
 
 (function third() {
   // Make sure that Stream.Writable is instanceof the
   // node version stream
   assert(new Stream.Writable() instanceof PlatformStream);
-  if(PlatformStream.Writable) {
-    assert(new Stream.Writable() instanceof PlatformStream.Writable);
-  }
 })();
 
 
@@ -54,9 +48,6 @@ var assert = require('assert');
   // Make sure that Stream.Duplex is instanceof the
   // node version stream
   assert(new Stream.Duplex() instanceof PlatformStream);
-  if(PlatformStream.Duplex) {
-    assert(new Stream.Duplex() instanceof PlatformStream.Duplex);
-  }
 })();
 
 
@@ -64,16 +55,11 @@ var assert = require('assert');
   // Make sure that Stream.Transform is instanceof the
   // node version stream
   assert(new Stream.Transform() instanceof PlatformStream);
-  if(PlatformStream.Transform) {
-    assert(new Stream.Transform() instanceof PlatformStream.Transform);
-  }
 })();
 
 (function sixth() {
   // Make sure that Stream.PassThrough is instanceof the
   // node version stream
   assert(new Stream.PassThough() instanceof PlatformStream);
-  if(PlatformStream.PassThrough) {
-    assert(new Stream.PassThrough() instanceof PlatformStream.PassThrough);
-  }
 })();
+
