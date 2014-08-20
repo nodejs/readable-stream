@@ -9,7 +9,7 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , files       = require('./files')
     , testReplace = require('./test-replacements')
 
-    , srcurlpfx   = 'https://raw.github.com/joyent/node/v' + process.argv[2] + '-release/'
+    , srcurlpfx   = 'https://raw.githubusercontent.com/joyent/node/v' + process.argv[2] + '-release/'
     , libsrcurl   = srcurlpfx + 'lib/'
     , testsrcurl  = srcurlpfx + 'test/simple/'
     , testlisturl = 'https://github.com/joyent/node/tree/v' + process.argv[2] + '-release/test/simple'
