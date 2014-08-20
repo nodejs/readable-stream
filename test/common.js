@@ -20,6 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var path = require('path');
+var fs = require('fs');
 var assert = require('assert');
 
 exports.testDir = path.dirname(__filename);
@@ -30,8 +31,19 @@ exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 
 if (process.platform === 'win32') {
   exports.PIPE = '\\\\.\\pipe\\libuv-test';
+  exports.opensslCli = path.join(process.execPath, '..', 'openssl-cli.exe');
 } else {
   exports.PIPE = exports.tmpDir + '/test.sock';
+  exports.opensslCli = path.join(process.execPath, '..', 'openssl-cli');
+}
+if (!fs.existsSync(exports.opensslCli))
+  exports.opensslCli = false;
+
+if (process.platform === 'win32') {
+  exports.faketimeCli = false;
+} else {
+  exports.faketimeCli = path.join(__dirname, "..", "tools", "faketime", "src",
+    "faketime");
 }
 
 var util = require('util');
