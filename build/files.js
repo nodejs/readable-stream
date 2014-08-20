@@ -32,7 +32,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
       ]
 
     , addDuplexRequire = [
-          /^(function Writable\(options\) \{)/m
+          /^(function (?:Writable|Readable)(?:State)?.*{)/gm
         , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
       ]
 
@@ -108,7 +108,8 @@ module.exports['_stream_passthrough.js'] = [
 ]
 
 module.exports['_stream_readable.js'] = [
-    requireReplacement
+    addDuplexRequire
+  , requireReplacement
   , instanceofReplacement
   , bufferReplacement
   , altForEachImplReplacement
