@@ -216,6 +216,14 @@ exports.mustCall = function(fn, expected) {
   };
 };
 
+exports.hasMultiLocalhost = function hasMultiLocalhost() {
+  var TCP = process.binding('tcp_wrap').TCP;
+  var t = new TCP();
+  var ret = t.bind('127.0.0.2', exports.PORT);
+  t.close();
+  return ret === 0;
+};
+
 function forEach (xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i);
