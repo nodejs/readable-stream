@@ -3,6 +3,14 @@
   "version": "1.1.13",
   "description": "Streams3, a user-land copy of the stream library from Node.js v0.11.x",
   "main": "readable.js",
+  "files": [
+    "duplex.js",
+    "lib",
+    "passthrough.js",
+    "readable.js",
+    "transform.js",
+    "writable.js"
+  ],
   "dependencies": {
     "core-util-is": "~1.0.0",
     "isarray": "0.0.1",
