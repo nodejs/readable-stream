@@ -9,15 +9,15 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , files       = require('./files')
     , testReplace = require('./test-replacements')
 
-    , srcurlpfx   = 'https://raw.githubusercontent.com/joyent/node/v' + process.argv[2] + '-release/'
+    , srcurlpfx   = 'https://raw.githubusercontent.com/iojs/io.js/v' + process.argv[2] + '-release/'
     , libsrcurl   = srcurlpfx + 'lib/'
-    , testsrcurl  = srcurlpfx + 'test/simple/'
-    , testlisturl = 'https://github.com/joyent/node/tree/v' + process.argv[2] + '-release/test/simple'
+    , testsrcurl  = srcurlpfx + 'test/parallel/'
+    , testlisturl = 'https://github.com/iojs/io.js/tree/v' + process.argv[2] + '-release/test/parallel'
     , libourroot  = path.join(__dirname, '../lib/')
-    , testourroot = path.join(__dirname, '../test/simple/')
+    , testourroot = path.join(__dirname, '../test/parallel/')
 
 
-if (!/^0\.1\d+\.\d+$/.test(process.argv[2])) {
+if (!/\d\.\d\.\d+/.test(process.argv[2])) {
   console.error('Usage: build.js xx.yy.zz')
   return process.exit(1);
 }
@@ -62,7 +62,7 @@ function processTestFile (file) {
 }
 
 
-if (!/0\.1\d\.\d+/.test(process.argv[2])) {
+if (!/\d\.\d\.\d+/.test(process.argv[2])) {
   console.log('Usage: build.js <node version>')
   return process.exit(-1)
 }
@@ -93,7 +93,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 // Grab the joyent/node test/common.js
 
 processFile(
-    testsrcurl.replace(/simple\/$/, 'common.js')
+    testsrcurl.replace(/parallel\/$/, 'common.js')
   , path.join(testourroot, '../common.js')
   , testReplace['common.js']
 )

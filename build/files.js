@@ -57,6 +57,17 @@ const headRegexp = /(^module.exports = \w+;?)/m
         + '}\n/*</replacement>*/\n'
       ]
 
+    , deprecateReplacement = [
+          /util.deprecate/
+      ,   'require(\'util-deprecate\')'
+      ]
+
+    , objectDefinePropertyReplacement = [
+          /Object.defineProperties/
+      ,   'if (Object.defineProperties) $1'
+      ]
+
+
     , isArrayDefine = [
           headRegexp
         , '$1\n\n/*<replacement>*/\nvar isArray = require(\'isarray\');\n/*</replacement>*/\n'
@@ -142,5 +153,8 @@ module.exports['_stream_writable.js'] = [
   , bufferReplacement
   , utilReplacement
   , stringDecoderReplacement
+  , debugLogReplacement
+  , deprecateReplacement
+  , objectDefinePropertyReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
 ]
