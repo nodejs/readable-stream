@@ -103,6 +103,13 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , constReplacement = [
         /const/g
       , 'var'
+      ]
+
+    , bufferIsEncodingReplacement = [
+      /Buffer.isEncoding\((\w+)\)/
+    ,   '([\'hex\', \'utf8\', \'utf-8\', \'ascii\', \'binary\', \'base64\',\n'
+      + '\'ucs2\', \'ucs-2\',\'utf16le\', \'utf-16le\', \'raw\']\n'
+      + '.indexOf(($1 + \'\').toLowerCase()) > -1)'
     ]
 
 module.exports['_stream_duplex.js'] = [
@@ -164,6 +171,7 @@ module.exports['_stream_writable.js'] = [
   , debugLogReplacement
   , deprecateReplacement
   , objectDefinePropertyReplacement
+  , bufferIsEncodingReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
 
 ]
