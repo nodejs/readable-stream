@@ -76,11 +76,16 @@ module.exports['common.js'] = [
     ]
 
     // for streams2 on node 0.11
+    // and dtrace in 0.10
   , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
         + '  if (typeof constructor == \'function\')\n'
         + '    knownGlobals.push(constructor);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_READ == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
         + '  /*</replacement>*/\n\n$1'
     ]
 

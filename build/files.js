@@ -98,10 +98,16 @@ const headRegexp = /(^module.exports = \w+;?)/m
         + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
         + '};\n/*</replacement>*/\n'
+      ]
+
+    , constReplacement = [
+        /const/g
+      , 'var'
     ]
 
 module.exports['_stream_duplex.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
@@ -112,14 +118,16 @@ module.exports['_stream_duplex.js'] = [
 ]
 
 module.exports['_stream_passthrough.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
-    addDuplexRequire
+    constReplacement
+  , addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -134,20 +142,20 @@ module.exports['_stream_readable.js'] = [
   , debugLogReplacement
   , utilReplacement
   , stringDecoderReplacement
-  , debugLogReplacement
   , eventEmittterReplacement
-
 ]
 
 module.exports['_stream_transform.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
-    addDuplexRequire
+    constReplacement
+  , addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -157,4 +165,5 @@ module.exports['_stream_writable.js'] = [
   , deprecateReplacement
   , objectDefinePropertyReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
+
 ]
