@@ -115,15 +115,15 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , requireStreamReplacement = [
       /var Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
-      + 'var Stream = require(\'st\' + \'ream\');'
+      + 'var Stream;\n (function (){try{\n'
+      + 'Stream = require(\'st\' + \'ream\');\n'
+      + '}catch(_){Stream = require(\'events\').EventEmitter;}}())'
       + '\n/*</replacement>*/\n'
     ]
 
-    , inheritStreamReplacement = [
-      /(util.inherits\(\w+, Stream\);)/
-    ,  '\n\n/*<replacement>*/\n'
-      + 'if (Stream) $1'
-      + '\n/*</replacement>*/\n'
+    , isBufferReplacement = [
+      /(\w+) instanceof Buffer/
+    , 'Buffer.isBuffer($1)'
     ]
 
 module.exports['_stream_duplex.js'] = [
@@ -165,7 +165,8 @@ module.exports['_stream_readable.js'] = [
   , stringDecoderReplacement
   , eventEmittterReplacement
   , requireStreamReplacement
-  , inheritStreamReplacement
+  , isBufferReplacement
+
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -190,6 +191,6 @@ module.exports['_stream_writable.js'] = [
   , bufferIsEncodingReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement
-  , inheritStreamReplacement
+  , isBufferReplacement
 
 ]
