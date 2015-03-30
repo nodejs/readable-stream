@@ -112,6 +112,20 @@ const headRegexp = /(^module.exports = \w+;?)/m
       + '.indexOf(($1 + \'\').toLowerCase()) > -1)'
     ]
 
+    , requireStreamReplacement = [
+      /var Stream = require\('stream'\);/
+    ,  '\n\n/*<replacement>*/\n'
+      + 'var Stream = require(\'st\' + \'ream\');'
+      + '\n/*</replacement>*/\n'
+    ]
+
+    , inheritStreamReplacement = [
+      /(util.inherits\(\w+, Stream\);)/
+    ,  '\n\n/*<replacement>*/\n'
+      + 'if (Stream) $1'
+      + '\n/*</replacement>*/\n'
+    ]
+
 module.exports['_stream_duplex.js'] = [
     constReplacement
   , requireReplacement
@@ -150,6 +164,8 @@ module.exports['_stream_readable.js'] = [
   , utilReplacement
   , stringDecoderReplacement
   , eventEmittterReplacement
+  , requireStreamReplacement
+  , inheritStreamReplacement
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -173,5 +189,7 @@ module.exports['_stream_writable.js'] = [
   , objectDefinePropertyReplacement
   , bufferIsEncodingReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
+  , requireStreamReplacement
+  , inheritStreamReplacement
 
 ]

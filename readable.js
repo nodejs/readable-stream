@@ -1,6 +1,9 @@
-var Stream = require('stream'); // hack to fix a circular dependency issue when used with browserify
+var Stream = require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
 exports = module.exports = require('./lib/_stream_readable.js');
-exports.Stream = Stream;
+
+if (Stream)
+  exports.Stream = Stream;
+
 exports.Readable = exports;
 exports.Writable = require('./lib/_stream_writable.js');
 exports.Duplex = require('./lib/_stream_duplex.js');
