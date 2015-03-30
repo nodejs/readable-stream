@@ -76,21 +76,27 @@ module.exports['common.js'] = [
     ]
 
     // for streams2 on node 0.11
+    // and dtrace in 0.10
   , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
         + '  if (typeof constructor == \'function\')\n'
         + '    knownGlobals.push(constructor);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_READ == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
         + '  /*</replacement>*/\n\n$1'
     ]
 
     // for node 0.8
   , [
-        /$/
+        /^/
       ,   '/*<replacement>*/'
         + '\nif (!global.setImmediate) {\n'
         + '  global.setImmediate = function setImmediate(fn) {\n'
-        + '    return setTimeout(fn, 0);\n'
+
+        + '    return setTimeout(fn.bind.apply(fn, arguments), 0);\n'
         + '  };\n'
         + '}\n'
         + 'if (!global.clearImmediate) {\n'
@@ -143,4 +149,11 @@ module.exports['test-stream2-stderr-sync.js'] = [
       ,   '$1\n'
         + '  return console.error(\'child 0\\nfoo\\nbar\\nbaz\');\n'
     ]
+]
+
+module.exports['test-stream-unshift-read-race.js'] = [
+  [
+    /data\.slice\(pos, pos \+ n\)/g,
+    'data.slice(pos, Math.min(pos + n, data.length))'
+  ]
 ]

@@ -98,10 +98,37 @@ const headRegexp = /(^module.exports = \w+;?)/m
         + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
         + '};\n/*</replacement>*/\n'
+      ]
+
+    , constReplacement = [
+        /const/g
+      , 'var'
+      ]
+
+    , bufferIsEncodingReplacement = [
+      /Buffer.isEncoding\((\w+)\)/
+    ,   '([\'hex\', \'utf8\', \'utf-8\', \'ascii\', \'binary\', \'base64\',\n'
+      + '\'ucs2\', \'ucs-2\',\'utf16le\', \'utf-16le\', \'raw\']\n'
+      + '.indexOf(($1 + \'\').toLowerCase()) > -1)'
+    ]
+
+    , requireStreamReplacement = [
+      /var Stream = require\('stream'\);/
+    ,  '\n\n/*<replacement>*/\n'
+      + 'var Stream;\n (function (){try{\n'
+      + 'Stream = require(\'st\' + \'ream\');\n'
+      + '}catch(_){Stream = require(\'events\').EventEmitter;}}())'
+      + '\n/*</replacement>*/\n'
+    ]
+
+    , isBufferReplacement = [
+      /(\w+) instanceof Buffer/
+    , 'Buffer.isBuffer($1)'
     ]
 
 module.exports['_stream_duplex.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
@@ -112,14 +139,16 @@ module.exports['_stream_duplex.js'] = [
 ]
 
 module.exports['_stream_passthrough.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
-    addDuplexRequire
+    constReplacement
+  , addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -134,20 +163,23 @@ module.exports['_stream_readable.js'] = [
   , debugLogReplacement
   , utilReplacement
   , stringDecoderReplacement
-  , debugLogReplacement
   , eventEmittterReplacement
+  , requireStreamReplacement
+  , isBufferReplacement
 
 ]
 
 module.exports['_stream_transform.js'] = [
-    requireReplacement
+    constReplacement
+  , requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
-    addDuplexRequire
+    constReplacement
+  , addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -156,5 +188,9 @@ module.exports['_stream_writable.js'] = [
   , debugLogReplacement
   , deprecateReplacement
   , objectDefinePropertyReplacement
+  , bufferIsEncodingReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
+  , requireStreamReplacement
+  , isBufferReplacement
+
 ]
