@@ -1,4 +1,4 @@
-var common = require('../common.js');
+var common = require('../common');
 var W = require('../../lib/_stream_writable');
 var D = require('../../lib/_stream_duplex');
 var assert = require('assert');
