@@ -30,7 +30,7 @@ r._read = function(n) {
 
   function push(fast) {
     assert(!pushedNull, 'push() after null push');
-    var c = pos >= data.length ? null : data.slice(pos, pos + n);
+    var c = pos >= data.length ? null : data.slice(pos, Math.min(pos + n, data.length));
     pushedNull = c === null;
     if (fast) {
       pos += n;

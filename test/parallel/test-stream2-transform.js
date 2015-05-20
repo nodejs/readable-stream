@@ -1,5 +1,5 @@
 var assert = require('assert');
-var common = require('../common.js');
+var common = require('../common');
 var PassThrough = require('../../lib/_stream_passthrough');
 var Transform = require('../../lib/_stream_transform');
 

@@ -1,4 +1,4 @@
-var common = require('../common.js');
+var common = require('../common');
 var stream = require('../../');
 var Readable = stream.Readable;
 var Writable = stream.Writable;

@@ -9,10 +9,10 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , files       = require('./files')
     , testReplace = require('./test-replacements')
 
-    , srcurlpfx   = 'https://raw.githubusercontent.com/iojs/io.js/v' + process.argv[2] + '/'
+    , srcurlpfx   = 'https://raw.githubusercontent.com/nodejs/io.js/v' + process.argv[2] + '/'
     , libsrcurl   = srcurlpfx + 'lib/'
     , testsrcurl  = srcurlpfx + 'test/parallel/'
-    , testlisturl = 'https://github.com/iojs/io.js/tree/v' + process.argv[2] + '/test/parallel'
+    , testlisturl = 'https://github.com/nodejs/io.js/tree/v' + process.argv[2] + '/test/parallel'
     , libourroot  = path.join(__dirname, '../lib/')
     , testourroot = path.join(__dirname, '../test/parallel/')
 
