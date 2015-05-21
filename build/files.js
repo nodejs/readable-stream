@@ -128,7 +128,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , processNextTickImport = [
       headRegexp
-    , '$1\n\n/*<replacement>*/\nvar processNextTick = require(\'immediate\');\n/*</replacement>*/\n'
+    , '$1\n\n/*<replacement>*/\nvar processNextTick = require(\'process-nextick-args\');\n/*</replacement>*/\n'
     ]
 
     , processNextTickReplacement = [

@@ -1,8 +1,3 @@
-
-
-/*<replacement>*/
-var processNextTick = require('immediate');
-/*</replacement>*/
 var common = require('../common');
 var assert = require('assert');
 
@@ -28,7 +23,7 @@ var buffered = 0;
 w.write = function(c) {
   writes += c.length;
   buffered += c.length;
-  processNextTick(drain);
+  process.nextTick(drain);
   return false;
 };
 
