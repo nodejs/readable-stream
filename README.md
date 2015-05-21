@@ -8,7 +8,7 @@ npm install --save io-stream
 
 ***Node/iojs-core streams for userland***
 
-This package is a mirror of the Streams in IOJS.
+This package is a mirror of the Streams in iojs.
 
 If you want to guarantee a stable streams base, regardless of what version of iojs you, or the users of your libraries are using, use **io-stream** *only* and avoid the *"stream"* module in iojs-core.
 
