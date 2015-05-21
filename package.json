@@ -5,7 +5,7 @@
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
-    "immediate": "^3.2.0",
+    "immediate": "~3.2.0",
     "inherits": "~2.0.1",
     "isarray": "0.0.1",
     "string_decoder": "~0.10.x",
