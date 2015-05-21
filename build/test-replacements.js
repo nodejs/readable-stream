@@ -157,3 +157,13 @@ module.exports['test-stream-unshift-read-race.js'] = [
     'data.slice(pos, Math.min(pos + n, data.length))'
   ]
 ]
+module.exports['test-stream2-readable-legacy-drain.js'] = [
+  [
+    /^/
+  , '\n\n/*<replacement>*/\nvar processNextTick = require(\'immediate\');\n/*</replacement>*/\n'
+  ]
+  ,[
+    /process.nextTick\(/g
+  , 'processNextTick('
+  ]
+]

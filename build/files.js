@@ -132,7 +132,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , processNextTickReplacement = [
-      /process.nextTick\(/
+      /process.nextTick\(/g
     , 'processNextTick('
     ]
 
