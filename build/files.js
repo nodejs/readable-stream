@@ -126,6 +126,16 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , 'Buffer.isBuffer($1)'
     ]
 
+    , processNextTickImport = [
+      headRegexp
+    , '$1\n\n/*<replacement>*/\nvar processNextTick = require(\'immediate\');\n/*</replacement>*/\n'
+    ]
+
+    , processNextTickReplacement = [
+      /process.nextTick\(/
+    , 'processNextTick('
+    ]
+
 module.exports['_stream_duplex.js'] = [
     constReplacement
   , requireReplacement
@@ -136,6 +146,8 @@ module.exports['_stream_duplex.js'] = [
   , altForEachUseReplacement
   , objectKeysReplacement
   , objectKeysDefine
+  , processNextTickImport
+  , processNextTickReplacement
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -166,6 +178,8 @@ module.exports['_stream_readable.js'] = [
   , eventEmittterReplacement
   , requireStreamReplacement
   , isBufferReplacement
+  , processNextTickImport
+  , processNextTickReplacement
 
 ]
 
@@ -192,5 +206,6 @@ module.exports['_stream_writable.js'] = [
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement
   , isBufferReplacement
-
+  , processNextTickImport
+  , processNextTickReplacement
 ]
