@@ -1,9 +1,12 @@
 # io-stream
 
-***Node/iojs-core streams for userland***
+[![Build Status](https://travis-ci.org/calvinmetcalf/io-stream.svg)](https://travis-ci.org/calvinmetcalf/io-stream)
 
-[![NPM](https://nodei.co/npm/io-stream.png?downloads=true&downloadRank=true)](https://nodei.co/npm/io-stream/)
-[![NPM](https://nodei.co/npm-dl/io-stream.png?&months=6&height=3)](https://nodei.co/npm/io-stream/)
+```bash
+npm install --save io-stream
+```
+
+***Node/iojs-core streams for userland***
 
 This package is a mirror of the Streams in IOJS.
 
