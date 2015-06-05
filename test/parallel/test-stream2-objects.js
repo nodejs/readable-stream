@@ -1,3 +1,4 @@
+'use strict';
 var common = require('../common');
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');

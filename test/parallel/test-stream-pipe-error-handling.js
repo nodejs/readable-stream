@@ -1,3 +1,4 @@
+'use strict';
 var common = require('../common');
 var assert = require('assert');
 var Stream = require('stream').Stream;
@@ -41,8 +42,8 @@ var Stream = require('stream').Stream;
   var R = require('../../').Readable;
   var W = require('../../').Writable;
 
-  var r = new R;
-  var w = new W;
+  var r = new R();
+  var w = new W();
   var removed = false;
   var didTest = false;
 
@@ -76,8 +77,8 @@ var Stream = require('stream').Stream;
   var R = require('../../').Readable;
   var W = require('../../').Writable;
 
-  var r = new R;
-  var w = new W;
+  var r = new R();
+  var w = new W();
   var removed = false;
   var didTest = false;
   var caught = false;

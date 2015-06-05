@@ -10,6 +10,7 @@ if (!global.clearImmediate) {
   };
 }
 /*</replacement>*/
+'use strict';
 var path = require('path');
 var fs = require('fs');
 var assert = require('assert');
@@ -119,8 +120,8 @@ if (process.env.NODE_COMMON_PIPE) {
 if (process.platform === 'win32') {
   exports.faketimeCli = false;
 } else {
-  exports.faketimeCli = path.join(__dirname, "..", "tools", "faketime", "src",
-    "faketime");
+  exports.faketimeCli = path.join(__dirname, '..', 'tools', 'faketime', 'src',
+                                  'faketime');
 }
 
 var ifaces = os.networkInterfaces();
@@ -328,7 +329,7 @@ exports.mustCall = function(fn, expected) {
   var context = {
     expected: expected,
     actual: 0,
-    stack: (new Error).stack,
+    stack: (new Error()).stack,
     name: fn.name || '<anonymous>'
   };
 
@@ -366,11 +367,11 @@ if (process.platform === 'win32') {
  */
 exports.getServiceName = function getServiceName(port, protocol) {
   if (port == null) {
-    throw new Error("Missing port number");
+    throw new Error('Missing port number');
   }
 
   if (typeof protocol !== 'string') {
-    throw new Error("Protocol must be a string");
+    throw new Error('Protocol must be a string');
   }
 
   /*
@@ -381,10 +382,10 @@ exports.getServiceName = function getServiceName(port, protocol) {
 
   try {
     /*
-     * I'm not a big fan of readFileSync, but reading /etc/services asynchronously
-     * here would require implementing a simple line parser, which seems overkill
-     * for a simple utility function that is not running concurrently with any
-     * other one.
+     * I'm not a big fan of readFileSync, but reading /etc/services
+     * asynchronously here would require implementing a simple line parser,
+     * which seems overkill for a simple utility function that is not running
+     * concurrently with any other one.
      */
     var servicesContent = fs.readFileSync(etcServicesFileName,
       { encoding: 'utf8'});
@@ -401,7 +402,7 @@ exports.getServiceName = function getServiceName(port, protocol) {
   }
 
   return serviceName;
-}
+};
 
 exports.hasMultiLocalhost = function hasMultiLocalhost() {
   var TCP = process.binding('tcp_wrap').TCP;
@@ -418,7 +419,7 @@ exports.isValidHostname = function(str) {
     '(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9]))*$');
 
   return !!str.match(re) && str.length <= 255;
-}
+};
 
 exports.fileExists = function(pathname) {
   try {
