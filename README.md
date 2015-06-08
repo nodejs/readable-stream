@@ -1,17 +1,23 @@
-# io-stream
+# readable-stream
 
-[![Build Status](https://travis-ci.org/calvinmetcalf/io-stream.svg)](https://travis-ci.org/calvinmetcalf/io-stream)
+***Node-core streams for userland***
+
+
+[![Build Status](https://travis-ci.org/nodejs/readable-stream.svg)](https://travis-ci.org/nodejs/readable-stream)
+[![NPM](https://nodei.co/npm/readable-stream.png?downloads=true&downloadRank=true)](https://nodei.co/npm/readable-stream/)
+[![NPM](https://nodei.co/npm-dl/readable-stream.png?&months=6&height=3)](https://nodei.co/npm/readable-stream/)
 
 ```bash
-npm install --save io-stream
+npm install --save readable-stream
 ```
 
-***Node/iojs-core streams for userland***
+***Node-core streams for userland***
 
-This package is a mirror of the Streams in iojs.
+This package is a mirror of the Streams2 and Streams3 implementations in
+Node-core.
 
-If you want to guarantee a stable streams base, regardless of what version of iojs you, or the users of your libraries are using, use **io-stream** *only* and avoid the *"stream"* module in iojs-core.
+If you want to guarantee a stable streams base, regardless of what version of
+Node you, or the users of your libraries are using, use **readable-stream** *only* and avoid the *"stream"* module in Node-core.
 
-**io-stream** versions are pegged to iojs versions so 1.7.1 would corispond to the streams from 1.7.1.
-
-This packaeg is forked from readable-stream and may end up being merged back in.
+**readable-stream** versions are pegged to the iojs version they derive from so
+2.2.1 would correspond to the streams from 2.2.1.
