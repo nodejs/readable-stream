@@ -5,17 +5,20 @@
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
-    "process-nextick-args": "~1.0.0",
     "inherits": "~2.0.1",
     "isarray": "0.0.1",
+    "process-nextick-args": "~1.0.0",
     "string_decoder": "~0.10.x",
     "util-deprecate": "~1.0.1"
   },
   "devDependencies": {
-    "tap": "~0.2.6"
+    "tap": "~0.2.6",
+    "tape": "~4.0.0",
+    "zuul": "~3.0.0"
   },
   "scripts": {
-    "test": "tap test/parallel/*.js"
+    "test": "tap test/parallel/*.js",
+    "browser": "zuul --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION -- test/browser.js"
   },
   "repository": {
     "type": "git",

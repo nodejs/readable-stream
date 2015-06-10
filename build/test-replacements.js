@@ -2,6 +2,10 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
     , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
+    , objectKeysDefine =
+    require('./common-replacements').objectKeysDefine
+    , objectKeysReplacement =
+    require('./common-replacements').objectKeysReplacement
 
 module.exports.all = [
     [
@@ -55,7 +59,9 @@ module.exports['test-stream-big-packet.js'] = [
 ]
 
 module.exports['common.js'] = [
-    altForEachImplReplacement
+    objectKeysDefine
+  , objectKeysReplacement
+  , altForEachImplReplacement
   , altForEachUseReplacement
 
   , [
@@ -106,6 +112,18 @@ module.exports['common.js'] = [
         + '}\n'
         + '/*</replacement>*/\n'
     ]
+  , [
+        /^if \(global\.ArrayBuffer\) \{([^\}]+)\}$/m
+      ,   '/*<replacement>*/if (!process.browser) {'
+        + '\nif \(global\.ArrayBuffer\) {$1}\n'
+        + '}/*</replacement>*/\n'
+    ]
+    , [
+          /^Object\.defineProperty\(([\w\W]+?)\}\)\;/mg
+        ,   '/*<replacement>*/if (!process.browser) {'
+          + '\nObject\.defineProperty($1});\n'
+          + '}/*</replacement>*/\n'
+      ]
 ]
 
 // this test has some trouble with the nextTick depth when run
