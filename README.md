@@ -1,9 +1,8 @@
 # readable-stream
 
-***Node-core streams for userland***
+***Node-core streams for userland*** [![Build Status](https://travis-ci.org/nodejs/readable-stream.svg)](https://travis-ci.org/nodejs/readable-stream)
 
 
-[![Build Status](https://travis-ci.org/nodejs/readable-stream.svg)](https://travis-ci.org/nodejs/readable-stream)
 [![NPM](https://nodei.co/npm/readable-stream.png?downloads=true&downloadRank=true)](https://nodei.co/npm/readable-stream/)
 [![NPM](https://nodei.co/npm-dl/readable-stream.png?&months=6&height=3)](https://nodei.co/npm/readable-stream/)
 
