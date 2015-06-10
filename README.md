@@ -25,7 +25,7 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
 
 * **Chris Dickinson** ([@chrisdickinson](https://github.com/chrisdickinson)) &lt;christopher.s.dickinson@gmail.com&gt;
   - Release GPG key: 9554F04D7259F04124DE6B476D5A82AC7E37093B
-* **Calvin Metcalf** ([@calvinmetcalf](https://github.com/calvinmetcalf)) $lt;calvin.metcalf@gmail.com@gt;
+* **Calvin Metcalf** ([@calvinmetcalf](https://github.com/calvinmetcalf)) &lt;calvin.metcalf@gmail.com&gt;
   - Release GPG key: F3EF5F62A87FC27A22E643F714CE4FF5015AA242
 * **Rod Vagg** ([@rvagg](https://github.com/rvagg)) &lt;rod@vagg.org&gt;
   - Release GPG key: DD8F2338BAE7501E3DD5AC78C273792F7D83545D
