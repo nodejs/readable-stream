@@ -63,10 +63,15 @@ const headRegexp = /(^module.exports = \w+;?)/m
       ]
 
     , objectDefinePropertyReplacement = [
-          /Object.defineProperties/
+          /(Object\.defineProperties)/
       ,   'if (Object.defineProperties) $1'
       ]
-
+    , objectDefinePropertySingReplacement = [
+          /Object\.defineProperty\(([\w\W]+?)\}\);/
+      ,   '(function (){try {\n'
+        + 'Object.defineProperty\($1});\n'
+        + '}catch(_){}}());\n'
+      ]
 
     , isArrayDefine = [
           headRegexp
@@ -78,19 +83,9 @@ const headRegexp = /(^module.exports = \w+;?)/m
         , 'isArray'
       ]
 
-    , objectKeysDefine = [
-          headRegexp
-        , '$1\n\n/*<replacement>*/\nvar objectKeys = Object.keys || function (obj) {\n'
-          + '  var keys = [];\n'
-          + '  for (var key in obj) keys.push(key);\n'
-          + '  return keys;\n'
-          + '}\n/*</replacement>*/\n'
-      ]
+    , objectKeysDefine = require('./common-replacements').objectKeysDefine
 
-    , objectKeysReplacement = [
-          /Object\.keys/g
-        , 'objectKeys'
-      ]
+    , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
 
     , eventEmittterReplacement = [
         /(require\('events'\)\.EventEmitter;)/
@@ -122,7 +117,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , isBufferReplacement = [
-      /(\w+) instanceof Buffer/
+      /(\w+) instanceof Buffer/g
     , 'Buffer.isBuffer($1)'
     ]
 
@@ -202,6 +197,7 @@ module.exports['_stream_writable.js'] = [
   , debugLogReplacement
   , deprecateReplacement
   , objectDefinePropertyReplacement
+  , objectDefinePropertySingReplacement
   , bufferIsEncodingReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement

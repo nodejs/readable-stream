@@ -11,6 +11,15 @@ if (!global.clearImmediate) {
 }
 /*</replacement>*/
 'use strict';
+
+/*<replacement>*/
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+  for (var key in obj) keys.push(key);
+  return keys;
+}
+/*</replacement>*/
+
 var path = require('path');
 var fs = require('fs');
 var assert = require('assert');
@@ -36,6 +45,7 @@ var opensslCli = null;
 var inFreeBSDJail = null;
 var localhostIPv4 = null;
 
+/*<replacement>*/if (!process.browser) {
 Object.defineProperty(exports, 'inFreeBSDJail', {
   get: function() {
     if (inFreeBSDJail !== null) return inFreeBSDJail;
@@ -50,7 +60,10 @@ Object.defineProperty(exports, 'inFreeBSDJail', {
     return inFreeBSDJail;
   }
 });
+}/*</replacement>*/
 
+
+/*<replacement>*/if (!process.browser) {
 Object.defineProperty(exports, 'localhostIPv4', {
   get: function() {
     if (localhostIPv4 !== null) return localhostIPv4;
@@ -73,8 +86,11 @@ Object.defineProperty(exports, 'localhostIPv4', {
     return localhostIPv4;
   }
 });
+}/*</replacement>*/
+
 
 // opensslCli defined lazily to reduce overhead of spawnSync
+/*<replacement>*/if (!process.browser) {
 Object.defineProperty(exports, 'opensslCli', {get: function() {
   if (opensslCli !== null) return opensslCli;
 
@@ -95,10 +111,15 @@ Object.defineProperty(exports, 'opensslCli', {get: function() {
   }
   return opensslCli;
 }, enumerable: true });
+}/*</replacement>*/
 
+
+/*<replacement>*/if (!process.browser) {
 Object.defineProperty(exports, 'hasCrypto', {get: function() {
   return process.versions.openssl ? true : false;
 }});
+}/*</replacement>*/
+
 
 if (process.platform === 'win32') {
   exports.PIPE = '\\\\.\\pipe\\libuv-test';
@@ -125,7 +146,7 @@ if (process.platform === 'win32') {
 }
 
 var ifaces = os.networkInterfaces();
-exports.hasIPv6 = Object.keys(ifaces).some(function(name) {
+exports.hasIPv6 = objectKeys(ifaces).some(function(name) {
   return /lo/.test(name) && ifaces[name].some(function(info) {
     return info.family === 'IPv6';
   });
@@ -245,6 +266,7 @@ if (global.LTTNG_HTTP_SERVER_RESPONSE) {
   knownGlobals.push(LTTNG_NET_SERVER_CONNECTION);
 }
 
+/*<replacement>*/if (!process.browser) {
 if (global.ArrayBuffer) {
   knownGlobals.push(ArrayBuffer);
   knownGlobals.push(Int8Array);
@@ -258,6 +280,8 @@ if (global.ArrayBuffer) {
   knownGlobals.push(Float64Array);
   knownGlobals.push(DataView);
 }
+}/*</replacement>*/
+
 
 // Harmony features.
 if (global.Proxy) {

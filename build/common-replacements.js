@@ -26,3 +26,16 @@ module.exports.altIndexOfUseReplacement = [
     /(\W)([\w\.\(\),\[\]]+)(\.indexOf\()/gm
   , '$1indexOf($2, '
 ]
+module.exports.objectKeysDefine = [
+     /^('use strict';)$/m
+   , '$1\n\n/*<replacement>*/\nvar objectKeys = Object.keys || function (obj) {\n'
+     + '  var keys = [];\n'
+     + '  for (var key in obj) keys.push(key);\n'
+     + '  return keys;\n'
+     + '}\n/*</replacement>*/\n'
+]
+
+module.exports.objectKeysReplacement = [
+     /Object\.keys/g
+   , 'objectKeys'
+ ]
