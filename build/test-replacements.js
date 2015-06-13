@@ -124,6 +124,10 @@ module.exports['common.js'] = [
           + '\nObject\.defineProperty($1});\n'
           + '}/*</replacement>*/\n'
       ]
+    , [
+      /if \(!process\.send\)/
+      , 'if (!process.send && !process.browser)'
+    ]
 ]
 
 // this test has some trouble with the nextTick depth when run

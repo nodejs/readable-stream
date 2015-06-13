@@ -73,7 +73,7 @@ function rmdirSync(p, originalEr) {
 }
 
 function refreshTmpDir() {
-  if (!process.send) { // Not a child process
+  if (!process.send && !process.browser) { // Not a child process
     try {
       rimrafSync(exports.tmpDir);
     } catch (e) {
