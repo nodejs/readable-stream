@@ -3,6 +3,14 @@
   "version": "2.0.0",
   "description": "Streams3, a user-land copy of the stream library from iojs v2.x",
   "main": "readable.js",
+  "files": [
+    "duplex.js",
+    "lib",
+    "passthrough.js",
+    "readable.js",
+    "transform.js",
+    "writable.js"
+  ],
   "dependencies": {
     "core-util-is": "~1.0.0",
     "process-nextick-args": "~1.0.0",
