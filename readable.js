@@ -4,7 +4,7 @@ var Stream = (function (){
   } catch(_){}
 }());
 exports = module.exports = require('./lib/_stream_readable.js');
-exports.Stream = Stream || module;
+exports.Stream = Stream || exports;
 exports.Readable = exports;
 exports.Writable = require('./lib/_stream_writable.js');
 exports.Duplex = require('./lib/_stream_duplex.js');
