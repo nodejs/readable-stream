@@ -110,9 +110,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , requireStreamReplacement = [
       /var Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
-      + 'var Stream;\n (function (){try{\n'
-      + 'Stream = require(\'st\' + \'ream\');\n'
-      + '}catch(_){Stream = require(\'events\').EventEmitter;}}())'
+      + 'var Stream;\n(function (){try{\n'
+      + '  Stream = require(\'st\' + \'ream\');\n'
+      + '}catch(_){\n'
+      + '}finally{if (!Stream) \n'
+      + '  Stream = require(\'events\').EventEmitter;\n'
+      + '}}())'
       + '\n/*</replacement>*/\n'
     ]
 

@@ -72,19 +72,10 @@ function rmdirSync(p, originalEr) {
   }
 }
 
-function refreshTmpDir() {
-  if (!process.send && !process.browser) { // Not a child process
-    try {
-      rimrafSync(exports.tmpDir);
-    } catch (e) {
-    }
-
-    try {
-      fs.mkdirSync(exports.tmpDir);
-    } catch (e) {
-    }
-  }
-}
+exports.refreshTmpDir = function() {
+  rimrafSync(exports.tmpDir);
+  fs.mkdirSync(exports.tmpDir);
+};
 
 if (process.env.TEST_THREAD_ID) {
   // Distribute ports in parallel tests
@@ -94,8 +85,6 @@ if (process.env.TEST_THREAD_ID) {
   exports.tmpDirName += '.' + process.env.TEST_THREAD_ID;
 }
 exports.tmpDir = path.join(exports.testDir, exports.tmpDirName);
-
-refreshTmpDir();
 
 var opensslCli = null;
 var inFreeBSDJail = null;
