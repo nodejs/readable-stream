@@ -18,7 +18,8 @@
   },
   "scripts": {
     "test": "tap test/parallel/*.js",
-    "browser": "zuul --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION -- test/browser.js"
+    "browser": "npm run write-zuul && zuul -- test/browser.js",
+    "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml"
   },
   "repository": {
     "type": "git",
