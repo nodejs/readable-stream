@@ -10,13 +10,13 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , testReplace = require('./test-replacements')
     , docReplace  = require('./doc-replacements')
 
-    , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/io.js/v${process.argv[2]}/`
+    , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${process.argv[2]}/`
     , libsrcurl   = srcurlpfx + 'lib/'
     , testsrcurl  = srcurlpfx + 'test/parallel/'
-    , testlisturl = `https://github.com/nodejs/io.js/tree/v${process.argv[2]}/test/parallel`
+    , testlisturl = `https://github.com/nodejs/node/tree/v${process.argv[2]}/test/parallel`
     , libourroot  = path.join(__dirname, '../lib/')
     , testourroot = path.join(__dirname, '../test/parallel/')
-    , docurlpfx   = `https://raw.githubusercontent.com/nodejs/io.js/v${process.argv[2]}/doc/api/`
+    , docurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${process.argv[2]}/doc/api/`
     , docourroot  = path.join(__dirname, '../doc')
 
 
@@ -87,7 +87,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   $('table.files .js-directory-link').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file))
+    if (/^test-stream/.test(file) && !/-wrap\.js$/.test(file))
       processTestFile(file)
   })
 }))

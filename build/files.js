@@ -90,10 +90,15 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , eventEmittterReplacement = [
         /(require\('events'\)\.EventEmitter;)/
       ,   '$1\n\n/*<replacement>*/\n'
-        + 'if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {\n'
+        + 'var EElistenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
         + '};\n/*</replacement>*/\n'
       ]
+
+      , eventEmittterListenerCountReplacement = [
+          /(EE\.listenerCount)/g
+        ,   'EElistenerCount'
+        ]
 
     , constReplacement = [
         /const/g
@@ -133,6 +138,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
       /process.nextTick\(/g
     , 'processNextTick('
     ]
+
+    , internalUtilReplacement = [
+          /^var internalUtil = require\('internal\/util'\);/m
+        ,   '\n/*<replacement>*/\nvar internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
+          + '/*</replacement>*/\n'
+      ]
 
 module.exports['_stream_duplex.js'] = [
     constReplacement
@@ -178,7 +189,7 @@ module.exports['_stream_readable.js'] = [
   , isBufferReplacement
   , processNextTickImport
   , processNextTickReplacement
-
+  , eventEmittterListenerCountReplacement
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -207,4 +218,5 @@ module.exports['_stream_writable.js'] = [
   , isBufferReplacement
   , processNextTickImport
   , processNextTickReplacement
+  , internalUtilReplacement
 ]

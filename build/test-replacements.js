@@ -179,3 +179,20 @@ module.exports['test-stream-unshift-read-race.js'] = [
     'data.slice(pos, Math.min(pos + n, data.length))'
   ]
 ]
+
+module.exports['test-stream-pipe-without-listenerCount.js'] = [
+  [
+    /const r \= new require\(\'stream'\)\.Stream\(\);/,
+    'var r = new stream({\n'
+  + '  read: noop'
+  + '});'
+  ],
+  [
+    /const w \= new require\('stream'\)\.Stream\(\);/,
+    'var w = new stream();'
+  ],
+  [
+    /const /g,
+    'var '
+  ]
+]
