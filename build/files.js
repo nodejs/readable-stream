@@ -49,9 +49,10 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , debugLogReplacement = [
           /var debug = util.debuglog\('stream'\);/
-      ,   '\n\n/*<replacement>*/\nvar debug = require(\'util\');\n'
-        + 'if (debug && debug.debuglog) {\n'
-        + '  debug = debug.debuglog(\'stream\');\n'
+      ,   '\n\n/*<replacement>*/\nvar debugUtil = require(\'util\');\n'
+        + 'var debug;\n'
+        + 'if (debugUtil && debugUtil.debuglog) {\n'
+        + '  debug = debugUtil.debuglog(\'stream\');\n'
         + '} else {\n'
         + '  debug = function () {};\n'
         + '}\n/*</replacement>*/\n'
