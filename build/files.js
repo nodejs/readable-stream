@@ -89,7 +89,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
 
     , eventEmittterReplacement = [
-        /(require\('events'\)\.EventEmitter;)/
+        /(require\('events'\)(?:\.EventEmitter)?;)/
       ,   '$1\n\n/*<replacement>*/\n'
         + 'var EElistenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
