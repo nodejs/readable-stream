@@ -128,6 +128,17 @@ module.exports['common.js'] = [
       /if \(!process\.send\)/
       , 'if (!process.send && !process.browser)'
     ]
+    , [
+      /^/,
+      `/*<replacement>*/
+      var util = require('util');
+      for (var i in util) exports[i] = util[i];
+      /*</replacement>*/`
+    ],
+    [
+      /var regexp = `\^\(\\\\w\+\)\\\\s\+\\\\s\$\{port\}\/\$\{protocol\}\\\\s`;/,
+      `var regexp = '^(\\w+)\\s+\\s' + port + '/' + protocol + '\\s';`
+    ]
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -191,6 +202,13 @@ module.exports['test-stream-pipe-without-listenerCount.js'] = [
     /const w \= new require\('stream'\)\.Stream\(\);/,
     'var w = new stream();'
   ],
+  [
+    /const /g,
+    'var '
+  ]
+]
+
+module.exports['test-stream-pipe-cleanup-pause.js'] = [
   [
     /const /g,
     'var '

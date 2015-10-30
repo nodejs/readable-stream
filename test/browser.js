@@ -20,6 +20,7 @@ test('streams', function (t) {
   require('./browser/test-stream-ispaused')(t);
   require('./browser/test-stream-pipe-after-end')(t);
   require('./browser/test-stream-pipe-cleanup')(t);
+  require('./browser/test-stream-pipe-cleanup-pause')(t);
   require('./browser/test-stream-pipe-error-handling')(t);
   require('./browser/test-stream-pipe-event')(t);
   require('./browser/test-stream-push-order')(t);
