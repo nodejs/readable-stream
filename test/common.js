@@ -1,4 +1,7 @@
 /*<replacement>*/
+      var util = require('util');
+      for (var i in util) exports[i] = util[i];
+      /*</replacement>*//*<replacement>*/
 if (!global.setImmediate) {
   global.setImmediate = function setImmediate(fn) {
     return setTimeout(fn.bind.apply(fn, arguments), 0);
@@ -10,6 +13,7 @@ if (!global.clearImmediate) {
   };
 }
 /*</replacement>*/
+/* eslint-disable required-modules */
 'use strict';
 
 /*<replacement>*/
@@ -26,6 +30,7 @@ var assert = require('assert');
 var os = require('os');
 var child_process = require('child_process');
 
+
 exports.testDir = path.dirname(__filename);
 exports.fixturesDir = path.join(exports.testDir, 'fixtures');
 exports.libDir = path.join(exports.testDir, '../lib');
@@ -33,6 +38,11 @@ exports.tmpDirName = 'tmp';
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 exports.isWindows = process.platform === 'win32';
 exports.isAix = process.platform === 'aix';
+exports.isLinuxPPCBE = (process.platform === 'linux') &&
+                       (process.arch === 'ppc64') &&
+                       (os.endianness() === 'BE');
+exports.isSunOS = process.platform === 'sunos';
+exports.isFreeBSD = process.platform === 'freebsd';
 
 function rimrafSync(p) {
   try {
@@ -197,10 +207,6 @@ exports.hasIPv6 = objectKeys(ifaces).some(function(name) {
     return info.family === 'IPv6';
   });
 });
-
-var util = require('util');
-for (var i in util) exports[i] = util[i];
-//for (var i in exports) global[i] = exports[i];
 
 function protoCtrChain(o) {
   var result = [];
@@ -451,15 +457,9 @@ exports.getServiceName = function getServiceName(port, protocol) {
   var serviceName = port.toString();
 
   try {
-    /*
-     * I'm not a big fan of readFileSync, but reading /etc/services
-     * asynchronously here would require implementing a simple line parser,
-     * which seems overkill for a simple utility function that is not running
-     * concurrently with any other one.
-     */
     var servicesContent = fs.readFileSync(etcServicesFileName,
       { encoding: 'utf8'});
-    var regexp = util.format('^(\\w+)\\s+\\s%d/%s\\s', port, protocol);
+    var regexp = '^(\w+)\s+\s' + port + '/' + protocol + '\s';
     var re = new RegExp(regexp, 'm');
 
     var matches = re.exec(servicesContent);
@@ -489,6 +489,10 @@ exports.fileExists = function(pathname) {
   } catch (err) {
     return false;
   }
+};
+
+exports.fail = function(msg) {
+  assert.fail(null, null, msg);
 };
 
 function forEach (xs, f) {
