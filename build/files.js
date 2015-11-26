@@ -31,9 +31,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
         , '$1\n\n/*<replacement>*/\nvar Buffer = require(\'buffer\').Buffer;\n/*</replacement>*/\n'
       ]
 
+      // The browser build ends up with a circular dependency, so the require is
+      // done lazily, but cached.
     , addDuplexRequire = [
           /^(function (?:Writable|Readable)(?:State)?.*{)/gm
-        , '$1\n  var Duplex = require(\'./_stream_duplex\');\n'
+        , 'var Duplex;\n$1\n  Duplex = Duplex || require(\'./_stream_duplex\');\n'
       ]
 
     , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
