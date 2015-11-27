@@ -171,9 +171,20 @@ Object.defineProperty(exports, 'opensslCli', {get: function() {
 
 
 /*<replacement>*/if (!process.browser) {
-Object.defineProperty(exports, 'hasCrypto', {get: function() {
-  return process.versions.openssl ? true : false;
-}});
+Object.defineProperty(exports, 'hasCrypto', {
+  get: function() {
+    return process.versions.openssl ? true : false;
+  }
+});
+}/*</replacement>*/
+
+
+/*<replacement>*/if (!process.browser) {
+Object.defineProperty(exports, 'hasFipsCrypto', {
+  get: function() {
+    return process.config.variables.openssl_fips ? true : false;
+  }
+});
 }/*</replacement>*/
 
 
@@ -418,11 +429,6 @@ exports.mustCall = function(fn, expected) {
     context.actual++;
     return fn.apply(this, arguments);
   };
-};
-
-exports.checkSpawnSyncRet = function(ret) {
-  assert.strictEqual(ret.status, 0);
-  assert.strictEqual(ret.error, undefined);
 };
 
 var etcServicesFileName = path.join('/etc', 'services');
