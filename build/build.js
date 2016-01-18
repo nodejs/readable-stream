@@ -77,7 +77,7 @@ if (!/\d\.\d\.\d+/.test(process.argv[2])) {
 Object.keys(files).forEach(processLibFile)
 
 //--------------------------------------------------------------------
-// Discover, grab and process all test-stream* files on joyent/node
+// Discover, grab and process all test-stream* files on nodejs/node
 
 hyperquest(testlisturl).pipe(bl(function (err, data) {
   if (err)
@@ -96,7 +96,7 @@ processFile(docurlpfx + 'stream.markdown', path.join(docourroot, 'stream.markdow
 
 
 //--------------------------------------------------------------------
-// Grab the joyent/node test/common.js
+// Grab the nodejs/node test/common.js
 
 processFile(
     testsrcurl.replace(/parallel\/$/, 'common.js')
