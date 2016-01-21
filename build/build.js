@@ -91,7 +91,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   $('table.files .js-directory-link').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file) && !/-wrap\.js$/.test(file))
+    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file))
       processTestFile(file)
   })
 }))

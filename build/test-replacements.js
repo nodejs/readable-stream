@@ -6,6 +6,8 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').objectKeysDefine
     , objectKeysReplacement =
     require('./common-replacements').objectKeysReplacement
+    , constReplacement =
+    require('./common-replacements').constReplacement
 
 module.exports.all = [
     [
@@ -30,6 +32,7 @@ module.exports.all = [
         /Stream.(Readable|Writable|Duplex|Transform|PassThrough)/g
       , 'require(\'../../\').$1'
     ]
+  , constReplacement
 
 ]
 
@@ -63,6 +66,7 @@ module.exports['common.js'] = [
   , objectKeysReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
+  , constReplacement
 
   , [
         /(exports.mustCall[\s\S]*)/m
@@ -138,7 +142,26 @@ module.exports['common.js'] = [
     [
       /var regexp = `\^\(\\\\w\+\)\\\\s\+\\\\s\$\{port\}\/\$\{protocol\}\\\\s`;/,
       `var regexp = '^(\\w+)\\s+\\s' + port + '/' + protocol + '\\s';`
-    ]
+    ],
+    [
+        /require\(['"]stream['"]\)/g
+      , 'require(\'../\')'
+    ],
+    [/forEach\(data, line => \{\n\s+this\.emit\('data', line \+ '\\n'\);\n\s+\}\);/m,
+    `var self = this;
+    forEach(data, function(line) {
+      self.emit('data', line + '\\n');
+    });`
+  ],
+    [
+      /(varructor,)/,
+      '// $1'
+    ],
+    [
+    /^var util = require\('util'\);/m
+  ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+    + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
+  ]
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -193,14 +216,8 @@ module.exports['test-stream-unshift-read-race.js'] = [
 
 module.exports['test-stream-pipe-without-listenerCount.js'] = [
   [
-    /const r \= new require\(\'stream'\)\.Stream\(\);/,
-    'var r = new stream({\n'
-  + '  read: noop'
-  + '});'
-  ],
-  [
-    /const w \= new require\('stream'\)\.Stream\(\);/,
-    'var w = new stream();'
+    /require\(\'stream\'\)/g,
+    'stream'
   ],
   [
     /const /g,
@@ -212,5 +229,14 @@ module.exports['test-stream-pipe-cleanup-pause.js'] = [
   [
     /const /g,
     'var '
+  ]
+]
+module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [[
+  /let /g,
+  'var '],
+  [
+    `var buf = Buffer(5).fill('x');`,
+    `var buf = new Buffer(5);
+  buf.fill('x');`
   ]
 ]

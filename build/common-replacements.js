@@ -39,3 +39,8 @@ module.exports.objectKeysReplacement = [
      /Object\.keys/g
    , 'objectKeys'
  ]
+
+module.exports.constReplacement = [
+    /const/g
+  , 'var'
+]

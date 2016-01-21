@@ -14,7 +14,7 @@
   "devDependencies": {
     "tap": "~0.2.6",
     "tape": "~4.0.0",
-    "zuul": "~3.0.0"
+    "zuul": "~3.9.0"
   },
   "scripts": {
     "test": "tap test/parallel/*.js",

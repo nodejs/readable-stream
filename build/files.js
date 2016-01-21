@@ -103,10 +103,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
         ,   'EElistenerCount'
         ]
 
-    , constReplacement = [
-        /const/g
-      , 'var'
-      ]
+    , constReplacement = require('./common-replacements').constReplacement
 
     , bufferIsEncodingReplacement = [
       /Buffer.isEncoding\((\w+)\)/
