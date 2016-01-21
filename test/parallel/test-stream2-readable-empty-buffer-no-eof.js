@@ -23,6 +23,7 @@ function test1() {
   var buf = new Buffer(5);
   buf.fill('x');
   var reads = 5;
+  var timeout = common.platformTimeout(50);
   r._read = function(n) {
     switch (reads--) {
       case 0:
@@ -30,15 +31,15 @@ function test1() {
       case 1:
         return r.push(buf);
       case 2:
-        setTimeout(r.read.bind(r, 0), 50);
+        setTimeout(r.read.bind(r, 0), timeout);
         return r.push(new Buffer(0)); // Not-EOF!
       case 3:
-        setTimeout(r.read.bind(r, 0), 50);
+        setTimeout(r.read.bind(r, 0), timeout);
         return process.nextTick(function() {
           return r.push(new Buffer(0));
         });
       case 4:
-        setTimeout(r.read.bind(r, 0), 50);
+        setTimeout(r.read.bind(r, 0), timeout);
         return setTimeout(function() {
           return r.push(new Buffer(0));
         });
