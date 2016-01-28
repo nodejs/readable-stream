@@ -27,8 +27,13 @@ if (!RegExp('^' + nodeVersionRegexString + '$').test(nodeVersion)) {
   return process.exit(1);
 }
 
-function processFile (url, out, replacements) {
-  hyperquest(url).pipe(bl(function (err, data) {
+// `inputLoc`: URL or local path.
+function processFile (inputLoc, out, replacements) {
+  var file = /^https?:\/\//.test(inputLoc) ?
+    hyperquest(inputLoc) :
+    fs.createReadStream(inputLoc, encoding)
+
+  file.pipe(bl(function (err, data) {
     if (err) throw err
 
     data = data.toString()
