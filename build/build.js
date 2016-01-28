@@ -5,39 +5,39 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , fs          = require('fs')
     , path        = require('path')
     , cheerio     = require('cheerio')
-
+    , encoding    = 'utf8'
+    , nodeVersion = process.argv[2]
+    , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
     , files       = require('./files')
     , testReplace = require('./test-replacements')
     , docReplace  = require('./doc-replacements')
 
-    , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${process.argv[2]}/`
+    , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${nodeVersion}/`
     , libsrcurl   = srcurlpfx + 'lib/'
     , testsrcurl  = srcurlpfx + 'test/parallel/'
-    , testlisturl = `https://github.com/nodejs/node/tree/v${process.argv[2]}/test/parallel`
+    , testlisturl = `https://github.com/nodejs/node/tree/v${nodeVersion}/test/parallel`
     , libourroot  = path.join(__dirname, '../lib/')
     , testourroot = path.join(__dirname, '../test/parallel/')
-    , docurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${process.argv[2]}/doc/api/`
+    , docurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${nodeVersion}/doc/api/`
     , docourroot  = path.join(__dirname, '../doc')
 
 
-if (!/\d\.\d\.\d+/.test(process.argv[2])) {
+if (!RegExp('^' + nodeVersionRegexString + '$').test(nodeVersion)) {
   console.error('Usage: build.js xx.yy.zz')
   return process.exit(1);
 }
 
 function processFile (url, out, replacements) {
   hyperquest(url).pipe(bl(function (err, data) {
-    if (err)
-      throw err
+    if (err) throw err
 
     data = data.toString()
     replacements.forEach(function (replacement) {
       data = data.replace.apply(data, replacement)
     })
 
-    fs.writeFile(out, data, 'utf8', function (err) {
-      if (err)
-        throw err
+    fs.writeFile(out, data, encoding, function (err) {
+      if (err) throw err
 
       console.log('Wrote', out)
     })
@@ -63,13 +63,6 @@ function processTestFile (file) {
 
   processFile(url, out, replacements)
 }
-
-
-if (!/\d\.\d\.\d+/.test(process.argv[2])) {
-  console.log('Usage: build.js <node version>')
-  return process.exit(-1)
-}
-
 
 //--------------------------------------------------------------------
 // Grab & process files in ../lib/
