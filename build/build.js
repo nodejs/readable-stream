@@ -8,6 +8,7 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , encoding    = 'utf8'
     , nodeVersion = process.argv[2]
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
+    , readmePath  = path.join(__dirname, '..', 'README.md')
     , files       = require('./files')
     , testReplace = require('./test-replacements')
     , docReplace  = require('./doc-replacements')
@@ -101,3 +102,13 @@ processFile(
   , path.join(testourroot, '../common.js')
   , testReplace['common.js']
 )
+
+//--------------------------------------------------------------------
+// Update Node version in README
+
+processFile(readmePath, readmePath, [
+  [
+      RegExp('(Node-core v)' + nodeVersionRegexString, 'g')
+    , "$1" + nodeVersion
+  ]
+])
