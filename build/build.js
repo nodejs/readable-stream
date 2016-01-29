@@ -6,8 +6,13 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , path        = require('path')
     , cheerio     = require('cheerio')
     , encoding    = 'utf8'
+    , urlRegex = /^https?:\/\//
     , nodeVersion = process.argv[2]
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
+    , usageVersionRegex = RegExp('^' + nodeVersionRegexString + '$')
+    , readmeVersionRegex =
+        RegExp('(Node-core v)' + nodeVersionRegexString, 'g')
+
     , readmePath  = path.join(__dirname, '..', 'README.md')
     , files       = require('./files')
     , testReplace = require('./test-replacements')
@@ -23,14 +28,14 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , docourroot  = path.join(__dirname, '../doc')
 
 
-if (!RegExp('^' + nodeVersionRegexString + '$').test(nodeVersion)) {
+if (!usageVersionRegex.test(nodeVersion)) {
   console.error('Usage: build.js xx.yy.zz')
   return process.exit(1);
 }
 
 // `inputLoc`: URL or local path.
 function processFile (inputLoc, out, replacements) {
-  var file = /^https?:\/\//.test(inputLoc) ?
+  var file = urlRegex.test(inputLoc) ?
     hyperquest(inputLoc) :
     fs.createReadStream(inputLoc, encoding)
 
@@ -107,8 +112,5 @@ processFile(
 // Update Node version in README
 
 processFile(readmePath, readmePath, [
-  [
-      RegExp('(Node-core v)' + nodeVersionRegexString, 'g')
-    , "$1" + nodeVersion
-  ]
+  [readmeVersionRegex, "$1" + nodeVersion]
 ])
