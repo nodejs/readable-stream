@@ -414,8 +414,9 @@ hexadecimal string format.
 
 This properly handles multi-byte characters that would otherwise be
 potentially mangled if you simply pulled the Buffers directly and
-called `buf.toString(encoding)` on them.  If you want to read the data
-as strings, always use this method.
+called `buf.toString(encoding)` on them. Also you can disable 
+any encoding at all with `readable.setEncoding(null)`.
+If you want to read the data as strings, always use this method.
 
 ```javascript
 var readable = getReadableStreamSomehow();
