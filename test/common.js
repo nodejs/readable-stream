@@ -234,7 +234,7 @@ exports.hasIPv6 = objectKeys(ifaces).some(function(name) {
 
 function protoCtrChain(o) {
   var result = [];
-  for (; o; o = o.__proto__) { result.push(o.varructor); }
+  for (; o; o = o.__proto__) { result.push(o.constructor); }
   return result.join();
 }
 
@@ -314,7 +314,7 @@ var knownGlobals = [setTimeout,
                     clearInterval,
                     clearImmediate,
                     console,
-                    // varructor, // Enumerable in V8 3.21.
+                    constructor, // Enumerable in V8 3.21.
                     Buffer,
                     process,
                     global];

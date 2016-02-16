@@ -41,6 +41,6 @@ module.exports.objectKeysReplacement = [
  ]
 
 module.exports.constReplacement = [
-    /const/g
+    /\bconst\b/g
   , 'var'
 ]

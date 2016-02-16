@@ -146,7 +146,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
       ]
     ,
     letReplacements = [
-        /let/g
+        /\blet\b/g
       , 'var'
     ]
 module.exports['_stream_duplex.js'] = [
