@@ -144,7 +144,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
         ,   '\n/*<replacement>*/\nvar internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
           + '/*</replacement>*/\n'
       ]
-
+    ,
+    letReplacements = [
+        /let/g
+      , 'var'
+    ]
 module.exports['_stream_duplex.js'] = [
     constReplacement
   , requireReplacement
@@ -190,6 +194,7 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
+  , letReplacements
 ]
 
 module.exports['_stream_transform.js'] = [
