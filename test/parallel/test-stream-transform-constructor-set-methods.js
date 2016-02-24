@@ -7,26 +7,25 @@ var Transform = require('../../').Transform;
 var _transformCalled = false;
 function _transform(d, e, n) {
   _transformCalled = true;
-  n();
-}
+  n();}
+
 
 var _flushCalled = false;
 function _flush(n) {
   _flushCalled = true;
-  n();
-}
+  n();}
 
-var t = new Transform({
-  transform: _transform,
-  flush: _flush
-});
+
+var t = new Transform({ 
+  transform: _transform, 
+  flush: _flush });
+
 
 t.end(new Buffer('blerg'));
 t.resume();
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(t._transform, _transform);
   assert.equal(t._flush, _flush);
   assert(_transformCalled);
-  assert(_flushCalled);
-});
+  assert(_flushCalled);});

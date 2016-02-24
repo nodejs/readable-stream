@@ -8,26 +8,25 @@ var gotEnd = false;
 var Readable = require('../../').Readable;
 var stream = new Readable();
 var calledRead = false;
-stream._read = function() {
+stream._read = function () {
   assert(!calledRead);
   calledRead = true;
-  this.push(null);
-};
+  this.push(null);};
 
-stream.on('data', function() {
-  throw new Error('should not ever get data');
-});
+
+stream.on('data', function () {
+  throw new Error('should not ever get data');});
+
 stream.pause();
 
-setTimeout(function() {
-  stream.on('end', function() {
-    gotEnd = true;
-  });
-  stream.resume();
-});
+setTimeout(function () {
+  stream.on('end', function () {
+    gotEnd = true;});
 
-process.on('exit', function() {
+  stream.resume();});
+
+
+process.on('exit', function () {
   assert(gotEnd);
   assert(calledRead);
-  console.log('ok');
-});
+  console.log('ok');});

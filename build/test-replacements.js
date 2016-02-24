@@ -6,8 +6,6 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').objectKeysDefine
     , objectKeysReplacement =
     require('./common-replacements').objectKeysReplacement
-    , constReplacement =
-    require('./common-replacements').constReplacement
 
 module.exports.all = [
     [
@@ -32,7 +30,6 @@ module.exports.all = [
         /Stream.(Readable|Writable|Duplex|Transform|PassThrough)/g
       , 'require(\'../../\').$1'
     ]
-  , constReplacement
 
 ]
 
@@ -66,7 +63,6 @@ module.exports['common.js'] = [
   , objectKeysReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
-  , constReplacement
 
   , [
         /(exports.mustCall[\s\S]*)/m
@@ -147,21 +143,16 @@ module.exports['common.js'] = [
         /require\(['"]stream['"]\)/g
       , 'require(\'../\')'
     ],
-    [/forEach\(data, line => \{\n\s+this\.emit\('data', line \+ '\\n'\);\n\s+\}\);/m,
-    `var self = this;
-    forEach(data, function(line) {
-      self.emit('data', line + '\\n');
-    });`
-  ],
-    [
-      /(varructor,)/,
-      '// $1'
-    ],
     [
     /^var util = require\('util'\);/m
   ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
     + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
-  ]
+  ],
+  [
+  /^const util = require\('util'\);/m
+,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+  + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
+]
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -191,7 +182,12 @@ module.exports['test-stream2-large-read-stall.js'] = [
 module.exports['test-stream-pipe-cleanup.js'] = [
     [
         /(function Writable\(\) \{)/
-      , 'if (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
+      , '(function (){\nif (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
+    ]
+    ,
+    [
+      /$/
+      ,'}())'
     ]
 ]
 
@@ -218,25 +214,31 @@ module.exports['test-stream-pipe-without-listenerCount.js'] = [
   [
     /require\(\'stream\'\)/g,
     'stream'
-  ],
-  [
-    /const /g,
-    'var '
   ]
 ]
 
-module.exports['test-stream-pipe-cleanup-pause.js'] = [
+module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
   [
-    /const /g,
-    'var '
-  ]
-]
-module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [[
-  /let /g,
-  'var '],
-  [
-    `var buf = Buffer(5).fill('x');`,
-    `var buf = new Buffer(5);
+    `const buf = Buffer(5).fill('x');`,
+    `const buf = new Buffer(5);
   buf.fill('x');`
   ]
+]
+
+module.exports['test-stream2-unpipe-drain.js'] = [
+  [
+    /^/,
+    `(function () {\n`
+  ],
+  [
+    /$/
+    ,'}())'
+  ]
+]
+
+module.exports['test-stream2-decode-partial.js'] = [
+ [
+   /readable\.push\(source\.slice\(4, 6\)\)/
+  ,`readable.push(source.slice(4, source.length));`
+ ]
 ]

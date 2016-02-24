@@ -5,6 +5,7 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , fs          = require('fs')
     , path        = require('path')
     , cheerio     = require('cheerio')
+    , babel       = require('babel-core')
     , encoding    = 'utf8'
     , urlRegex = /^https?:\/\//
     , nodeVersion = process.argv[2]
@@ -46,7 +47,13 @@ function processFile (inputLoc, out, replacements) {
     replacements.forEach(function (replacement) {
       data = data.replace.apply(data, replacement)
     })
-
+    if (inputLoc.slice(-3) === '.js') {
+      const transformed = babel.transform(data, {
+        retainLines: true,
+        plugins: ['transform-es2015-arrow-functions', 'transform-es2015-block-scoping']
+      })
+      data = transformed.code
+    }
     fs.writeFile(out, data, encoding, function (err) {
       if (err) throw err
 

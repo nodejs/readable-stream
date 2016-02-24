@@ -12,7 +12,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
           /(require\(['"])(_stream_)/g
         , '$1./$2'
       ]
-
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
@@ -44,15 +43,15 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
     , utilReplacement = [
-          /^var util = require\('util'\);/m
-        ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+          /^const util = require\('util'\);/m
+        ,   '\n/*<replacement>*/\nconst util = require(\'core-util-is\');\n'
           + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
       ]
 
     , debugLogReplacement = [
-          /var debug = util.debuglog\('stream'\);/
-      ,   '\n\n/*<replacement>*/\nvar debugUtil = require(\'util\');\n'
-        + 'var debug;\n'
+          /const debug = util.debuglog\('stream'\);/
+      ,   '\n\n/*<replacement>*/\nconst debugUtil = require(\'util\');\n'
+        + 'let debug;\n'
         + 'if (debugUtil && debugUtil.debuglog) {\n'
         + '  debug = debugUtil.debuglog(\'stream\');\n'
         + '} else {\n'
@@ -103,8 +102,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         ,   'EElistenerCount'
         ]
 
-    , constReplacement = require('./common-replacements').constReplacement
-
     , bufferIsEncodingReplacement = [
       /Buffer.isEncoding\((\w+)\)/
     ,   '([\'hex\', \'utf8\', \'utf-8\', \'ascii\', \'binary\', \'base64\',\n'
@@ -113,7 +110,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , requireStreamReplacement = [
-      /var Stream = require\('stream'\);/
+      /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
       + 'var Stream;\n(function (){try{\n'
       + '  Stream = require(\'st\' + \'ream\');\n'
@@ -140,18 +137,13 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , internalUtilReplacement = [
-          /^var internalUtil = require\('internal\/util'\);/m
-        ,   '\n/*<replacement>*/\nvar internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
+          /^const internalUtil = require\('internal\/util'\);/m
+        ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
           + '/*</replacement>*/\n'
       ]
-    ,
-    letReplacements = [
-        /\blet\b/g
-      , 'var'
-    ]
+
 module.exports['_stream_duplex.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
@@ -164,16 +156,14 @@ module.exports['_stream_duplex.js'] = [
 ]
 
 module.exports['_stream_passthrough.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
-    constReplacement
-  , addDuplexRequire
+    addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -194,20 +184,17 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
-  , letReplacements
 ]
 
 module.exports['_stream_transform.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
-    constReplacement
-  , addDuplexRequire
+    addDuplexRequire
   , requireReplacement
   , instanceofReplacement
   , bufferReplacement
@@ -224,4 +211,5 @@ module.exports['_stream_writable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , internalUtilReplacement
+
 ]

@@ -6,8 +6,8 @@ var Writable = require('../../').Writable;
 
 var _writeCalled = false;
 function _write(d, e, n) {
-  _writeCalled = true;
-}
+  _writeCalled = true;}
+
 
 var w = new Writable({ write: _write });
 w.end(new Buffer('blerg'));
@@ -16,8 +16,8 @@ var _writevCalled = false;
 var dLength = 0;
 function _writev(d, n) {
   dLength = d.length;
-  _writevCalled = true;
-}
+  _writevCalled = true;}
+
 
 var w2 = new Writable({ writev: _writev });
 w2.cork();
@@ -26,10 +26,9 @@ w2.write(new Buffer('blerg'));
 w2.write(new Buffer('blerg'));
 w2.end();
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(w._write, _write);
   assert(_writeCalled);
   assert.equal(w2._writev, _writev);
   assert.equal(dLength, 2);
-  assert(_writevCalled);
-});
+  assert(_writevCalled);});

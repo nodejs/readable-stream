@@ -4,34 +4,34 @@ var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
 var assert = require('assert');
 
-var src = new R({encoding: 'base64'});
+var src = new R({ encoding: 'base64' });
 var dst = new W();
 var hasRead = false;
 var accum = [];
 var timeout;
 
-src._read = function(n) {
+src._read = function (n) {
   if (!hasRead) {
     hasRead = true;
-    process.nextTick(function() {
+    process.nextTick(function () {
       src.push(new Buffer('1'));
-      src.push(null);
-    });
-  }
-};
+      src.push(null);});}};
 
-dst._write = function(chunk, enc, cb) {
+
+
+
+dst._write = function (chunk, enc, cb) {
   accum.push(chunk);
-  cb();
-};
+  cb();};
 
-src.on('end', function() {
+
+src.on('end', function () {
   assert.equal(Buffer.concat(accum) + '', 'MQ==');
-  clearTimeout(timeout);
-});
+  clearTimeout(timeout);});
+
 
 src.pipe(dst);
 
-timeout = setTimeout(function() {
-  assert.fail(null, null, 'timed out waiting for _write');
-}, 100);
+timeout = setTimeout(function () {
+  assert.fail(null, null, 'timed out waiting for _write');}, 
+100);

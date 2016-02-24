@@ -1,60 +1,60 @@
-'use strict';
-var common = require('../common');
-var assert = require('assert');
-var stream = require('../../');
+(function () {
+  'use strict';
+  var common = require('../common');
+  var assert = require('assert');
+  var stream = require('../../');
 
-if (!common.hasCrypto) {
-  console.log('1..0 # Skipped: missing crypto');
-  return;
-}
-var crypto = require('crypto');
+  if (!common.hasCrypto) {
+    console.log('1..0 # Skipped: missing crypto');
+    return;}
 
-var util = require('util');
+  var crypto = require('crypto');
 
-function TestWriter() {
-  stream.Writable.call(this);
-}
-util.inherits(TestWriter, stream.Writable);
+  var util = require('util');
 
-TestWriter.prototype._write = function(buffer, encoding, callback) {
-  console.log('write called');
-  // super slow write stream (callback never called)
-};
+  function TestWriter() {
+    stream.Writable.call(this);}
 
-var dest = new TestWriter();
+  util.inherits(TestWriter, stream.Writable);
 
-function TestReader(id) {
-  stream.Readable.call(this);
-  this.reads = 0;
-}
-util.inherits(TestReader, stream.Readable);
+  TestWriter.prototype._write = function (buffer, encoding, callback) {
+    console.log('write called');
+    // super slow write stream (callback never called)
+  };
 
-TestReader.prototype._read = function(size) {
-  this.reads += 1;
-  this.push(crypto.randomBytes(size));
-};
+  var dest = new TestWriter();
 
-var src1 = new TestReader();
-var src2 = new TestReader();
+  function TestReader(id) {
+    stream.Readable.call(this);
+    this.reads = 0;}
 
-src1.pipe(dest);
+  util.inherits(TestReader, stream.Readable);
 
-src1.once('readable', function() {
-  process.nextTick(function() {
-
-    src2.pipe(dest);
-
-    src2.once('readable', function() {
-      process.nextTick(function() {
-
-        src1.unpipe(dest);
-      });
-    });
-  });
-});
+  TestReader.prototype._read = function (size) {
+    this.reads += 1;
+    this.push(crypto.randomBytes(size));};
 
 
-process.on('exit', function() {
-  assert.equal(src1.reads, 2);
-  assert.equal(src2.reads, 2);
-});
+  var src1 = new TestReader();
+  var src2 = new TestReader();
+
+  src1.pipe(dest);
+
+  src1.once('readable', function () {
+    process.nextTick(function () {
+
+      src2.pipe(dest);
+
+      src2.once('readable', function () {
+        process.nextTick(function () {
+
+          src1.unpipe(dest);});});});});
+
+
+
+
+
+
+  process.on('exit', function () {
+    assert.equal(src1.reads, 2);
+    assert.equal(src2.reads, 2);});})();

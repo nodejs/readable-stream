@@ -13,41 +13,40 @@ function TestReader() {
   this._buffer = new Buffer(100);
   this._buffer.fill('x');
 
-  this.on('data', function() {
-    ondataCalled++;
-  });
-}
+  this.on('data', function () {
+    ondataCalled++;});}
+
+
 
 util.inherits(TestReader, R);
 
-TestReader.prototype._read = function(n) {
+TestReader.prototype._read = function (n) {
   this.push(this._buffer);
-  this._buffer = new Buffer(0);
-};
+  this._buffer = new Buffer(0);};
+
 
 var reader = new TestReader();
-setImmediate(function() {
+setImmediate(function () {
   assert.equal(ondataCalled, 1);
   console.log('ok');
-  reader.push(null);
-});
+  reader.push(null);});
+
 
 function TestWriter() {
   W.apply(this);
   this.write('foo');
-  this.end();
-}
+  this.end();}
+
 
 util.inherits(TestWriter, W);
 
-TestWriter.prototype._write = function(chunk, enc, cb) {
-  cb();
-};
+TestWriter.prototype._write = function (chunk, enc, cb) {
+  cb();};
+
 
 var writer = new TestWriter();
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.strictEqual(reader.readable, false);
   assert.strictEqual(writer.writable, false);
-  console.log('ok');
-});
+  console.log('ok');});

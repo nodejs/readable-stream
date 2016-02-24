@@ -7,32 +7,32 @@ var stream = require('../../');
 var passed = false;
 
 function PassThrough() {
-  stream.Transform.call(this);
-}
+  stream.Transform.call(this);}
+
 util.inherits(PassThrough, stream.Transform);
-PassThrough.prototype._transform = function(chunk, encoding, done) {
+PassThrough.prototype._transform = function (chunk, encoding, done) {
   this.push(chunk);
-  done();
-};
+  done();};
+
 
 function TestStream() {
-  stream.Transform.call(this);
-}
+  stream.Transform.call(this);}
+
 util.inherits(TestStream, stream.Transform);
-TestStream.prototype._transform = function(chunk, encoding, done) {
+TestStream.prototype._transform = function (chunk, encoding, done) {
   if (!passed) {
     // Char 'a' only exists in the last write
-    passed = indexOf(chunk.toString(), 'a') >= 0;
-  }
-  done();
-};
+    passed = indexOf(chunk.toString(), 'a') >= 0;}
+
+  done();};
+
 
 var s1 = new PassThrough();
 var s2 = new PassThrough();
 var s3 = new TestStream();
 s1.pipe(s3);
 // Don't let s2 auto close which may close s3
-s2.pipe(s3, {end: false});
+s2.pipe(s3, { end: false });
 
 // We must write a buffer larger than highWaterMark
 var big = new Buffer(s1._writableState.highWaterMark + 1);
@@ -48,13 +48,12 @@ assert(s2.write('tiny'));
 setImmediate(s1.write.bind(s1), 'later');
 
 // Assert after two IO loops when all operations have been done.
-process.on('exit', function() {
-  assert(passed, 'Large buffer is not handled properly by Writable Stream');
-});
+process.on('exit', function () {
+  assert(passed, 'Large buffer is not handled properly by Writable Stream');});
 
-function indexOf (xs, x) {
+
+function indexOf(xs, x) {
   for (var i = 0, l = xs.length; i < l; i++) {
-    if (xs[i] === x) return i;
-  }
-  return -1;
-}
+    if (xs[i] === x) return i;}
+
+  return -1;}

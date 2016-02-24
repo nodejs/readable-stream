@@ -4,9 +4,12 @@
   "description": "",
   "main": "build.js",
   "dependencies": {
+    "babel-core": "^6.5.2",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.5.2",
+    "babel-plugin-transform-es2015-block-scoping": "^6.5.0",
     "bl": "~0.6.0",
-    "hyperzip": "0.0.0",
+    "cheerio": "~0.13.1",
     "hyperdirect": "0.0.0",
-    "cheerio": "~0.13.1"
+    "hyperzip": "0.0.0"
   }
 }

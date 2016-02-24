@@ -9,40 +9,40 @@ var count = 0;
 
 function test(name, fn) {
   count++;
-  tests.push([name, fn]);
-}
+  tests.push([name, fn]);}
+
 
 function run() {
   var next = tests.shift();
-  if (!next)
-    return console.error('ok');
+  if (!next) 
+  return console.error('ok');
 
   var name = next[0];
   var fn = next[1];
   console.log('# %s', name);
-  fn({
-    same: assert.deepEqual,
-    equal: assert.equal,
-    end: function() {
+  fn({ 
+    same: assert.deepEqual, 
+    equal: assert.equal, 
+    end: function () {
       count--;
-      run();
-    }
-  });
-}
+      run();} });}
+
+
+
 
 // ensure all tests have run
-process.on('exit', function() {
-  assert.equal(count, 0);
-});
+process.on('exit', function () {
+  assert.equal(count, 0);});
+
 
 process.nextTick(run);
 
 
-test('buffers', function(t) {
-  var list = [ new Buffer('foog'),
-               new Buffer('bark'),
-               new Buffer('bazy'),
-               new Buffer('kuel') ];
+test('buffers', function (t) {
+  var list = [new Buffer('foog'), 
+  new Buffer('bark'), 
+  new Buffer('bazy'), 
+  new Buffer('kuel')];
 
   // read more than the first element.
   var ret = fromList(6, { buffer: list, length: 16 });
@@ -63,14 +63,14 @@ test('buffers', function(t) {
   // all consumed.
   t.same(list, []);
 
-  t.end();
-});
+  t.end();});
 
-test('strings', function(t) {
-  var list = [ 'foog',
-               'bark',
-               'bazy',
-               'kuel' ];
+
+test('strings', function (t) {
+  var list = ['foog', 
+  'bark', 
+  'bazy', 
+  'kuel'];
 
   // read more than the first element.
   var ret = fromList(6, { buffer: list, length: 16, decoder: true });
@@ -91,5 +91,4 @@ test('strings', function(t) {
   // all consumed.
   t.same(list, []);
 
-  t.end();
-});
+  t.end();});
