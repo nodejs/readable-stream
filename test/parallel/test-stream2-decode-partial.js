@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var Readable = require('../../lib/_stream_readable');
 var assert = require('assert');
@@ -15,8 +16,9 @@ readable.push(source.slice(4, source.length));;
 readable.push(null);
 
 readable.on('data', function (data) {
-  buf += data;});
-
+  buf += data;
+});
 
 process.on('exit', function () {
-  assert.strictEqual(buf, '€¢');});
+  assert.strictEqual(buf, '€¢');
+});

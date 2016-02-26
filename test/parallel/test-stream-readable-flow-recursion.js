@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 
@@ -19,11 +20,8 @@ stream._read = function (size) {
   reads++;
   size = Math.min(size, total);
   total -= size;
-  if (size === 0) 
-  stream.push(null);else 
-
-  stream.push(new Buffer(size));};
-
+  if (size === 0) stream.push(null);else stream.push(new Buffer(size));
+};
 
 var depth = 0;
 
@@ -31,18 +29,15 @@ function flow(stream, size, callback) {
   depth += 1;
   var chunk = stream.read(size);
 
-  if (!chunk) 
-  stream.once('readable', flow.bind(null, stream, size, callback));else 
-
-  callback(chunk);
+  if (!chunk) stream.once('readable', flow.bind(null, stream, size, callback));else callback(chunk);
 
   depth -= 1;
-  console.log('flow(' + depth + '): exit');}
-
+  console.log('flow(' + depth + '): exit');
+}
 
 flow(stream, 5000, function () {
-  console.log('complete (' + depth + ')');});
-
+  console.log('complete (' + depth + ')');
+});
 
 process.on('exit', function (code) {
   assert.equal(reads, 2);
@@ -52,4 +47,5 @@ process.on('exit', function (code) {
   assert.equal(stream._readableState.length, 0);
   assert(!code);
   assert.equal(depth, 0);
-  console.log('ok');});
+  console.log('ok');
+});

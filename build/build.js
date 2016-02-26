@@ -49,7 +49,6 @@ function processFile (inputLoc, out, replacements) {
     })
     if (inputLoc.slice(-3) === '.js') {
       const transformed = babel.transform(data, {
-        retainLines: true,
         plugins: ['transform-es2015-arrow-functions', 'transform-es2015-block-scoping']
       })
       data = transformed.code

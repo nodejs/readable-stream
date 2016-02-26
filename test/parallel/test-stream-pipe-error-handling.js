@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 var Stream = require('stream').Stream;
@@ -11,13 +12,13 @@ var Stream = require('stream').Stream;
 
   var gotErr = null;
   source.on('error', function (err) {
-    gotErr = err;});
-
+    gotErr = err;
+  });
 
   var err = new Error('This stream turned into bacon.');
   source.emit('error', err);
-  assert.strictEqual(gotErr, err);})();
-
+  assert.strictEqual(gotErr, err);
+})();
 
 (function testErrorWithoutListenerThrows() {
   var source = new Stream();
@@ -29,13 +30,13 @@ var Stream = require('stream').Stream;
 
   var gotErr = null;
   try {
-    source.emit('error', err);} 
-  catch (e) {
-    gotErr = e;}
+    source.emit('error', err);
+  } catch (e) {
+    gotErr = e;
+  }
 
-
-  assert.strictEqual(gotErr, err);})();
-
+  assert.strictEqual(gotErr, err);
+})();
 
 (function testErrorWithRemovedListenerThrows() {
   var R = require('../../').Readable;
@@ -48,18 +49,18 @@ var Stream = require('stream').Stream;
 
   process.on('exit', function () {
     assert(didTest);
-    console.log('ok');});
-
+    console.log('ok');
+  });
 
   r._read = function () {
     setTimeout(function () {
       assert(removed);
       assert.throws(function () {
-        w.emit('error', new Error('fail'));});
-
-      didTest = true;});};
-
-
+        w.emit('error', new Error('fail'));
+      });
+      didTest = true;
+    });
+  };
 
   w.on('error', myOnError);
   r.pipe(w);
@@ -67,9 +68,9 @@ var Stream = require('stream').Stream;
   removed = true;
 
   function myOnError(er) {
-    throw new Error('this should not happen');}})();
-
-
+    throw new Error('this should not happen');
+  }
+})();
 
 (function testErrorWithRemovedListenerThrows() {
   var R = require('../../').Readable;
@@ -83,16 +84,16 @@ var Stream = require('stream').Stream;
 
   process.on('exit', function () {
     assert(didTest);
-    console.log('ok');});
-
+    console.log('ok');
+  });
 
   r._read = function () {
     setTimeout(function () {
       assert(removed);
       w.emit('error', new Error('fail'));
-      didTest = true;});};
-
-
+      didTest = true;
+    });
+  };
 
   w.on('error', myOnError);
   w._write = function () {};
@@ -104,4 +105,6 @@ var Stream = require('stream').Stream;
 
   function myOnError(er) {
     assert(!caught);
-    caught = true;}})();
+    caught = true;
+  }
+})();

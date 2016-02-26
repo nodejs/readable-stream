@@ -8,33 +8,32 @@ var assert = require('assert');
 var util = require('util');
 
 (function () {
-  if (/^v0\.8\./.test(process.version)) 
-  return;
+  if (/^v0\.8\./.test(process.version)) return;
 
   function Writable() {
     this.writable = true;
     this.endCalls = 0;
-    require('stream').Stream.call(this);}
-
+    require('stream').Stream.call(this);
+  }
   util.inherits(Writable, require('stream').Stream);
   Writable.prototype.end = function () {
-    this.endCalls++;};
-
+    this.endCalls++;
+  };
 
   Writable.prototype.destroy = function () {
-    this.endCalls++;};
-
+    this.endCalls++;
+  };
 
   function Readable() {
     this.readable = true;
-    require('stream').Stream.call(this);}
-
+    require('stream').Stream.call(this);
+  }
   util.inherits(Readable, require('stream').Stream);
 
   function Duplex() {
     this.readable = true;
-    Writable.call(this);}
-
+    Writable.call(this);
+  }
   util.inherits(Duplex, Writable);
 
   var i = 0;
@@ -47,8 +46,8 @@ var util = require('util');
   for (i = 0; i < limit; i++) {
     r = new Readable();
     r.pipe(w);
-    r.emit('end');}
-
+    r.emit('end');
+  }
   assert.equal(0, r.listeners('end').length);
   assert.equal(limit, w.endCalls);
 
@@ -57,8 +56,8 @@ var util = require('util');
   for (i = 0; i < limit; i++) {
     r = new Readable();
     r.pipe(w);
-    r.emit('close');}
-
+    r.emit('close');
+  }
   assert.equal(0, r.listeners('close').length);
   assert.equal(limit, w.endCalls);
 
@@ -69,8 +68,8 @@ var util = require('util');
   for (i = 0; i < limit; i++) {
     w = new Writable();
     r.pipe(w);
-    w.emit('close');}
-
+    w.emit('close');
+  }
   assert.equal(0, w.listeners('close').length);
 
   r = new Readable();
@@ -103,4 +102,5 @@ var util = require('util');
   assert.equal(d.listeners('end').length, 0);
   assert.equal(d.listeners('close').length, 0);
   assert.equal(w.listeners('end').length, 0);
-  assert.equal(w.listeners('close').length, 0);})();
+  assert.equal(w.listeners('close').length, 0);
+})();

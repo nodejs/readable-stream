@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 var gotEnd = false;
@@ -11,22 +12,23 @@ var calledRead = false;
 stream._read = function () {
   assert(!calledRead);
   calledRead = true;
-  this.push(null);};
-
+  this.push(null);
+};
 
 stream.on('data', function () {
-  throw new Error('should not ever get data');});
-
+  throw new Error('should not ever get data');
+});
 stream.pause();
 
 setTimeout(function () {
   stream.on('end', function () {
-    gotEnd = true;});
-
-  stream.resume();});
-
+    gotEnd = true;
+  });
+  stream.resume();
+});
 
 process.on('exit', function () {
   assert(gotEnd);
   assert(calledRead);
-  console.log('ok');});
+  console.log('ok');
+});

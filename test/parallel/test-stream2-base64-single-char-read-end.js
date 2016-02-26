@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
@@ -15,23 +16,23 @@ src._read = function (n) {
     hasRead = true;
     process.nextTick(function () {
       src.push(new Buffer('1'));
-      src.push(null);});}};
-
-
-
+      src.push(null);
+    });
+  }
+};
 
 dst._write = function (chunk, enc, cb) {
   accum.push(chunk);
-  cb();};
-
+  cb();
+};
 
 src.on('end', function () {
   assert.equal(Buffer.concat(accum) + '', 'MQ==');
-  clearTimeout(timeout);});
-
+  clearTimeout(timeout);
+});
 
 src.pipe(dst);
 
 timeout = setTimeout(function () {
-  assert.fail(null, null, 'timed out waiting for _write');}, 
-100);
+  assert.fail(null, null, 'timed out waiting for _write');
+}, 100);

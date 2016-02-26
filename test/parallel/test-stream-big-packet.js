@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 var util = require('util');
@@ -7,25 +8,25 @@ var stream = require('../../');
 var passed = false;
 
 function PassThrough() {
-  stream.Transform.call(this);}
-
+  stream.Transform.call(this);
+}
 util.inherits(PassThrough, stream.Transform);
 PassThrough.prototype._transform = function (chunk, encoding, done) {
   this.push(chunk);
-  done();};
-
+  done();
+};
 
 function TestStream() {
-  stream.Transform.call(this);}
-
+  stream.Transform.call(this);
+}
 util.inherits(TestStream, stream.Transform);
 TestStream.prototype._transform = function (chunk, encoding, done) {
   if (!passed) {
     // Char 'a' only exists in the last write
-    passed = indexOf(chunk.toString(), 'a') >= 0;}
-
-  done();};
-
+    passed = indexOf(chunk.toString(), 'a') >= 0;
+  }
+  done();
+};
 
 var s1 = new PassThrough();
 var s2 = new PassThrough();
@@ -49,11 +50,12 @@ setImmediate(s1.write.bind(s1), 'later');
 
 // Assert after two IO loops when all operations have been done.
 process.on('exit', function () {
-  assert(passed, 'Large buffer is not handled properly by Writable Stream');});
-
+  assert(passed, 'Large buffer is not handled properly by Writable Stream');
+});
 
 function indexOf(xs, x) {
   for (var i = 0, l = xs.length; i < l; i++) {
-    if (xs[i] === x) return i;}
-
-  return -1;}
+    if (xs[i] === x) return i;
+  }
+  return -1;
+}

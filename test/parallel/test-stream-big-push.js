@@ -1,13 +1,14 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 var stream = require('../../');
 var str = 'asdfasdfasdfasdfasdf';
 
-var r = new stream.Readable({ 
-  highWaterMark: 5, 
-  encoding: 'utf8' });
-
+var r = new stream.Readable({
+  highWaterMark: 5,
+  encoding: 'utf8'
+});
 
 var reads = 0;
 var eofed = false;
@@ -16,23 +17,23 @@ var ended = false;
 r._read = function (n) {
   if (reads === 0) {
     setTimeout(function () {
-      r.push(str);});
-
-    reads++;} else 
-  if (reads === 1) {
+      r.push(str);
+    });
+    reads++;
+  } else if (reads === 1) {
     var ret = r.push(str);
     assert.equal(ret, false);
-    reads++;} else 
-  {
+    reads++;
+  } else {
     assert(!eofed);
     eofed = true;
-    r.push(null);}};
-
-
+    r.push(null);
+  }
+};
 
 r.on('end', function () {
-  ended = true;});
-
+  ended = true;
+});
 
 // push some data in to start.
 // we've never gotten any read event at this point.
@@ -53,11 +54,12 @@ r.once('readable', function () {
   assert.equal(chunk, str + str);
 
   chunk = r.read();
-  assert.equal(chunk, null);});
-
+  assert.equal(chunk, null);
+});
 
 process.on('exit', function () {
   assert(eofed);
   assert(ended);
   assert.equal(reads, 2);
-  console.log('ok');});
+  console.log('ok');
+});

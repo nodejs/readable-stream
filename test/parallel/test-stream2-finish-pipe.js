@@ -1,17 +1,18 @@
 'use strict';
+
 require('../common');
 var stream = require('../../');
 var Buffer = require('buffer').Buffer;
 
 var r = new stream.Readable();
 r._read = function (size) {
-  r.push(new Buffer(size));};
-
+  r.push(new Buffer(size));
+};
 
 var w = new stream.Writable();
 w._write = function (data, encoding, cb) {
-  cb(null);};
-
+  cb(null);
+};
 
 r.pipe(w);
 

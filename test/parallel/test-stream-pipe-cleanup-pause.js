@@ -1,4 +1,5 @@
 'use strict';
+
 var common = require('../common');
 var stream = require('../../');
 
@@ -15,8 +16,8 @@ reader._read = function (n) {};
 
 writer1._write = common.mustCall(function (chunk, encoding, cb) {
   this.emit('chunk-received');
-  cb();}, 
-1);
+  cb();
+}, 1);
 writer1.once('chunk-received', function () {
   reader.unpipe(writer1);
   reader.pipe(writer2);
@@ -24,14 +25,14 @@ writer1.once('chunk-received', function () {
   setImmediate(function () {
     reader.push(buffer);
     setImmediate(function () {
-      reader.push(buffer);});});});
-
-
-
+      reader.push(buffer);
+    });
+  });
+});
 
 writer2._write = common.mustCall(function (chunk, encoding, cb) {
-  cb();}, 
-3);
+  cb();
+}, 3);
 
 reader.pipe(writer1);
 reader.push(buffer);

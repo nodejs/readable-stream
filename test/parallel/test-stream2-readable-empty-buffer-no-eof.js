@@ -1,4 +1,5 @@
 'use strict';
+
 var common = require('../common');
 var assert = require('assert');
 
@@ -36,62 +37,64 @@ function test1() {
       case 3:
         setTimeout(r.read.bind(r, 0), timeout);
         return process.nextTick(function () {
-          return r.push(new Buffer(0));});
-
+          return r.push(new Buffer(0));
+        });
       case 4:
         setTimeout(r.read.bind(r, 0), timeout);
         return setTimeout(function () {
-          return r.push(new Buffer(0));});
-
+          return r.push(new Buffer(0));
+        });
       case 5:
         return setTimeout(function () {
-          return r.push(buf);});
-
+          return r.push(buf);
+        });
       default:
-        throw new Error('unreachable');}};
-
-
+        throw new Error('unreachable');
+    }
+  };
 
   var results = [];
   function flow() {
     var chunk = undefined;
     while (null !== (chunk = r.read())) {
-      results.push(chunk + '');}}
-
+      results.push(chunk + '');
+    }
+  }
   r.on('readable', flow);
   r.on('end', function () {
-    results.push('EOF');});
-
+    results.push('EOF');
+  });
   flow();
 
   process.on('exit', function () {
     assert.deepEqual(results, ['xxxxx', 'xxxxx', 'EOF']);
-    console.log('ok');});}
-
-
+    console.log('ok');
+  });
+}
 
 function test2() {
   var r = new Readable({ encoding: 'base64' });
   var reads = 5;
   r._read = function (n) {
-    if (! reads--) 
-    return r.push(null); // EOF
-    else 
-      return r.push(new Buffer('x'));};
-
+    if (! reads--) return r.push(null); // EOF
+    else return r.push(new Buffer('x'));
+  };
 
   var results = [];
   function flow() {
     var chunk;
     while (null !== (chunk = r.read())) {
-      results.push(chunk + '');}}
-
+      results.push(chunk + '');
+    }
+  }
   r.on('readable', flow);
   r.on('end', function () {
-    results.push('EOF');});
-
+    results.push('EOF');
+  });
   flow();
 
   process.on('exit', function () {
     assert.deepEqual(results, ['eHh4', 'eHg=', 'EOF']);
-    console.log('ok');});}
+    console.log('ok');
+  });
+}

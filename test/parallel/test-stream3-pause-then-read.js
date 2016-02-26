@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 
@@ -14,45 +15,38 @@ var expectEndingData = expectTotalData;
 var r = new Readable({ highWaterMark: 1000 });
 var chunks = totalChunks;
 r._read = function (n) {
-  if (!(chunks % 2)) 
-  setImmediate(push);else 
-  if (!(chunks % 3)) 
-  process.nextTick(push);else 
-
-  push();};
-
+  if (!(chunks % 2)) setImmediate(push);else if (!(chunks % 3)) process.nextTick(push);else push();
+};
 
 var totalPushed = 0;
 function push() {
   var chunk = chunks-- > 0 ? new Buffer(chunkSize) : null;
   if (chunk) {
     totalPushed += chunk.length;
-    chunk.fill('x');}
-
-  r.push(chunk);}
-
+    chunk.fill('x');
+  }
+  r.push(chunk);
+}
 
 read100();
 
 // first we read 100 bytes
 function read100() {
-  readn(100, onData);}
-
+  readn(100, onData);
+}
 
 function readn(n, then) {
   console.error('read %d', n);
   expectEndingData -= n;
   (function read() {
     var c = r.read(n);
-    if (!c) 
-    r.once('readable', read);else 
-    {
+    if (!c) r.once('readable', read);else {
       assert.equal(c.length, n);
       assert(!r._readableState.flowing);
-      then();}})();}
-
-
-
+      then();
+    }
+  })();
+}
 
 // then we listen to some data events
 function onData() {
@@ -70,14 +64,14 @@ function onData() {
         // put the extra back.
         var diff = seen - 100;
         r.unshift(c.slice(c.length - diff));
-        console.error('seen too much', seen, diff);}
-
+        console.error('seen too much', seen, diff);
+      }
 
       // Nothing should be lost in between
-      setImmediate(pipeLittle);}});}
-
-
-
+      setImmediate(pipeLittle);
+    }
+  });
+}
 
 // Just pipe 200 bytes, then unshift the extra and unpipe
 function pipeLittle() {
@@ -87,8 +81,8 @@ function pipeLittle() {
   var written = 0;
   w.on('finish', function () {
     assert.equal(written, 200);
-    setImmediate(read1234);});
-
+    setImmediate(read1234);
+  });
   w._write = function (chunk, encoding, cb) {
     written += chunk.length;
     if (written >= 200) {
@@ -98,19 +92,19 @@ function pipeLittle() {
       if (written > 200) {
         var diff = written - 200;
         written -= diff;
-        r.unshift(chunk.slice(chunk.length - diff));}} else 
-
-    {
-      setImmediate(cb);}};
-
-
-  r.pipe(w);}
-
+        r.unshift(chunk.slice(chunk.length - diff));
+      }
+    } else {
+      setImmediate(cb);
+    }
+  };
+  r.pipe(w);
+}
 
 // now read 1234 more bytes
 function read1234() {
-  readn(1234, resumePause);}
-
+  readn(1234, resumePause);
+}
 
 function resumePause() {
   console.error('resumePause');
@@ -125,9 +119,8 @@ function resumePause() {
   r.pause();
   r.resume();
   r.pause();
-  setImmediate(pipe);}
-
-
+  setImmediate(pipe);
+}
 
 function pipe() {
   console.error('pipe the rest');
@@ -135,12 +128,13 @@ function pipe() {
   var written = 0;
   w._write = function (chunk, encoding, cb) {
     written += chunk.length;
-    cb();};
-
+    cb();
+  };
   w.on('finish', function () {
     console.error('written', written, totalPushed);
     assert.equal(written, expectEndingData);
     assert.equal(totalPushed, expectTotalData);
-    console.log('ok');});
-
-  r.pipe(w);}
+    console.log('ok');
+  });
+  r.pipe(w);
+}

@@ -1,20 +1,21 @@
 (function () {
   'use strict';
+
   var common = require('../common');
   var assert = require('assert');
   var stream = require('../../');
 
   if (!common.hasCrypto) {
     console.log('1..0 # Skipped: missing crypto');
-    return;}
-
+    return;
+  }
   var crypto = require('crypto');
 
   var util = require('util');
 
   function TestWriter() {
-    stream.Writable.call(this);}
-
+    stream.Writable.call(this);
+  }
   util.inherits(TestWriter, stream.Writable);
 
   TestWriter.prototype._write = function (buffer, encoding, callback) {
@@ -26,14 +27,14 @@
 
   function TestReader(id) {
     stream.Readable.call(this);
-    this.reads = 0;}
-
+    this.reads = 0;
+  }
   util.inherits(TestReader, stream.Readable);
 
   TestReader.prototype._read = function (size) {
     this.reads += 1;
-    this.push(crypto.randomBytes(size));};
-
+    this.push(crypto.randomBytes(size));
+  };
 
   var src1 = new TestReader();
   var src2 = new TestReader();
@@ -48,13 +49,14 @@
       src2.once('readable', function () {
         process.nextTick(function () {
 
-          src1.unpipe(dest);});});});});
-
-
-
-
-
+          src1.unpipe(dest);
+        });
+      });
+    });
+  });
 
   process.on('exit', function () {
     assert.equal(src1.reads, 2);
-    assert.equal(src2.reads, 2);});})();
+    assert.equal(src2.reads, 2);
+  });
+})();

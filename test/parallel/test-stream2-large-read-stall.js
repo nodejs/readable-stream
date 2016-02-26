@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 
@@ -11,9 +12,9 @@ var PUSHCOUNT = 1000;
 var HWM = 50;
 
 var Readable = require('../../').Readable;
-var r = new Readable({ 
-  highWaterMark: HWM });
-
+var r = new Readable({
+  highWaterMark: HWM
+});
 var rs = r._readableState;
 
 r._read = push;
@@ -23,36 +24,32 @@ r.on('readable', function () {
   do {
     ;false && console.error('  > read(%d)', READSIZE);
     var ret = r.read(READSIZE);
-    ;false && console.error('  < %j (%d remain)', ret && ret.length, rs.length);} while (
-  ret && ret.length === READSIZE);
+    ;false && console.error('  < %j (%d remain)', ret && ret.length, rs.length);
+  } while (ret && ret.length === READSIZE);
 
-  ;false && console.error('<< after read()', 
-  ret && ret.length, 
-  rs.needReadable, 
-  rs.length);});
-
+  ;false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
+});
 
 var endEmitted = false;
 r.on('end', function () {
   endEmitted = true;
-  ;false && console.error('end');});
-
+  ;false && console.error('end');
+});
 
 var pushes = 0;
 function push() {
-  if (pushes > PUSHCOUNT) 
-  return;
+  if (pushes > PUSHCOUNT) return;
 
   if (pushes++ === PUSHCOUNT) {
     ;false && console.error('   push(EOF)');
-    return r.push(null);}
-
+    return r.push(null);
+  }
 
   ;false && console.error('   push #%d', pushes);
-  if (r.push(new Buffer(PUSHSIZE))) 
-  setTimeout(push);}
-
+  if (r.push(new Buffer(PUSHSIZE))) setTimeout(push);
+}
 
 process.on('exit', function () {
   assert.equal(pushes, PUSHCOUNT + 1);
-  assert(endEmitted);});
+  assert(endEmitted);
+});

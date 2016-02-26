@@ -1,4 +1,5 @@
 'use strict';
+
 require('../common');
 var assert = require('assert');
 var Readable = require('../../').Readable;
@@ -12,22 +13,22 @@ process.maxTickDepth = N + 2;
 var reads = 0;
 r._read = function (n) {
   var chunk = reads++ === N ? null : new Buffer(1);
-  r.push(chunk);};
-
+  r.push(chunk);
+};
 
 r.on('readable', function onReadable() {
-  if (!(r._readableState.length % 256)) 
-  console.error('readable', r._readableState.length);
-  r.read(N * 2);});
-
+  if (!(r._readableState.length % 256)) console.error('readable', r._readableState.length);
+  r.read(N * 2);
+});
 
 var ended = false;
 r.on('end', function onEnd() {
-  ended = true;});
-
+  ended = true;
+});
 
 r.read(0);
 
 process.on('exit', function () {
   assert(ended);
-  console.log('ok');});
+  console.log('ok');
+});
