@@ -36,6 +36,7 @@ test('streams', function (t) {
   require('./browser/test-stream-writable-constructor-set-methods')(t);
   require('./browser/test-stream-writable-decoded-encoding')(t);
   require('./browser/test-stream-writev')(t);
+  require('./browser/test-stream-sync-write')(t);
   require('./browser/test-stream-pipe-without-listenerCount');
 });
 

@@ -17,7 +17,7 @@
     "zuul": "~3.9.0"
   },
   "scripts": {
-    "test": "tap test/parallel/*.js",
+    "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul -- test/browser.js",
     "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml"
   },
