@@ -99,15 +99,18 @@ var opensslCli = null;
 var inFreeBSDJail = null;
 var localhostIPv4 = null;
 
-exports.localIPv6Hosts = [
-// Debian/Ubuntu
-'ip6-localhost', 'ip6-loopback',
+exports.localIPv6Hosts = ['localhost'];
+if (process.platform === 'linux') {
+  exports.localIPv6Hosts = [
+  // Debian/Ubuntu
+  'ip6-localhost', 'ip6-loopback',
 
-// SUSE
-'ipv6-localhost', 'ipv6-loopback',
+  // SUSE
+  'ipv6-localhost', 'ipv6-loopback',
 
-// Typically universal
-'localhost'];
+  // Typically universal
+  'localhost'];
+}
 
 /*<replacement>*/if (!process.browser) {
   Object.defineProperty(exports, 'inFreeBSDJail', {
