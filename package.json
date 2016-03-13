@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "tap": "~0.2.6",
-    "tape": "~4.0.0",
+    "tape": "~4.5.1",
     "zuul": "~3.9.0"
   },
   "scripts": {
