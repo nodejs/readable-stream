@@ -95,7 +95,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   var $ = cheerio.load(data.toString())
 
-  $('table.files .js-directory-link').each(function () {
+  $('table.files .js-navigation-open').each(function () {
     var file = $(this).text()
     if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file))
       processTestFile(file)
