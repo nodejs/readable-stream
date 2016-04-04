@@ -33,4 +33,3 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
   - Release GPG key: DD8F2338BAE7501E3DD5AC78C273792F7D83545D
 * **Sam Newman** ([@sonewman](https://github.com/sonewman)) &lt;newmansam@outlook.com&gt;
 * **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
-* **Domenic Denicola** ([@domenic](https://github.com/domenic)) &lt;d@domenic.me&gt;
