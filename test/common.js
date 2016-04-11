@@ -329,6 +329,7 @@ if (global.Symbol) {
 if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
+if (global.__coverage__) knownGlobals.push(__coverage__);
 /*</replacement>*/
 
 function leakedGlobals() {

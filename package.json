@@ -6,20 +6,26 @@
   "dependencies": {
     "core-util-is": "~1.0.0",
     "inherits": "~2.0.1",
+    "inline-process-browser": "~2.0.1",
     "isarray": "~1.0.0",
     "process-nextick-args": "~1.0.6",
     "string_decoder": "~0.10.x",
+    "unreachable-branch-transform": "~0.5.0",
     "util-deprecate": "~1.0.1"
   },
   "devDependencies": {
-    "tap": "~0.2.6",
+    "nyc": "^6.4.0",
+    "tap": "~0.7.1",
     "tape": "~4.5.1",
     "zuul": "~3.9.0"
   },
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul -- test/browser.js",
-    "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml"
+    "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
+    "local": "zuul --local -- test/browser.js",
+    "cover": "nyc npm test",
+    "report": "nyc report --reporter=lcov"
   },
   "repository": {
     "type": "git",
@@ -32,6 +38,15 @@
   ],
   "browser": {
     "util": false
+  },
+  "nyc": {
+   "include": ["lib/**.js"]
+ },
+  "browserify": {
+    "transform": [
+      "inline-process-browser",
+      "unreachable-branch-transform"
+    ]
   },
   "license": "MIT"
 }

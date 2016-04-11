@@ -83,6 +83,7 @@ module.exports['common.js'] = [
 
     // for streams2 on node 0.11
     // and dtrace in 0.10
+    // and coverage in all
   , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
@@ -92,6 +93,8 @@ module.exports['common.js'] = [
         + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
         + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
         + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
+        + '  if (global.__coverage__)\n'
+        + '    knownGlobals.push(__coverage__);\n'
         + '  /*</replacement>*/\n\n$1'
     ]
 
