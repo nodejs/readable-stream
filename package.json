@@ -1,6 +1,6 @@
 {
   "name": "readable-stream",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "description": "Streams3, a user-land copy of the stream library from Node.js",
   "main": "readable.js",
   "dependencies": {
@@ -40,8 +40,10 @@
     "util": false
   },
   "nyc": {
-   "include": ["lib/**.js"]
- },
+    "include": [
+      "lib/**.js"
+    ]
+  },
   "browserify": {
     "transform": [
       "inline-process-browser",
