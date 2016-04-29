@@ -42,11 +42,5 @@
       "lib/**.js"
     ]
   },
-  "browserify": {
-    "transform": [
-      "inline-process-browser",
-      "unreachable-branch-transform"
-    ]
-  },
   "license": "MIT"
 }
