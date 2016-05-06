@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var Readable = require('../../').Readable;
 var r = new Readable();
 var N = 256 * 1024;
@@ -12,7 +13,7 @@ process.maxTickDepth = N + 2;
 
 var reads = 0;
 r._read = function (n) {
-  var chunk = reads++ === N ? null : new Buffer(1);
+  var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
   r.push(chunk);
 };
 

@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 var common = require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Readable = require('../../').Readable;
 
@@ -11,9 +12,9 @@ test2();
 function test1() {
   var r = new Readable();
 
-  // should not end when we get a Buffer(0) or '' as the _read result
-  // that just means that there is *temporarily* no data, but to go
-  // ahead and try again later.
+  // should not end when we get a bufferShim.alloc(0) or '' as the _read
+  // result that just means that there is *temporarily* no data, but to
+  // go ahead and try again later.
   //
   // note that this is very unusual.  it only works for crypto streams
   // because the other side of the stream will call read(0) to cycle
@@ -21,8 +22,7 @@ function test1() {
   // r.read(0) again later, otherwise there is no more work being done
   // and the process just exits.
 
-  var buf = new Buffer(5);
-  buf.fill('x');
+  var buf = bufferShim.alloc(5, 'x');
   var reads = 5;
   var timeout = common.platformTimeout(50);
   r._read = function (n) {
@@ -33,16 +33,16 @@ function test1() {
         return r.push(buf);
       case 2:
         setTimeout(r.read.bind(r, 0), timeout);
-        return r.push(new Buffer(0)); // Not-EOF!
+        return r.push(bufferShim.alloc(0)); // Not-EOF!
       case 3:
         setTimeout(r.read.bind(r, 0), timeout);
         return process.nextTick(function () {
-          return r.push(new Buffer(0));
+          return r.push(bufferShim.alloc(0));
         });
       case 4:
         setTimeout(r.read.bind(r, 0), timeout);
         return setTimeout(function () {
-          return r.push(new Buffer(0));
+          return r.push(bufferShim.alloc(0));
         });
       case 5:
         return setTimeout(function () {
@@ -55,7 +55,7 @@ function test1() {
 
   var results = [];
   function flow() {
-    var chunk = undefined;
+    var chunk = void 0;
     while (null !== (chunk = r.read())) {
       results.push(chunk + '');
     }
@@ -67,7 +67,7 @@ function test1() {
   flow();
 
   process.on('exit', function () {
-    assert.deepEqual(results, ['xxxxx', 'xxxxx', 'EOF']);
+    assert.deepStrictEqual(results, ['xxxxx', 'xxxxx', 'EOF']);
     console.log('ok');
   });
 }
@@ -77,7 +77,7 @@ function test2() {
   var reads = 5;
   r._read = function (n) {
     if (! reads--) return r.push(null); // EOF
-    else return r.push(new Buffer('x'));
+    else return r.push(bufferShim.from('x'));
   };
 
   var results = [];
@@ -94,7 +94,7 @@ function test2() {
   flow();
 
   process.on('exit', function () {
-    assert.deepEqual(results, ['eHh4', 'eHg=', 'EOF']);
+    assert.deepStrictEqual(results, ['eHh4', 'eHg=', 'EOF']);
     console.log('ok');
   });
 }

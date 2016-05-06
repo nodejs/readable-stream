@@ -1,5 +1,6 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 var common = require('../common');
 var stream = require('../../');
 

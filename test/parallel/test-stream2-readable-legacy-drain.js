@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Stream = require('../../');
 var Readable = require('../../').Readable;
@@ -10,7 +11,7 @@ var r = new Readable();
 var N = 256;
 var reads = 0;
 r._read = function (n) {
-  return r.push(++reads === N ? null : new Buffer(1));
+  return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
 };
 
 var rended = false;

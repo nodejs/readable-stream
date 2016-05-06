@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 // this test verifies that passing a huge number to read(size)
 // will push up the highWaterMark, and cause the stream to read
@@ -20,7 +21,7 @@ stream._read = function (size) {
   reads++;
   size = Math.min(size, total);
   total -= size;
-  if (size === 0) stream.push(null);else stream.push(new Buffer(size));
+  if (size === 0) stream.push(null);else stream.push(bufferShim.allocUnsafe(size));
 };
 
 var depth = 0;

@@ -1,8 +1,9 @@
 (function () {
-  'use strict';
-
+  /*<replacement>*/
+  var bufferShim = require('buffer-shims');
+  /*</replacement>*/
   var common = require('../common');
-  var assert = require('assert');
+  var assert = require('assert/');
   var stream = require('../../');
 
   if (!common.hasCrypto) {

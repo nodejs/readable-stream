@@ -1,9 +1,10 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
-var assert = require('assert');
+var assert = require('assert/');
 
 var src = new R({ encoding: 'base64' });
 var dst = new W();
@@ -15,7 +16,7 @@ src._read = function (n) {
   if (!hasRead) {
     hasRead = true;
     process.nextTick(function () {
-      src.push(new Buffer('1'));
+      src.push(bufferShim.from('1'));
       src.push(null);
     });
   }

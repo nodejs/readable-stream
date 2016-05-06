@@ -4,13 +4,15 @@ var bufferShim = require('buffer-shims');
 var common = require('../common');
 var stream = require('../../');
 
+// This is very similar to test-stream-pipe-cleanup-pause.js.
+
 var reader = new stream.Readable();
 var writer1 = new stream.Writable();
 var writer2 = new stream.Writable();
 
 // 560000 is chosen here because it is larger than the (default) highWaterMark
 // and will cause `.write()` to return false
-// See: https://github.com/nodejs/node/issues/2323
+// See: https://github.com/nodejs/node/issues/5820
 var buffer = bufferShim.allocUnsafe(560000);
 
 reader._read = function (n) {};
@@ -20,20 +22,21 @@ writer1._write = common.mustCall(function (chunk, encoding, cb) {
   cb();
 }, 1);
 writer1.once('chunk-received', function () {
-  reader.unpipe(writer1);
-  reader.pipe(writer2);
-  reader.push(buffer);
   setImmediate(function () {
+    // This one should *not* get through to writer1 because writer2 is not
+    // "done" processing.
     reader.push(buffer);
-    setImmediate(function () {
-      reader.push(buffer);
-    });
   });
 });
 
+// A "slow" consumer:
 writer2._write = common.mustCall(function (chunk, encoding, cb) {
-  cb();
-}, 3);
+  // Not calling cb here to "simulate" slow stream.
+
+  // This should be called exactly once, since the first .write() call
+  // will return false.
+}, 1);
 
 reader.pipe(writer1);
+reader.pipe(writer2);
 reader.push(buffer);

@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 // This test verifies that:
 // 1. unshift() does not cause colliding _read() calls.
@@ -15,7 +16,7 @@ var hwm = 10;
 var r = stream.Readable({ highWaterMark: hwm });
 var chunks = 10;
 
-var data = new Buffer(chunks * hwm + Math.ceil(hwm / 2));
+var data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
 for (var i = 0; i < data.length; i++) {
   var c = 'asdf'.charCodeAt(i % 4);
   data[i] = c;
@@ -49,7 +50,7 @@ r._read = function (n) {
 
 function pushError() {
   assert.throws(function () {
-    r.push(new Buffer(1));
+    r.push(bufferShim.allocUnsafe(1));
   });
 }
 
@@ -64,7 +65,7 @@ var ended = false;
 r.on('end', function () {
   assert(!ended, 'end emitted more than once');
   assert.throws(function () {
-    r.unshift(new Buffer(1));
+    r.unshift(bufferShim.allocUnsafe(1));
   });
   ended = true;
   w.end();
@@ -74,7 +75,7 @@ r.on('readable', function () {
   var chunk;
   while (null !== (chunk = r.read(10))) {
     w.write(chunk);
-    if (chunk.length > 4) r.unshift(new Buffer('1234'));
+    if (chunk.length > 4) r.unshift(bufferShim.from('1234'));
   }
 });
 

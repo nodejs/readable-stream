@@ -1,10 +1,11 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var stream = require('../../');
 
-var chunk = new Buffer('hallo');
+var chunk = bufferShim.from('hallo');
 
 var util = require('util');
 

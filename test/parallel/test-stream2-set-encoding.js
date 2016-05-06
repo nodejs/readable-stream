@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var R = require('../../lib/_stream_readable');
 var util = require('util');
 
@@ -66,8 +67,7 @@ TestReader.prototype._read = function (n) {
     }
 
     this.pos += n;
-    var ret = new Buffer(n);
-    ret.fill('a');
+    var ret = bufferShim.alloc(n, 'a');
 
     console.log('this.push(ret)', ret);
 

@@ -1,16 +1,16 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
-// This test verifies that stream.unshift(Buffer(0)) or
+// This test verifies that stream.unshift(bufferShim.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
 var Readable = require('../../').Readable;
 
 var r = new Readable();
 var nChunks = 10;
-var chunk = new Buffer(10);
-chunk.fill('x');
+var chunk = bufferShim.alloc(10, 'x');
 
 r._read = function (n) {
   setTimeout(function () {
@@ -29,8 +29,7 @@ r.on('readable', function () {
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
-    var putBack = new Buffer(readAll ? 0 : 5);
-    putBack.fill('y');
+    var putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
     readAll = !readAll;
     r.unshift(putBack);
   }
@@ -39,6 +38,6 @@ r.on('readable', function () {
 var expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
 
 r.on('end', function () {
-  assert.deepEqual(seen, expect);
+  assert.deepStrictEqual(seen, expect);
   console.log('ok');
 });

@@ -97,12 +97,12 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   $('table.files .js-navigation-open').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file))
+    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file) && file !== 'test-stream2-httpclient-response-end.js')
       processTestFile(file)
   })
 }))
 
-processFile(docurlpfx + 'stream.markdown', path.join(docourroot, 'stream.markdown'), docReplace)
+processFile(docurlpfx + 'stream.md', path.join(docourroot, 'stream.md'), docReplace)
 
 
 //--------------------------------------------------------------------

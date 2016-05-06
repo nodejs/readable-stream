@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var util = require('util');
 var stream = require('../../');
 
@@ -36,8 +37,7 @@ s1.pipe(s3);
 s2.pipe(s3, { end: false });
 
 // We must write a buffer larger than highWaterMark
-var big = new Buffer(s1._writableState.highWaterMark + 1);
-big.fill('x');
+var big = bufferShim.alloc(s1._writableState.highWaterMark + 1, 'x');
 
 // Since big is larger than highWaterMark, it will be buffered internally.
 assert(!s1.write(big));

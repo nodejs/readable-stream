@@ -6,6 +6,10 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').objectKeysDefine
     , objectKeysReplacement =
     require('./common-replacements').objectKeysReplacement
+    , bufferShimFix =
+    require('./common-replacements').bufferShimFix
+    , bufferStaticMethods =
+    require('./common-replacements').bufferStaticMethods
 
 module.exports.all = [
     [
@@ -30,7 +34,12 @@ module.exports.all = [
         /Stream.(Readable|Writable|Duplex|Transform|PassThrough)/g
       , 'require(\'../../\').$1'
     ]
-
+  , bufferShimFix
+  , bufferStaticMethods
+  ,   [
+        /require\(['"]assert['"]\)/g
+      , 'require(\'assert/\')'
+    ]
 ]
 
 module.exports['test-stream2-basic.js'] = [

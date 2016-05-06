@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var fromList = require('../../lib/_stream_readable')._fromList;
 
 // tiny node-tap lookalike.
@@ -38,7 +39,7 @@ process.on('exit', function () {
 process.nextTick(run);
 
 test('buffers', function (t) {
-  var list = [new Buffer('foog'), new Buffer('bark'), new Buffer('bazy'), new Buffer('kuel')];
+  var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
 
   // read more than the first element.
   var ret = fromList(6, { buffer: list, length: 16 });

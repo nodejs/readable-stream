@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var stream = require('../../');
 
 (function testErrorListenerCatches() {
@@ -11,7 +12,7 @@ var stream = require('../../');
   source._read = function (n) {
     n = Math.min(count, n);
     count -= n;
-    source.push(new Buffer(n));
+    source.push(bufferShim.allocUnsafe(n));
   };
 
   var unpipedDest;
@@ -51,7 +52,7 @@ var stream = require('../../');
   source._read = function (n) {
     n = Math.min(count, n);
     count -= n;
-    source.push(new Buffer(n));
+    source.push(bufferShim.allocUnsafe(n));
   };
 
   var unpipedDest;

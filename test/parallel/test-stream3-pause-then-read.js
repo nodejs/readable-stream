@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var stream = require('../../');
 var Readable = stream.Readable;
@@ -20,10 +21,9 @@ r._read = function (n) {
 
 var totalPushed = 0;
 function push() {
-  var chunk = chunks-- > 0 ? new Buffer(chunkSize) : null;
+  var chunk = chunks-- > 0 ? bufferShim.alloc(chunkSize, 'x') : null;
   if (chunk) {
     totalPushed += chunk.length;
-    chunk.fill('x');
   }
   r.push(chunk);
 }

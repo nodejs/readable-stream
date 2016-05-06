@@ -76,8 +76,14 @@ function rmdirSync(p, originalEr) {
   } catch (e) {
     if (e.code === 'ENOTDIR') throw originalEr;
     if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
-      forEach(fs.readdirSync(p), function (f) {
-        rimrafSync(path.join(p, f));
+      var enc = process.platform === 'linux' ? 'buffer' : 'utf8';
+      fs.readdirSync(p, forEach(enc), function (f) {
+        if (f instanceof Buffer) {
+          var buf = Buffer.concat([Buffer.from(p), Buffer.from(path.sep), f]);
+          rimrafSync(buf);
+        } else {
+          rimrafSync(path.join(p, f));
+        }
       });
       fs.rmdirSync(p);
     }
@@ -185,7 +191,7 @@ if (process.platform === 'linux') {
 /*<replacement>*/if (!process.browser) {
   Object.defineProperty(exports, 'hasFipsCrypto', {
     get: function () {
-      return process.config.variables.openssl_fips ? true : false;
+      return exports.hasCrypto && require('crypto').fips;
     }
   });
 } /*</replacement>*/
@@ -255,6 +261,8 @@ exports.spawnPwd = function (options) {
 exports.platformTimeout = function (ms) {
   if (process.config.target_defaults.default_configuration === 'Debug') ms = 2 * ms;
 
+  if (exports.isAix) return 2 * ms; // default localhost speed is slower on AIX
+
   if (process.arch !== 'arm') return ms;
 
   var armv = process.config.variables.arm_version;
@@ -270,7 +278,7 @@ var knownGlobals = [setTimeout, setInterval, setImmediate, clearTimeout, clearIn
 Buffer, process, global];
 
 if (global.gc) {
-  knownGlobals.push(gc);
+  knownGlobals.push(global.gc);
 }
 
 if (global.DTRACE_HTTP_SERVER_RESPONSE) {

@@ -25,11 +25,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         , '$1$2/$3'
       ]
 
-    , bufferReplacement = [
-          headRegexp
-        , '$1\n\n/*<replacement>*/\nvar Buffer = require(\'buffer\').Buffer;\n/*</replacement>*/\n'
-      ]
-
       // The browser build ends up with a circular dependency, so the require is
       // done lazily, but cached.
     , addDuplexRequire = [
@@ -90,8 +85,8 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
 
     , eventEmittterReplacement = [
-        /(require\('events'\)(?:\.EventEmitter)?;)/
-      ,   '$1\n\n/*<replacement>*/\n'
+        /^(const EE = require\('events'\));$/m
+      ,   '/*<replacement>*/\n$1.EventEmitter;\n\n'
         + 'var EElistenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
         + '};\n/*</replacement>*/\n'
@@ -165,6 +160,17 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
       `
     ]
+  , bufferShimFix = [
+    /const Buffer = require\('buffer'\)\.Buffer;/,
+    `const Buffer = require('buffer').Buffer;
+/*<replacement>*/
+  const bufferShim = require('buffer-shims');
+/*</replacement>*/`
+  ]
+  , bufferStaticMethods = [
+    /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
+    `bufferShim.$1`
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -190,7 +196,6 @@ module.exports['_stream_readable.js'] = [
     addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , bufferReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
   , altIndexOfImplReplacement
@@ -208,6 +213,8 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
+  , bufferShimFix
+  , bufferStaticMethods
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -221,7 +228,6 @@ module.exports['_stream_writable.js'] = [
     addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , bufferReplacement
   , utilReplacement
   , stringDecoderReplacement
   , debugLogReplacement
@@ -237,5 +243,6 @@ module.exports['_stream_writable.js'] = [
   , processNextTickReplacement
   , internalUtilReplacement
   , fixSyncWrite
-
+  , bufferShimFix
+  , bufferStaticMethods
 ]

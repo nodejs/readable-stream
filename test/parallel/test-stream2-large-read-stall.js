@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 // If everything aligns so that you do a read(n) of exactly the
 // remaining buffer, then make sure that 'end' still emits.
@@ -46,7 +47,7 @@ function push() {
   }
 
   ;false && console.error('   push #%d', pushes);
-  if (r.push(new Buffer(PUSHSIZE))) setTimeout(push);
+  if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push);
 }
 
 process.on('exit', function () {

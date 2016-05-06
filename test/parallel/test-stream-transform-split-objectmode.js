@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Transform = require('../../').Transform;
 
@@ -22,7 +23,7 @@ parser.on('data', function (obj) {
   parsed = obj;
 });
 
-parser.end(new Buffer([42]));
+parser.end(bufferShim.from([42]));
 
 process.on('exit', function () {
   assert(parsed.val === 42);
@@ -36,7 +37,7 @@ assert(serializer._readableState.highWaterMark === 16 * 1024);
 assert(serializer._writableState.highWaterMark === 16);
 
 serializer._transform = function (obj, _, callback) {
-  callback(null, new Buffer([obj.val]));
+  callback(null, bufferShim.from([obj.val]));
 };
 
 var serialized;

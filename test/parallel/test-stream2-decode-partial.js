@@ -1,8 +1,9 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var Readable = require('../../lib/_stream_readable');
-var assert = require('assert');
+var assert = require('assert/');
 
 var buf = '';
 var euro = new Buffer([0xE2, 0x82, 0xAC]);

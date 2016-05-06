@@ -1,7 +1,8 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Readable = require('../../').Readable;
 
@@ -18,7 +19,7 @@ var Readable = require('../../').Readable;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('blerg'));
+  r.push(bufferShim.from('blerg'));
 
   var caughtReadable = false;
   setTimeout(function () {
@@ -52,7 +53,7 @@ var Readable = require('../../').Readable;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('bl'));
+  r.push(bufferShim.from('bl'));
 
   var caughtReadable = false;
   setTimeout(function () {
@@ -85,7 +86,7 @@ var Readable = require('../../').Readable;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('blerg'));
+  r.push(bufferShim.from('blerg'));
   r.push(null);
 
   var caughtReadable = false;

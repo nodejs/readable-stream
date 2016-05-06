@@ -1,8 +1,9 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var stream = require('../../');
-var assert = require('assert');
+var assert = require('assert/');
 var util = require('util');
 
 function Writable() {

@@ -1,10 +1,11 @@
-'use strict';
-
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var stream = require('../../');
 var Readable = stream.Readable;
 var Writable = stream.Writable;
-var assert = require('assert');
+var assert = require('assert/');
 
 var EE = require('events').EventEmitter;
 
@@ -91,7 +92,7 @@ function data() {
 
 function finish() {
   console.error('finish');
-  assert.deepEqual(written, expectWritten);
+  assert.deepStrictEqual(written, expectWritten);
   console.log('ok');
 }
 

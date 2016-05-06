@@ -1,10 +1,12 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 // This test asserts that Stream.prototype.pipe does not leave listeners
 // hanging on the source or dest.
 
 require('../common');
 var stream = require('../../');
-var assert = require('assert');
+var assert = require('assert/');
 var util = require('util');
 
 (function () {
