@@ -29,7 +29,7 @@ matrix:
   - node_js: 6
     env: TASK=test
   - node_js: 5
-    env: TASK=browser BROWSER_NAME=android BROWSER_VERSION="3.0..latest"
+    env: TASK=browser BROWSER_NAME=android BROWSER_VERSION="4.0..latest"
   - node_js: 5
     env: TASK=browser BROWSER_NAME=ie BROWSER_VERSION="9..latest"
   - node_js: 5
