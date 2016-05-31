@@ -7,9 +7,6 @@ notifications:
   email: false
 matrix:
   fast_finish: true
-  allow_failures:
-    - env: TASK=browser BROWSER_NAME=ipad BROWSER_VERSION="6.0..latest"
-    - env: TASK=browser BROWSER_NAME=iphone BROWSER_VERSION="6.0..latest"
   include:
   - node_js: '0.8'
     env: TASK=test
@@ -28,6 +25,8 @@ matrix:
   - node_js: 4
     env: TASK=test
   - node_js: 5
+    env: TASK=test
+  - node_js: 6
     env: TASK=test
   - node_js: 5
     env: TASK=browser BROWSER_NAME=android BROWSER_VERSION="4.0..latest"
