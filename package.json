@@ -17,7 +17,7 @@
     "nyc": "^6.4.0",
     "tap": "~0.7.1",
     "tape": "~4.5.1",
-    "zuul": "~3.10.0",
+    "zuul": "~3.10.0"
   },
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
