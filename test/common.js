@@ -432,7 +432,7 @@ exports.fail = function (msg) {
 };
 
 exports.skip = function (msg) {
-  console.log(`1..0 # Skipped: ${ msg }`);
+  console.log('1..0 # Skipped: ' + msg);
 };
 
 // A stream to push an array into a REPL
