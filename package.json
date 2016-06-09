@@ -18,12 +18,11 @@
     "tap": "~0.7.1",
     "tape": "~4.5.1",
     "zuul": "~3.10.0",
-    "zuul-ngrok": "^4.0.0"
   },
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul -- test/browser.js",
-    "write-zuul": "printf \"ui: tape\ntunnel: ngrok\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
+    "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
     "local": "zuul --local -- test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov"
