@@ -83,7 +83,7 @@ writeChunks(inputChunks, function () {
 
     var expected = new Buffer(expectedChunks[i]);
     // it was what we expected
-    assert.ok(seen.equals(expected));
+    assert.deepEqual(seen, expected);
   }
 
   setImmediate(function () {

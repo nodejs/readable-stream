@@ -254,3 +254,11 @@ module.exports['test-stream2-decode-partial.js'] = [
   ,`readable.push(source.slice(4, source.length));`
  ]
 ]
+
+
+module.exports['test-stream3-cork-uncork.js'] = module.exports['test-stream3-cork-end.js'] = [
+  [
+    /assert\.ok\(seen\.equals\(expected\)\);/,
+    'assert.deepEqual(seen, expected);'
+  ]
+]
