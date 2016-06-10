@@ -5,7 +5,7 @@ for (var i in util) {
 } /*</replacement>*/ /*<replacement>*/
 if (!global.setImmediate) {
   global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 0);
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
   };
 }
 if (!global.clearImmediate) {

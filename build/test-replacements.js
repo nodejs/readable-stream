@@ -114,7 +114,7 @@ module.exports['common.js'] = [
         + '\nif (!global.setImmediate) {\n'
         + '  global.setImmediate = function setImmediate(fn) {\n'
 
-        + '    return setTimeout(fn.bind.apply(fn, arguments), 0);\n'
+        + '    return setTimeout(fn.bind.apply(fn, arguments), 4);\n'
         + '  };\n'
         + '}\n'
         + 'if (!global.clearImmediate) {\n'
