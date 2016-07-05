@@ -104,6 +104,7 @@ module.exports['common.js'] = [
         + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
         + '  if (global.__coverage__)\n'
         + '    knownGlobals.push(__coverage__);\n'
+        + '\'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
         + '  /*</replacement>*/\n\n$1'
     ]
 
@@ -143,6 +144,7 @@ module.exports['common.js'] = [
     , [
       /^/,
       `/*<replacement>*/
+      require('babel-polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/`

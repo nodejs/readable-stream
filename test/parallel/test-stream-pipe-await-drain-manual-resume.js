@@ -38,8 +38,29 @@ readable.once('pause', common.mustCall(function () {
     // fall back to 0 and all chunks that are pending on the readable side
     // should be flushed.
     isCurrentlyBufferingWrites = false;
-    for (var queued of queue) {
-      queued.cb();
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var queued = _step.value;
+
+        queued.cb();
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
     }
   }));
 }));
