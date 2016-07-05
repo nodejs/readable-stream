@@ -52,7 +52,8 @@ function processFile (inputLoc, out, replacements) {
         plugins: [
           'transform-es2015-arrow-functions',
           'transform-es2015-block-scoping',
-          'transform-es2015-template-literals'
+          'transform-es2015-template-literals',
+          'transform-es2015-shorthand-properties'
         ]
       })
       data = transformed.code

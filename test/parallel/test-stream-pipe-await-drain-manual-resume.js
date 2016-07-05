@@ -15,11 +15,11 @@ var isCurrentlyBufferingWrites = true;
 var queue = [];
 
 writable._write = function (chunk, encoding, cb) {
-  if (isCurrentlyBufferingWrites) queue.push({ chunk, cb });else cb();
+  if (isCurrentlyBufferingWrites) queue.push({ chunk: chunk, cb: cb });else cb();
 };
 
 var readable = new stream.Readable({
-  read() {}
+  read: function () {}
 });
 
 readable.pipe(writable);
