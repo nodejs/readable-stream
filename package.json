@@ -23,7 +23,7 @@
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul -- test/browser.js",
-    "write-zuul": "printf \"ui: tape\nsauce_connect: true\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
+    "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
     "local": "zuul --local -- test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov"
