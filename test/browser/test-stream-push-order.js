@@ -27,8 +27,7 @@ module.exports = function (t) {
     // ACTUALLY [1, 3, 5, 6, 4, 2]
 
     setTimeout(function() {
-      t.deepEqual(s._readableState.buffer,
-                       ['1', '2', '3', '4', '5', '6']);
+      t.equals(s._readableState.buffer.join(','), '1,2,3,4,5,6');
     });
   });
 }

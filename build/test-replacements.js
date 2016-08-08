@@ -167,6 +167,10 @@ module.exports['common.js'] = [
 ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
   + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
 ]
+, [
+  /process\.binding\('timer_wrap'\)\.Timer;/,
+  '{now: function (){}}'
+]
 ]
 
 // this test has some trouble with the nextTick depth when run

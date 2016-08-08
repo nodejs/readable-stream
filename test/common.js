@@ -39,7 +39,7 @@ var util = require('core-util-is');
 util.inherits = require('inherits');
 /*</replacement>*/
 
-var Timer = process.binding('timer_wrap').Timer;
+var Timer = { now: function () {} };
 
 var testRoot = path.resolve(process.env.NODE_TEST_DIR || path.dirname(__filename));
 

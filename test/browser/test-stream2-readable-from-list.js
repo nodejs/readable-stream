@@ -1,16 +1,22 @@
-'use strict';
-var common = require('../common');
+// Flags: --expose_internals
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
+require('../common');
 var fromList = require('../../lib/_stream_readable')._fromList;
+var BufferList = require('../../lib/internal/streams/BufferList');
 
+function bufferListFromArray(arr) {
+  var bl = new BufferList();
+  for (var i = 0; i < arr.length; ++i) {
+    bl.push(arr[i]);
+  }return bl;
+}
 
 module.exports = function (t) {
-  t.test('buffers', function(t) {
-    // have a length
-    var len = 16;
-    var list = [ new Buffer('foog'),
-                 new Buffer('bark'),
-                 new Buffer('bazy'),
-                 new Buffer('kuel') ];
+  t.test('buffers', function (t) {
+    var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
+    list = bufferListFromArray(list);
 
     // read more than the first element.
     var ret = fromList(6, { buffer: list, length: 16 });
@@ -29,18 +35,14 @@ module.exports = function (t) {
     t.equal(ret.toString(), 'zykuel');
 
     // all consumed.
-    t.same(list, []);
+    t.same(list, new BufferList());
 
     t.end();
   });
 
-  t.test('strings', function(t) {
-    // have a length
-    var len = 16;
-    var list = [ 'foog',
-                 'bark',
-                 'bazy',
-                 'kuel' ];
+  t.test('strings', function (t) {
+    var list = ['foog', 'bark', 'bazy', 'kuel'];
+    list = bufferListFromArray(list);
 
     // read more than the first element.
     var ret = fromList(6, { buffer: list, length: 16, decoder: true });
@@ -59,7 +61,7 @@ module.exports = function (t) {
     t.equal(ret, 'zykuel');
 
     // all consumed.
-    t.same(list, []);
+    t.same(list, new BufferList());
 
     t.end();
   });
