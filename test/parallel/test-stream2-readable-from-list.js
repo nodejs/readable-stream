@@ -5,7 +5,7 @@ var bufferShim = require('buffer-shims');
 require('../common');
 var assert = require('assert/');
 var fromList = require('../../lib/_stream_readable')._fromList;
-var BufferList = require('internal/streams/BufferList');
+var BufferList = require('../../lib/internal/streams/BufferList');
 
 // tiny node-tap lookalike.
 var tests = [];

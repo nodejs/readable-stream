@@ -171,6 +171,10 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
     `bufferShim.$1`
   ]
+  , internalDirectory = [
+    /require\('internal\/streams\/BufferList'\)/,
+    'require(\'./internal/streams/BufferList\')'
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -215,6 +219,7 @@ module.exports['_stream_readable.js'] = [
   , eventEmittterListenerCountReplacement
   , bufferShimFix
   , bufferStaticMethods
+  , internalDirectory
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -244,5 +249,9 @@ module.exports['_stream_writable.js'] = [
   , internalUtilReplacement
   , fixSyncWrite
   , bufferShimFix
+  , bufferStaticMethods
+]
+module.exports['internal/streams/BufferList.js'] = [
+    bufferShimFix
   , bufferStaticMethods
 ]

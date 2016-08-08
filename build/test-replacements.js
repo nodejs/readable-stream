@@ -264,3 +264,9 @@ module.exports['test-stream3-cork-uncork.js'] = module.exports['test-stream3-cor
     'assert.deepEqual(seen, expected);'
   ]
 ]
+module.exports['test-stream2-readable-from-list.js'] = [
+  [
+    /require\('internal\/streams\/BufferList'\)/,
+    'require(\'../../lib/internal/streams/BufferList\')'
+  ]
+]
