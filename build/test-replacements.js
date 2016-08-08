@@ -104,6 +104,7 @@ module.exports['common.js'] = [
         + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
         + '  if (global.__coverage__)\n'
         + '    knownGlobals.push(__coverage__);\n'
+        + '\'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
         + '  /*</replacement>*/\n\n$1'
     ]
 
@@ -114,7 +115,7 @@ module.exports['common.js'] = [
         + '\nif (!global.setImmediate) {\n'
         + '  global.setImmediate = function setImmediate(fn) {\n'
 
-        + '    return setTimeout(fn.bind.apply(fn, arguments), 0);\n'
+        + '    return setTimeout(fn.bind.apply(fn, arguments), 4);\n'
         + '  };\n'
         + '}\n'
         + 'if (!global.clearImmediate) {\n'
@@ -143,6 +144,7 @@ module.exports['common.js'] = [
     , [
       /^/,
       `/*<replacement>*/
+      require('babel-polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/`
@@ -253,4 +255,12 @@ module.exports['test-stream2-decode-partial.js'] = [
    /readable\.push\(source\.slice\(4, 6\)\)/
   ,`readable.push(source.slice(4, source.length));`
  ]
+]
+
+
+module.exports['test-stream3-cork-uncork.js'] = module.exports['test-stream3-cork-end.js'] = [
+  [
+    /assert\.ok\(seen\.equals\(expected\)\);/,
+    'assert.deepEqual(seen, expected);'
+  ]
 ]

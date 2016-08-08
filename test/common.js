@@ -1,11 +1,12 @@
 /*<replacement>*/
+require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
 } /*</replacement>*/ /*<replacement>*/
 if (!global.setImmediate) {
   global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 0);
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
   };
 }
 if (!global.clearImmediate) {
@@ -46,6 +47,7 @@ exports.libDir = path.join(exports.testDir, '../lib');
 exports.tmpDirName = 'tmp';
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 exports.isWindows = process.platform === 'win32';
+exports.isWOW64 = exports.isWindows && process.env['PROCESSOR_ARCHITEW6432'] !== undefined;
 exports.isAix = process.platform === 'aix';
 exports.isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
 exports.isSunOS = process.platform === 'sunos';
@@ -258,6 +260,16 @@ exports.spawnPwd = function (options) {
   }
 };
 
+exports.spawnSyncPwd = function (options) {
+  var spawnSync = require('child_process').spawnSync;
+
+  if (exports.isWindows) {
+    return spawnSync('cmd.exe', ['/c', 'cd'], options);
+  } else {
+    return spawnSync('pwd', [], options);
+  }
+};
+
 exports.platformTimeout = function (ms) {
   if (process.config.target_defaults.default_configuration === 'Debug') ms = 2 * ms;
 
@@ -338,7 +350,11 @@ if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
 if (global.__coverage__) knownGlobals.push(__coverage__);
-/*</replacement>*/
+'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
+  return typeof global[item] !== undefined;
+}).forEach(function (item) {
+  knownGlobals.push(global[item]);
+}); /*</replacement>*/
 
 function leakedGlobals() {
   var leaked = [];
@@ -399,53 +415,6 @@ exports.mustCall = function (fn, expected) {
   };
 };
 
-var etcServicesFileName = path.join('/etc', 'services');
-if (exports.isWindows) {
-  etcServicesFileName = path.join(process.env.SystemRoot, 'System32', 'drivers', 'etc', 'services');
-}
-
-/*
- * Returns a string that represents the service name associated
- * to the service bound to port "port" and using protocol "protocol".
- *
- * If the service is not defined in the services file, it returns
- * the port number as a string.
- *
- * Returns undefined if /etc/services (or its equivalent on non-UNIX
- * platforms) can't be read.
- */
-exports.getServiceName = function getServiceName(port, protocol) {
-  if (port == null) {
-    throw new Error('Missing port number');
-  }
-
-  if (typeof protocol !== 'string') {
-    throw new Error('Protocol must be a string');
-  }
-
-  /*
-   * By default, if a service can't be found in /etc/services,
-   * its name is considered to be its port number.
-   */
-  var serviceName = port.toString();
-
-  try {
-    var servicesContent = fs.readFileSync(etcServicesFileName, { encoding: 'utf8' });
-    var regexp = '^(\w+)\s+\s' + port + '/' + protocol + '\s';
-    var re = new RegExp(regexp, 'm');
-
-    var matches = re.exec(servicesContent);
-    if (matches && matches.length > 1) {
-      serviceName = matches[1];
-    }
-  } catch (e) {
-    console.error('Cannot read file: ', etcServicesFileName);
-    return undefined;
-  }
-
-  return serviceName;
-};
-
 exports.hasMultiLocalhost = function hasMultiLocalhost() {
   var TCP = process.binding('tcp_wrap').TCP;
   var t = new TCP();
@@ -465,6 +434,10 @@ exports.fileExists = function (pathname) {
 
 exports.fail = function (msg) {
   assert.fail(null, null, msg);
+};
+
+exports.skip = function (msg) {
+  console.log('1..0 # Skipped: ' + msg);
 };
 
 // A stream to push an array into a REPL
