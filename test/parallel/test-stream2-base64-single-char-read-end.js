@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
 var assert = require('assert/');
@@ -35,5 +35,5 @@ src.on('end', function () {
 src.pipe(dst);
 
 timeout = setTimeout(function () {
-  assert.fail(null, null, 'timed out waiting for _write');
+  common.fail('timed out waiting for _write');
 }, 100);

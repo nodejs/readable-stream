@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 var Readable = require('../../lib/_stream_readable');
 
@@ -42,14 +42,7 @@ test.read(0);
 function next() {
   // now let's make 'end' happen
   test.removeListener('end', thrower);
-
-  var endEmitted = false;
-  process.on('exit', function () {
-    assert(endEmitted, 'end should be emitted by now');
-  });
-  test.on('end', function () {
-    endEmitted = true;
-  });
+  test.on('end', common.mustCall(function () {}));
 
   // one to get the last byte
   var r = test.read();

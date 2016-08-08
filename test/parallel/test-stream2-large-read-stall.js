@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 // If everything aligns so that you do a read(n) of exactly the
@@ -31,11 +31,7 @@ r.on('readable', function () {
   ;false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
 });
 
-var endEmitted = false;
-r.on('end', function () {
-  endEmitted = true;
-  ;false && console.error('end');
-});
+r.on('end', common.mustCall(function () {}));
 
 var pushes = 0;
 function push() {
@@ -52,5 +48,4 @@ function push() {
 
 process.on('exit', function () {
   assert.equal(pushes, PUSHCOUNT + 1);
-  assert(endEmitted);
 });

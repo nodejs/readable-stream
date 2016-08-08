@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var Stream = require('../../');
@@ -14,17 +14,12 @@ r._read = function (n) {
   return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
 };
 
-var rended = false;
-r.on('end', function () {
-  rended = true;
-});
+r.on('end', common.mustCall(function () {}));
 
 var w = new Stream();
 w.writable = true;
-var writes = 0;
 var buffered = 0;
 w.write = function (c) {
-  writes += c.length;
   buffered += c.length;
   process.nextTick(drain);
   return false;
@@ -36,10 +31,7 @@ function drain() {
   w.emit('drain');
 }
 
-var wended = false;
-w.end = function () {
-  wended = true;
-};
+w.end = common.mustCall(function () {});
 
 // Just for kicks, let's mess with the drain count.
 // This verifies that even if it gets negative in the
@@ -49,8 +41,3 @@ r.on('readable', function () {
 });
 
 r.pipe(w);
-process.on('exit', function () {
-  assert(rended);
-  assert(wended);
-  console.error('ok');
-});

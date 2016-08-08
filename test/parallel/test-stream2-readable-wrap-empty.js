@@ -1,8 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
-var assert = require('assert/');
+var common = require('../common');
 
 var Readable = require('../../lib/_stream_readable');
 var EE = require('events').EventEmitter;
@@ -13,13 +12,6 @@ oldStream.resume = function () {};
 
 var newStream = new Readable().wrap(oldStream);
 
-var ended = false;
-newStream.on('readable', function () {}).on('end', function () {
-  ended = true;
-});
+newStream.on('readable', function () {}).on('end', common.mustCall(function () {}));
 
 oldStream.emit('end');
-
-process.on('exit', function () {
-  assert.ok(ended);
-});
