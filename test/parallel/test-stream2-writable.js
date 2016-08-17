@@ -133,7 +133,7 @@ test('write bufferize', function (t) {
     highWaterMark: 100
   });
 
-  var encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'latin1', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
+  var encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
 
   tw.on('finish', function () {
     t.same(tw.buffer, chunks, 'got the expected chunks');
@@ -159,7 +159,7 @@ test('write no bufferize', function (t) {
     return TestWriter.prototype._write.call(this, chunk, encoding, cb);
   };
 
-  var encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'latin1', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
+  var encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
 
   tw.on('finish', function () {
     t.same(tw.buffer, chunks, 'got the expected chunks');
