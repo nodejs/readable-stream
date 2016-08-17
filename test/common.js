@@ -41,19 +41,21 @@ util.inherits = require('inherits');
 
 var Timer = { now: function () {} };
 
-var testRoot = path.resolve(process.env.NODE_TEST_DIR || path.dirname(__filename));
+var testRoot = process.env.NODE_TEST_DIR ? path.resolve(process.env.NODE_TEST_DIR) : __dirname;
 
-exports.testDir = path.dirname(__filename);
+exports.testDir = __dirname;
 exports.fixturesDir = path.join(exports.testDir, 'fixtures');
 exports.libDir = path.join(exports.testDir, '../lib');
 exports.tmpDirName = 'tmp';
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 exports.isWindows = process.platform === 'win32';
-exports.isWOW64 = exports.isWindows && process.env['PROCESSOR_ARCHITEW6432'] !== undefined;
+exports.isWOW64 = exports.isWindows && process.env.PROCESSOR_ARCHITEW6432 !== undefined;
 exports.isAix = process.platform === 'aix';
 exports.isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
 exports.isSunOS = process.platform === 'sunos';
 exports.isFreeBSD = process.platform === 'freebsd';
+exports.isLinux = process.platform === 'linux';
+exports.isOSX = process.platform === 'darwin';
 
 exports.enoughTestMem = os.totalmem() > 0x40000000; /* 1 Gb */
 exports.rootDir = exports.isWindows ? 'c:\\' : '/';
@@ -81,7 +83,7 @@ function rmdirSync(p, originalEr) {
   } catch (e) {
     if (e.code === 'ENOTDIR') throw originalEr;
     if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
-      var enc = process.platform === 'linux' ? 'buffer' : 'utf8';
+      var enc = exports.isLinux ? 'buffer' : 'utf8';
       fs.readdirSync(p, forEach(enc), function (f) {
         if (f instanceof Buffer) {
           var buf = Buffer.concat([Buffer.from(p), Buffer.from(path.sep), f]);
@@ -111,7 +113,7 @@ var inFreeBSDJail = null;
 var localhostIPv4 = null;
 
 exports.localIPv6Hosts = ['localhost'];
-if (process.platform === 'linux') {
+if (exports.isLinux) {
   exports.localIPv6Hosts = [
   // Debian/Ubuntu
   'ip6-localhost', 'ip6-loopback',
@@ -128,7 +130,7 @@ if (process.platform === 'linux') {
     get: function () {
       if (inFreeBSDJail !== null) return inFreeBSDJail;
 
-      if (process.platform === 'freebsd' && child_process.execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
+      if (exports.isFreeBSD && child_process.execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
         inFreeBSDJail = true;
       } else {
         inFreeBSDJail = false;
@@ -348,6 +350,15 @@ if (global.Symbol) {
   knownGlobals.push(Symbol);
 }
 
+function allowGlobals() {
+  for (var _len = arguments.length, whitelist = Array(_len), _key = 0; _key < _len; _key++) {
+    whitelist[_key] = arguments[_key];
+  }
+
+  knownGlobals = knownGlobals.concat(whitelist);
+}
+exports.allowGlobals = allowGlobals;
+
 /*<replacement>*/
 if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
@@ -479,7 +490,7 @@ exports.nodeProcessAborted = function nodeProcessAborted(exitCode, signal) {
 
   // On Windows, v8's base::OS::Abort triggers an access violation,
   // which corresponds to exit code 3221225477 (0xC0000005)
-  if (process.platform === 'win32') expectedExitCodes = [3221225477];
+  if (exports.isWindows) expectedExitCodes = [3221225477];
 
   // When using --abort-on-uncaught-exception, V8 will use
   // base::OS::Abort to terminate the process.

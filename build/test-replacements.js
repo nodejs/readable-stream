@@ -60,6 +60,10 @@ module.exports['test-stream2-transform.js'] = [
 module.exports['test-stream2-writable.js'] = [
     altForEachImplReplacement
   , altForEachUseReplacement
+  , [
+    /'latin1',/g,
+    '\'binary\','
+  ]
 ]
 
 module.exports['test-stream-big-packet.js'] = [
@@ -272,5 +276,11 @@ module.exports['test-stream2-readable-from-list.js'] = [
   [
     /require\('internal\/streams\/BufferList'\)/,
     'require(\'../../lib/internal/streams/BufferList\')'
+  ]
+]
+module.exports['test-stream-writev.js'] = [
+  [
+    /'latin1'/g,
+    `'binary'`
   ]
 ]

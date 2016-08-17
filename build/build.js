@@ -50,6 +50,7 @@ function processFile (inputLoc, out, replacements) {
     if (inputLoc.slice(-3) === '.js') {
       const transformed = babel.transform(data, {
         plugins: [
+          'transform-es2015-parameters',
           'transform-es2015-arrow-functions',
           'transform-es2015-block-scoping',
           'transform-es2015-template-literals',
@@ -103,7 +104,7 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   $('table.files .js-navigation-open').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file) && file !== 'test-stream2-httpclient-response-end.js' && file !== 'test-stream-base-no-abort.js')
+    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file) && file !== 'test-stream2-httpclient-response-end.js' && file !== 'test-stream-base-no-abort.js' && file !== 'test-stream-preprocess.js')
       processTestFile(file)
   })
 }))

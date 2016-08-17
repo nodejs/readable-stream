@@ -1,6 +1,6 @@
 # Stream
 
-    Stability: 2 - Stable
+> Stability: 2 - Stable
 
 A stream is an abstract interface for working with streaming data in Node.js.
 The `stream` module provides a base API that makes it easy to build objects
@@ -20,7 +20,7 @@ const stream = require('stream');
 ```
 
 While it is important for all Node.js users to understand how streams works,
-the `stream` module itself is most useful for developer's that are creating new
+the `stream` module itself is most useful for developers that are creating new
 types of stream instances. Developer's who are primarily *consuming* stream
 objects will rarely (if ever) have need to use the `stream` module directly.
 
@@ -343,7 +343,7 @@ The buffered data will be flushed when either the [`stream.uncork()`][] or
 [`stream.end()`][stream-end] methods are called.
 
 The primary intent of `writable.cork()` is to avoid a situation where writing
-many small chunks of data to a stream do not cause an backup in the internal
+many small chunks of data to a stream do not cause a backup in the internal
 buffer that would have an adverse impact on performance. In such situations,
 implementations that implement the `writable._writev()` method can perform
 buffered writes in a more optimized manner.
@@ -411,7 +411,7 @@ If the `writable.cork()` method is called multiple times on a stream, the same
 number of calls to `writable.uncork()` must be called to flush the buffered
 data.
 
-```
+```js
 stream.cork();
 stream.write('some ');
 stream.cork();
@@ -444,7 +444,7 @@ first argument. To reliably detect write errors, add a listener for the
 The return value indicates whether the written `chunk` was buffered internally
 and the buffer has exceeded the `highWaterMark` configured when the stream was
 created. If `false` is returned, further attempts to write data to the stream
-should be paused until the `'drain'` event is emitted.
+should be paused until the [`'drain'`][] event is emitted.
 
 A Writable stream in object mode will always ignore the `encoding` argument.
 
@@ -676,7 +676,7 @@ rr.on('end', () => {
 
 The output of running this script is:
 
-```
+```txt
 $ node test.js
 readable: null
 end
@@ -1262,7 +1262,7 @@ write succeeded.
 It is important to note that all calls to `writable.write()` that occur between
 the time `writable._write()` is called and the `callback` is called will cause
 the written data to be buffered. Once the `callback` is invoked, the stream will
-emit a `'drain'` event. If a stream implementation is capable of processing
+emit a [`'drain'`][] event. If a stream implementation is capable of processing
 multiple chunks of data at once, the `writable._writev()` method should be
 implemented.
 
@@ -1554,7 +1554,7 @@ class Counter extends Readable {
 A [Duplex][] stream is one that implements both [Readable][] and [Writable][],
 such as a TCP socket connection.
 
-Because Javascript does not have support for multiple inheritance, the
+Because JavaScript does not have support for multiple inheritance, the
 `stream.Duplex` class is extended to implement a [Duplex][] stream (as opposed
 to extending the `stream.Readable` *and* `stream.Writable` classes).
 
@@ -1968,36 +1968,32 @@ readable buffer so there is nothing for a user to consume.
 [`'end'`]: #stream_event_end
 [`'finish'`]: #stream_event_finish
 [`'readable'`]: #stream_event_readable
-[`buf.toString(encoding)`]: https://nodejs.org/docs/v6.3.1/api/buffer.html#buffer_buf_tostring_encoding_start_end
-[`EventEmitter`]: https://nodejs.org/docs/v6.3.1/api/events.html#events_class_eventemitter
-[`process.stderr`]: https://nodejs.org/docs/v6.3.1/api/process.html#process_process_stderr
-[`process.stdin`]: https://nodejs.org/docs/v6.3.1/api/process.html#process_process_stdin
-[`process.stdout`]: https://nodejs.org/docs/v6.3.1/api/process.html#process_process_stdout
+[`EventEmitter`]: https://nodejs.org/docs/v6.4.0/api/events.html#events_class_eventemitter
+[`process.stderr`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stderr
+[`process.stdin`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stdin
+[`process.stdout`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stdout
 [`stream.cork()`]: #stream_writable_cork
 [`stream.pipe()`]: #stream_readable_pipe_destination_options
 [`stream.uncork()`]: #stream_writable_uncork
 [`stream.unpipe()`]: #stream_readable_unpipe_destination
 [`stream.wrap()`]: #stream_readable_wrap_stream
-[`tls.CryptoStream`]: https://nodejs.org/docs/v6.3.1/api/tls.html#tls_class_cryptostream
 [API for Stream Consumers]: #stream_api_for_stream_consumers
 [API for Stream Implementers]: #stream_api_for_stream_implementers
-[child process stdin]: https://nodejs.org/docs/v6.3.1/api/child_process.html#child_process_child_stdin
-[child process stdout and stderr]: https://nodejs.org/docs/v6.3.1/api/child_process.html#child_process_child_stdout
+[child process stdin]: https://nodejs.org/docs/v6.4.0/api/child_process.html#child_process_child_stdin
+[child process stdout and stderr]: https://nodejs.org/docs/v6.4.0/api/child_process.html#child_process_child_stdout
 [Compatibility]: #stream_compatibility_with_older_node_js_versions
 [crypto]: crypto.html
 [Duplex]: #stream_class_stream_duplex
-[fs read streams]: https://nodejs.org/docs/v6.3.1/api/fs.html#fs_class_fs_readstream
-[fs write streams]: https://nodejs.org/docs/v6.3.1/api/fs.html#fs_class_fs_writestream
-[`fs.createReadStream()`]: https://nodejs.org/docs/v6.3.1/api/fs.html#fs_fs_createreadstream_path_options
-[`fs.createWriteStream()`]: https://nodejs.org/docs/v6.3.1/api/fs.html#fs_fs_createwritestream_path_options
-[`net.Socket`]: https://nodejs.org/docs/v6.3.1/api/net.html#net_class_net_socket
-[`zlib.createDeflate()`]: https://nodejs.org/docs/v6.3.1/api/zlib.html#zlib_zlib_createdeflate_options
-[HTTP requests, on the client]: https://nodejs.org/docs/v6.3.1/api/http.html#http_class_http_clientrequest
-[HTTP responses, on the server]: https://nodejs.org/docs/v6.3.1/api/http.html#http_class_http_serverresponse
-[http-incoming-message]: https://nodejs.org/docs/v6.3.1/api/http.html#http_class_http_incomingmessage
-[Object mode]: #stream_object_mode
+[fs read streams]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_class_fs_readstream
+[fs write streams]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_class_fs_writestream
+[`fs.createReadStream()`]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_fs_createreadstream_path_options
+[`fs.createWriteStream()`]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_fs_createwritestream_path_options
+[`net.Socket`]: https://nodejs.org/docs/v6.4.0/api/net.html#net_class_net_socket
+[`zlib.createDeflate()`]: https://nodejs.org/docs/v6.4.0/api/zlib.html#zlib_zlib_createdeflate_options
+[HTTP requests, on the client]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_clientrequest
+[HTTP responses, on the server]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_serverresponse
+[http-incoming-message]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_incomingmessage
 [Readable]: #stream_class_stream_readable
-[SimpleProtocol v2]: #stream_example_simpleprotocol_parser_v2
 [stream-_flush]: #stream_transform_flush_callback
 [stream-_read]: #stream_readable_read_size_1
 [stream-_transform]: #stream_transform_transform_chunk_encoding_callback
@@ -2009,7 +2005,7 @@ readable buffer so there is nothing for a user to consume.
 [stream-read]: #stream_readable_read_size
 [stream-resume]: #stream_readable_resume
 [stream-write]: #stream_writable_write_chunk_encoding_callback
-[TCP sockets]: https://nodejs.org/docs/v6.3.1/api/net.html#net_class_net_socket
+[TCP sockets]: https://nodejs.org/docs/v6.4.0/api/net.html#net_class_net_socket
 [Transform]: #stream_class_stream_transform
 [Writable]: #stream_class_stream_writable
 [zlib]: zlib.html
