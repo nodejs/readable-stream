@@ -130,15 +130,14 @@ const server = http.createServer( (req, res) => {
   req.on('end', () => {
     try {
       const data = JSON.parse(body);
+      // write back something interesting to the user:
+      res.write(typeof data);
+      res.end();
     } catch (er) {
       // uh oh!  bad json!
       res.statusCode = 400;
       return res.end(`error: ${er.message}`);
     }
-
-    // write back something interesting to the user:
-    res.write(typeof data);
-    res.end();
   });
 });
 
@@ -1968,10 +1967,10 @@ readable buffer so there is nothing for a user to consume.
 [`'end'`]: #stream_event_end
 [`'finish'`]: #stream_event_finish
 [`'readable'`]: #stream_event_readable
-[`EventEmitter`]: https://nodejs.org/docs/v6.4.0/api/events.html#events_class_eventemitter
-[`process.stderr`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stderr
-[`process.stdin`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stdin
-[`process.stdout`]: https://nodejs.org/docs/v6.4.0/api/process.html#process_process_stdout
+[`EventEmitter`]: https://nodejs.org/docs/v6.5.0/api/events.html#events_class_eventemitter
+[`process.stderr`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stderr
+[`process.stdin`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stdin
+[`process.stdout`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stdout
 [`stream.cork()`]: #stream_writable_cork
 [`stream.pipe()`]: #stream_readable_pipe_destination_options
 [`stream.uncork()`]: #stream_writable_uncork
@@ -1979,20 +1978,20 @@ readable buffer so there is nothing for a user to consume.
 [`stream.wrap()`]: #stream_readable_wrap_stream
 [API for Stream Consumers]: #stream_api_for_stream_consumers
 [API for Stream Implementers]: #stream_api_for_stream_implementers
-[child process stdin]: https://nodejs.org/docs/v6.4.0/api/child_process.html#child_process_child_stdin
-[child process stdout and stderr]: https://nodejs.org/docs/v6.4.0/api/child_process.html#child_process_child_stdout
+[child process stdin]: https://nodejs.org/docs/v6.5.0/api/child_process.html#child_process_child_stdin
+[child process stdout and stderr]: https://nodejs.org/docs/v6.5.0/api/child_process.html#child_process_child_stdout
 [Compatibility]: #stream_compatibility_with_older_node_js_versions
 [crypto]: crypto.html
 [Duplex]: #stream_class_stream_duplex
-[fs read streams]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_class_fs_readstream
-[fs write streams]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_class_fs_writestream
-[`fs.createReadStream()`]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_fs_createreadstream_path_options
-[`fs.createWriteStream()`]: https://nodejs.org/docs/v6.4.0/api/fs.html#fs_fs_createwritestream_path_options
-[`net.Socket`]: https://nodejs.org/docs/v6.4.0/api/net.html#net_class_net_socket
-[`zlib.createDeflate()`]: https://nodejs.org/docs/v6.4.0/api/zlib.html#zlib_zlib_createdeflate_options
-[HTTP requests, on the client]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_clientrequest
-[HTTP responses, on the server]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_serverresponse
-[http-incoming-message]: https://nodejs.org/docs/v6.4.0/api/http.html#http_class_http_incomingmessage
+[fs read streams]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_class_fs_readstream
+[fs write streams]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_class_fs_writestream
+[`fs.createReadStream()`]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_fs_createreadstream_path_options
+[`fs.createWriteStream()`]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_fs_createwritestream_path_options
+[`net.Socket`]: https://nodejs.org/docs/v6.5.0/api/net.html#net_class_net_socket
+[`zlib.createDeflate()`]: https://nodejs.org/docs/v6.5.0/api/zlib.html#zlib_zlib_createdeflate_options
+[HTTP requests, on the client]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_clientrequest
+[HTTP responses, on the server]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_serverresponse
+[http-incoming-message]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_incomingmessage
 [Readable]: #stream_class_stream_readable
 [stream-_flush]: #stream_transform_flush_callback
 [stream-_read]: #stream_readable_read_size_1
@@ -2005,7 +2004,7 @@ readable buffer so there is nothing for a user to consume.
 [stream-read]: #stream_readable_read_size
 [stream-resume]: #stream_readable_resume
 [stream-write]: #stream_writable_write_chunk_encoding_callback
-[TCP sockets]: https://nodejs.org/docs/v6.4.0/api/net.html#net_class_net_socket
+[TCP sockets]: https://nodejs.org/docs/v6.5.0/api/net.html#net_class_net_socket
 [Transform]: #stream_class_stream_transform
 [Writable]: #stream_class_stream_writable
 [zlib]: zlib.html
