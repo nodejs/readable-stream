@@ -70,16 +70,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         + '}catch(_){}}());\n'
       ]
 
-    , isArrayDefine = [
-          headRegexp
-        , '$1\n\n/*<replacement>*/\nvar isArray = require(\'isarray\');\n/*</replacement>*/\n'
-      ]
-
-    , isArrayReplacement = [
-          /Array\.isArray/g
-        , 'isArray'
-      ]
-
     , objectKeysDefine = require('./common-replacements').objectKeysDefine
 
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
@@ -220,8 +210,6 @@ module.exports['_stream_readable.js'] = [
   , altIndexOfUseReplacement
   , instanceofReplacement
   , stringDecoderReplacement
-  , isArrayDefine
-  , isArrayReplacement
   , debugLogReplacement
   , utilReplacement
   , stringDecoderReplacement
