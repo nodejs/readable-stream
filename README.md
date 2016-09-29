@@ -34,3 +34,5 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
 * **Sam Newman** ([@sonewman](https://github.com/sonewman)) &lt;newmansam@outlook.com&gt;
 * **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
 * **Domenic Denicola** ([@domenic](https://github.com/domenic)) &lt;d@domenic.me&gt;
+* **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
+  - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
