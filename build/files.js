@@ -72,7 +72,20 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , isArrayDefine = [
           headRegexp
-        , '$1\n\n/*<replacement>*/\nvar isArray = require(\'isarray\');\n/*</replacement>*/\n'
+        , `$1
+
+/*<replacement>*/
+// from https://github.com/juliangruber/isarray/blob/aa39e3199004330bd72daa46207bf22f7ea5be17/index.js
+// MIT Licenced
+// Copyright (c) 2013 Julian Gruber <julian@juliangruber.com>
+
+var toString = {}.toString;
+
+var isArray = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+/*</replacement>*/
+`
       ]
 
     , isArrayReplacement = [
@@ -207,8 +220,8 @@ module.exports['_stream_readable.js'] = [
   , altIndexOfUseReplacement
   , instanceofReplacement
   , stringDecoderReplacement
-  , isArrayDefine
   , isArrayReplacement
+  , isArrayDefine
   , debugLogReplacement
   , utilReplacement
   , stringDecoderReplacement
