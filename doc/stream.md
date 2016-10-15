@@ -35,13 +35,13 @@ the elements of the API that are required to *implement* new types of streams.
 
 There are four fundamental stream types within Node.js:
 
-* [Readable][] - streams from which data can be read (for example
+* [Readable](#class-streamreadable) - streams from which data can be read (for example
   [`fs.createReadStream()`][]).
-* [Writable][] - streams to which data can be written (for example
+* [Writable](#class-streamwritable) - streams to which data can be written (for example
   [`fs.createWriteStream()`][]).
-* [Duplex][] - streams that are both Readable and Writable (for example
+* [Duplex](#class-streamduplex) - streams that are both Readable and Writable (for example
   [`net.Socket`][]).
-* [Transform][] - Duplex streams that can modify or transform the data as it
+* [Transform](#class-streamtransform) - Duplex streams that can modify or transform the data as it
   is written and read (for example [`zlib.createDeflate()`][]).
 
 ### Object Mode
@@ -60,7 +60,7 @@ object mode is not safe.
 
 <!--type=misc-->
 
-Both [Writable][] and [Readable][] streams will store data in an internal
+Both [Writable](#class-streamwritable) and [Readable](#class-streamreadable) streams will store data in an internal
 buffer that can be retrieved using `writable._writableState.getBuffer()` or
 `readable._readableState.buffer`, respectively.
 
@@ -91,11 +91,11 @@ A key goal of the `stream` API, and in particular the [`stream.pipe()`] method,
 is to limit the buffering of data to acceptable levels such that sources and
 destinations of differing speeds will not overwhelm the available memory.
 
-Because [Duplex][] and [Transform][] streams are both Readable and Writable,
+Because [Duplex](#class-streamduplex) and [Transform](#class-streamtransform) streams are both Readable and Writable,
 each maintain *two* separate internal buffers used for reading and writing,
 allowing each side to operate independently of the other while maintaining an
 appropriate and efficient flow of data. For example, [`net.Socket`][] instances
-are [Duplex][] streams whose Readable side allows consumption of data received
+are [Duplex](#class-streamduplex) streams whose Readable side allows consumption of data received
 *from* the socket and whose Writable side allows writing data *to* the socket.
 Because data may be written to the socket at a faster or slower rate than data
 is received, it is important each side operate (and buffer) independently of
@@ -151,17 +151,17 @@ server.listen(1337);
 // error: Unexpected token o
 ```
 
-[Writable][] streams (such as `res` in the example) expose methods such as
+[Writable](#class-streamwritable) streams (such as `res` in the example) expose methods such as
 `write()` and `end()` that are used to write data onto the stream.
 
-[Readable][] streams use the [`EventEmitter`][] API for notifying application
+[Readable](#class-streamreadable) streams use the [`EventEmitter`][] API for notifying application
 code when data is available to be read off the stream. That available data can
 be read from the stream in multiple ways.
 
-Both [Writable][] and [Readable][] streams use the [`EventEmitter`][] API in
+Both [Writable](#class-streamwritable) and [Readable](#class-streamreadable) streams use the [`EventEmitter`][] API in
 various ways to communicate the current state of the stream.
 
-[Duplex][] and [Transform][] streams are both [Writable][] and [Readable][].
+[Duplex](#class-streamduplex) and [Transform](#class-streamtransform) streams are both [Writable](#class-streamwritable) and [Readable](#class-streamreadable).
 
 Applications that are either writing data to or consuming data from a stream
 are not required to implement the stream interfaces directly and will generally
@@ -175,7 +175,7 @@ section [API for Stream Implementers][].
 Writable streams are an abstraction for a *destination* to which data is
 written.
 
-Examples of [Writable][] streams include:
+Examples of [Writable](#class-streamwritable) streams include:
 
 * [HTTP requests, on the client][]
 * [HTTP responses, on the server][]
@@ -186,13 +186,13 @@ Examples of [Writable][] streams include:
 * [child process stdin][]
 * [`process.stdout`][], [`process.stderr`][]
 
-*Note*: Some of these examples are actually [Duplex][] streams that implement
-the [Writable][] interface.
+*Note*: Some of these examples are actually [Duplex](#class-streamduplex) streams that implement
+the [Writable](#class-streamwritable) interface.
 
-All [Writable][] streams implement the interface defined by the
+All [Writable](#class-streamwritable) streams implement the interface defined by the
 `stream.Writable` class.
 
-While specific instances of [Writable][] streams may differ in various ways,
+While specific instances of [Writable](#class-streamwritable) streams may differ in various ways,
 all Writable streams follow the same fundamental usage pattern as illustrated
 in the example below:
 
@@ -314,11 +314,11 @@ reader.pipe(writer);
 added: v0.9.4
 -->
 
-* `src` {[Readable][] Stream} The source stream that
+* `src` {[Readable](#class-streamreadable) Stream} The source stream that
   [unpiped][`stream.unpipe()`] this writable
 
 The `'unpipe'` event is emitted when the [`stream.unpipe()`][] method is called
-on a [Readable][] stream, removing this [Writable][] from its set of
+on a [Readable](#class-streamreadable) stream, removing this [Writable](#class-streamwritable) from its set of
 destinations.
 
 ```js
@@ -359,7 +359,7 @@ added: v0.9.4
 * `callback` {Function} Optional callback for when the stream is finished
 
 Calling the `writable.end()` method signals that no more data will be written
-to the [Writable][]. The optional `chunk` and `encoding` arguments allow one
+to the [Writable](#class-streamwritable). The optional `chunk` and `encoding` arguments allow one
 final additional chunk of data to be written immediately before closing the
 stream. If provided, the optional `callback` function is attached as a listener
 for the [`'finish'`][] event.
@@ -384,7 +384,7 @@ added: v0.11.15
 * Return: `this`
 
 The `writable.setDefaultEncoding()` method sets the default `encoding` for a
-[Writable][] stream.
+[Writable](#class-streamwritable) stream.
 
 ##### writable.uncork()
 <!-- YAML
@@ -463,7 +463,7 @@ Examples of Readable streams include:
 * [child process stdout and stderr][]
 * [`process.stdin`][]
 
-All [Readable][] streams implement the interface defined by the
+All [Readable](#class-streamreadable) streams implement the interface defined by the
 `stream.Readable` class.
 
 #### Two Modes
@@ -477,12 +477,12 @@ and provided to an application as quickly as possible using events via the
 In paused mode, the [`stream.read()`][stream-read] method must be called
 explicitly to read chunks of data from the stream.
 
-All [Readable][] streams begin in paused mode but can be switched to flowing
+All [Readable](#class-streamreadable) streams begin in paused mode but can be switched to flowing
 mode in one of the following ways:
 
 * Adding a [`'data'`][] event handler.
 * Calling the [`stream.resume()`][stream-resume] method.
-* Calling the [`stream.pipe()`][] method to send the data to a [Writable][].
+* Calling the [`stream.pipe()`][] method to send the data to a [Writable](#class-streamwritable).
 
 The Readable can switch back to paused mode using one of the following:
 
@@ -503,7 +503,7 @@ destinations, then calling [`stream.pause()`][stream-pause] will not guarantee
 that the stream will *remain* paused once those destinations drain and ask for
 more data.
 
-*Note*: If a [Readable][] is switched into flowing mode and there are no
+*Note*: If a [Readable](#class-streamreadable) is switched into flowing mode and there are no
 consumers available handle the data, that data will be lost. This can occur,
 for instance, when the `readable.resume()` method is called without a listener
 attached to the `'data'` event, or when a `'data'` event handler is removed
@@ -566,7 +566,7 @@ The `'close'` event is emitted when the stream and any of its underlying
 resources (a file descriptor, for example) have been closed. The event indicates
 that no more events will be emitted, and no further computation will occur.
 
-Not all [Readable][] streams will emit the `'close'` event.
+Not all [Readable](#class-streamreadable) streams will emit the `'close'` event.
 
 ##### Event: 'data'
 <!-- YAML
@@ -739,9 +739,9 @@ added: v0.9.4
 * `options` {Object} Pipe options
   * `end` {Boolean} End the writer when the reader ends. Defaults to `true`.
 
-The `readable.pipe()` method attaches a [Writable][] stream to the `readable`,
+The `readable.pipe()` method attaches a [Writable](#class-streamwritable) stream to the `readable`,
 causing it to switch automatically into flowing mode and push all of its data
-to the attached [Writable][]. The flow of data will be automatically managed so
+to the attached [Writable](#class-streamwritable). The flow of data will be automatically managed so
 that the destination Writable stream is not overwhelmed by a faster Readable
 stream.
 
@@ -940,7 +940,7 @@ pulled out of the source, so that the data can be passed on to some other party.
 [`'end'`][] event has been emitted or a runtime error will be thrown.
 
 Developers using `stream.unshift()` often should consider switching to
-use of a [Transform][] stream instead. See the [API for Stream Implementers][]
+use of a [Transform](#class-streamtransform) stream instead. See the [API for Stream Implementers][]
 section for more information.
 
 ```js
@@ -1000,7 +1000,7 @@ for more information.)
 
 When using an older Node.js library that emits [`'data'`][] events and has a
 [`stream.pause()`][stream-pause] method that is advisory only, the
-`readable.wrap()` method can be used to create a [Readable][] stream that uses
+`readable.wrap()` method can be used to create a [Readable](#class-streamreadable) stream that uses
 the old stream as its data source.
 
 It will rarely be necessary to use `readable.wrap()` but the method has been
@@ -1029,8 +1029,8 @@ added: v0.9.4
 
 <!--type=class-->
 
-Duplex streams are streams that implement both the [Readable][] and
-[Writable][] interfaces.
+Duplex streams are streams that implement both the [Readable](#class-streamreadable) and
+[Writable](#class-streamwritable) interfaces.
 
 Examples of Duplex streams include:
 
@@ -1045,9 +1045,9 @@ added: v0.9.4
 
 <!--type=class-->
 
-Transform streams are [Duplex][] streams where the output is in some way
-related to the input. Like all [Duplex][] streams, Transform streams
-implement both the [Readable][] and [Writable][] interfaces.
+Transform streams are [Duplex](#class-streamduplex) streams where the output is in some way
+related to the input. Like all [Duplex](#class-streamduplex) streams, Transform streams
+implement both the [Readable](#class-streamreadable) and [Writable](#class-streamwritable) interfaces.
 
 Examples of Transform streams include:
 
@@ -1166,7 +1166,7 @@ const myWritable = new Writable({
 
 ### Implementing a Writable Stream
 
-The `stream.Writable` class is extended to implement a [Writable][] stream.
+The `stream.Writable` class is extended to implement a [Writable](#class-streamwritable) stream.
 
 Custom Writable streams *must* call the `new stream.Writable([options])`
 constructor and implement the `writable._write()` method. The
@@ -1246,7 +1246,7 @@ All Writable stream implementations must provide a
 [`writable._write()`][stream-_write] method to send data to the underlying
 resource.
 
-*Note*: [Transform][] streams provide their own implementation of the
+*Note*: [Transform](#class-streamtransform) streams provide their own implementation of the
 [`writable._write()`][stream-_write].
 
 *Note*: **This function MUST NOT be called by application code directly.** It
@@ -1326,7 +1326,7 @@ const myWritable = new Writable({
 The following illustrates a rather simplistic (and somewhat pointless) custom
 Writable stream implementation. While this specific Writable stream instance
 is not of any real particular usefulness, the example illustrates each of the
-required elements of a custom [Writable][] stream instance:
+required elements of a custom [Writable](#class-streamwritable) stream instance:
 
 ```js
 const Writable = require('stream').Writable;
@@ -1348,7 +1348,7 @@ class MyWritable extends Writable {
 
 ### Implementing a Readable Stream
 
-The `stream.Readable` class is extended to implement a [Readable][] stream.
+The `stream.Readable` class is extended to implement a [Readable](#class-streamreadable) stream.
 
 Custom Readable streams *must* call the `new stream.Readable([options])`
 constructor and implement the `readable._read()` method.
@@ -1550,11 +1550,11 @@ class Counter extends Readable {
 
 ### Implementing a Duplex Stream
 
-A [Duplex][] stream is one that implements both [Readable][] and [Writable][],
+A [Duplex](#class-streamduplex) stream is one that implements both [Readable](#class-streamreadable) and [Writable](#class-streamwritable),
 such as a TCP socket connection.
 
 Because JavaScript does not have support for multiple inheritance, the
-`stream.Duplex` class is extended to implement a [Duplex][] stream (as opposed
+`stream.Duplex` class is extended to implement a [Duplex](#class-streamduplex) stream (as opposed
 to extending the `stream.Readable` *and* `stream.Writable` classes).
 
 *Note*: The `stream.Duplex` class prototypically inherits from `stream.Readable`
@@ -1626,8 +1626,8 @@ hypothetical lower-level source object to which data can be written, and
 from which data can be read, albeit using an API that is not compatible with
 Node.js streams.
 The following illustrates a simple example of a Duplex stream that buffers
-incoming written data via the [Writable][] interface that is read back out
-via the [Readable][] interface.
+incoming written data via the [Writable](#class-streamwritable) interface that is read back out
+via the [Readable](#class-streamreadable) interface.
 
 ```js
 const Duplex = require('stream').Duplex;
@@ -1666,7 +1666,7 @@ or Writable side using the `readableObjectMode` and `writableObjectMode` options
 respectively.
 
 In the following example, for instance, a new Transform stream (which is a
-type of [Duplex][] stream) is created that has an object mode Writable side
+type of [Duplex](#class-streamduplex) stream) is created that has an object mode Writable side
 that accepts JavaScript numbers that are converted to hexidecimal strings on
 the Readable side.
 
@@ -1702,7 +1702,7 @@ myTransform.write(100);
 
 ### Implementing a Transform Stream
 
-A [Transform][] stream is a [Duplex][] stream where the output is computed
+A [Transform](#class-streamtransform) stream is a [Duplex](#class-streamduplex) stream where the output is computed
 in some way from the input. Examples include [zlib][] streams or [crypto][]
 streams that compress, encrypt, or decrypt data.
 
@@ -1712,7 +1712,7 @@ Hash stream will only ever have a single chunk of output which is
 provided when the input is ended. A `zlib` stream will produce output
 that is either much smaller or much larger than its input.
 
-The `stream.Transform` class is extended to implement a [Transform][] stream.
+The `stream.Transform` class is extended to implement a [Transform](#class-streamtransform) stream.
 
 The `stream.Transform` class prototypically inherits from `stream.Duplex` and
 implements its own versions of the `writable._write()` and `readable._read()`
@@ -1795,10 +1795,10 @@ store an amount of internal state used to optimally compress the output. When
 the stream ends, however, that additional data needs to be flushed so that the
 compressed data will be complete.
 
-Custom [Transform][] implementations *may* implement the `transform._flush()`
+Custom [Transform](#class-streamtransform) implementations *may* implement the `transform._flush()`
 method. This will be called when there is no more written data to be consumed,
 but before the [`'end'`][] event is emitted signaling the end of the
-[Readable][] stream.
+[Readable](#class-streamreadable) stream.
 
 Within the `transform._flush()` implementation, the `readable.push()` method
 may be called zero or more times, as appropriate. The `callback` function must
@@ -1857,7 +1857,7 @@ user programs.
 
 #### Class: stream.PassThrough
 
-The `stream.PassThrough` class is a trivial implementation of a [Transform][]
+The `stream.PassThrough` class is a trivial implementation of a [Transform](#class-streamtransform)
 stream that simply passes the input bytes across to the output. Its purpose is
 primarily for examples and testing, but there are some use cases where
 `stream.PassThrough` is useful as a building block for novel sorts of streams.
@@ -1881,7 +1881,7 @@ simpler, but also less powerful and less useful.
   guaranteed. This meant that it was still necessary to be prepared to receive
   [`'data'`][] events *even when the stream was in a paused state*.
 
-In Node.js v0.10, the [Readable][] class was added. For backwards compatibility
+In Node.js v0.10, the [Readable](#class-streamreadable) class was added. For backwards compatibility
 with older Node.js programs, Readable streams switch into "flowing mode" when a
 [`'data'`][] event handler is added, or when the
 [`stream.resume()`][stream-resume] method is called. The effect is that, even
