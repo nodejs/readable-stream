@@ -39,7 +39,7 @@ There are four fundamental stream types within Node.js:
   [`fs.createReadStream()`][]).
 * [Writable][] - streams to which data can be written (for example
   [`fs.createWriteStream()`][]).
-* [Duplex][] - streams that are both Readable and Writable (for example
+* [Duplex](#class-streamduplex) - streams that are both Readable and Writable (for example
   [`net.Socket`][]).
 * [Transform][] - Duplex streams that can modify or transform the data as it
   is written and read (for example [`zlib.createDeflate()`][]).
@@ -91,11 +91,11 @@ A key goal of the `stream` API, and in particular the [`stream.pipe()`] method,
 is to limit the buffering of data to acceptable levels such that sources and
 destinations of differing speeds will not overwhelm the available memory.
 
-Because [Duplex][] and [Transform][] streams are both Readable and Writable,
+Because [Duplex](#class-streamduplex) and [Transform][] streams are both Readable and Writable,
 each maintain *two* separate internal buffers used for reading and writing,
 allowing each side to operate independently of the other while maintaining an
 appropriate and efficient flow of data. For example, [`net.Socket`][] instances
-are [Duplex][] streams whose Readable side allows consumption of data received
+are [Duplex](#class-streamduplex) streams whose Readable side allows consumption of data received
 *from* the socket and whose Writable side allows writing data *to* the socket.
 Because data may be written to the socket at a faster or slower rate than data
 is received, it is important each side operate (and buffer) independently of
@@ -161,7 +161,7 @@ be read from the stream in multiple ways.
 Both [Writable][] and [Readable][] streams use the [`EventEmitter`][] API in
 various ways to communicate the current state of the stream.
 
-[Duplex][] and [Transform][] streams are both [Writable][] and [Readable][].
+[Duplex](#class-streamduplex) and [Transform][] streams are both [Writable][] and [Readable][].
 
 Applications that are either writing data to or consuming data from a stream
 are not required to implement the stream interfaces directly and will generally
@@ -186,7 +186,7 @@ Examples of [Writable][] streams include:
 * [child process stdin][]
 * [`process.stdout`][], [`process.stderr`][]
 
-*Note*: Some of these examples are actually [Duplex][] streams that implement
+*Note*: Some of these examples are actually [Duplex](#class-streamduplex) streams that implement
 the [Writable][] interface.
 
 All [Writable][] streams implement the interface defined by the
@@ -1045,8 +1045,8 @@ added: v0.9.4
 
 <!--type=class-->
 
-Transform streams are [Duplex][] streams where the output is in some way
-related to the input. Like all [Duplex][] streams, Transform streams
+Transform streams are [Duplex](#class-streamduplex) streams where the output is in some way
+related to the input. Like all [Duplex](#class-streamduplex) streams, Transform streams
 implement both the [Readable][] and [Writable][] interfaces.
 
 Examples of Transform streams include:
@@ -1550,11 +1550,11 @@ class Counter extends Readable {
 
 ### Implementing a Duplex Stream
 
-A [Duplex][] stream is one that implements both [Readable][] and [Writable][],
+A [Duplex](#class-streamduplex) stream is one that implements both [Readable][] and [Writable][],
 such as a TCP socket connection.
 
 Because JavaScript does not have support for multiple inheritance, the
-`stream.Duplex` class is extended to implement a [Duplex][] stream (as opposed
+`stream.Duplex` class is extended to implement a [Duplex](#class-streamduplex) stream (as opposed
 to extending the `stream.Readable` *and* `stream.Writable` classes).
 
 *Note*: The `stream.Duplex` class prototypically inherits from `stream.Readable`
@@ -1666,7 +1666,7 @@ or Writable side using the `readableObjectMode` and `writableObjectMode` options
 respectively.
 
 In the following example, for instance, a new Transform stream (which is a
-type of [Duplex][] stream) is created that has an object mode Writable side
+type of [Duplex](#class-streamduplex) stream) is created that has an object mode Writable side
 that accepts JavaScript numbers that are converted to hexidecimal strings on
 the Readable side.
 
@@ -1702,7 +1702,7 @@ myTransform.write(100);
 
 ### Implementing a Transform Stream
 
-A [Transform][] stream is a [Duplex][] stream where the output is computed
+A [Transform][] stream is a [Duplex](#class-streamduplex) stream where the output is computed
 in some way from the input. Examples include [zlib][] streams or [crypto][]
 streams that compress, encrypt, or decrypt data.
 
