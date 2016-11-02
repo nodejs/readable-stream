@@ -23,7 +23,7 @@ r._read = function (n) {
     reads++;
   } else if (reads === 1) {
     var ret = r.push(str);
-    assert.equal(ret, false);
+    assert.strictEqual(ret, false);
     reads++;
   } else {
     assert(!eofed);
@@ -42,9 +42,9 @@ var ret = r.push(str);
 // should be false.  > hwm
 assert(!ret);
 var chunk = r.read();
-assert.equal(chunk, str);
+assert.strictEqual(chunk, str);
 chunk = r.read();
-assert.equal(chunk, null);
+assert.strictEqual(chunk, null);
 
 r.once('readable', function () {
   // this time, we'll get *all* the remaining data, because
@@ -52,15 +52,15 @@ r.once('readable', function () {
   // us below the hwm, and so it triggered a _read() again,
   // which synchronously added more, which we then return.
   chunk = r.read();
-  assert.equal(chunk, str + str);
+  assert.strictEqual(chunk, str + str);
 
   chunk = r.read();
-  assert.equal(chunk, null);
+  assert.strictEqual(chunk, null);
 });
 
 process.on('exit', function () {
   assert(eofed);
   assert(ended);
-  assert.equal(reads, 2);
+  assert.strictEqual(reads, 2);
   console.log('ok');
 });

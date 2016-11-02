@@ -46,7 +46,7 @@ function run() {
   var fn = next[1];
   console.log('# %s', name);
   fn({
-    same: assert.deepEqual,
+    same: assert.deepStrictEqual,
     equal: assert.equal,
     end: function () {
       count--;
@@ -154,7 +154,7 @@ test('write no bufferize', function (t) {
   });
 
   tw._write = function (chunk, encoding, cb) {
-    assert(typeof chunk === 'string');
+    assert.strictEqual(typeof chunk, 'string');
     chunk = bufferShim.from(chunk, encoding);
     return TestWriter.prototype._write.call(this, chunk, encoding, cb);
   };

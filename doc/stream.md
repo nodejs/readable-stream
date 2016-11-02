@@ -19,14 +19,14 @@ The `stream` module can be accessed using:
 const stream = require('stream');
 ```
 
-While it is important for all Node.js users to understand how streams works,
+While it is important for all Node.js users to understand how streams work,
 the `stream` module itself is most useful for developers that are creating new
 types of stream instances. Developer's who are primarily *consuming* stream
 objects will rarely (if ever) have need to use the `stream` module directly.
 
-## Organization of this document
+## Organization of this Document
 
-This document is divided into two primary sections and third section for
+This document is divided into two primary sections with a third section for
 additional notes. The first section explains the elements of the stream API that
 are required to *use* streams within an application. The second section explains
 the elements of the API that are required to *implement* new types of streams.
@@ -48,7 +48,7 @@ There are four fundamental stream types within Node.js:
 
 All streams created by Node.js APIs operate exclusively on strings and `Buffer`
 objects. It is possible, however, for stream implementations to work with other
-types of JavaScript values (with the exception of `null` which serves a special
+types of JavaScript values (with the exception of `null`, which serves a special
 purpose within streams). Such streams are considered to operate in "object
 mode".
 
@@ -83,11 +83,11 @@ used to fill the read buffer).
 Data is buffered in Writable streams when the
 [`writable.write(chunk)`][stream-write] method is called repeatedly. While the
 total size of the internal write buffer is below the threshold set by
-`highWaterMark`, calls to `writable.write()` will return `true`. Once the
+`highWaterMark`, calls to `writable.write()` will return `true`. Once
 the size of the internal buffer reaches or exceeds the `highWaterMark`, `false`
 will be returned.
 
-A key goal of the `stream` API, and in particular the [`stream.pipe()`] method,
+A key goal of the `stream` API, particularly the [`stream.pipe()`] method,
 is to limit the buffering of data to acceptable levels such that sources and
 destinations of differing speeds will not overwhelm the available memory.
 
@@ -98,8 +98,8 @@ appropriate and efficient flow of data. For example, [`net.Socket`][] instances
 are [Duplex][] streams whose Readable side allows consumption of data received
 *from* the socket and whose Writable side allows writing data *to* the socket.
 Because data may be written to the socket at a faster or slower rate than data
-is received, it is important each side operate (and buffer) independently of
-the other.
+is received, it is important for each side to operate (and buffer) independently
+of the other.
 
 ## API for Stream Consumers
 
@@ -963,10 +963,11 @@ function parseHeader(stream, callback) {
         header += split.shift();
         const remaining = split.join('\n\n');
         const buf = Buffer.from(remaining, 'utf8');
+        stream.removeListener('error', callback);
+        // set the readable listener before unshifting
+        stream.removeListener('readable', onReadable);
         if (buf.length)
           stream.unshift(buf);
-        stream.removeListener('error', callback);
-        stream.removeListener('readable', onReadable);
         // now the body of the message can be read from the stream.
         callback(null, header, stream);
       } else {
@@ -1060,7 +1061,7 @@ Examples of Transform streams include:
 <!--type=misc-->
 
 The `stream` module API has been designed to make it possible to easily
-implement streams using JavaScript's prototypical inheritance model.
+implement streams using JavaScript's prototypal inheritance model.
 
 First, a stream developer would declare a new JavaScript class that extends one
 of the four basic stream classes (`stream.Writable`, `stream.Readable`,
@@ -1558,7 +1559,9 @@ Because JavaScript does not have support for multiple inheritance, the
 to extending the `stream.Readable` *and* `stream.Writable` classes).
 
 *Note*: The `stream.Duplex` class prototypically inherits from `stream.Readable`
-and parasitically from `stream.Writable`.
+and parasitically from `stream.Writable`, but `instanceof` will work properly
+for both base classes due to overriding [`Symbol.hasInstance`][]
+on `stream.Writable`.
 
 Custom Duplex streams *must* call the `new stream.Duplex([options])`
 constructor and implement *both* the `readable._read()` and
@@ -1642,8 +1645,8 @@ class MyDuplex extends Duplex {
   _write(chunk, encoding, callback) {
     // The underlying source only deals with strings
     if (Buffer.isBuffer(chunk))
-      chunk = chunk.toString(encoding);
-    this[kSource].writeSomeData(chunk, encoding);
+      chunk = chunk.toString();
+    this[kSource].writeSomeData(chunk);
     callback();
   }
 
@@ -1667,7 +1670,7 @@ respectively.
 
 In the following example, for instance, a new Transform stream (which is a
 type of [Duplex][] stream) is created that has an object mode Writable side
-that accepts JavaScript numbers that are converted to hexidecimal strings on
+that accepts JavaScript numbers that are converted to hexadecimal strings on
 the Readable side.
 
 ```js
@@ -1783,7 +1786,7 @@ after all data has been output, which occurs after the callback in
 #### transform.\_flush(callback)
 
 * `callback` {Function} A callback function (optionally with an error
-  argument) to be called when remaining data has been flushed.
+  argument and data) to be called when remaining data has been flushed.
 
 *Note*: **This function MUST NOT be called by application code directly.** It
 should be implemented by child classes, and called only by the internal Readable
@@ -1967,10 +1970,10 @@ readable buffer so there is nothing for a user to consume.
 [`'end'`]: #stream_event_end
 [`'finish'`]: #stream_event_finish
 [`'readable'`]: #stream_event_readable
-[`EventEmitter`]: https://nodejs.org/docs/v6.5.0/api/events.html#events_class_eventemitter
-[`process.stderr`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stderr
-[`process.stdin`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stdin
-[`process.stdout`]: https://nodejs.org/docs/v6.5.0/api/process.html#process_process_stdout
+[`EventEmitter`]: https://nodejs.org/docs/v7.0.0/api/events.html#events_class_eventemitter
+[`process.stderr`]: https://nodejs.org/docs/v7.0.0/api/process.html#process_process_stderr
+[`process.stdin`]: https://nodejs.org/docs/v7.0.0/api/process.html#process_process_stdin
+[`process.stdout`]: https://nodejs.org/docs/v7.0.0/api/process.html#process_process_stdout
 [`stream.cork()`]: #stream_writable_cork
 [`stream.pipe()`]: #stream_readable_pipe_destination_options
 [`stream.uncork()`]: #stream_writable_uncork
@@ -1978,20 +1981,20 @@ readable buffer so there is nothing for a user to consume.
 [`stream.wrap()`]: #stream_readable_wrap_stream
 [API for Stream Consumers]: #stream_api_for_stream_consumers
 [API for Stream Implementers]: #stream_api_for_stream_implementers
-[child process stdin]: https://nodejs.org/docs/v6.5.0/api/child_process.html#child_process_child_stdin
-[child process stdout and stderr]: https://nodejs.org/docs/v6.5.0/api/child_process.html#child_process_child_stdout
+[child process stdin]: https://nodejs.org/docs/v7.0.0/api/child_process.html#child_process_child_stdin
+[child process stdout and stderr]: https://nodejs.org/docs/v7.0.0/api/child_process.html#child_process_child_stdout
 [Compatibility]: #stream_compatibility_with_older_node_js_versions
 [crypto]: crypto.html
 [Duplex]: #stream_class_stream_duplex
-[fs read streams]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_class_fs_readstream
-[fs write streams]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_class_fs_writestream
-[`fs.createReadStream()`]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_fs_createreadstream_path_options
-[`fs.createWriteStream()`]: https://nodejs.org/docs/v6.5.0/api/fs.html#fs_fs_createwritestream_path_options
-[`net.Socket`]: https://nodejs.org/docs/v6.5.0/api/net.html#net_class_net_socket
-[`zlib.createDeflate()`]: https://nodejs.org/docs/v6.5.0/api/zlib.html#zlib_zlib_createdeflate_options
-[HTTP requests, on the client]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_clientrequest
-[HTTP responses, on the server]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_serverresponse
-[http-incoming-message]: https://nodejs.org/docs/v6.5.0/api/http.html#http_class_http_incomingmessage
+[fs read streams]: https://nodejs.org/docs/v7.0.0/api/fs.html#fs_class_fs_readstream
+[fs write streams]: https://nodejs.org/docs/v7.0.0/api/fs.html#fs_class_fs_writestream
+[`fs.createReadStream()`]: https://nodejs.org/docs/v7.0.0/api/fs.html#fs_fs_createreadstream_path_options
+[`fs.createWriteStream()`]: https://nodejs.org/docs/v7.0.0/api/fs.html#fs_fs_createwritestream_path_options
+[`net.Socket`]: https://nodejs.org/docs/v7.0.0/api/net.html#net_class_net_socket
+[`zlib.createDeflate()`]: https://nodejs.org/docs/v7.0.0/api/zlib.html#zlib_zlib_createdeflate_options
+[HTTP requests, on the client]: https://nodejs.org/docs/v7.0.0/api/http.html#http_class_http_clientrequest
+[HTTP responses, on the server]: https://nodejs.org/docs/v7.0.0/api/http.html#http_class_http_serverresponse
+[http-incoming-message]: https://nodejs.org/docs/v7.0.0/api/http.html#http_class_http_incomingmessage
 [Readable]: #stream_class_stream_readable
 [stream-_flush]: #stream_transform_flush_callback
 [stream-_read]: #stream_readable_read_size_1
@@ -2004,7 +2007,8 @@ readable buffer so there is nothing for a user to consume.
 [stream-read]: #stream_readable_read_size
 [stream-resume]: #stream_readable_resume
 [stream-write]: #stream_writable_write_chunk_encoding_callback
-[TCP sockets]: https://nodejs.org/docs/v6.5.0/api/net.html#net_class_net_socket
+[TCP sockets]: https://nodejs.org/docs/v7.0.0/api/net.html#net_class_net_socket
 [Transform]: #stream_class_stream_transform
 [Writable]: #stream_class_stream_writable
 [zlib]: zlib.html
+[`Symbol.hasInstance`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/hasInstance

@@ -3,7 +3,6 @@ var bufferShim = require('buffer-shims');
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-
 var stream = require('../../');
 
 var readable = new stream.Readable();

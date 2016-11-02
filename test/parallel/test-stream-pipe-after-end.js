@@ -3,7 +3,6 @@ var bufferShim = require('buffer-shims');
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
 var util = require('util');
