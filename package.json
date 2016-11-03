@@ -6,6 +6,7 @@
   "dependencies": {
     "buffer-shims": "^1.0.0",
     "core-util-is": "~1.0.0",
+    "isarray": "~1.0.0",
     "inherits": "~2.0.1",
     "process-nextick-args": "~1.0.6",
     "string_decoder": "~0.10.x",
@@ -20,6 +21,13 @@
     "tape": "~4.5.1",
     "zuul": "~3.10.0"
   },
+  "bundledDependencies": [
+    "buffer-shims",
+    "core-util-is",
+    "isarray",
+    "process-nextick-args",
+    "util-deprecate"
+  ],
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul --browser-retries 2 -- test/browser.js",
