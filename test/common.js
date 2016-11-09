@@ -60,10 +60,10 @@ exports.isOSX = process.platform === 'darwin';
 exports.enoughTestMem = os.totalmem() > 0x40000000; /* 1 Gb */
 
 var cpus = os.cpus();
-exports.enoughTestCpu = cpus.length > 1 || cpus[0].speed > 999;
+//exports.enoughTestCpu = cpus.length > 1 || cpus[0].speed > 999;
 
 exports.rootDir = exports.isWindows ? 'c:\\' : '/';
-exports.buildType = process.config.target_defaults.default_configuration;
+//exports.buildType = process.config.target_defaults.default_configuration;
 
 function rimrafSync(p) {
   try {
@@ -536,6 +536,14 @@ exports.expectWarning = function (name, expected) {
     expected.splice(expected.indexOf(warning.message), 1);
   }, expected.length));
 };
+
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasIntl', {
+    get: function () {
+      return process.binding('config').hasIntl;
+    }
+  });
+} /*</replacement>*/
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

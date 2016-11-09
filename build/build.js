@@ -12,12 +12,11 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
     , usageVersionRegex = RegExp('^' + nodeVersionRegexString + '$')
     , readmeVersionRegex =
-        RegExp('(Node-core v)' + nodeVersionRegexString, 'g')
+        RegExp('((?:Node-core )|(?:https\:\/\/nodejs\.org\/dist\/)v)' + nodeVersionRegexString, 'g')
 
     , readmePath  = path.join(__dirname, '..', 'README.md')
     , files       = require('./files')
     , testReplace = require('./test-replacements')
-    , docReplace  = require('./doc-replacements')
 
     , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${nodeVersion}/`
     , libsrcurl   = srcurlpfx + 'lib/'
@@ -25,8 +24,6 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , testlisturl = `https://github.com/nodejs/node/tree/v${nodeVersion}/test/parallel`
     , libourroot  = path.join(__dirname, '../lib/')
     , testourroot = path.join(__dirname, '../test/parallel/')
-    , docurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${nodeVersion}/doc/api/`
-    , docourroot  = path.join(__dirname, '../doc')
 
 
 if (!usageVersionRegex.test(nodeVersion)) {
@@ -68,7 +65,14 @@ function processFile (inputLoc, out, replacements) {
     })
   }))
 }
-
+function deleteOldTests(){
+  const files = fs.readdirSync(path.join(__dirname, '..', 'test', 'parallel'));
+  for (let file of files) {
+    let name = path.join(__dirname, '..', 'test', 'parallel', file);
+    console.log('removing', name);
+    fs.unlinkSync(name);
+  }
+}
 function processLibFile (file) {
   var replacements = files[file]
     , url          = libsrcurl + file
@@ -94,6 +98,10 @@ function processTestFile (file) {
 
 Object.keys(files).forEach(processLibFile)
 
+// delete the current contents of test/parallel so if node removes any tests
+// they are removed here
+deleteOldTests();
+
 //--------------------------------------------------------------------
 // Discover, grab and process all test-stream* files on nodejs/node
 
@@ -109,8 +117,6 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
       processTestFile(file)
   })
 }))
-
-processFile(docurlpfx + 'stream.md', path.join(docourroot, 'stream.md'), docReplace)
 
 
 //--------------------------------------------------------------------

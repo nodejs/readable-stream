@@ -27,9 +27,13 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
       // The browser build ends up with a circular dependency, so the require is
       // done lazily, but cached.
+    , addDuplexDec = [
+          headRegexp
+        , '$1\n\n/*<replacement>*/\nvar Duplex;\n/*</replacement>*/\n'
+    ]
     , addDuplexRequire = [
           /^(function (?:Writable|Readable)(?:State)?.*{)/gm
-        , 'var Duplex;\n$1\n  Duplex = Duplex || require(\'./_stream_duplex\');\n'
+        , '\n$1\n  Duplex = Duplex || require(\'./_stream_duplex\');\n'
       ]
 
     , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
@@ -199,6 +203,7 @@ module.exports['_stream_passthrough.js'] = [
 
 module.exports['_stream_readable.js'] = [
     addDuplexRequire
+  , addDuplexDec
   , requireReplacement
   , instanceofReplacement
   , altForEachImplReplacement
@@ -232,6 +237,7 @@ module.exports['_stream_transform.js'] = [
 
 module.exports['_stream_writable.js'] = [
     addDuplexRequire
+  , addDuplexDec
   , requireReplacement
   , instanceofReplacement
   , utilReplacement

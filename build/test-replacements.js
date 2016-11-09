@@ -174,6 +174,14 @@ module.exports['common.js'] = [
 , [
   /process\.binding\('timer_wrap'\)\.Timer;/,
   '{now: function (){}}'
+],
+[
+  /exports\.enoughTestCpu/,
+  '//exports.enoughTestCpu'
+],
+[
+  /exports\.buildType/,
+  '//exports.buildType'
 ]
 ]
 
@@ -282,5 +290,11 @@ module.exports['test-stream-writev.js'] = [
   [
     /'latin1'/g,
     `'binary'`
+  ]
+]
+module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
+  [
+    /case 3:\n(\s+)setImmediate\(r\.read\.bind\(r, 0\)\);/,
+    'case 3:\n$1setTimeout(r.read.bind(r, 0), 50);'
   ]
 ]
