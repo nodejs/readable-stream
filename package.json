@@ -21,13 +21,6 @@
     "tape": "~4.5.1",
     "zuul": "~3.10.0"
   },
-  "bundledDependencies": [
-    "buffer-shims",
-    "core-util-is",
-    "isarray",
-    "process-nextick-args",
-    "util-deprecate"
-  ],
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js",
     "browser": "npm run write-zuul && zuul --browser-retries 2 -- test/browser.js",
