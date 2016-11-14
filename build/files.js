@@ -179,7 +179,10 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /require\('internal\/streams\/BufferList'\)/,
     'require(\'./internal/streams/BufferList\')'
   ]
-
+  , fixInstanceCheck = [
+    /if \(typeof Symbol === 'function' && Symbol\.hasInstance\) \{/,
+    `if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {`
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -257,6 +260,7 @@ module.exports['_stream_writable.js'] = [
   , fixSyncWrite
   , bufferShimFix
   , bufferStaticMethods
+  , fixInstanceCheck
 ]
 module.exports['internal/streams/BufferList.js'] = [
     bufferShimFix
