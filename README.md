@@ -27,8 +27,8 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
 
 # Streams Working Group
 
-`readable-stream` is maintained by the Streams Working Group, who
-oversee the development and maintenance of the Streams API within
+`readable-stream` is maintained by the Streams Working Group, which
+oversees the development and maintenance of the Streams API within
 Node.js. The responsibilities of the Streams Working Group include:
 
 * Addressing stream issues on the Node.js issue tracker.
@@ -39,9 +39,9 @@ Node.js. The responsibilities of the Streams Working Group include:
 * Assisting in the implementation of stream providers within Node.js.
 * Recommending versions of `readable-stream` to be included in Node.js.
 * Messaging about the future of streams to give the community advance
-  notice of
-  changes.
+  notice of changes.
 
+<a name="members"></a>
 ## Team Members
 
 * **Chris Dickinson** ([@chrisdickinson](https://github.com/chrisdickinson)) &lt;christopher.s.dickinson@gmail.com&gt;

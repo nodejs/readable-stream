@@ -25,7 +25,7 @@ WG on an ongoing basis.
 Individuals making significant and valuable contributions are made
 Collaborators and given commit-access to the project. These
 individuals are identified by the WG and their addition as
-Collaborators is discussed during the weekly WG meeting.
+Collaborators is discussed during the WG meeting.
 
 _Note:_ If you make a significant contribution and are not considered
 for commit-access log an issue or contact a WG member directly and it
@@ -51,7 +51,7 @@ request or issue. The WG should serve as the final arbiter where
 required.
 
 For the current list of Collaborators, see the project
-[README.md](./README.md#current-project-team-members).
+[README.md](./README.md#members).
 
 ### WG Membership
 
@@ -88,7 +88,7 @@ members affiliated with the over-represented employer(s).
 
 ### WG Meetings
 
-The WG meets weekly on a Google Hangout On Air. A designated moderator
+The WG meets occasionally on a Google Hangout On Air. A designated moderator
 approved by the WG runs the meeting. Each meeting should be
 published to YouTube.
 
@@ -132,5 +132,5 @@ either a closing vote or a vote to table the issue to the next
 meeting. The call for a vote must be seconded by a majority of the WG
 or else the discussion will continue. Simple majority wins.
 
-Note that changes to WG membership require unanimous consensus.  See
+Note that changes to WG membership require a majority consensus.  See
 "WG Membership" above.
