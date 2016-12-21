@@ -100,7 +100,7 @@ function end() {
   source.emit('end');
   assert(!reading);
   writer.end(stream.read());
-  setTimeout(function () {
+  setImmediate(function () {
     assert(ended);
   });
 }
