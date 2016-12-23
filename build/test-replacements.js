@@ -176,8 +176,8 @@ module.exports['common.js'] = [
   '{now: function (){}}'
 ],
 [
-  /exports\.enoughTestCpu/,
-  '//exports.enoughTestCpu'
+  /(exports\.enoughTestCpu[^;]+;)/,
+  '/*$1*/'
 ],
 [
   /exports\.buildType/,
@@ -296,5 +296,11 @@ module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
   [
     /case 3:\n(\s+)setImmediate\(r\.read\.bind\(r, 0\)\);/,
     'case 3:\n$1setTimeout(r.read.bind(r, 0), 50);'
+  ]
+]
+module.exports['test-stream-buffer-list.js'] = [
+  [
+    /require\('internal\/streams\/BufferList'\);/,
+    'require(\'../../lib/internal/streams/BufferList\');'
   ]
 ]

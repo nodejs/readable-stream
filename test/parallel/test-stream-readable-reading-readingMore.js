@@ -1,0 +1,66 @@
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
+var common = require('../common');
+var assert = require('assert/');
+var Readable = require('../../').Readable;
+
+var readable = new Readable({
+  read: function (size) {}
+});
+
+var state = readable._readableState;
+
+// Starting off with false initially.
+assert.strictEqual(state.reading, false);
+assert.strictEqual(state.readingMore, false);
+
+readable.on('data', common.mustCall(function (data) {
+  // while in a flowing state, should try to read more.
+  if (state.flowing) assert.strictEqual(state.readingMore, true);
+
+  // reading as long as we've not ended
+  assert.strictEqual(state.reading, !state.ended);
+}, 2));
+
+function onStreamEnd() {
+  // End of stream; state.reading is false
+  // And so should be readingMore.
+  assert.strictEqual(state.readingMore, false);
+  assert.strictEqual(state.reading, false);
+}
+
+readable.on('readable', common.mustCall(function () {
+  // 'readable' always gets called before 'end'
+  // since 'end' hasn't been emitted, more data could be incoming
+  assert.strictEqual(state.readingMore, true);
+
+  // if the stream has ended, we shouldn't be reading
+  assert.strictEqual(state.ended, !state.reading);
+
+  if (readable.read() === null) // reached end of stream
+    process.nextTick(common.mustCall(onStreamEnd, 1));
+}, 2));
+
+readable.on('end', common.mustCall(onStreamEnd));
+
+readable.push('pushed');
+
+// stop emitting 'data' events
+readable.pause();
+
+// read() should only be called while operating in paused mode
+readable.read(6);
+
+// reading
+assert.strictEqual(state.reading, true);
+assert.strictEqual(state.readingMore, true);
+
+// resume emitting 'data' events
+readable.resume();
+
+// add chunk to front
+readable.unshift('unshifted');
+
+// end
+readable.push(null);
