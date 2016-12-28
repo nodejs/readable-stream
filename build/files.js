@@ -183,6 +183,23 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /if \(typeof Symbol === 'function' && Symbol\.hasInstance\) \{/,
     `if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {`
   ]
+  , removeOnWriteBind = [
+    /onwrite\.bind\([^)]+?\)/,
+    `function(er) { onwrite(stream, er); }`
+  ]
+  , removeCorkedFinishBind = [
+    /onCorkedFinish\.bind\([^)]+?\)/,
+    function (match) {
+      const code = this
+      var src = /^function onCorkedFinish[^{]*?\{([\s\S]+?\r?\n)\}/m.exec(code)
+      src = src[1].trim().replace(/corkReq/g, 'this').replace(/(\r?\n)/mg, '  $1')
+      return `(err) => {\n${src}\n}`
+    }
+  ]
+  , removeOnCorkedFinish = [
+    /^function onCorkedFinish[\s\S]+?\r?\n\}/m,
+    ''
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -261,6 +278,9 @@ module.exports['_stream_writable.js'] = [
   , bufferShimFix
   , bufferStaticMethods
   , fixInstanceCheck
+  , removeOnWriteBind
+  , removeCorkedFinishBind
+  , removeOnCorkedFinish
 ]
 module.exports['internal/streams/BufferList.js'] = [
     bufferShimFix
