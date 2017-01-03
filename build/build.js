@@ -49,6 +49,10 @@ function processFile (inputLoc, out, replacements) {
       var arg2 = replacement[1]
       if (typeof arg2 === 'function')
         arg2 = arg2.bind(data)
+      if (arg2 === undefined) {
+        console.error('missing second arg for file', inputLoc, replacement)
+        throw new Error('missing second arg in replacement')
+      }
       data = data.replace(regexp, arg2)
     })
     if (inputLoc.slice(-3) === '.js') {
@@ -114,7 +118,6 @@ pump(
     if (err) {
       throw err
     }
-
 
     //--------------------------------------------------------------------
     // Grab & process files in ../lib/

@@ -139,8 +139,8 @@ const headRegexp = /(^module.exports = \w+;?)/m
           /^const internalUtil = require\('internal\/util'\);/m
         ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
           + '/*</replacement>*/\n'
-      ],
-      isNode10 = [
+      ]
+    , isNode10 = [
         headRegexp
       , `$1
 
@@ -156,7 +156,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         asyncWrite(afterWrite, stream, state, finished, cb);
       /*</replacement>*/
     }
-
       `
     ]
   , safeBufferFix = [
@@ -174,14 +173,13 @@ const headRegexp = /(^module.exports = \w+;?)/m
     `if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {`
   ]
   , removeOnWriteBind = [
-    /onwrite\.bind\([^)]+?\)/,
-    `function(er) { onwrite(stream, er); }`
+      /onwrite\.bind\([^)]+?\)/
+    , `function(er) { onwrite(stream, er); }`
   ]
   , addUintStuff = [
-    /const Buffer = require\('buffer'\)\.Buffer;/,
-    `/*<replacement>*/
+      /const Buffer = require\('buffer'\)\.Buffer;/
+    , `/*<replacement>*/
   const Buffer = require('safe-buffer').Buffer
-
 function _uint8ArrayToBuffer(chunk) {
    return Buffer.from(chunk);
 }
@@ -189,20 +187,51 @@ function _isUint8Array(obj) {
   return Object.prototype.toString.call(obj) === '[object Uint8Array]' || Buffer.isBuffer(obj);
 }
 /*</replacement>*/
+  `
+  ]
+  , addConstructors = [
+      headRegexp
+    , `$1
+
+/* <replacement> */
+function WriteReq(chunk, encoding, cb) {
+  this.chunk = chunk;
+  this.encoding = encoding;
+  this.callback = cb;
+  this.next = null;
+}
+
+// It seems a linked list but it is not
+// there will be only 2 of these for each stream
+function CorkedRequest(state) {
+  this.next = null;
+  this.entry = null;
+  this.finish = onCorkedFinish.bind(undefined, this, state);
+}
+/* </replacement> */
 `
   ]
+  , useWriteReq = [
+      /state\.lastBufferedRequest = \{.+?\}/g
+    , `state.lastBufferedRequest = new WriteReq(chunk, encoding, cb)`
+  ]
+  , useCorkedRequest = [
+      /var corkReq = [\s\S]+?(.+?)\.corkedRequestsFree = corkReq/g
+    , `$1.corkedRequestsFree = new CorkedRequest($1)`
+  ]
   , fixUintStuff = [
-    /Stream\.(_isUint8Array|_uint8ArrayToBuffer)\(/g,
-    `$1(`
+      /Stream\.(_isUint8Array|_uint8ArrayToBuffer)\(/g
+    , `$1(`
   ]
   , fixBufferCheck = [
-    /Object\.getPrototypeOf\((chunk)\) !== Buffer\.prototype/g,
-    '!Buffer.isBuffer($1)'
+      /Object\.getPrototypeOf\((chunk)\) !== Buffer\.prototype/g
+    , '!Buffer.isBuffer($1)'
   ]
   , fixCopyBuffer = [
-    /Buffer\.prototype\.copy\.call\(src, target, offset\);/,
-    'src.copy(target, offset);'
+      /Buffer\.prototype\.copy\.call\(src, target, offset\);/
+    , 'src.copy(target, offset);'
   ]
+
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
@@ -283,6 +312,9 @@ module.exports['_stream_writable.js'] = [
   , fixUintStuff
   , addUintStuff
   , fixBufferCheck
+  , useWriteReq
+  , useCorkedRequest
+  , addConstructors
 ]
 module.exports['internal/streams/BufferList.js'] = [
     safeBufferFix
