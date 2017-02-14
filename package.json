@@ -39,7 +39,8 @@
     "pipe"
   ],
   "browser": {
-    "util": false
+    "util": false,
+    "stream": false
   },
   "nyc": {
     "include": [
