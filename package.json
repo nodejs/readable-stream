@@ -43,7 +43,7 @@
   },
   "react-native": {
     "stream": false 
-  }
+  },
   "nyc": {
     "include": [
       "lib/**.js"
