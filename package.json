@@ -39,9 +39,11 @@
     "pipe"
   ],
   "browser": {
-    "util": false,
-    "stream": false
+    "util": false
   },
+  "react-native": {
+    "stream": false 
+  }
   "nyc": {
     "include": [
       "lib/**.js"
