@@ -41,6 +41,9 @@
   "browser": {
     "util": false
   },
+  "react-native": {
+    "stream": false 
+  },
   "nyc": {
     "include": [
       "lib/**.js"
