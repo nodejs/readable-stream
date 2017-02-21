@@ -1,6 +1,6 @@
 {
   "name": "readable-stream",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Streams3, a user-land copy of the stream library from Node.js",
   "main": "readable.js",
   "dependencies": {
@@ -42,7 +42,7 @@
     "util": false
   },
   "react-native": {
-    "stream": false 
+    "stream": false
   },
   "nyc": {
     "include": [
