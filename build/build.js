@@ -42,7 +42,11 @@ function processFile (inputLoc, out, replacements) {
 
     data = data.toString()
     replacements.forEach(function (replacement) {
-      data = data.replace.apply(data, replacement)
+      const regexp = replacement[0]
+      var arg2 = replacement[1]
+      if (typeof arg2 === 'function')
+        arg2 = arg2.bind(data)
+      data = data.replace(regexp, arg2)
     })
     if (inputLoc.slice(-3) === '.js') {
       const transformed = babel.transform(data, {
