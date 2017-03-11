@@ -75,13 +75,13 @@ function test2() {
   var r = new Readable({ encoding: 'base64' });
   var reads = 5;
   r._read = function (n) {
-    if (! reads--) return r.push(null); // EOF
+    if (!reads--) return r.push(null); // EOF
     else return r.push(bufferShim.from('x'));
   };
 
   var results = [];
   function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = r.read())) {
       results.push(chunk + '');
     }

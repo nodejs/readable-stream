@@ -21,7 +21,7 @@ r._read = function (n) {
 var readAll = false;
 var seen = [];
 r.on('readable', function () {
-  var chunk;
+  var chunk = void 0;
   while (chunk = r.read()) {
     seen.push(chunk.toString());
     // simulate only reading a certain amount of the data,

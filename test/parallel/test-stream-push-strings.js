@@ -35,7 +35,7 @@ MyStream.prototype._read = function (n) {
 var ms = new MyStream();
 var results = [];
 ms.on('readable', function () {
-  var chunk;
+  var chunk = void 0;
   while (null !== (chunk = ms.read())) {
     results.push(chunk + '');
   }
@@ -43,7 +43,7 @@ ms.on('readable', function () {
 
 var expect = ['first chunksecond to last chunk', 'last chunk'];
 process.on('exit', function () {
-  assert.equal(ms._chunks, -1);
+  assert.strictEqual(ms._chunks, -1);
   assert.deepStrictEqual(results, expect);
   console.log('ok');
 });

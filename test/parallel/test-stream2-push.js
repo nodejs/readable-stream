@@ -2,16 +2,15 @@
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
 require('../common');
-var stream = require('../../');
-var Readable = stream.Readable;
-var Writable = stream.Writable;
+var Readable = require('../../').Readable;
+var Writable = require('../../').Writable;
 var assert = require('assert/');
 
 var EE = require('events').EventEmitter;
 
 // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
-stream = new Readable({
+var stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
 });

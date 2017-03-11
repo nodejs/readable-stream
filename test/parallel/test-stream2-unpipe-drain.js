@@ -2,16 +2,10 @@
   /*<replacement>*/
   var bufferShim = require('buffer-shims');
   /*</replacement>*/
-  var common = require('../common');
+  require('../common');
   var assert = require('assert/');
+
   var stream = require('../../');
-
-  if (!common.hasCrypto) {
-    common.skip('missing crypto');
-    return;
-  }
-  var crypto = require('crypto');
-
   var util = require('util');
 
   function TestWriter() {
@@ -34,7 +28,7 @@
 
   TestReader.prototype._read = function (size) {
     this.reads += 1;
-    this.push(crypto.randomBytes(size));
+    this.push(bufferShim.alloc(size));
   };
 
   var src1 = new TestReader();
@@ -57,7 +51,7 @@
   });
 
   process.on('exit', function () {
-    assert.equal(src1.reads, 2);
-    assert.equal(src2.reads, 2);
+    assert.strictEqual(src1.reads, 2);
+    assert.strictEqual(src2.reads, 2);
   });
 })();

@@ -40,8 +40,9 @@ util.inherits = require('inherits');
 /*</replacement>*/
 
 var Timer = { now: function () {} };
+var execSync = require('child_process').execSync;
 
-var testRoot = process.env.NODE_TEST_DIR ? path.resolve(process.env.NODE_TEST_DIR) : __dirname;
+var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : __dirname;
 
 exports.fixturesDir = path.join(__dirname, 'fixtures');
 exports.tmpDirName = 'tmp';
@@ -66,8 +67,9 @@ exports.rootDir = exports.isWindows ? 'c:\\' : '/';
 //exports.buildType = process.config.target_defaults.default_configuration;
 
 function rimrafSync(p) {
+  var st = void 0;
   try {
-    var st = fs.lstatSync(p);
+    st = fs.lstatSync(p);
   } catch (e) {
     if (e.code === 'ENOENT') return;
   }
@@ -183,8 +185,8 @@ if (exports.isLinux) {
 
       if (exports.isWindows) opensslCli += '.exe';
 
-      var openssl_cmd = child_process.spawnSync(opensslCli, ['version']);
-      if (openssl_cmd.status !== 0 || openssl_cmd.error !== undefined) {
+      var opensslCmd = child_process.spawnSync(opensslCli, ['version']);
+      if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
         // openssl command cannot be executed
         opensslCli = false;
       }
@@ -224,6 +226,27 @@ exports.hasIPv6 = objectKeys(ifaces).some(function (name) {
     })
   );
 });
+
+/*
+ * Check that when running a test with
+ * `$node --abort-on-uncaught-exception $file child`
+ * the process aborts.
+ */
+exports.childShouldThrowAndAbort = function () {
+  var testCmd = '';
+  if (!exports.isWindows) {
+    // Do not create core files, as it can take a lot of disk space on
+    // continuous testing and developers' machines
+    testCmd += 'ulimit -c 0 && ';
+  }
+  testCmd += process.argv[0] + ' --abort-on-uncaught-exception ';
+  testCmd += process.argv[1] + ' child';
+  var child = child_process.exec(testCmd);
+  child.on('exit', function onExit(exitCode, signal) {
+    var errMsg = 'Test should have aborted ' + ('but instead exited with exit code ' + exitCode) + (' and signal ' + signal);
+    assert(exports.nodeProcessAborted(exitCode, signal), errMsg);
+  });
+};
 
 exports.ddCommand = function (filename, kilobytes) {
   if (exports.isWindows) {
@@ -276,6 +299,8 @@ exports.spawnSyncPwd = function (options) {
 
 exports.platformTimeout = function (ms) {
   if (process.config.target_defaults.default_configuration === 'Debug') ms = 2 * ms;
+
+  if (global.__coverage__) ms = 4 * ms;
 
   if (exports.isAix) return 2 * ms; // default localhost speed is slower on AIX
 
@@ -374,7 +399,13 @@ function leakedGlobals() {
 
   for (var val in global) {
     if (!knownGlobals.includes(global[val])) leaked.push(val);
-  }return leaked;
+  }if (global.__coverage__) {
+    return leaked.filter(function (varname) {
+      return !/^(cov_|__cov)/.test(varname);
+    });
+  } else {
+    return leaked;
+  }
 }
 exports.leakedGlobals = leakedGlobals;
 
@@ -385,8 +416,7 @@ process.on('exit', function () {
   if (!exports.globalCheck) return;
   var leaked = leakedGlobals();
   if (leaked.length > 0) {
-    console.error('Unknown globals: %s', leaked);
-    fail('Unknown global found');
+    fail('Unexpected global(s) found: ' + leaked.join(', '));
   }
 });
 
@@ -408,7 +438,7 @@ function runCallChecks(exitCode) {
 }
 
 exports.mustCall = function (fn, expected) {
-  if (typeof expected !== 'number') expected = 1;
+  if (expected === undefined) expected = 1;else if (typeof expected !== 'number') throw new TypeError('Invalid expected value: ' + expected);
 
   var context = {
     expected: expected,
@@ -445,10 +475,43 @@ exports.fileExists = function (pathname) {
   }
 };
 
+exports.canCreateSymLink = function () {
+  // On Windows, creating symlinks requires admin privileges.
+  // We'll only try to run symlink test if we have enough privileges.
+  // On other platforms, creating symlinks shouldn't need admin privileges
+  if (exports.isWindows) {
+    // whoami.exe needs to be the one from System32
+    // If unix tools are in the path, they can shadow the one we want,
+    // so use the full path while executing whoami
+    var whoamiPath = path.join(process.env['SystemRoot'], 'System32', 'whoami.exe');
+
+    var err = false;
+    var output = '';
+
+    try {
+      output = execSync(whoamiPath + ' /priv', { timout: 1000 });
+    } catch (e) {
+      err = true;
+    } finally {
+      if (err || !output.includes('SeCreateSymbolicLinkPrivilege')) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
 function fail(msg) {
   assert.fail(null, null, msg);
 }
 exports.fail = fail;
+
+exports.mustNotCall = function (msg) {
+  return function mustNotCall() {
+    fail(msg || 'function should not have been called');
+  };
+};
 
 exports.skip = function (msg) {
   console.log('1..0 # Skipped: ' + msg);
@@ -539,6 +602,52 @@ exports.expectWarning = function (name, expected) {
     }
   });
 } /*</replacement>*/
+
+// https://github.com/w3c/testharness.js/blob/master/testharness.js
+exports.WPT = {
+  test: function (fn, desc) {
+    try {
+      fn();
+    } catch (err) {
+      if (err instanceof Error) err.message = 'In ' + desc + ':\n  ' + err.message;
+      throw err;
+    }
+  },
+  assert_equals: assert.strictEqual,
+  assert_true: function (value, message) {
+    return assert.strictEqual(value, true, message);
+  },
+  assert_false: function (value, message) {
+    return assert.strictEqual(value, false, message);
+  },
+  assert_throws: function (code, func, desc) {
+    assert.throws(func, function (err) {
+      return typeof err === 'object' && 'name' in err && err.name === code.name;
+    }, desc);
+  },
+  assert_array_equals: assert.deepStrictEqual,
+  assert_unreached: function (desc) {
+    assert.fail(undefined, undefined, 'Reached unreachable code: ' + desc);
+  }
+};
+
+// Useful for testing expected internal/error objects
+exports.expectsError = function expectsError(_ref) {
+  var code = _ref.code,
+      type = _ref.type,
+      message = _ref.message;
+
+  return function (error) {
+    assert.strictEqual(error.code, code);
+    if (type !== undefined) assert(error instanceof type, error + ' is not the expected type ' + type);
+    if (message instanceof RegExp) {
+      assert(message.test(error.message), error.message + ' does not match ' + message);
+    } else if (typeof message === 'string') {
+      assert.strictEqual(error.message, message);
+    }
+    return true;
+  };
+};
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

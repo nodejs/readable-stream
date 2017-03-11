@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
-const hyperquest  = require('hyperzip')(require('hyperdirect'))
+const hyperquest  = require('hyperquest')
     , bl          = require('bl')
     , fs          = require('fs')
     , path        = require('path')
-    , cheerio     = require('cheerio')
+    , tar         = require('tar-fs')
+    , gunzip      = require('gunzip-maybe')
     , babel       = require('babel-core')
+    , glob        = require('glob')
+    , pump        = require('pump')
+    , rimraf      = require('rimraf')
     , encoding    = 'utf8'
-    , urlRegex = /^https?:\/\//
+    , urlRegex    = /^https?:\/\//
     , nodeVersion = process.argv[2]
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
     , usageVersionRegex = RegExp('^' + nodeVersionRegexString + '$')
@@ -18,10 +22,10 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , files       = require('./files')
     , testReplace = require('./test-replacements')
 
-    , srcurlpfx   = `https://raw.githubusercontent.com/nodejs/node/v${nodeVersion}/`
-    , libsrcurl   = srcurlpfx + 'lib/'
-    , testsrcurl  = srcurlpfx + 'test/parallel/'
-    , testlisturl = `https://github.com/nodejs/node/tree/v${nodeVersion}/test/parallel`
+    , downloadurl = `https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}.tar.gz`
+    , src         = path.join(__dirname, `node-v${nodeVersion}`)
+    , libsrcurl   = path.join(src, 'lib/')
+    , testsrcurl  = path.join(src, 'test/parallel/')
     , libourroot  = path.join(__dirname, '../lib/')
     , testourroot = path.join(__dirname, '../test/parallel/')
 
@@ -33,13 +37,12 @@ if (!usageVersionRegex.test(nodeVersion)) {
 
 // `inputLoc`: URL or local path.
 function processFile (inputLoc, out, replacements) {
-  var file = urlRegex.test(inputLoc) ?
-    hyperquest(inputLoc) :
-    fs.createReadStream(inputLoc, encoding)
+  var file = fs.createReadStream(inputLoc, encoding)
 
   file.pipe(bl(function (err, data) {
     if (err) throw err
 
+    console.log('Processing', inputLoc)
     data = data.toString()
     replacements.forEach(function (replacement) {
       const regexp = replacement[0]
@@ -73,7 +76,7 @@ function deleteOldTests(){
   const files = fs.readdirSync(path.join(__dirname, '..', 'test', 'parallel'));
   for (let file of files) {
     let name = path.join(__dirname, '..', 'test', 'parallel', file);
-    console.log('removing', name);
+    console.log('Removing', name);
     fs.unlinkSync(name);
   }
 }
@@ -98,43 +101,73 @@ function processTestFile (file) {
 }
 
 //--------------------------------------------------------------------
-// Grab & process files in ../lib/
+// Download the release from nodejs.org
+console.log(`Downloading ${downloadurl}`)
+pump(
+  hyperquest(downloadurl),
+  gunzip(),
+  tar.extract(__dirname),
+  function (err) {
+    if (err) {
+      throw err
+    }
 
-Object.keys(files).forEach(processLibFile)
+
+    //--------------------------------------------------------------------
+    // Grab & process files in ../lib/
+
+    Object.keys(files).forEach(processLibFile)
+
+
+    //--------------------------------------------------------------------
+    // Discover, grab and process all test-stream* files on the given release
+
+    glob(path.join(testsrcurl, 'test-stream*.js'), function (err, list) {
+      if (err) {
+        throw err
+      }
+
+      list.forEach(function (file) {
+        file = path.basename(file)
+        if (!/-wrap(?:-encoding)?\.js$/.test(file) &&
+            file !== 'test-stream2-httpclient-response-end.js' &&
+            file !== 'test-stream-base-no-abort.js' &&
+            file !== 'test-stream-preprocess.js' &&
+            file !== 'test-stream-inheritance.js') {
+          processTestFile(file)
+        }
+      })
+    })
+
+
+    //--------------------------------------------------------------------
+    // Grab the nodejs/node test/common.js
+
+    processFile(
+        testsrcurl.replace(/parallel\/$/, 'common.js')
+      , path.join(testourroot, '../common.js')
+      , testReplace['common.js']
+    )
+
+    //--------------------------------------------------------------------
+    // Update Node version in README
+
+    processFile(readmePath, readmePath, [
+      [readmeVersionRegex, "$1" + nodeVersion]
+    ])
+  }
+)
 
 // delete the current contents of test/parallel so if node removes any tests
 // they are removed here
 deleteOldTests();
 
-//--------------------------------------------------------------------
-// Discover, grab and process all test-stream* files on nodejs/node
+process.once('beforeExit', function () {
+  rimraf(src, function (err) {
+    if (err) {
+      throw err
+    }
 
-hyperquest(testlisturl).pipe(bl(function (err, data) {
-  if (err)
-    throw err
-
-  var $ = cheerio.load(data.toString())
-
-  $('table.files .js-navigation-open').each(function () {
-    var file = $(this).text()
-    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file) && file !== 'test-stream2-httpclient-response-end.js' && file !== 'test-stream-base-no-abort.js' && file !== 'test-stream-preprocess.js' && file !== 'test-stream-inheritance.js')
-      processTestFile(file)
+    console.log('Removed', src)
   })
-}))
-
-
-//--------------------------------------------------------------------
-// Grab the nodejs/node test/common.js
-
-processFile(
-    testsrcurl.replace(/parallel\/$/, 'common.js')
-  , path.join(testourroot, '../common.js')
-  , testReplace['common.js']
-)
-
-//--------------------------------------------------------------------
-// Update Node version in README
-
-processFile(readmePath, readmePath, [
-  [readmeVersionRegex, "$1" + nodeVersion]
-])
+})

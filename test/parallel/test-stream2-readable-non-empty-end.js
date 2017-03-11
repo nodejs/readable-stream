@@ -18,7 +18,7 @@ test._read = function (size) {
   var chunk = chunks[n++];
   setTimeout(function () {
     test.push(chunk === undefined ? null : chunk);
-  });
+  }, 1);
 };
 
 test.on('end', thrower);
@@ -33,7 +33,7 @@ test.on('readable', function () {
   if (res) {
     bytesread += res.length;
     console.error('br=%d len=%d', bytesread, len);
-    setTimeout(next);
+    setTimeout(next, 1);
   }
   test.read(0);
 });
@@ -47,7 +47,7 @@ function next() {
   // one to get the last byte
   var r = test.read();
   assert(r);
-  assert.equal(r.length, 1);
+  assert.strictEqual(r.length, 1);
   r = test.read();
-  assert.equal(r, null);
+  assert.strictEqual(r, null);
 }
