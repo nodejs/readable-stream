@@ -200,25 +200,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /^function onCorkedFinish[\s\S]+?\r?\n\}/m,
     ''
   ]
-  , addConstructors = [
-    headRegexp,
-    `$1\n\n
-    // It seems a linked list but it is not
-    // there will be only 2 of these for each stream
-    function CorkedRequest(state) {
-      this.next = null;
-      this.entry = null;
-      this.finish = onCorkedFinish.bind(undefined, this, state);
-    }\n\n`
-  ]
-  , useWriteReq = [
-    /state\.lastBufferedRequest = \{.+?\}/g,
-    `state.lastBufferedRequest = new WriteReq(chunk, encoding, cb)`
-  ]
-  , useCorkedRequest = [
-    /var corkReq = [\s\S]+?(.+?)\.corkedRequestsFree = corkReq/g,
-    `$1.corkedRequestsFree = new CorkedRequest($1)`
-  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -300,9 +281,6 @@ module.exports['_stream_writable.js'] = [
   , removeOnWriteBind
   , removeCorkedFinishBind
   , removeOnCorkedFinish
-  , addConstructors
-  , useWriteReq
-  , useCorkedRequest
 ]
 module.exports['internal/streams/BufferList.js'] = [
     bufferShimFix
