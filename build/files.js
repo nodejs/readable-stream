@@ -183,6 +183,47 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /if \(typeof Symbol === 'function' && Symbol\.hasInstance\) \{/,
     `if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {`
   ]
+  , removeOnWriteBind = [
+    /onwrite\.bind\([^)]+?\)/,
+    `function(er) { onwrite(stream, er); }`
+  ]
+  , removeCorkedFinishBind = [
+    /onCorkedFinish\.bind\([^)]+?\)/,
+    function (match) {
+      const code = this
+      var src = /^function onCorkedFinish[^{]*?\{([\s\S]+?\r?\n)\}/m.exec(code)
+      src = src[1].trim().replace(/corkReq/g, 'this').replace(/(\r?\n)/mg, '  $1')
+      return `(err) => {\n${src}\n}`
+    }
+  ]
+  , removeOnCorkedFinish = [
+    /^function onCorkedFinish[\s\S]+?\r?\n\}/m,
+    ''
+  ]
+  , addConstructors = [
+    headRegexp,
+    `$1\n\nfunction WriteReq(chunk, encoding, cb) {
+      this.chunk = chunk;
+      this.encoding = encoding;
+      this.callback = cb;
+      this.next = null;
+    }
+    // It seems a linked list but it is not
+    // there will be only 2 of these for each stream
+    function CorkedRequest(state) {
+      this.next = null;
+      this.entry = null;
+      this.finish = onCorkedFinish.bind(undefined, this, state);
+    }\n\n`
+  ]
+  , useWriteReq = [
+    /state\.lastBufferedRequest = \{.+?\}/g,
+    `state.lastBufferedRequest = new WriteReq(chunk, encoding, cb)`
+  ]
+  , useCorkedRequest = [
+    /var corkReq = [\s\S]+?(.+?)\.corkedRequestsFree = corkReq/g,
+    `$1.corkedRequestsFree = new CorkedRequest($1)`
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -261,6 +302,12 @@ module.exports['_stream_writable.js'] = [
   , bufferShimFix
   , bufferStaticMethods
   , fixInstanceCheck
+  , removeOnWriteBind
+  , removeCorkedFinishBind
+  , removeOnCorkedFinish
+  , addConstructors
+  , useWriteReq
+  , useCorkedRequest
 ]
 module.exports['internal/streams/BufferList.js'] = [
     bufferShimFix

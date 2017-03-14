@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('buffer-shims');
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 // This test verifies that:
@@ -43,7 +43,7 @@ r._read = function (n) {
         pos += n;
         r.push(c);
         if (c === null) pushError();
-      });
+      }, 1);
     }
   }
 };
@@ -51,7 +51,7 @@ r._read = function (n) {
 function pushError() {
   assert.throws(function () {
     r.push(bufferShim.allocUnsafe(1));
-  });
+  }, /^Error: stream.push\(\) after EOF$/);
 }
 
 var w = stream.Writable();
@@ -61,39 +61,34 @@ w._write = function (chunk, encoding, cb) {
   cb();
 };
 
-var ended = false;
-r.on('end', function () {
-  assert(!ended, 'end emitted more than once');
+r.on('end', common.mustCall(function () {
   assert.throws(function () {
     r.unshift(bufferShim.allocUnsafe(1));
-  });
-  ended = true;
+  }, /^Error: stream.unshift\(\) after end event$/);
   w.end();
-});
+}));
 
 r.on('readable', function () {
-  var chunk;
+  var chunk = void 0;
   while (null !== (chunk = r.read(10))) {
     w.write(chunk);
     if (chunk.length > 4) r.unshift(bufferShim.from('1234'));
   }
 });
 
-var finished = false;
-w.on('finish', function () {
-  finished = true;
+w.on('finish', common.mustCall(function () {
   // each chunk should start with 1234, and then be asfdasdfasdf...
   // The first got pulled out before the first unshift('1234'), so it's
   // lacking that piece.
-  assert.equal(written[0], 'asdfasdfas');
+  assert.strictEqual(written[0], 'asdfasdfas');
   var asdf = 'd';
   console.error('0: %s', written[0]);
-  for (var i = 1; i < written.length; i++) {
-    console.error('%s: %s', i.toString(32), written[i]);
-    assert.equal(written[i].slice(0, 4), '1234');
-    for (var j = 4; j < written[i].length; j++) {
-      var c = written[i].charAt(j);
-      assert.equal(c, asdf);
+  for (var _i = 1; _i < written.length; _i++) {
+    console.error('%s: %s', _i.toString(32), written[_i]);
+    assert.strictEqual(written[_i].slice(0, 4), '1234');
+    for (var j = 4; j < written[_i].length; j++) {
+      var _c = written[_i].charAt(j);
+      assert.strictEqual(_c, asdf);
       switch (asdf) {
         case 'a':
           asdf = 's';break;
@@ -106,11 +101,9 @@ w.on('finish', function () {
       }
     }
   }
-});
+}));
 
 process.on('exit', function () {
-  assert.equal(written.length, 18);
-  assert(ended, 'stream ended');
-  assert(finished, 'stream finished');
+  assert.strictEqual(written.length, 18);
   console.log('ok');
 });

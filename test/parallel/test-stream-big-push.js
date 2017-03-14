@@ -20,8 +20,8 @@ function _read() {
     }, 1);
     reads++;
   } else if (reads === 1) {
-    var ret = r.push(str);
-    assert.strictEqual(ret, false);
+    var _ret = r.push(str);
+    assert.strictEqual(_ret, false);
     reads++;
   } else {
     r.push(null);

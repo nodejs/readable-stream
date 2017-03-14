@@ -76,7 +76,7 @@ var slowProducer = new Readable({
 
 slowProducer.on('readable', common.mustCall(function () {
   if (slowProducer.read(8) === null) {
-    // The buffer doesn't have enough data, and the stream is not ened,
+    // The buffer doesn't have enough data, and the stream is not need,
     // we need to notify the reader when data arrives.
     assert.strictEqual(slowProducer._readableState.needReadable, true);
   } else {

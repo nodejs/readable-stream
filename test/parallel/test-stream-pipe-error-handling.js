@@ -40,56 +40,52 @@ var Stream = require('stream').Stream;
 }
 
 {
-  (function () {
-    var R = require('../../').Readable;
-    var W = require('../../').Writable;
+  var R = require('../../').Readable;
+  var W = require('../../').Writable;
 
-    var r = new R();
-    var w = new W();
-    var removed = false;
+  var r = new R();
+  var w = new W();
+  var removed = false;
 
-    r._read = common.mustCall(function () {
-      setTimeout(common.mustCall(function () {
-        assert(removed);
-        assert.throws(function () {
-          w.emit('error', new Error('fail'));
-        });
-      }));
-    });
+  r._read = common.mustCall(function () {
+    setTimeout(common.mustCall(function () {
+      assert(removed);
+      assert.throws(function () {
+        w.emit('error', new Error('fail'));
+      }, /^Error: fail$/);
+    }), 1);
+  });
 
-    w.on('error', myOnError);
-    r.pipe(w);
-    w.removeListener('error', myOnError);
-    removed = true;
+  w.on('error', myOnError);
+  r.pipe(w);
+  w.removeListener('error', myOnError);
+  removed = true;
 
-    function myOnError(er) {
-      throw new Error('this should not happen');
-    }
-  })();
+  function myOnError() {
+    throw new Error('this should not happen');
+  }
 }
 
 {
-  (function () {
-    var R = require('../../').Readable;
-    var W = require('../../').Writable;
+  var _R = require('../../').Readable;
+  var _W = require('../../').Writable;
 
-    var r = new R();
-    var w = new W();
-    var removed = false;
+  var _r = new _R();
+  var _w = new _W();
+  var _removed = false;
 
-    r._read = common.mustCall(function () {
-      setTimeout(common.mustCall(function () {
-        assert(removed);
-        w.emit('error', new Error('fail'));
-      }));
-    });
+  _r._read = common.mustCall(function () {
+    setTimeout(common.mustCall(function () {
+      assert(_removed);
+      _w.emit('error', new Error('fail'));
+    }), 1);
+  });
 
-    w.on('error', common.mustCall(function (er) {}));
-    w._write = function () {};
+  _w.on('error', common.mustCall(function () {}));
+  _w._write = function () {};
 
-    r.pipe(w);
-    // Removing some OTHER random listener should not do anything
-    w.removeListener('error', function () {});
-    removed = true;
-  })();
+  _r.pipe(_w);
+  // Removing some OTHER random listener should not do anything
+  _w.removeListener('error', function () {});
+  _removed = true;
 }

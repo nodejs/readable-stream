@@ -28,7 +28,7 @@ TestReader.prototype._read = function (n) {
 
 var reader = new TestReader();
 setImmediate(function () {
-  assert.equal(ondataCalled, 1);
+  assert.strictEqual(ondataCalled, 1);
   console.log('ok');
   reader.push(null);
 });
