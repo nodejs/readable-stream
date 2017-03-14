@@ -202,12 +202,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
   ]
   , addConstructors = [
     headRegexp,
-    `$1\n\nfunction WriteReq(chunk, encoding, cb) {
-      this.chunk = chunk;
-      this.encoding = encoding;
-      this.callback = cb;
-      this.next = null;
-    }
+    `$1\n\n
     // It seems a linked list but it is not
     // there will be only 2 of these for each stream
     function CorkedRequest(state) {
