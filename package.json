@@ -40,7 +40,7 @@
   ],
   "browser": {
     "util": false,
-    "./readable.js": "./readlable-browser.js"
+    "./readable.js": "./readable-browser.js"
   },
   "react-native": {
     "stream": false
