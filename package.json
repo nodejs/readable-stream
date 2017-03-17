@@ -39,7 +39,8 @@
     "pipe"
   ],
   "browser": {
-    "util": false
+    "util": false,
+    "./readable.js": "./readlable-browser.js"
   },
   "react-native": {
     "stream": false
