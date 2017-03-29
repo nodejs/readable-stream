@@ -1,12 +1,7 @@
+var Stream = require("stream")
 var Writable = require("./lib/_stream_writable.js")
 
-if (!process.browser && process.env.READABLE_STREAM === 'disable') {
-  var Stream = (function (){
-    try {
-      return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
-    } catch(_){}
-  }());
-
+if (process.env.READABLE_STREAM === 'disable') {
   module.exports = Stream && Stream.Writable || Writable
 }
 
