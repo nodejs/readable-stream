@@ -9,7 +9,7 @@
     "isarray": "~1.0.0",
     "inherits": "~2.0.1",
     "process-nextick-args": "~1.0.6",
-    "string_decoder": "~0.10.x",
+    "string_decoder": "~1.0.0",
     "util-deprecate": "~1.0.1"
   },
   "devDependencies": {
