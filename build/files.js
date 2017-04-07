@@ -111,7 +111,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , requireStreamReplacement = [
       /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
-      + 'var Stream = require(\'../_internal_stream\')'
+      + 'var Stream = require(\'./internal/streams/stream\')'
       + '\n/*</replacement>*/\n'
     ]
 
