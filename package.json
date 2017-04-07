@@ -45,9 +45,6 @@
     "./duplex.js": "./duplex-browser.js",
     "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
   },
-  "react-native": {
-    "stream": false
-  },
   "nyc": {
     "include": [
       "lib/**.js"
