@@ -304,3 +304,10 @@ module.exports['test-stream-buffer-list.js'] = [
     'require(\'../../lib/internal/streams/BufferList\');'
   ]
 ]
+
+module.exports['test-stream-transform-constructor-set-methods.js'] = [
+  [
+    /Error: _transform\\\(\\\) is n/,
+    'Error: .*[Nn]'
+  ]
+]

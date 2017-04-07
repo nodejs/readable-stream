@@ -30,7 +30,7 @@ t.resume();
 
 assert.throws(function () {
   t2.end(bufferShim.from('blerg'));
-}, /^Error: _transform\(\) is not implemented$/);
+}, /^Error: .*[Nn]ot implemented$/);
 
 process.on('exit', function () {
   assert.strictEqual(t._transform, _transform);
