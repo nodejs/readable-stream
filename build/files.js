@@ -111,11 +111,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , requireStreamReplacement = [
       /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
-      + 'var Stream;\nif (process.browser){\n'
-      + '    Stream = require(\'events\').EventEmitter;\n'
-      + '} else {\n'
-      + '  Stream = require(\'st\' + \'ream\');\n'
-      + '}'
+      + 'var Stream = require(\'../_internal_stream\')'
       + '\n/*</replacement>*/\n'
     ]
 

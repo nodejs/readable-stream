@@ -42,7 +42,8 @@
     "util": false,
     "./readable.js": "./readable-browser.js",
     "./writable.js": "./writable-browser.js",
-    "./duplex.js": "./duplex-browser.js"
+    "./duplex.js": "./duplex-browser.js",
+    "./_internal_stream.js": "./_internal_stream-browser.js"
   },
   "react-native": {
     "stream": false
