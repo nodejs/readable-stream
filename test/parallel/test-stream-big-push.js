@@ -1,7 +1,7 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
+require('../common');
 var assert = require('assert/');
 var stream = require('../../');
 var str = 'asdfasdfasdfasdfasdf';
@@ -12,25 +12,29 @@ var r = new stream.Readable({
 });
 
 var reads = 0;
+var eofed = false;
+var ended = false;
 
-function _read() {
+r._read = function (n) {
   if (reads === 0) {
     setTimeout(function () {
       r.push(str);
-    }, 1);
+    });
     reads++;
   } else if (reads === 1) {
-    var _ret = r.push(str);
-    assert.strictEqual(_ret, false);
+    var ret = r.push(str);
+    assert.strictEqual(ret, false);
     reads++;
   } else {
+    assert(!eofed);
+    eofed = true;
     r.push(null);
   }
-}
+};
 
-r._read = common.mustCall(_read, 3);
-
-r.on('end', common.mustCall(function () {}));
+r.on('end', function () {
+  ended = true;
+});
 
 // push some data in to start.
 // we've never gotten any read event at this point.
@@ -52,4 +56,11 @@ r.once('readable', function () {
 
   chunk = r.read();
   assert.strictEqual(chunk, null);
+});
+
+process.on('exit', function () {
+  assert(eofed);
+  assert(ended);
+  assert.strictEqual(reads, 2);
+  console.log('ok');
 });

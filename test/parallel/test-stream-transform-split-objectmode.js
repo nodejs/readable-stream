@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -17,7 +17,7 @@ parser._transform = function (chunk, enc, callback) {
   callback(null, { val: chunk[0] });
 };
 
-var parsed = void 0;
+var parsed;
 
 parser.on('data', function (obj) {
   parsed = obj;
@@ -40,7 +40,7 @@ serializer._transform = function (obj, _, callback) {
   callback(null, bufferShim.from([obj.val]));
 };
 
-var serialized = void 0;
+var serialized;
 
 serializer.on('data', function (chunk) {
   serialized = chunk;

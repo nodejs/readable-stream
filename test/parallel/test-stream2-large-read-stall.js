@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var assert = require('assert/');
@@ -22,19 +22,16 @@ r._read = push;
 
 r.on('readable', function () {
   ;false && console.error('>> readable');
-  var ret = void 0;
   do {
     ;false && console.error('  > read(%d)', READSIZE);
-    ret = r.read(READSIZE);
+    var ret = r.read(READSIZE);
     ;false && console.error('  < %j (%d remain)', ret && ret.length, rs.length);
   } while (ret && ret.length === READSIZE);
 
   ;false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
 });
 
-r.on('end', common.mustCall(function () {
-  assert.strictEqual(pushes, PUSHCOUNT + 1);
-}));
+r.on('end', common.mustCall(function () {}));
 
 var pushes = 0;
 function push() {
@@ -46,5 +43,9 @@ function push() {
   }
 
   ;false && console.error('   push #%d', pushes);
-  if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
+  if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push);
 }
+
+process.on('exit', function () {
+  assert.equal(pushes, PUSHCOUNT + 1);
+});

@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -35,7 +35,7 @@ MyStream.prototype._read = function (n) {
 var ms = new MyStream();
 var results = [];
 ms.on('readable', function () {
-  var chunk = void 0;
+  var chunk;
   while (null !== (chunk = ms.read())) {
     results.push(chunk + '');
   }
@@ -43,7 +43,7 @@ ms.on('readable', function () {
 
 var expect = ['first chunksecond to last chunk', 'last chunk'];
 process.on('exit', function () {
-  assert.strictEqual(ms._chunks, -1);
+  assert.equal(ms._chunks, -1);
   assert.deepStrictEqual(results, expect);
   console.log('ok');
 });

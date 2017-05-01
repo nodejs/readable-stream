@@ -1,14 +1,8 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var stream = require('../../');
-var assert = require('assert/');
-
-var awaitDrainStates = [1, // after first chunk before callback
-1, // after second chunk before callback
-0 // resolving chunk pushed after first chunk, awaitDrain is decreased
-];
 
 // A writable stream which pushes data onto the stream which pipes into it,
 // but only the first time it's written to. Since it's not paused at this time,
@@ -18,14 +12,8 @@ var writable = new stream.Writable({
   write: common.mustCall(function (chunk, encoding, cb) {
     if (chunk.length === 32 * 1024) {
       // first chunk
-      var beforePush = readable._readableState.awaitDrain;
-      readable.push(new Buffer(34 * 1024)); // above hwm
-      // We should check if awaitDrain counter is increased.
-      var afterPush = readable._readableState.awaitDrain;
-      assert.strictEqual(afterPush - beforePush, 1, 'Counter is not increased for awaitDrain');
+      readable.push(new Buffer(33 * 1024)); // above hwm
     }
-
-    assert.strictEqual(awaitDrainStates.shift(), readable._readableState.awaitDrain, 'State variable awaitDrain is not correct.');
     cb();
   }, 3)
 });

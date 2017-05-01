@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -38,14 +38,14 @@ for (var i = 0; i < 10; i++) {
   src.unpipe(dest);
 }
 
-assert.strictEqual(src.listeners('end').length, 0);
-assert.strictEqual(src.listeners('readable').length, 0);
+assert.equal(src.listeners('end').length, 0);
+assert.equal(src.listeners('readable').length, 0);
 
-assert.strictEqual(dest.listeners('unpipe').length, 0);
-assert.strictEqual(dest.listeners('drain').length, 0);
-assert.strictEqual(dest.listeners('error').length, 0);
-assert.strictEqual(dest.listeners('close').length, 0);
-assert.strictEqual(dest.listeners('finish').length, 0);
+assert.equal(dest.listeners('unpipe').length, 0);
+assert.equal(dest.listeners('drain').length, 0);
+assert.equal(dest.listeners('error').length, 0);
+assert.equal(dest.listeners('close').length, 0);
+assert.equal(dest.listeners('finish').length, 0);
 
 console.error(src._readableState);
 process.on('exit', function () {

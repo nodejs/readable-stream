@@ -1,16 +1,17 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-var Readable = require('../../').Readable;
-var Writable = require('../../').Writable;
+var stream = require('../../');
+var Readable = stream.Readable;
+var Writable = stream.Writable;
 var assert = require('assert/');
 
 var EE = require('events').EventEmitter;
 
 // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
-var stream = new Readable({
+stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
 });
@@ -99,7 +100,7 @@ function end() {
   source.emit('end');
   assert(!reading);
   writer.end(stream.read());
-  setImmediate(function () {
+  setTimeout(function () {
     assert(ended);
   });
 }

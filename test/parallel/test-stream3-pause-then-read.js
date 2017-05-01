@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -41,7 +41,7 @@ function readn(n, then) {
   (function read() {
     var c = r.read(n);
     if (!c) r.once('readable', read);else {
-      assert.strictEqual(c.length, n);
+      assert.equal(c.length, n);
       assert(!r._readableState.flowing);
       then();
     }
@@ -80,7 +80,7 @@ function pipeLittle() {
   var w = new Writable();
   var written = 0;
   w.on('finish', function () {
-    assert.strictEqual(written, 200);
+    assert.equal(written, 200);
     setImmediate(read1234);
   });
   w._write = function (chunk, encoding, cb) {
@@ -132,8 +132,8 @@ function pipe() {
   };
   w.on('finish', function () {
     console.error('written', written, totalPushed);
-    assert.strictEqual(written, expectEndingData);
-    assert.strictEqual(totalPushed, expectTotalData);
+    assert.equal(written, expectEndingData);
+    assert.equal(totalPushed, expectTotalData);
     console.log('ok');
   });
   r.pipe(w);

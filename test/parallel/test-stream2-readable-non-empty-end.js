@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var assert = require('assert/');
@@ -18,7 +18,7 @@ test._read = function (size) {
   var chunk = chunks[n++];
   setTimeout(function () {
     test.push(chunk === undefined ? null : chunk);
-  }, 1);
+  });
 };
 
 test.on('end', thrower);
@@ -33,7 +33,7 @@ test.on('readable', function () {
   if (res) {
     bytesread += res.length;
     console.error('br=%d len=%d', bytesread, len);
-    setTimeout(next, 1);
+    setTimeout(next);
   }
   test.read(0);
 });
@@ -47,7 +47,7 @@ function next() {
   // one to get the last byte
   var r = test.read();
   assert(r);
-  assert.strictEqual(r.length, 1);
+  assert.equal(r.length, 1);
   r = test.read();
-  assert.strictEqual(r, null);
+  assert.equal(r, null);
 }

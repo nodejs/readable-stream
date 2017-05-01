@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var R = require('../../lib/_stream_readable');
@@ -10,6 +10,7 @@ var src = new R({ encoding: 'base64' });
 var dst = new W();
 var hasRead = false;
 var accum = [];
+var timeout;
 
 src._read = function (n) {
   if (!hasRead) {
@@ -27,12 +28,12 @@ dst._write = function (chunk, enc, cb) {
 };
 
 src.on('end', function () {
-  assert.strictEqual(Buffer.concat(accum) + '', 'MQ==');
+  assert.equal(Buffer.concat(accum) + '', 'MQ==');
   clearTimeout(timeout);
 });
 
 src.pipe(dst);
 
-var timeout = setTimeout(function () {
+timeout = setTimeout(function () {
   common.fail('timed out waiting for _write');
 }, 100);

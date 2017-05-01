@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var Readable = require('../../lib/_stream_readable');
@@ -24,7 +24,7 @@ function run() {
   console.log('# %s', name);
   fn({
     same: assert.deepStrictEqual,
-    equal: assert.strictEqual,
+    equal: assert.equal,
     end: function () {
       count--;
       run();
@@ -34,7 +34,7 @@ function run() {
 
 // ensure all tests have run
 process.on('exit', function () {
-  assert.strictEqual(count, 0);
+  assert.equal(count, 0);
 });
 
 process.nextTick(run);
@@ -202,16 +202,16 @@ test('high watermark _read', function (t) {
 
   var v = r.read();
 
-  assert.strictEqual(calls, 0);
-  assert.strictEqual(v, '1');
+  assert.equal(calls, 0);
+  assert.equal(v, '1');
 
   var v2 = r.read();
-  assert.strictEqual(v2, '2');
+  assert.equal(v2, '2');
 
   var v3 = r.read();
-  assert.strictEqual(v3, '3');
+  assert.equal(v3, '3');
 
-  assert.strictEqual(calls, 1);
+  assert.equal(calls, 1);
 
   t.end();
 });
@@ -224,7 +224,7 @@ test('high watermark push', function (t) {
   r._read = function (n) {};
   for (var i = 0; i < 6; i++) {
     var bool = r.push(i);
-    assert.strictEqual(bool, i !== 5);
+    assert.equal(bool, i === 5 ? false : true);
   }
 
   t.end();
@@ -301,7 +301,7 @@ test('buffers finish until cb is called', function (t) {
   var called = false;
 
   w._write = function (chunk, encoding, cb) {
-    assert.strictEqual(chunk, 'foo');
+    assert.equal(chunk, 'foo');
 
     process.nextTick(function () {
       called = true;
@@ -310,7 +310,7 @@ test('buffers finish until cb is called', function (t) {
   };
 
   w.on('finish', function () {
-    assert.strictEqual(called, true);
+    assert.equal(called, true);
 
     t.end();
   });

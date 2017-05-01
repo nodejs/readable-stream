@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var assert = require('assert/');
@@ -28,9 +28,6 @@ source.unpipe(dest2);
 
 assert.strictEqual(source._readableState.pipes, dest1);
 assert.notStrictEqual(source._readableState.pipes, dest2);
-
-dest2.on('unpipe', common.mustNotCall());
-source.unpipe(dest2);
 
 source.unpipe(dest1);
 

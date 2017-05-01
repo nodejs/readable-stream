@@ -1,7 +1,7 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
+require('../common');
 var assert = require('assert/');
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
@@ -14,7 +14,7 @@ function TestReadable(opt) {
   this._ended = false;
 }
 
-TestReadable.prototype._read = function () {
+TestReadable.prototype._read = function (n) {
   if (this._ended) this.emit('error', new Error('_read called twice'));
   this._ended = true;
   this.push(null);
@@ -34,18 +34,31 @@ TestWritable.prototype._write = function (chunk, encoding, cb) {
 
 // this one should not emit 'end' until we read() from it later.
 var ender = new TestReadable();
+var enderEnded = false;
 
 // what happens when you pipe() a Readable that's already ended?
 var piper = new TestReadable();
 // pushes EOF null, and length=0, so this will trigger 'end'
 piper.read();
 
-setTimeout(common.mustCall(function () {
-  ender.on('end', common.mustCall(function () {}));
+setTimeout(function () {
+  ender.on('end', function () {
+    enderEnded = true;
+  });
+  assert(!enderEnded);
   var c = ender.read();
-  assert.strictEqual(c, null);
+  assert.equal(c, null);
 
   var w = new TestWritable();
-  w.on('finish', common.mustCall(function () {}));
+  var writableFinished = false;
+  w.on('finish', function () {
+    writableFinished = true;
+  });
   piper.pipe(w);
-}), 1);
+
+  process.on('exit', function () {
+    assert(enderEnded);
+    assert(writableFinished);
+    console.log('ok');
+  });
+});

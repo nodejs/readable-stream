@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var R = require('../../lib/_stream_readable');
@@ -28,7 +28,7 @@ TestReader.prototype._read = function (n) {
 
 var reader = new TestReader();
 setImmediate(function () {
-  assert.strictEqual(ondataCalled, 1);
+  assert.equal(ondataCalled, 1);
   console.log('ok');
   reader.push(null);
 });

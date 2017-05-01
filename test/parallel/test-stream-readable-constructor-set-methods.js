@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -16,6 +16,6 @@ var r = new Readable({ read: _read });
 r.resume();
 
 process.on('exit', function () {
-  assert.strictEqual(r._read, _read);
+  assert.equal(r._read, _read);
   assert(_readCalled);
 });

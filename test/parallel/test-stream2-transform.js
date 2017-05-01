@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -24,7 +24,7 @@ function run() {
   console.log('# %s', name);
   fn({
     same: assert.deepStrictEqual,
-    equal: assert.strictEqual,
+    equal: assert.equal,
     ok: assert,
     end: function () {
       count--;
@@ -35,7 +35,7 @@ function run() {
 
 // ensure all tests have run
 process.on('exit', function () {
-  assert.strictEqual(count, 0);
+  assert.equal(count, 0);
 });
 
 process.nextTick(run);
@@ -104,14 +104,6 @@ test('object passthrough', function (t) {
   t.equal(pt.read(), 'foo');
   t.equal(pt.read(), '');
   t.same(pt.read(), { a: 'b' });
-  t.end();
-});
-
-test('passthrough constructor', function (t) {
-  var pt = PassThrough();
-
-  assert(pt instanceof PassThrough);
-
   t.end();
 });
 

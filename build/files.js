@@ -159,16 +159,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
       `
     ]
-  , bufferShimFix = [
+  , safeBufferFix = [
     /const Buffer = require\('buffer'\)\.Buffer;/,
-    `const Buffer = require('buffer').Buffer;
-/*<replacement>*/
-  const bufferShim = require('buffer-shims');
+    `/*<replacement>*/
+  const Buffer = require('safe-buffer').Buffer
 /*</replacement>*/`
-  ]
-  , bufferStaticMethods = [
-    /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
-    `bufferShim.$1`
   ]
   , internalDirectory = [
     /require\('internal\/streams\/BufferList'\)/,
@@ -238,8 +233,7 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
-  , bufferShimFix
-  , bufferStaticMethods
+  , safeBufferFix
   , internalDirectory
 ]
 
@@ -270,14 +264,12 @@ module.exports['_stream_writable.js'] = [
   , processNextTickReplacement
   , internalUtilReplacement
   , fixSyncWrite
-  , bufferShimFix
-  , bufferStaticMethods
+  , safeBufferFix
   , fixInstanceCheck
   , removeOnWriteBind
   , removeCorkedFinishBind
   , removeOnCorkedFinish
 ]
 module.exports['internal/streams/BufferList.js'] = [
-    bufferShimFix
-  , bufferStaticMethods
+    safeBufferFix
 ]

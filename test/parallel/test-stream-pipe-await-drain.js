@@ -1,16 +1,14 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var stream = require('../../');
-var assert = require('assert/');
 
 // This is very similar to test-stream-pipe-cleanup-pause.js.
 
 var reader = new stream.Readable();
 var writer1 = new stream.Writable();
 var writer2 = new stream.Writable();
-var writer3 = new stream.Writable();
 
 // 560000 is chosen here because it is larger than the (default) highWaterMark
 // and will cause `.write()` to return false
@@ -23,9 +21,7 @@ writer1._write = common.mustCall(function (chunk, encoding, cb) {
   this.emit('chunk-received');
   cb();
 }, 1);
-
 writer1.once('chunk-received', function () {
-  assert.strictEqual(reader._readableState.awaitDrain, 0, 'initial value is not 0');
   setImmediate(function () {
     // This one should *not* get through to writer1 because writer2 is not
     // "done" processing.
@@ -35,20 +31,12 @@ writer1.once('chunk-received', function () {
 
 // A "slow" consumer:
 writer2._write = common.mustCall(function (chunk, encoding, cb) {
-  assert.strictEqual(reader._readableState.awaitDrain, 1, 'awaitDrain isn\'t 1 after first push');
   // Not calling cb here to "simulate" slow stream.
-  // This should be called exactly once, since the first .write() call
-  // will return false.
-}, 1);
 
-writer3._write = common.mustCall(function (chunk, encoding, cb) {
-  assert.strictEqual(reader._readableState.awaitDrain, 2, 'awaitDrain isn\'t 2 after second push');
-  // Not calling cb here to "simulate" slow stream.
   // This should be called exactly once, since the first .write() call
   // will return false.
 }, 1);
 
 reader.pipe(writer1);
 reader.pipe(writer2);
-reader.pipe(writer3);
 reader.push(buffer);

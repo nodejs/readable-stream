@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -22,7 +22,7 @@ var w = new Writable();
 // lets arrange to store the chunks
 w._write = function (chunk, encoding, cb) {
   // default encoding given none was specified
-  assert.strictEqual(encoding, 'buffer');
+  assert.equal(encoding, 'buffer');
 
   seenChunks.push(chunk);
   cb();
@@ -34,7 +34,7 @@ w.on('finish', function () {
 
 function writeChunks(remainingChunks, callback) {
   var writeChunk = remainingChunks.shift();
-  var writeState = void 0;
+  var writeState;
 
   if (writeChunk) {
     setImmediate(function () {
@@ -52,7 +52,7 @@ function writeChunks(remainingChunks, callback) {
 // do an initial write
 w.write('stuff');
 // the write was immediate
-assert.strictEqual(seenChunks.length, 1);
+assert.equal(seenChunks.length, 1);
 // reset the chunks seen so far
 seenChunks = [];
 
@@ -62,13 +62,13 @@ w.cork();
 // write the bufferedChunks
 writeChunks(inputChunks, function () {
   // should not have seen anything yet
-  assert.strictEqual(seenChunks.length, 0);
+  assert.equal(seenChunks.length, 0);
 
   // trigger writing out the buffer
   w.uncork();
 
   // buffered bytes shoud be seen in current tick
-  assert.strictEqual(seenChunks.length, 4);
+  assert.equal(seenChunks.length, 4);
 
   // did the chunks match
   for (var i = 0, l = expectedChunks.length; i < l; i++) {

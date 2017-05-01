@@ -1,7 +1,7 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var Readable = require('../../').Readable;
@@ -18,35 +18,36 @@ function test1() {
   //
   // note that this is very unusual.  it only works for crypto streams
   // because the other side of the stream will call read(0) to cycle
-  // data through openssl.  that's why setImmediate() is used to call
+  // data through openssl.  that's why we set the timeouts to call
   // r.read(0) again later, otherwise there is no more work being done
   // and the process just exits.
 
   var buf = bufferShim.alloc(5, 'x');
   var reads = 5;
+  var timeout = common.platformTimeout(50);
   r._read = function (n) {
     switch (reads--) {
-      case 5:
-        return setImmediate(function () {
-          return r.push(buf);
-        });
-      case 4:
-        setImmediate(function () {
-          return r.push(bufferShim.alloc(0));
-        });
-        return setImmediate(r.read.bind(r, 0));
+      case 0:
+        return r.push(null); // EOF
+      case 1:
+        return r.push(buf);
+      case 2:
+        setTimeout(r.read.bind(r, 0), timeout);
+        return r.push(bufferShim.alloc(0)); // Not-EOF!
       case 3:
-        setTimeout(r.read.bind(r, 0), 50);
+        setTimeout(r.read.bind(r, 0), timeout);
         return process.nextTick(function () {
           return r.push(bufferShim.alloc(0));
         });
-      case 2:
-        setImmediate(r.read.bind(r, 0));
-        return r.push(bufferShim.alloc(0)); // Not-EOF!
-      case 1:
-        return r.push(buf);
-      case 0:
-        return r.push(null); // EOF
+      case 4:
+        setTimeout(r.read.bind(r, 0), timeout);
+        return setTimeout(function () {
+          return r.push(bufferShim.alloc(0));
+        });
+      case 5:
+        return setTimeout(function () {
+          return r.push(buf);
+        });
       default:
         throw new Error('unreachable');
     }
@@ -81,7 +82,7 @@ function test2() {
 
   var results = [];
   function flow() {
-    var chunk = void 0;
+    var chunk;
     while (null !== (chunk = r.read())) {
       results.push(chunk + '');
     }

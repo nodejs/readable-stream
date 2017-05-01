@@ -1,7 +1,7 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
+require('../common');
 var assert = require('assert/');
 
 var stream = require('../../');
@@ -30,14 +30,16 @@ function test(decode, uncork, multi, next) {
     expectCount++;
     var expect = expectCount;
     return function (er) {
-      assert.ifError(er);
+      if (er) throw er;
       counter++;
-      assert.strictEqual(counter, expect);
+      assert.equal(counter, expect);
     };
   }
 
   var w = new stream.Writable({ decodeStrings: decode });
-  w._write = common.mustNotCall('Should not call _write');
+  w._write = function (chunk, e, cb) {
+    assert(false, 'Should not call _write');
+  };
 
   var expectChunks = decode ? [{ encoding: 'buffer',
     chunk: [104, 101, 108, 108, 111, 44, 32] }, { encoding: 'buffer',
@@ -46,7 +48,7 @@ function test(decode, uncork, multi, next) {
     chunk: [10, 97, 110, 100, 32, 116, 104, 101, 110, 46, 46, 46] }, { encoding: 'buffer',
     chunk: [250, 206, 190, 167, 222, 173, 190, 239, 222, 202, 251, 173] }] : [{ encoding: 'ascii', chunk: 'hello, ' }, { encoding: 'utf8', chunk: 'world' }, { encoding: 'buffer', chunk: [33] }, { encoding: 'binary', chunk: '\nand then...' }, { encoding: 'hex', chunk: 'facebea7deadbeefdecafbad' }];
 
-  var actualChunks = void 0;
+  var actualChunks;
   w._writev = function (chunks, cb) {
     actualChunks = chunks.map(function (chunk) {
       return {

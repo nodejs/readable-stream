@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
@@ -13,7 +13,7 @@ var nChunks = 10;
 var chunk = bufferShim.alloc(10, 'x');
 
 r._read = function (n) {
-  setImmediate(function () {
+  setTimeout(function () {
     r.push(--nChunks === 0 ? null : chunk);
   });
 };
@@ -21,7 +21,7 @@ r._read = function (n) {
 var readAll = false;
 var seen = [];
 r.on('readable', function () {
-  var chunk = void 0;
+  var chunk;
   while (chunk = r.read()) {
     seen.push(chunk.toString());
     // simulate only reading a certain amount of the data,

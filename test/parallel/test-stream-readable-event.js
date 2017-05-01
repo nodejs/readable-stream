@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var assert = require('assert/');
@@ -13,7 +13,7 @@ var Readable = require('../../').Readable;
     highWaterMark: 3
   });
 
-  r._read = common.mustNotCall();
+  r._read = common.fail;
 
   // This triggers a 'readable' event, which is lost.
   r.push(bufferShim.from('blerg'));
@@ -22,7 +22,7 @@ var Readable = require('../../').Readable;
     // we're testing what we think we are
     assert(!r._readableState.reading);
     r.on('readable', common.mustCall(function () {}));
-  }, 1);
+  });
 }
 
 {
@@ -42,7 +42,7 @@ var Readable = require('../../').Readable;
     // assert we're testing what we think we are
     assert(_r._readableState.reading);
     _r.on('readable', common.mustCall(function () {}));
-  }, 1);
+  });
 }
 
 {
@@ -52,7 +52,7 @@ var Readable = require('../../').Readable;
     highWaterMark: 30
   });
 
-  _r2._read = common.mustNotCall();
+  _r2._read = common.fail;
 
   // This triggers a 'readable' event, which is lost.
   _r2.push(bufferShim.from('blerg'));
@@ -62,5 +62,5 @@ var Readable = require('../../').Readable;
     // assert we're testing what we think we are
     assert(!_r2._readableState.reading);
     _r2.on('readable', common.mustCall(function () {}));
-  }, 1);
+  });
 }
