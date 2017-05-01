@@ -24,7 +24,7 @@ function run() {
   console.log('# %s', name);
   fn({
     same: assert.deepStrictEqual,
-    equal: assert.equal,
+    equal: assert.strictEqual,
     end: function () {
       count--;
       run();
@@ -34,7 +34,7 @@ function run() {
 
 // ensure all tests have run
 process.on('exit', function () {
-  assert.equal(count, 0);
+  assert.strictEqual(count, 0);
 });
 
 process.nextTick(run);
@@ -82,7 +82,7 @@ test('setEncoding utf8', function (t) {
   var expect = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }
@@ -101,7 +101,7 @@ test('setEncoding hex', function (t) {
   var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }
@@ -121,7 +121,7 @@ test('setEncoding hex with read(13)', function (t) {
 
   tr.on('readable', function flow() {
     console.log('readable once');
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(13))) {
       out.push(chunk);
     }
@@ -141,7 +141,7 @@ test('setEncoding base64', function (t) {
   var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }
@@ -159,7 +159,7 @@ test('encoding: utf8', function (t) {
   var expect = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }
@@ -177,7 +177,7 @@ test('encoding: hex', function (t) {
   var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }
@@ -195,7 +195,7 @@ test('encoding: hex with read(13)', function (t) {
   var expect = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(13))) {
       out.push(chunk);
     }
@@ -213,7 +213,7 @@ test('encoding: base64', function (t) {
   var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
   tr.on('readable', function flow() {
-    var chunk;
+    var chunk = void 0;
     while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
     }

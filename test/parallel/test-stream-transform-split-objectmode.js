@@ -17,7 +17,7 @@ parser._transform = function (chunk, enc, callback) {
   callback(null, { val: chunk[0] });
 };
 
-var parsed;
+var parsed = void 0;
 
 parser.on('data', function (obj) {
   parsed = obj;
@@ -40,7 +40,7 @@ serializer._transform = function (obj, _, callback) {
   callback(null, bufferShim.from([obj.val]));
 };
 
-var serialized;
+var serialized = void 0;
 
 serializer.on('data', function (chunk) {
   serialized = chunk;

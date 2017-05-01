@@ -10,7 +10,6 @@ var src = new R({ encoding: 'base64' });
 var dst = new W();
 var hasRead = false;
 var accum = [];
-var timeout;
 
 src._read = function (n) {
   if (!hasRead) {
@@ -28,12 +27,12 @@ dst._write = function (chunk, enc, cb) {
 };
 
 src.on('end', function () {
-  assert.equal(Buffer.concat(accum) + '', 'MQ==');
+  assert.strictEqual(Buffer.concat(accum) + '', 'MQ==');
   clearTimeout(timeout);
 });
 
 src.pipe(dst);
 
-timeout = setTimeout(function () {
+var timeout = setTimeout(function () {
   common.fail('timed out waiting for _write');
 }, 100);

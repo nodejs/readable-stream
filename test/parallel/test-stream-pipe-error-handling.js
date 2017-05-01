@@ -52,8 +52,8 @@ var Stream = require('stream').Stream;
       assert(removed);
       assert.throws(function () {
         w.emit('error', new Error('fail'));
-      });
-    }));
+      }, /^Error: fail$/);
+    }), 1);
   });
 
   w.on('error', myOnError);
@@ -61,7 +61,7 @@ var Stream = require('stream').Stream;
   w.removeListener('error', myOnError);
   removed = true;
 
-  function myOnError(er) {
+  function myOnError() {
     throw new Error('this should not happen');
   }
 }
@@ -78,10 +78,10 @@ var Stream = require('stream').Stream;
     setTimeout(common.mustCall(function () {
       assert(_removed);
       _w.emit('error', new Error('fail'));
-    }));
+    }), 1);
   });
 
-  _w.on('error', common.mustCall(function (er) {}));
+  _w.on('error', common.mustCall(function () {}));
   _w._write = function () {};
 
   _r.pipe(_w);

@@ -7,6 +7,7 @@ var Duplex = require('../../').Transform;
 
 var stream = new Duplex({ objectMode: true });
 
+assert(Duplex() instanceof Duplex);
 assert(stream._readableState.objectMode);
 assert(stream._writableState.objectMode);
 

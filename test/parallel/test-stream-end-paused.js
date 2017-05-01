@@ -23,7 +23,7 @@ stream.pause();
 setTimeout(common.mustCall(function () {
   stream.on('end', common.mustCall(function () {}));
   stream.resume();
-}));
+}), 1);
 
 process.on('exit', function () {
   assert(calledRead);

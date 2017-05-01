@@ -26,7 +26,7 @@ TestWriter.prototype._write = function (chunk, encoding, cb) {
 
 var chunks = new Array(50);
 for (var i = 0; i < chunks.length; i++) {
-  chunks[i] = new Array(i + 1).join('x');
+  chunks[i] = 'x'.repeat(i);
 }
 
 // tiny node-tap lookalike.
@@ -47,7 +47,7 @@ function run() {
   console.log('# %s', name);
   fn({
     same: assert.deepStrictEqual,
-    equal: assert.equal,
+    equal: assert.strictEqual,
     end: function () {
       count--;
       run();
@@ -57,7 +57,7 @@ function run() {
 
 // ensure all tests have run
 process.on('exit', function () {
-  assert.equal(count, 0);
+  assert.strictEqual(count, 0);
 });
 
 process.nextTick(run);
@@ -115,8 +115,9 @@ test('write backpressure', function (t) {
 
   var i = 0;
   (function W() {
+    var ret = void 0;
     do {
-      var ret = tw.write(chunks[i++]);
+      ret = tw.write(chunks[i++]);
     } while (ret !== false && i < chunks.length);
 
     if (i < chunks.length) {
@@ -175,7 +176,7 @@ test('write no bufferize', function (t) {
 
 test('write callbacks', function (t) {
   var callbacks = chunks.map(function (chunk, i) {
-    return [i, function (er) {
+    return [i, function () {
       callbacks._called[i] = chunk;
     }];
   }).reduce(function (set, x) {
@@ -246,7 +247,7 @@ test('end callback called after write callback', function (t) {
 test('encoding should be ignored for buffers', function (t) {
   var tw = new W();
   var hex = '018b5e9a8f6236ffe30e31baf80d2cf6eb';
-  tw._write = function (chunk, encoding, cb) {
+  tw._write = function (chunk) {
     t.equal(chunk.toString('hex'), hex);
     t.end();
   };
@@ -258,7 +259,7 @@ test('writables are not pipable', function (t) {
   var w = new W();
   w._write = function () {};
   var gotError = false;
-  w.on('error', function (er) {
+  w.on('error', function () {
     gotError = true;
   });
   w.pipe(process.stdout);
@@ -271,7 +272,7 @@ test('duplexes are pipable', function (t) {
   d._read = function () {};
   d._write = function () {};
   var gotError = false;
-  d.on('error', function (er) {
+  d.on('error', function () {
     gotError = true;
   });
   d.pipe(process.stdout);
@@ -305,7 +306,7 @@ test('dont end while writing', function (t) {
     setTimeout(function () {
       this.writing = false;
       cb();
-    });
+    }, 1);
   };
   w.on('finish', function () {
     assert(wrote);
@@ -342,7 +343,7 @@ test('finish does not come before sync _write cb', function (t) {
     assert(writeCb);
     t.end();
   });
-  w.write(bufferShim.alloc(0), function (er) {
+  w.write(bufferShim.alloc(0), function () {
     writeCb = true;
   });
   w.end();
