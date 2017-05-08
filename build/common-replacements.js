@@ -44,7 +44,7 @@ module.exports.objectKeysReplacement = [
 module.exports.bufferShimFix = [
   /^('use strict';)$/m,
   `/*<replacement>*/
- const bufferShim = require('buffer-shims');
+ const bufferShim = require('safe-buffer').Buffer;
  /*</replacement>*/`
 ]
 

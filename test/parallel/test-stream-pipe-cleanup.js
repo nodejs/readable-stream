@@ -1,5 +1,5 @@
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 // This test asserts that Stream.prototype.pipe does not leave listeners
 // hanging on the source or dest.
