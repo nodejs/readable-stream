@@ -4,20 +4,21 @@
   "description": "",
   "main": "build.js",
   "dependencies": {
-    "babel-core": "^6.5.2",
+    "babel-core": "^6.24.1",
     "babel-plugin-transform-es2015-arrow-functions": "^6.5.2",
-    "babel-plugin-transform-es2015-block-scoping": "^6.5.0",
+    "babel-plugin-transform-es2015-block-scoping": "^6.24.1",
+    "babel-plugin-transform-es2015-classes": "^6.24.1",
     "babel-plugin-transform-es2015-destructuring": "^6.18.0",
     "babel-plugin-transform-es2015-for-of": "^6.8.0",
-    "babel-plugin-transform-es2015-parameters": "^6.11.4",
-    "babel-plugin-transform-es2015-shorthand-properties": "^6.8.0",
+    "babel-plugin-transform-es2015-parameters": "^6.24.1",
+    "babel-plugin-transform-es2015-shorthand-properties": "^6.24.1",
     "babel-plugin-transform-es2015-template-literals": "^6.8.0",
-    "bl": "^1.2.0",
-    "glob": "^7.1.1",
+    "bl": "^1.2.1",
+    "glob": "^7.1.2",
     "gunzip-maybe": "^1.4.0",
     "hyperquest": "^2.1.2",
     "pump": "^1.0.2",
     "rimraf": "^2.6.1",
-    "tar-fs": "^1.15.1"
+    "tar-fs": "^1.15.2"
   }
 }

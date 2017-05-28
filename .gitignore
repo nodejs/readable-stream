@@ -2,3 +2,4 @@ node_modules/
 .zuul.yml
 .nyc_output
 coverage
+package-lock.json

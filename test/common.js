@@ -377,6 +377,7 @@ if (global.__coverage__) knownGlobals.push(__coverage__);
 function leakedGlobals() {
   var leaked = [];
 
+  // eslint-disable-next-line no-var
   for (var val in global) {
     if (!knownGlobals.includes(global[val])) leaked.push(val);
   }if (global.__coverage__) {
@@ -564,15 +565,46 @@ exports.isAlive = function isAlive(pid) {
   }
 };
 
-exports.expectWarning = function (name, expected) {
-  if (typeof expected === 'string') expected = [expected];
-  process.on('warning', exports.mustCall(function (warning) {
+function expectWarning(name, expectedMessages) {
+  return exports.mustCall(function (warning) {
     assert.strictEqual(warning.name, name);
-    assert.ok(expected.includes(warning.message), 'unexpected error message: "' + warning.message + '"');
+    assert.ok(expectedMessages.includes(warning.message), 'unexpected error message: "' + warning.message + '"');
     // Remove a warning message after it is seen so that we guarantee that we
     // get each message only once.
-    expected.splice(expected.indexOf(warning.message), 1);
-  }, expected.length));
+    expectedMessages.splice(expectedMessages.indexOf(warning.message), 1);
+  }, expectedMessages.length);
+}
+
+function expectWarningByName(name, expected) {
+  if (typeof expected === 'string') {
+    expected = [expected];
+  }
+  process.on('warning', expectWarning(name, expected));
+}
+
+function expectWarningByMap(warningMap) {
+  var catchWarning = {};
+  forEach(objectKeys(warningMap), function (name) {
+    var expected = warningMap[name];
+    if (typeof expected === 'string') {
+      expected = [expected];
+    }
+    catchWarning[name] = expectWarning(name, expected);
+  });
+  process.on('warning', function (warning) {
+    return catchWarning[warning.name](warning);
+  });
+}
+
+// accepts a warning name and description or array of descriptions or a map
+// of warning names to description(s)
+// ensures a warning is generated for each name/description pair
+exports.expectWarning = function (nameOrMap, expected) {
+  if (typeof nameOrMap === 'string') {
+    expectWarningByName(nameOrMap, expected);
+  } else {
+    expectWarningByMap(nameOrMap);
+  }
 };
 
 /*<replacement>*/if (!process.browser) {
