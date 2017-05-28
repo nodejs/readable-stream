@@ -3,7 +3,7 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-var Duplex = require('../../').Transform;
+var Duplex = require('../../').Duplex;
 
 var stream = new Duplex({ objectMode: true });
 

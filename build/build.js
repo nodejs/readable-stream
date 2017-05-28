@@ -60,6 +60,7 @@ function processFile (inputLoc, out, replacements) {
           'transform-es2015-template-literals',
           'transform-es2015-shorthand-properties',
           'transform-es2015-for-of',
+          'transform-es2015-classes',
           'transform-es2015-destructuring'
         ]
       })
