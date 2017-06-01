@@ -311,3 +311,10 @@ module.exports['test-stream-transform-constructor-set-methods.js'] = [
     'Error: .*[Nn]'
   ]
 ]
+
+module.exports['test-stream-unpipe-event.js'] = [
+  [
+    /^/,
+    'if (process.version.indexOf(\'v0.8\') === 0) { process.exit(0) }\n'
+  ]
+]
