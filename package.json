@@ -22,7 +22,7 @@
     "zuul": "~3.10.0"
   },
   "scripts": {
-    "test": "tap test/parallel/*.js test/ours/*.js",
+    "test": "tap test/parallel/*.js test/ours/*.js && node test/verify-dependencies.js",
     "browser": "npm run write-zuul && zuul --browser-retries 2 -- test/browser.js",
     "write-zuul": "printf \"ui: tape\nbrowsers:\n  - name: $BROWSER_NAME\n    version: $BROWSER_VERSION\n\">.zuul.yml",
     "local": "zuul --local 3000 --no-coverage -- test/browser.js",
