@@ -8,7 +8,7 @@
     "inherits": "~2.0.1",
     "isarray": "~1.0.0",
     "process-nextick-args": "~1.0.6",
-    "safe-buffer": "^5.0.1",
+    "safe-buffer": "~5.0.1",
     "string_decoder": "~1.0.0",
     "util-deprecate": "~1.0.1"
   },
