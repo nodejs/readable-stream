@@ -10,6 +10,8 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').bufferShimFix
     , bufferStaticMethods =
     require('./common-replacements').bufferStaticMethods
+    , specialForEachReplacment =
+    require('./common-replacements').specialForEachReplacment
 
 module.exports.all = [
     [
@@ -44,7 +46,7 @@ module.exports.all = [
 
 module.exports['test-stream2-basic.js'] = [
     altForEachImplReplacement
-  , altForEachUseReplacement
+  , specialForEachReplacment
 ]
 
 module.exports['test-stream2-objects.js'] = [
@@ -182,6 +184,18 @@ module.exports['common.js'] = [
 [
   /exports\.buildType/,
   '//exports.buildType'
+],
+[
+  /require\('async_hooks'\)/,
+  '/*require(\'async_hooks\')'
+],
+[
+  /\}\).enable\(\);/,
+  '}).enable();*/'
+],
+[
+  /const async_wrap = process.binding\('async_wrap'\);/,
+  '//const async_wrap = process.binding(\'async_wrap\');'
 ]
 ]
 

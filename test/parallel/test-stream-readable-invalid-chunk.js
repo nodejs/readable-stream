@@ -1,12 +1,13 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+
+var common = require('../common');
 var stream = require('../../');
 var assert = require('assert/');
 
 var readable = new stream.Readable({
-  read: function () {}
+  read: common.noop
 });
 
 assert.throws(function () {

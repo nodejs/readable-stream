@@ -1,7 +1,29 @@
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+
+var common = require('../common');
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
 var assert = require('assert/');
@@ -55,7 +77,7 @@ function toArray(callback) {
 
 function fromArray(list) {
   var r = new Readable({ objectMode: true });
-  r._read = noop;
+  r._read = common.mustNotCall();
   forEach(list, function (chunk) {
     r.push(chunk);
   });
@@ -63,8 +85,6 @@ function fromArray(list) {
 
   return r;
 }
-
-function noop() {}
 
 test('can read objects from stream', function (t) {
   var r = fromArray([{ one: '1' }, { two: '2' }]);
@@ -136,7 +156,7 @@ test('can read strings as objects', function (t) {
   var r = new Readable({
     objectMode: true
   });
-  r._read = noop;
+  r._read = common.mustNotCall();
   var list = ['one', 'two', 'three'];
   forEach(list, function (str) {
     r.push(str);
@@ -154,7 +174,7 @@ test('read(0) for object streams', function (t) {
   var r = new Readable({
     objectMode: true
   });
-  r._read = noop;
+  r._read = common.mustNotCall();
 
   r.push('foobar');
   r.push(null);
@@ -170,7 +190,7 @@ test('falsey values', function (t) {
   var r = new Readable({
     objectMode: true
   });
-  r._read = noop;
+  r._read = common.mustNotCall();
 
   r.push(false);
   r.push(0);
@@ -221,7 +241,7 @@ test('high watermark push', function (t) {
     highWaterMark: 6,
     objectMode: true
   });
-  r._read = function (n) {};
+  r._read = common.mustNotCall();
   for (var i = 0; i < 6; i++) {
     var bool = r.push(i);
     assert.strictEqual(bool, i !== 5);

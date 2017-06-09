@@ -74,13 +74,11 @@ var NeverEndReadable = function (_Readable2) {
   return NeverEndReadable;
 }(Readable);
 
-function noop() {}
-
 {
   var dest = new NullWriteable();
   var src = new QuickEndReadable();
-  dest.on('pipe', common.mustCall(noop));
-  dest.on('unpipe', common.mustCall(noop));
+  dest.on('pipe', common.mustCall());
+  dest.on('unpipe', common.mustCall());
   src.pipe(dest);
   setImmediate(function () {
     assert.strictEqual(src._readableState.pipesCount, 0);
@@ -90,7 +88,7 @@ function noop() {}
 {
   var _dest = new NullWriteable();
   var _src = new NeverEndReadable();
-  _dest.on('pipe', common.mustCall(noop));
+  _dest.on('pipe', common.mustCall());
   _dest.on('unpipe', common.mustNotCall('unpipe should not have been emitted'));
   _src.pipe(_dest);
   setImmediate(function () {
@@ -101,8 +99,8 @@ function noop() {}
 {
   var _dest2 = new NullWriteable();
   var _src2 = new NeverEndReadable();
-  _dest2.on('pipe', common.mustCall(noop));
-  _dest2.on('unpipe', common.mustCall(noop));
+  _dest2.on('pipe', common.mustCall());
+  _dest2.on('unpipe', common.mustCall());
   _src2.pipe(_dest2);
   _src2.unpipe(_dest2);
   setImmediate(function () {
@@ -113,8 +111,8 @@ function noop() {}
 {
   var _dest3 = new NullWriteable();
   var _src3 = new QuickEndReadable();
-  _dest3.on('pipe', common.mustCall(noop));
-  _dest3.on('unpipe', common.mustCall(noop));
+  _dest3.on('pipe', common.mustCall());
+  _dest3.on('unpipe', common.mustCall());
   _src3.pipe(_dest3, { end: false });
   setImmediate(function () {
     assert.strictEqual(_src3._readableState.pipesCount, 0);
@@ -124,7 +122,7 @@ function noop() {}
 {
   var _dest4 = new NullWriteable();
   var _src4 = new NeverEndReadable();
-  _dest4.on('pipe', common.mustCall(noop));
+  _dest4.on('pipe', common.mustCall());
   _dest4.on('unpipe', common.mustNotCall('unpipe should not have been emitted'));
   _src4.pipe(_dest4, { end: false });
   setImmediate(function () {
@@ -135,8 +133,8 @@ function noop() {}
 {
   var _dest5 = new NullWriteable();
   var _src5 = new NeverEndReadable();
-  _dest5.on('pipe', common.mustCall(noop));
-  _dest5.on('unpipe', common.mustCall(noop));
+  _dest5.on('pipe', common.mustCall());
+  _dest5.on('unpipe', common.mustCall());
   _src5.pipe(_dest5, { end: false });
   _src5.unpipe(_dest5);
   setImmediate(function () {

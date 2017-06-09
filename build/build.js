@@ -16,7 +16,7 @@ const hyperquest  = require('hyperquest')
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
     , usageVersionRegex = RegExp('^' + nodeVersionRegexString + '$')
     , readmeVersionRegex =
-        RegExp('((?:Node-core )|(?:https\:\/\/nodejs\.org\/dist\/)v)' + nodeVersionRegexString, 'g')
+        RegExp('((?:(?:Node-core )|(?:https\:\/\/nodejs\.org\/dist\/))v)' + nodeVersionRegexString, 'g')
 
     , readmePath  = path.join(__dirname, '..', 'README.md')
     , files       = require('./files')
@@ -61,7 +61,9 @@ function processFile (inputLoc, out, replacements) {
           'transform-es2015-shorthand-properties',
           'transform-es2015-for-of',
           'transform-es2015-classes',
-          'transform-es2015-destructuring'
+          'transform-es2015-destructuring',
+          'transform-es2015-computed-properties',
+          'transform-es2015-spread'
         ]
       })
       data = transformed.code
@@ -134,7 +136,8 @@ pump(
             file !== 'test-stream2-httpclient-response-end.js' &&
             file !== 'test-stream-base-no-abort.js' &&
             file !== 'test-stream-preprocess.js' &&
-            file !== 'test-stream-inheritance.js') {
+            file !== 'test-stream-inheritance.js' &&
+            file !== 'test-stream-base-typechecking.js') {
           processTestFile(file)
         }
       })
@@ -145,14 +148,13 @@ pump(
     // Grab the nodejs/node test/common.js
 
     processFile(
-        testsrcurl.replace(/parallel\/$/, 'common.js')
+        testsrcurl.replace(/parallel\/$/, 'common/index.js')
       , path.join(testourroot, '../common.js')
       , testReplace['common.js']
     )
 
     //--------------------------------------------------------------------
     // Update Node version in README
-
     processFile(readmePath, readmePath, [
       [readmeVersionRegex, "$1" + nodeVersion]
     ])

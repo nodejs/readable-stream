@@ -1,26 +1,27 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var Transform = require('../../').Transform;
 
-var _transformCalled = false;
-function _transform(d, e, n) {
-  _transformCalled = true;
+var _transform = common.mustCall(function _transform(d, e, n) {
   n();
-}
+});
 
-var _flushCalled = false;
-function _flush(n) {
-  _flushCalled = true;
+var _final = common.mustCall(function _final(n) {
   n();
-}
+});
+
+var _flush = common.mustCall(function _flush(n) {
+  n();
+});
 
 var t = new Transform({
   transform: _transform,
-  flush: _flush
+  flush: _flush,
+  final: _final
 });
 
 var t2 = new Transform({});
@@ -35,6 +36,5 @@ assert.throws(function () {
 process.on('exit', function () {
   assert.strictEqual(t._transform, _transform);
   assert.strictEqual(t._flush, _flush);
-  assert.strictEqual(_transformCalled, true);
-  assert.strictEqual(_flushCalled, true);
+  assert.strictEqual(t._final, _final);
 });

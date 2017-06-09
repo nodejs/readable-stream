@@ -6,7 +6,7 @@ var assert = require('assert/');
 var Readable = require('../../').Readable;
 
 var readable = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 // Initialized to false.
@@ -30,7 +30,7 @@ readable.on('end', common.mustCall(function () {
 }));
 
 var asyncReadable = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 asyncReadable.on('readable', common.mustCall(function () {
@@ -53,7 +53,7 @@ process.nextTick(common.mustCall(function () {
 }));
 
 var flowing = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 // Notice this must be above the on('data') call.
@@ -71,7 +71,7 @@ flowing.on('data', common.mustCall(function (data) {
 }, 3));
 
 var slowProducer = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 slowProducer.on('readable', common.mustCall(function () {

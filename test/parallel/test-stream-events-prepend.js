@@ -25,7 +25,7 @@ Readable.prototype._read = function () {
 };
 
 var w = new Writable();
-w.on('pipe', common.mustCall(function () {}));
+w.on('pipe', common.mustCall());
 
 var r = new Readable();
 r.pipe(w);

@@ -121,7 +121,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , processNextTickImport = [
-      headRegexp
+      /^('use strict';)$/m
     , `$1
 
 /*<replacement>*/
@@ -166,8 +166,8 @@ const headRegexp = /(^module.exports = \w+;?)/m
 /*</replacement>*/`
   ]
   , internalDirectory = [
-    /require\('internal\/streams\/BufferList'\)/,
-    'require(\'./internal/streams/BufferList\')'
+    /require\('internal\/streams\/([a-zA-z]+)'\)/g,
+    'require(\'./internal/streams/$1\')'
   ]
   , fixInstanceCheck = [
     /if \(typeof Symbol === 'function' && Symbol\.hasInstance\) \{/,
@@ -177,20 +177,32 @@ const headRegexp = /(^module.exports = \w+;?)/m
     /onwrite\.bind\([^)]+?\)/,
     `function(er) { onwrite(stream, er); }`
   ]
-  , removeCorkedFinishBind = [
-    /onCorkedFinish\.bind\([^)]+?\)/,
-    function (match) {
-      const code = this
-      var src = /^function onCorkedFinish[^{]*?\{([\s\S]+?\r?\n)\}/m.exec(code)
-      src = src[1].trim().replace(/corkReq/g, 'this').replace(/(\r?\n)/mg, '  $1')
-      return `(err) => {\n${src}\n}`
-    }
-  ]
-  , removeOnCorkedFinish = [
-    /^function onCorkedFinish[\s\S]+?\r?\n\}/m,
-    ''
-  ]
+  , addUintStuff = [
+    /const Buffer = require\('buffer'\)\.Buffer;/,
+    `/*<replacement>*/
+  const Buffer = require('safe-buffer').Buffer
 
+function _uint8ArrayToBuffer(chunk) {
+   return Buffer.from(chunk);
+}
+function _isUint8Array(obj) {
+  return Object.prototype.toString.call(obj) === '[object Uint8Array]' || Buffer.isBuffer(obj);
+}
+/*</replacement>*/
+`
+  ]
+  , fixUintStuff = [
+    /Stream\.(_isUint8Array|_uint8ArrayToBuffer)\(/g,
+    `$1(`
+  ]
+  , fixBufferCheck = [
+    /Object\.getPrototypeOf\((chunk)\) !== Buffer\.prototype/g,
+    '!Buffer.isBuffer($1)'
+  ]
+  , fixCopyBuffer = [
+    /Buffer\.prototype\.copy\.call\(src, target, offset\);/,
+    'src.copy(target, offset);'
+  ]
 module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
@@ -233,8 +245,9 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
-  , safeBufferFix
   , internalDirectory
+  , fixUintStuff
+  , addUintStuff
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -264,12 +277,19 @@ module.exports['_stream_writable.js'] = [
   , processNextTickReplacement
   , internalUtilReplacement
   , fixSyncWrite
-  , safeBufferFix
   , fixInstanceCheck
   , removeOnWriteBind
-  , removeCorkedFinishBind
-  , removeOnCorkedFinish
+  , internalDirectory
+  , fixUintStuff
+  , addUintStuff
+  , fixBufferCheck
 ]
 module.exports['internal/streams/BufferList.js'] = [
     safeBufferFix
+  , fixCopyBuffer
+
+]
+module.exports['internal/streams/destroy.js'] = [
+    processNextTickImport
+  , processNextTickReplacement
 ]

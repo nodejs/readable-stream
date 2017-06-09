@@ -8,15 +8,15 @@ var _require = require('../../'),
     Readable = _require.Readable,
     Writable = _require.Writable;
 
-var source = Readable({ read: function () {} });
-var dest1 = Writable({ write: function () {} });
-var dest2 = Writable({ write: function () {} });
+var source = Readable({ read: common.noop });
+var dest1 = Writable({ write: common.noop });
+var dest2 = Writable({ write: common.noop });
 
 source.pipe(dest1);
 source.pipe(dest2);
 
-dest1.on('unpipe', common.mustCall(function () {}));
-dest2.on('unpipe', common.mustCall(function () {}));
+dest1.on('unpipe', common.mustCall());
+dest2.on('unpipe', common.mustCall());
 
 assert.strictEqual(source._readableState.pipes[0], dest1);
 assert.strictEqual(source._readableState.pipes[1], dest2);

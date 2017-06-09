@@ -1,7 +1,29 @@
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+
+var common = require('../common');
 var W = require('../../lib/_stream_writable');
 var D = require('../../lib/_stream_duplex');
 var assert = require('assert/');
@@ -257,7 +279,7 @@ test('encoding should be ignored for buffers', function (t) {
 
 test('writables are not pipable', function (t) {
   var w = new W();
-  w._write = function () {};
+  w._write = common.noop;
   var gotError = false;
   w.on('error', function () {
     gotError = true;
@@ -269,8 +291,8 @@ test('writables are not pipable', function (t) {
 
 test('duplexes are pipable', function (t) {
   var d = new D();
-  d._read = function () {};
-  d._write = function () {};
+  d._read = common.noop;
+  d._write = common.noop;
   var gotError = false;
   d.on('error', function () {
     gotError = true;
@@ -282,7 +304,7 @@ test('duplexes are pipable', function (t) {
 
 test('end(chunk) two times is an error', function (t) {
   var w = new W();
-  w._write = function () {};
+  w._write = common.noop;
   var gotError = false;
   w.on('error', function (er) {
     gotError = true;
@@ -359,6 +381,28 @@ test('finish is emitted if last chunk is empty', function (t) {
   });
   w.write(bufferShim.allocUnsafe(1));
   w.end(bufferShim.alloc(0));
+});
+
+test('finish is emitted after shutdown', function (t) {
+  var w = new W();
+  var shutdown = false;
+
+  w._final = common.mustCall(function (cb) {
+    assert.strictEqual(this, w);
+    setTimeout(function () {
+      shutdown = true;
+      cb();
+    }, 100);
+  });
+  w._write = function (chunk, e, cb) {
+    process.nextTick(cb);
+  };
+  w.on('finish', common.mustCall(function () {
+    assert(shutdown);
+    t.end();
+  }));
+  w.write(bufferShim.allocUnsafe(1));
+  w.end(bufferShim.allocUnsafe(0));
 });
 
 function forEach(xs, f) {

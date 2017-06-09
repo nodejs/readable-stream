@@ -12,6 +12,11 @@ module.exports.altForEachUseReplacement = [
   , '$1forEach($2, '
 ]
 
+module.exports.specialForEachReplacment = [
+    /(\W)(\[(?:\d\,\s)+\d\])(\.forEach\()/gm
+  , '$1forEach($2, '
+]
+
 module.exports.altIndexOfImplReplacement = [
     /$/
   ,   '\nfunction indexOf (xs, x) {\n'

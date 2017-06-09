@@ -6,7 +6,7 @@ var stream = require('../../');
 var assert = require('assert/');
 
 var readable = new stream.Readable({
-  read: function () {}
+  read: common.noop
 });
 
 var writables = [];
@@ -20,7 +20,7 @@ var _loop = function (i) {
   });
   target.output = [];
 
-  target.on('pipe', common.mustCall(function () {}));
+  target.on('pipe', common.mustCall());
   readable.pipe(target);
 
   writables.push(target);
@@ -47,7 +47,7 @@ process.nextTick(common.mustCall(function () {
 
       assert.deepStrictEqual(_target.output, [input]);
 
-      _target.on('unpipe', common.mustCall(function () {}));
+      _target.on('unpipe', common.mustCall());
       readable.unpipe(_target);
     }
   } catch (err) {

@@ -6,7 +6,7 @@ var assert = require('assert/');
 var Readable = require('../../').Readable;
 
 var readable = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 // Initialized to false.
@@ -39,7 +39,7 @@ process.nextTick(common.mustCall(function () {
 }));
 
 var noRead = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 noRead.on('readable', common.mustCall(function () {
@@ -54,7 +54,7 @@ noRead.push('foo');
 noRead.push(null);
 
 var flowing = new Readable({
-  read: function () {}
+  read: common.noop
 });
 
 flowing.on('data', common.mustCall(function () {

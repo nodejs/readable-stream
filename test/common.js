@@ -1,3 +1,5 @@
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
@@ -15,6 +17,27 @@ if (!global.clearImmediate) {
   };
 }
 /*</replacement>*/
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 /* eslint-disable required-modules */
 'use strict';
 
@@ -33,6 +56,7 @@ var assert = require('assert');
 var os = require('os');
 var child_process = require('child_process');
 var stream = require('../');
+var buffer = require('buffer');
 
 /*<replacement>*/
 var util = require('core-util-is');
@@ -42,9 +66,12 @@ util.inherits = require('inherits');
 var Timer = { now: function () {} };
 var execSync = require('child_process').execSync;
 
-var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : __dirname;
+var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..');
 
-exports.fixturesDir = path.join(__dirname, 'fixtures');
+var noop = function () {};
+
+exports.noop = noop;
+exports.fixturesDir = path.join(__dirname, '..', 'fixtures');
 exports.tmpDirName = 'tmp';
 // PORT should match the definition in test/testpy/__init__.py.
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
@@ -58,13 +85,58 @@ exports.isLinux = process.platform === 'linux';
 exports.isOSX = process.platform === 'darwin';
 
 exports.enoughTestMem = os.totalmem() > 0x40000000; /* 1 Gb */
-
+exports.bufferMaxSizeMsg = new RegExp('^RangeError: "size" argument must not be larger than ' + buffer.kMaxLength + '$');
 var cpus = os.cpus();
 /*exports.enoughTestCpu = Array.isArray(cpus) &&
                         (cpus.length > 1 || cpus[0].speed > 999);*/
 
 exports.rootDir = exports.isWindows ? 'c:\\' : '/';
 //exports.buildType = process.config.target_defaults.default_configuration;
+
+// If env var is set then enable async_hook hooks for all tests.
+if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
+  var destroydIdsList = {};
+  var destroyListList = {};
+  var initHandles = {};
+  //const async_wrap = process.binding('async_wrap');
+
+  process.on('exit', function () {
+    // itterate through handles to make sure nothing crashes
+    for (var k in initHandles) {
+      util.inspect(initHandles[k]);
+    }
+  });
+
+  var _addIdToDestroyList = async_wrap.addIdToDestroyList;
+  async_wrap.addIdToDestroyList = function addIdToDestroyList(id) {
+    if (destroyListList[id] !== undefined) {
+      process._rawDebug(destroyListList[id]);
+      process._rawDebug();
+      throw new Error('same id added twice (' + id + ')');
+    }
+    destroyListList[id] = new Error().stack;
+    _addIdToDestroyList(id);
+  };
+
+  /*require('async_hooks').createHook({
+    init(id, ty, tr, h) {
+      if (initHandles[id]) {
+        throw new Error(`init called twice for same id (${id})`);
+      }
+      initHandles[id] = h;
+    },
+    before() { },
+    after() { },
+    destroy(id) {
+      if (destroydIdsList[id] !== undefined) {
+        process._rawDebug(destroydIdsList[id]);
+        process._rawDebug();
+        throw new Error(`destroy called for same id (${id})`);
+      }
+      destroydIdsList[id] = new Error().stack;
+    },
+  }).enable();*/
+}
 
 function rimrafSync(p) {
   var st = void 0;
@@ -239,8 +311,8 @@ exports.childShouldThrowAndAbort = function () {
     // continuous testing and developers' machines
     testCmd += 'ulimit -c 0 && ';
   }
-  testCmd += process.argv[0] + ' --abort-on-uncaught-exception ';
-  testCmd += process.argv[1] + ' child';
+  testCmd += '"' + process.argv[0] + '" --abort-on-uncaught-exception ';
+  testCmd += '"' + process.argv[1] + '" child';
   var child = child_process.exec(testCmd);
   child.on('exit', function onExit(exitCode, signal) {
     var errMsg = 'Test should have aborted ' + ('but instead exited with exit code ' + exitCode) + (' and signal ' + signal);
@@ -397,7 +469,7 @@ process.on('exit', function () {
   if (!exports.globalCheck) return;
   var leaked = leakedGlobals();
   if (leaked.length > 0) {
-    fail('Unexpected global(s) found: ' + leaked.join(', '));
+    assert.fail('Unexpected global(s) found: ' + leaked.join(', '));
   }
 });
 
@@ -407,26 +479,44 @@ function runCallChecks(exitCode) {
   if (exitCode !== 0) return;
 
   var failed = mustCallChecks.filter(function (context) {
-    return context.actual !== context.expected;
+    if ('minimum' in context) {
+      context.messageSegment = 'at least ' + context.minimum;
+      return context.actual < context.minimum;
+    } else {
+      context.messageSegment = 'exactly ' + context.exact;
+      return context.actual !== context.exact;
+    }
   });
 
   forEach(failed, function (context) {
-    console.log('Mismatched %s function calls. Expected %d, actual %d.', context.name, context.expected, context.actual);
+    console.log('Mismatched %s function calls. Expected %s, actual %d.', context.name, context.messageSegment, context.actual);
     console.log(context.stack.split('\n').slice(2).join('\n'));
   });
 
   if (failed.length) process.exit(1);
 }
 
-exports.mustCall = function (fn, expected) {
-  if (expected === undefined) expected = 1;else if (typeof expected !== 'number') throw new TypeError('Invalid expected value: ' + expected);
+exports.mustCall = function (fn, exact) {
+  return _mustCallInner(fn, exact, 'exact');
+};
 
-  var context = {
-    expected: expected,
-    actual: 0,
-    stack: new Error().stack,
-    name: fn.name || '<anonymous>'
-  };
+exports.mustCallAtLeast = function (fn, minimum) {
+  return _mustCallInner(fn, minimum, 'minimum');
+};
+
+function _mustCallInner(fn, criteria, field) {
+  var _context;
+
+  if (typeof fn === 'number') {
+    criteria = fn;
+    fn = noop;
+  } else if (fn === undefined) {
+    fn = noop;
+  }
+
+  if (criteria === undefined) criteria = 1;else if (typeof criteria !== 'number') throw new TypeError('Invalid ' + field + ' value: ' + criteria);
+
+  var context = (_context = {}, _defineProperty(_context, field, criteria), _defineProperty(_context, 'actual', 0), _defineProperty(_context, 'stack', new Error().stack), _defineProperty(_context, 'name', fn.name || '<anonymous>'), _context);
 
   // add the exit listener only once to avoid listener leak warnings
   if (mustCallChecks.length === 0) process.on('exit', runCallChecks);
@@ -437,7 +527,7 @@ exports.mustCall = function (fn, expected) {
     context.actual++;
     return fn.apply(this, arguments);
   };
-};
+}
 
 exports.hasMultiLocalhost = function hasMultiLocalhost() {
   var TCP = process.binding('tcp_wrap').TCP;
@@ -483,14 +573,9 @@ exports.canCreateSymLink = function () {
   return true;
 };
 
-function fail(msg) {
-  assert.fail(null, null, msg);
-}
-exports.fail = fail;
-
 exports.mustNotCall = function (msg) {
   return function mustNotCall() {
-    fail(msg || 'function should not have been called');
+    assert.fail(msg || 'function should not have been called');
   };
 };
 
@@ -513,9 +598,9 @@ util.inherits(ArrayStream, stream.Stream);
 exports.ArrayStream = ArrayStream;
 ArrayStream.prototype.readable = true;
 ArrayStream.prototype.writable = true;
-ArrayStream.prototype.pause = function () {};
-ArrayStream.prototype.resume = function () {};
-ArrayStream.prototype.write = function () {};
+ArrayStream.prototype.pause = noop;
+ArrayStream.prototype.resume = noop;
+ArrayStream.prototype.write = noop;
 
 // Returns true if the exit code "exitCode" and/or signal name "signal"
 // represent the exit code and/or signal name of a node process that aborted,
@@ -532,9 +617,12 @@ exports.nodeProcessAborted = function nodeProcessAborted(exitCode, signal) {
   // or SIGABRT (depending on the compiler).
   var expectedSignals = ['SIGILL', 'SIGTRAP', 'SIGABRT'];
 
-  // On Windows, v8's base::OS::Abort triggers an access violation,
+  // On Windows, 'aborts' are of 2 types, depending on the context:
+  // (i) Forced access violation, if --abort-on-uncaught-exception is on
   // which corresponds to exit code 3221225477 (0xC0000005)
-  if (exports.isWindows) expectedExitCodes = [3221225477];
+  // (ii) raise(SIGABRT) or abort(), which lands up in CRT library calls
+  // which corresponds to exit code 3.
+  if (exports.isWindows) expectedExitCodes = [3221225477, 3];
 
   // When using --abort-on-uncaught-exception, V8 will use
   // base::OS::Abort to terminate the process.
@@ -615,34 +703,6 @@ exports.expectWarning = function (nameOrMap, expected) {
   });
 } /*</replacement>*/
 
-// https://github.com/w3c/testharness.js/blob/master/testharness.js
-exports.WPT = {
-  test: function (fn, desc) {
-    try {
-      fn();
-    } catch (err) {
-      if (err instanceof Error) err.message = 'In ' + desc + ':\n  ' + err.message;
-      throw err;
-    }
-  },
-  assert_equals: assert.strictEqual,
-  assert_true: function (value, message) {
-    return assert.strictEqual(value, true, message);
-  },
-  assert_false: function (value, message) {
-    return assert.strictEqual(value, false, message);
-  },
-  assert_throws: function (code, func, desc) {
-    assert.throws(func, function (err) {
-      return typeof err === 'object' && 'name' in err && err.name === code.name;
-    }, desc);
-  },
-  assert_array_equals: assert.deepStrictEqual,
-  assert_unreached: function (desc) {
-    assert.fail(undefined, undefined, 'Reached unreachable code: ' + desc);
-  }
-};
-
 // Useful for testing expected internal/error objects
 exports.expectsError = function expectsError(_ref) {
   var code = _ref.code,
@@ -659,6 +719,75 @@ exports.expectsError = function expectsError(_ref) {
     }
     return true;
   };
+};
+
+exports.skipIfInspectorDisabled = function skipIfInspectorDisabled() {
+  if (process.config.variables.v8_enable_inspector === 0) {
+    exports.skip('V8 inspector is disabled');
+    process.exit(0);
+  }
+};
+
+var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
+
+exports.getArrayBufferViews = function getArrayBufferViews(buf) {
+  var buffer = buf.buffer,
+      byteOffset = buf.byteOffset,
+      byteLength = buf.byteLength;
+
+
+  var out = [];
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = arrayBufferViews[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var type = _step.value;
+      var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
+          BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === undefined ? 1 : _type$BYTES_PER_ELEME;
+
+      if (byteLength % BYTES_PER_ELEMENT === 0) {
+        out.push(new type(buffer, byteOffset, byteLength / BYTES_PER_ELEMENT));
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return out;
+};
+
+// Crash the process on unhandled rejections.
+exports.crashOnUnhandledRejection = function () {
+  process.on('unhandledRejection', function (err) {
+    return process.nextTick(function () {
+      throw err;
+    });
+  });
+};
+
+exports.getTTYfd = function getTTYfd() {
+  var tty = require('tty');
+  var tty_fd = 0;
+  if (!tty.isatty(tty_fd)) tty_fd++;else if (!tty.isatty(tty_fd)) tty_fd++;else if (!tty.isatty(tty_fd)) tty_fd++;else try {
+    tty_fd = require('fs').openSync('/dev/tty');
+  } catch (e) {
+    // There aren't any tty fd's available to use.
+    return -1;
+  }
+  return tty_fd;
 };
 
 function forEach(xs, f) {
