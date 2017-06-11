@@ -5,7 +5,7 @@
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
-    "inherits": "~2.0.1",
+    "inherits": "~2.0.3",
     "isarray": "~1.0.0",
     "process-nextick-args": "~1.0.6",
     "safe-buffer": "~5.0.1",
