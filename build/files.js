@@ -159,9 +159,9 @@ const headRegexp = /(^module.exports = \w+;?)/m
       `
     ]
   , safeBufferFix = [
-    /const Buffer = require\('buffer'\)\.Buffer;/,
+    /(?:var|const) Buffer = require\('buffer'\)\.Buffer;/,
     `/*<replacement>*/
-  const Buffer = require('safe-buffer').Buffer
+  var Buffer = require('safe-buffer').Buffer
 /*</replacement>*/`
   ]
   , internalDirectory = [
@@ -177,7 +177,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , `function(er) { onwrite(stream, er); }`
   ]
   , addUintStuff = [
-      /const Buffer = require\('buffer'\)\.Buffer;/
+      /(?:var|const) Buffer = require\('buffer'\)\.Buffer;/
     , `/*<replacement>*/
   const Buffer = require('safe-buffer').Buffer
 function _uint8ArrayToBuffer(chunk) {
@@ -206,7 +206,7 @@ function WriteReq(chunk, encoding, cb) {
 function CorkedRequest(state) {
   this.next = null;
   this.entry = null;
-  this.finish = onCorkedFinish.bind(undefined, this, state);
+  this.finish = () => { onCorkedFinish(this, state) };
 }
 /* </replacement> */
 `
