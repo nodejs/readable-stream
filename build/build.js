@@ -64,7 +64,7 @@ function processFile (inputLoc, out, replacements) {
           'transform-es2015-template-literals',
           'transform-es2015-shorthand-properties',
           'transform-es2015-for-of',
-          'transform-es2015-classes',
+          ['transform-es2015-classes', { loose: true }],
           'transform-es2015-destructuring',
           'transform-es2015-computed-properties',
           'transform-es2015-spread'
