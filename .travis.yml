@@ -47,7 +47,7 @@ matrix:
   - node_js: 8
     env: TASK=test
   - node_js: 6
-    env: TASK=browser BROWSER_NAME=ie BROWSER_VERSION="9..latest"
+    env: TASK=browser BROWSER_NAME=ie BROWSER_VERSION="7..latest"
   - node_js: 6
     env: TASK=browser BROWSER_NAME=opera BROWSER_VERSION="11..latest"
   - node_js: 6
