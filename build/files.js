@@ -184,7 +184,7 @@ function _uint8ArrayToBuffer(chunk) {
    return Buffer.from(chunk);
 }
 function _isUint8Array(obj) {
-  return Object.prototype.toString.call(obj) === '[object Uint8Array]' || Buffer.isBuffer(obj);
+  return Buffer.isBuffer(obj) || (typeof obj !== 'string' && Object.prototype.toString.call(obj) === '[object Uint8Array]');
 }
 /*</replacement>*/
   `
