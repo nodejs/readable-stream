@@ -231,6 +231,22 @@ function CorkedRequest(state) {
       /Buffer\.prototype\.copy\.call\(src, target, offset\);/
     , 'src.copy(target, offset);'
   ]
+  , maybeDefineProperty = [
+        headRegexp
+      , '$1\n' + `
+/* <replacement> */
+var maybeDefineProperty = Object.defineProperty;
+// IE < 9
+if (!maybeDefineProperty || global.document && global.document.documentMode < 9) {
+  maybeDefineProperty = function () {};
+}
+/* </replacement> */
+`
+  ]
+  , defineProperty = [
+      /Object\.defineProperty/g
+    , 'maybeDefineProperty'
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -243,6 +259,8 @@ module.exports['_stream_duplex.js'] = [
   , objectKeysDefine
   , processNextTickImport
   , processNextTickReplacement
+  , defineProperty
+  , maybeDefineProperty
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -277,6 +295,8 @@ module.exports['_stream_readable.js'] = [
   , internalDirectory
   , fixUintStuff
   , addUintStuff
+  , defineProperty
+  , maybeDefineProperty
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -315,12 +335,16 @@ module.exports['_stream_writable.js'] = [
   , useWriteReq
   , useCorkedRequest
   , addConstructors
+  , defineProperty
+  , maybeDefineProperty
 ]
+
 module.exports['internal/streams/BufferList.js'] = [
     safeBufferFix
   , fixCopyBuffer
 
 ]
+
 module.exports['internal/streams/destroy.js'] = [
     processNextTickImport
   , processNextTickReplacement
