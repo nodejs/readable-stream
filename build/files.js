@@ -180,11 +180,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
       /(?:var|const) Buffer = require\('buffer'\)\.Buffer;/
     , `/*<replacement>*/
   const Buffer = require('safe-buffer').Buffer
+  const OurUint8Array = global.Uint8Array || function () {}
 function _uint8ArrayToBuffer(chunk) {
    return Buffer.from(chunk);
 }
 function _isUint8Array(obj) {
-  return Buffer.isBuffer(obj) || (typeof obj !== 'string' && Object.prototype.toString.call(obj) === '[object Uint8Array]');
+  return Buffer.isBuffer(obj) || (typeof obj !== 'string' && obj instanceof OurUint8Array);
 }
 /*</replacement>*/
   `
