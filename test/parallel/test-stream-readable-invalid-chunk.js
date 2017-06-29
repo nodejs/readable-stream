@@ -10,12 +10,13 @@ var readable = new stream.Readable({
   read: common.noop
 });
 
+var errMessage = /Invalid non-string\/buffer chunk/;
 assert.throws(function () {
   return readable.push([]);
-}, /Invalid non-string\/buffer chunk/);
+}, errMessage);
 assert.throws(function () {
   return readable.push({});
-}, /Invalid non-string\/buffer chunk/);
+}, errMessage);
 assert.throws(function () {
   return readable.push(0);
-}, /Invalid non-string\/buffer chunk/);
+}, errMessage);

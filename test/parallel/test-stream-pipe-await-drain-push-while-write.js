@@ -19,7 +19,7 @@ var writable = new stream.Writable({
     if (chunk.length === 32 * 1024) {
       // first chunk
       var beforePush = readable._readableState.awaitDrain;
-      readable.push(new Buffer(34 * 1024)); // above hwm
+      readable.push(bufferShim.alloc(34 * 1024)); // above hwm
       // We should check if awaitDrain counter is increased.
       var afterPush = readable._readableState.awaitDrain;
       assert.strictEqual(afterPush - beforePush, 1, 'Counter is not increased for awaitDrain');
@@ -31,7 +31,7 @@ var writable = new stream.Writable({
 });
 
 // A readable stream which produces two buffers.
-var bufs = [new Buffer(32 * 1024), new Buffer(33 * 1024)]; // above hwm
+var bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
 var readable = new stream.Readable({
   read: function () {
     while (bufs.length > 0) {
