@@ -81,7 +81,7 @@ writeChunks(inputChunks, function () {
     // there was a chunk
     assert.ok(seen);
 
-    var expected = new Buffer(expectedChunks[i]);
+    var expected = bufferShim.from(expectedChunks[i]);
     // it was what we expected
     assert.deepEqual(seen, expected);
   }

@@ -22,45 +22,10 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 var R = require('../../lib/_stream_readable');
 var util = require('util');
-
-// tiny node-tap lookalike.
-var tests = [];
-var count = 0;
-
-function test(name, fn) {
-  count++;
-  tests.push([name, fn]);
-}
-
-function run() {
-  var next = tests.shift();
-  if (!next) return console.error('ok');
-
-  var name = next[0];
-  var fn = next[1];
-  console.log('# %s', name);
-  fn({
-    same: assert.deepStrictEqual,
-    equal: assert.strictEqual,
-    end: function () {
-      count--;
-      run();
-    }
-  });
-}
-
-// ensure all tests have run
-process.on('exit', function () {
-  assert.strictEqual(count, 0);
-});
-
-process.nextTick(run);
-
-/////
 
 util.inherits(TestReader, R);
 
@@ -90,13 +55,12 @@ TestReader.prototype._read = function (n) {
     this.pos += n;
     var ret = bufferShim.alloc(n, 'a');
 
-    console.log('this.push(ret)', ret);
-
     return this.push(ret);
   }.bind(this), 1);
 };
 
-test('setEncoding utf8', function (t) {
+{
+  // Verify utf8 encoding
   var tr = new TestReader(100);
   tr.setEncoding('utf8');
   var out = [];
@@ -109,145 +73,142 @@ test('setEncoding utf8', function (t) {
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  tr.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(out, expect);
+  }));
+}
 
-test('setEncoding hex', function (t) {
-  var tr = new TestReader(100);
-  tr.setEncoding('hex');
-  var out = [];
-  var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
+{
+  // Verify hex encoding
+  var _tr = new TestReader(100);
+  _tr.setEncoding('hex');
+  var _out = [];
+  var _expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
-  tr.on('readable', function flow() {
+  _tr.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(10))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr.read(10))) {
+      _out.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out, _expect);
+  }));
+}
 
-test('setEncoding hex with read(13)', function (t) {
-  var tr = new TestReader(100);
-  tr.setEncoding('hex');
-  var out = [];
-  var expect = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
+{
+  // Verify hex encoding with read(13)
+  var _tr2 = new TestReader(100);
+  _tr2.setEncoding('hex');
+  var _out2 = [];
+  var _expect2 = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
 
-  tr.on('readable', function flow() {
-    console.log('readable once');
+  _tr2.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(13))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr2.read(13))) {
+      _out2.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    console.log('END');
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr2.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out2, _expect2);
+  }));
+}
 
-test('setEncoding base64', function (t) {
-  var tr = new TestReader(100);
-  tr.setEncoding('base64');
-  var out = [];
-  var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
+{
+  // Verify base64 encoding
+  var _tr3 = new TestReader(100);
+  _tr3.setEncoding('base64');
+  var _out3 = [];
+  var _expect3 = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
-  tr.on('readable', function flow() {
+  _tr3.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(10))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr3.read(10))) {
+      _out3.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr3.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out3, _expect3);
+  }));
+}
 
-test('encoding: utf8', function (t) {
-  var tr = new TestReader(100, { encoding: 'utf8' });
-  var out = [];
-  var expect = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
+{
+  // Verify utf8 encoding
+  var _tr4 = new TestReader(100, { encoding: 'utf8' });
+  var _out4 = [];
+  var _expect4 = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
 
-  tr.on('readable', function flow() {
+  _tr4.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(10))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr4.read(10))) {
+      _out4.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr4.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out4, _expect4);
+  }));
+}
 
-test('encoding: hex', function (t) {
-  var tr = new TestReader(100, { encoding: 'hex' });
-  var out = [];
-  var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
+{
+  // Verify hex encoding
+  var _tr5 = new TestReader(100, { encoding: 'hex' });
+  var _out5 = [];
+  var _expect5 = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
-  tr.on('readable', function flow() {
+  _tr5.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(10))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr5.read(10))) {
+      _out5.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr5.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out5, _expect5);
+  }));
+}
 
-test('encoding: hex with read(13)', function (t) {
-  var tr = new TestReader(100, { encoding: 'hex' });
-  var out = [];
-  var expect = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
+{
+  // Verify hex encoding with read(13)
+  var _tr6 = new TestReader(100, { encoding: 'hex' });
+  var _out6 = [];
+  var _expect6 = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
 
-  tr.on('readable', function flow() {
+  _tr6.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(13))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr6.read(13))) {
+      _out6.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr6.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out6, _expect6);
+  }));
+}
 
-test('encoding: base64', function (t) {
-  var tr = new TestReader(100, { encoding: 'base64' });
-  var out = [];
-  var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
+{
+  // Verify base64 encoding
+  var _tr7 = new TestReader(100, { encoding: 'base64' });
+  var _out7 = [];
+  var _expect7 = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
-  tr.on('readable', function flow() {
+  _tr7.on('readable', function flow() {
     var chunk = void 0;
-    while (null !== (chunk = tr.read(10))) {
-      out.push(chunk);
+    while (null !== (chunk = _tr7.read(10))) {
+      _out7.push(chunk);
     }
   });
 
-  tr.on('end', function () {
-    t.same(out, expect);
-    t.end();
-  });
-});
+  _tr7.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(_out7, _expect7);
+  }));
+}
 
-test('chainable', function (t) {
-  var tr = new TestReader(100);
-  t.equal(tr.setEncoding('utf8'), tr);
-  t.end();
-});
+{
+  // Verify chaining behavior
+  var _tr8 = new TestReader(100);
+  assert.deepStrictEqual(_tr8.setEncoding('utf8'), _tr8);
+}

@@ -292,11 +292,11 @@ if (exports.isWindows) {
 }
 
 var ifaces = os.networkInterfaces();
+var re = /lo/;
 exports.hasIPv6 = objectKeys(ifaces).some(function (name) {
-  return (/lo/.test(name) && ifaces[name].some(function (info) {
-      return info.family === 'IPv6';
-    })
-  );
+  return re.test(name) && ifaces[name].some(function (info) {
+    return info.family === 'IPv6';
+  });
 });
 
 /*
@@ -454,7 +454,7 @@ function leakedGlobals() {
     if (!knownGlobals.includes(global[val])) leaked.push(val);
   }if (global.__coverage__) {
     return leaked.filter(function (varname) {
-      return !/^(cov_|__cov)/.test(varname);
+      return !/^(?:cov_|__cov)/.test(varname);
     });
   } else {
     return leaked;
@@ -699,6 +699,14 @@ exports.expectWarning = function (nameOrMap, expected) {
   Object.defineProperty(exports, 'hasIntl', {
     get: function () {
       return process.binding('config').hasIntl;
+    }
+  });
+} /*</replacement>*/
+
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasSmallICU', {
+    get: function () {
+      return process.binding('config').hasSmallICU;
     }
   });
 } /*</replacement>*/

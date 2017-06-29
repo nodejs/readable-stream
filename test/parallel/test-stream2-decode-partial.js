@@ -6,8 +6,8 @@ var Readable = require('../../lib/_stream_readable');
 var assert = require('assert/');
 
 var buf = '';
-var euro = new Buffer([0xE2, 0x82, 0xAC]);
-var cent = new Buffer([0xC2, 0xA2]);
+var euro = bufferShim.from([0xE2, 0x82, 0xAC]);
+var cent = bufferShim.from([0xC2, 0xA2]);
 var source = Buffer.concat([euro, cent]);
 
 var readable = Readable({ encoding: 'utf8' });

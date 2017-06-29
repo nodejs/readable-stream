@@ -28,39 +28,6 @@ var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
 var assert = require('assert/');
 
-// tiny node-tap lookalike.
-var tests = [];
-var count = 0;
-
-function test(name, fn) {
-  count++;
-  tests.push([name, fn]);
-}
-
-function run() {
-  var next = tests.shift();
-  if (!next) return console.error('ok');
-
-  var name = next[0];
-  var fn = next[1];
-  console.log('# %s', name);
-  fn({
-    same: assert.deepStrictEqual,
-    equal: assert.strictEqual,
-    end: function () {
-      count--;
-      run();
-    }
-  });
-}
-
-// ensure all tests have run
-process.on('exit', function () {
-  assert.strictEqual(count, 0);
-});
-
-process.nextTick(run);
-
 function toArray(callback) {
   var stream = new Writable({ objectMode: true });
   var list = [];
@@ -68,9 +35,9 @@ function toArray(callback) {
     list.push(chunk);
   };
 
-  stream.end = function () {
+  stream.end = common.mustCall(function () {
     callback(list);
-  };
+  });
 
   return stream;
 }
@@ -86,7 +53,8 @@ function fromArray(list) {
   return r;
 }
 
-test('can read objects from stream', function (t) {
+{
+  // Verify that objects can be read from the stream
   var r = fromArray([{ one: '1' }, { two: '2' }]);
 
   var v1 = r.read();
@@ -96,161 +64,150 @@ test('can read objects from stream', function (t) {
   assert.deepStrictEqual(v1, { one: '1' });
   assert.deepStrictEqual(v2, { two: '2' });
   assert.deepStrictEqual(v3, null);
+}
 
-  t.end();
-});
+{
+  // Verify that objects can be piped into the stream
+  var _r = fromArray([{ one: '1' }, { two: '2' }]);
 
-test('can pipe objects into stream', function (t) {
-  var r = fromArray([{ one: '1' }, { two: '2' }]);
-
-  r.pipe(toArray(function (list) {
+  _r.pipe(toArray(common.mustCall(function (list) {
     assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('read(n) is ignored', function (t) {
-  var r = fromArray([{ one: '1' }, { two: '2' }]);
-
-  var value = r.read(2);
+{
+  // Verify that read(n) is ignored
+  var _r2 = fromArray([{ one: '1' }, { two: '2' }]);
+  var value = _r2.read(2);
 
   assert.deepStrictEqual(value, { one: '1' });
+}
 
-  t.end();
-});
-
-test('can read objects from _read (sync)', function (t) {
-  var r = new Readable({ objectMode: true });
+{
+  // Verify that objects can be synchronously read
+  var _r3 = new Readable({ objectMode: true });
   var list = [{ one: '1' }, { two: '2' }];
-  r._read = function (n) {
+  _r3._read = function (n) {
     var item = list.shift();
-    r.push(item || null);
+    _r3.push(item || null);
   };
 
-  r.pipe(toArray(function (list) {
+  _r3.pipe(toArray(common.mustCall(function (list) {
     assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('can read objects from _read (async)', function (t) {
-  var r = new Readable({ objectMode: true });
-  var list = [{ one: '1' }, { two: '2' }];
-  r._read = function (n) {
-    var item = list.shift();
+{
+  // Verify that objects can be asynchronously read
+  var _r4 = new Readable({ objectMode: true });
+  var _list = [{ one: '1' }, { two: '2' }];
+  _r4._read = function (n) {
+    var item = _list.shift();
     process.nextTick(function () {
-      r.push(item || null);
+      _r4.push(item || null);
     });
   };
 
-  r.pipe(toArray(function (list) {
+  _r4.pipe(toArray(common.mustCall(function (list) {
     assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('can read strings as objects', function (t) {
-  var r = new Readable({
+{
+  // Verify that strings can be read as objects
+  var _r5 = new Readable({
     objectMode: true
   });
-  r._read = common.mustNotCall();
-  var list = ['one', 'two', 'three'];
-  forEach(list, function (str) {
-    r.push(str);
+  _r5._read = common.mustNotCall();
+  var _list2 = ['one', 'two', 'three'];
+  forEach(_list2, function (str) {
+    _r5.push(str);
   });
-  r.push(null);
+  _r5.push(null);
 
-  r.pipe(toArray(function (array) {
-    assert.deepStrictEqual(array, list);
+  _r5.pipe(toArray(common.mustCall(function (array) {
+    assert.deepStrictEqual(array, _list2);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('read(0) for object streams', function (t) {
-  var r = new Readable({
+{
+  // Verify read(0) behavior for object streams
+  var _r6 = new Readable({
     objectMode: true
   });
-  r._read = common.mustNotCall();
+  _r6._read = common.mustNotCall();
 
-  r.push('foobar');
-  r.push(null);
+  _r6.push('foobar');
+  _r6.push(null);
 
-  r.pipe(toArray(function (array) {
+  _r6.pipe(toArray(common.mustCall(function (array) {
     assert.deepStrictEqual(array, ['foobar']);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('falsey values', function (t) {
-  var r = new Readable({
+{
+  // Verify the behavior of pushing falsey values
+  var _r7 = new Readable({
     objectMode: true
   });
-  r._read = common.mustNotCall();
+  _r7._read = common.mustNotCall();
 
-  r.push(false);
-  r.push(0);
-  r.push('');
-  r.push(null);
+  _r7.push(false);
+  _r7.push(0);
+  _r7.push('');
+  _r7.push(null);
 
-  r.pipe(toArray(function (array) {
+  _r7.pipe(toArray(common.mustCall(function (array) {
     assert.deepStrictEqual(array, [false, 0, '']);
+  })));
+}
 
-    t.end();
-  }));
-});
-
-test('high watermark _read', function (t) {
-  var r = new Readable({
+{
+  // Verify high watermark _read() behavior
+  var _r8 = new Readable({
     highWaterMark: 6,
     objectMode: true
   });
   var calls = 0;
-  var list = ['1', '2', '3', '4', '5', '6', '7', '8'];
+  var _list3 = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-  r._read = function (n) {
+  _r8._read = function (n) {
     calls++;
   };
 
-  forEach(list, function (c) {
-    r.push(c);
+  forEach(_list3, function (c) {
+    _r8.push(c);
   });
 
-  var v = r.read();
+  var v = _r8.read();
 
   assert.strictEqual(calls, 0);
   assert.strictEqual(v, '1');
 
-  var v2 = r.read();
-  assert.strictEqual(v2, '2');
+  var _v = _r8.read();
+  assert.strictEqual(_v, '2');
 
-  var v3 = r.read();
-  assert.strictEqual(v3, '3');
+  var _v2 = _r8.read();
+  assert.strictEqual(_v2, '3');
 
   assert.strictEqual(calls, 1);
+}
 
-  t.end();
-});
-
-test('high watermark push', function (t) {
-  var r = new Readable({
+{
+  // Verify high watermark push behavior
+  var _r9 = new Readable({
     highWaterMark: 6,
     objectMode: true
   });
-  r._read = common.mustNotCall();
+  _r9._read = common.mustNotCall();
   for (var i = 0; i < 6; i++) {
-    var bool = r.push(i);
+    var bool = _r9.push(i);
     assert.strictEqual(bool, i !== 5);
   }
+}
 
-  t.end();
-});
-
-test('can write objects to stream', function (t) {
+{
+  // Verify that objects can be written to stream
   var w = new Writable({ objectMode: true });
 
   w._write = function (chunk, encoding, cb) {
@@ -258,69 +215,65 @@ test('can write objects to stream', function (t) {
     cb();
   };
 
-  w.on('finish', function () {
-    t.end();
-  });
-
+  w.on('finish', common.mustCall());
   w.write({ foo: 'bar' });
   w.end();
-});
+}
 
-test('can write multiple objects to stream', function (t) {
-  var w = new Writable({ objectMode: true });
-  var list = [];
+{
+  // Verify that multiple objects can be written to stream
+  var _w = new Writable({ objectMode: true });
+  var _list4 = [];
 
-  w._write = function (chunk, encoding, cb) {
-    list.push(chunk);
+  _w._write = function (chunk, encoding, cb) {
+    _list4.push(chunk);
     cb();
   };
 
-  w.on('finish', function () {
-    assert.deepStrictEqual(list, [0, 1, 2, 3, 4]);
+  _w.on('finish', common.mustCall(function () {
+    assert.deepStrictEqual(_list4, [0, 1, 2, 3, 4]);
+  }));
 
-    t.end();
-  });
+  _w.write(0);
+  _w.write(1);
+  _w.write(2);
+  _w.write(3);
+  _w.write(4);
+  _w.end();
+}
 
-  w.write(0);
-  w.write(1);
-  w.write(2);
-  w.write(3);
-  w.write(4);
-  w.end();
-});
-
-test('can write strings as objects', function (t) {
-  var w = new Writable({
+{
+  // Verify that strings can be written as objects
+  var _w2 = new Writable({
     objectMode: true
   });
-  var list = [];
+  var _list5 = [];
 
-  w._write = function (chunk, encoding, cb) {
-    list.push(chunk);
+  _w2._write = function (chunk, encoding, cb) {
+    _list5.push(chunk);
     process.nextTick(cb);
   };
 
-  w.on('finish', function () {
-    assert.deepStrictEqual(list, ['0', '1', '2', '3', '4']);
+  _w2.on('finish', common.mustCall(function () {
+    assert.deepStrictEqual(_list5, ['0', '1', '2', '3', '4']);
+  }));
 
-    t.end();
-  });
+  _w2.write('0');
+  _w2.write('1');
+  _w2.write('2');
+  _w2.write('3');
+  _w2.write('4');
+  _w2.end();
+}
 
-  w.write('0');
-  w.write('1');
-  w.write('2');
-  w.write('3');
-  w.write('4');
-  w.end();
-});
-
-test('buffers finish until cb is called', function (t) {
-  var w = new Writable({
+{
+  // Verify that stream buffers finish until callback is called
+  var _w3 = new Writable({
     objectMode: true
   });
   var called = false;
 
-  w._write = function (chunk, encoding, cb) {
+  _w3._write = function (chunk, encoding, cb) {
     assert.strictEqual(chunk, 'foo');
 
     process.nextTick(function () {
@@ -329,15 +282,13 @@ test('buffers finish until cb is called', function (t) {
     });
   };
 
-  w.on('finish', function () {
+  _w3.on('finish', common.mustCall(function () {
     assert.strictEqual(called, true);
+  }));
 
-    t.end();
-  });
-
-  w.write('foo');
-  w.end();
-});
+  _w3.write('foo');
+  _w3.end();
+}
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
