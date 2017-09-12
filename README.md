@@ -55,3 +55,4 @@ Node.js. The responsibilities of the Streams Working Group include:
 * **Domenic Denicola** ([@domenic](https://github.com/domenic)) &lt;d@domenic.me&gt;
 * **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
+* **Irina Shestak** ([@lrlna](https://github.com/lrlna)) &lt;shestak.irina@gmail.com&gt;
