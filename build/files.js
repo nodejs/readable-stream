@@ -125,14 +125,14 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , `$1
 
 /*<replacement>*/
-  var processNextTick = require(\'process-nextick-args\');
+  var pna = require(\'process-nextick-args\');
 /*</replacement>*/
 `
     ]
 
     , processNextTickReplacement = [
       /process.nextTick\(/g
-    , 'processNextTick('
+    , 'pna.nextTick('
     ]
 
     , internalUtilReplacement = [
