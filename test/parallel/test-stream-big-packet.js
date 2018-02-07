@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,34 +30,32 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-var util = require('util');
 var stream = require('../../');
 
 var passed = false;
 
-function PassThrough() {
-  stream.Transform.call(this);
-}
-util.inherits(PassThrough, stream.Transform);
-PassThrough.prototype._transform = function (chunk, encoding, done) {
-  this.push(chunk);
-  done();
-};
+var TestStream = function (_stream$Transform) {
+  _inherits(TestStream, _stream$Transform);
 
-function TestStream() {
-  stream.Transform.call(this);
-}
-util.inherits(TestStream, stream.Transform);
-TestStream.prototype._transform = function (chunk, encoding, done) {
-  if (!passed) {
-    // Char 'a' only exists in the last write
-    passed = chunk.toString().includes('a');
+  function TestStream() {
+    _classCallCheck(this, TestStream);
+
+    return _possibleConstructorReturn(this, _stream$Transform.apply(this, arguments));
   }
-  done();
-};
 
-var s1 = new PassThrough();
-var s2 = new PassThrough();
+  TestStream.prototype._transform = function _transform(chunk, encoding, done) {
+    if (!passed) {
+      // Char 'a' only exists in the last write
+      passed = chunk.toString().includes('a');
+    }
+    done();
+  };
+
+  return TestStream;
+}(stream.Transform);
+
+var s1 = new stream.PassThrough();
+var s2 = new stream.PassThrough();
 var s3 = new TestStream();
 s1.pipe(s3);
 // Don't let s2 auto close which may close s3

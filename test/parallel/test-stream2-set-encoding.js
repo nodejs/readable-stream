@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -25,39 +31,46 @@ var bufferShim = require('safe-buffer').Buffer;
 var common = require('../common');
 var assert = require('assert/');
 var R = require('../../lib/_stream_readable');
-var util = require('util');
 
-util.inherits(TestReader, R);
+var TestReader = function (_R) {
+  _inherits(TestReader, _R);
 
-function TestReader(n, opts) {
-  R.call(this, opts);
+  function TestReader(n, opts) {
+    _classCallCheck(this, TestReader);
 
-  this.pos = 0;
-  this.len = n || 100;
-}
+    var _this = _possibleConstructorReturn(this, _R.call(this, opts));
 
-TestReader.prototype._read = function (n) {
-  setTimeout(function () {
+    _this.pos = 0;
+    _this.len = n || 100;
+    return _this;
+  }
 
-    if (this.pos >= this.len) {
-      // double push(null) to test eos handling
-      this.push(null);
-      return this.push(null);
-    }
+  TestReader.prototype._read = function _read(n) {
+    var _this2 = this;
 
-    n = Math.min(n, this.len - this.pos);
-    if (n <= 0) {
-      // double push(null) to test eos handling
-      this.push(null);
-      return this.push(null);
-    }
+    setTimeout(function () {
+      if (_this2.pos >= _this2.len) {
+        // double push(null) to test eos handling
+        _this2.push(null);
+        return _this2.push(null);
+      }
 
-    this.pos += n;
-    var ret = bufferShim.alloc(n, 'a');
+      n = Math.min(n, _this2.len - _this2.pos);
+      if (n <= 0) {
+        // double push(null) to test eos handling
+        _this2.push(null);
+        return _this2.push(null);
+      }
 
-    return this.push(ret);
-  }.bind(this), 1);
-};
+      _this2.pos += n;
+      var ret = bufferShim.alloc(n, 'a');
+
+      return _this2.push(ret);
+    }, 1);
+  };
+
+  return TestReader;
+}(R);
 
 {
   // Verify utf8 encoding

@@ -24,7 +24,6 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var stream = require('../../');
-var Buffer = require('buffer').Buffer;
 
 var r = new stream.Readable();
 r._read = function (size) {

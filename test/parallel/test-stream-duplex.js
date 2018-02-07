@@ -22,7 +22,7 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-var common = require('../common');
+require('../common');
 var assert = require('assert/');
 var Duplex = require('../../').Duplex;
 
@@ -40,7 +40,7 @@ stream._write = function (obj, _, cb) {
   cb();
 };
 
-stream._read = common.noop;
+stream._read = function () {};
 
 stream.on('data', function (obj) {
   read = obj;

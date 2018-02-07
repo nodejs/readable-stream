@@ -103,10 +103,10 @@ var Stream = require('stream').Stream;
   });
 
   _w.on('error', common.mustCall());
-  _w._write = common.noop;
+  _w._write = function () {};
 
   _r.pipe(_w);
   // Removing some OTHER random listener should not do anything
-  _w.removeListener('error', common.noop);
+  _w.removeListener('error', function () {});
   _removed = true;
 }

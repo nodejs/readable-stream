@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,34 +32,51 @@ var common = require('../common');
 var assert = require('assert/');
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
-var util = require('util');
 
-util.inherits(TestReadable, Readable);
-function TestReadable(opt) {
-  if (!(this instanceof TestReadable)) return new TestReadable(opt);
-  Readable.call(this, opt);
-  this._ended = false;
-}
+var TestReadable = function (_Readable) {
+  _inherits(TestReadable, _Readable);
 
-TestReadable.prototype._read = function () {
-  if (this._ended) this.emit('error', new Error('_read called twice'));
-  this._ended = true;
-  this.push(null);
-};
+  function TestReadable(opt) {
+    _classCallCheck(this, TestReadable);
 
-util.inherits(TestWritable, Writable);
-function TestWritable(opt) {
-  if (!(this instanceof TestWritable)) return new TestWritable(opt);
-  Writable.call(this, opt);
-  this._written = [];
-}
+    var _this = _possibleConstructorReturn(this, _Readable.call(this, opt));
 
-TestWritable.prototype._write = function (chunk, encoding, cb) {
-  this._written.push(chunk);
-  cb();
-};
+    _this._ended = false;
+    return _this;
+  }
+
+  TestReadable.prototype._read = function _read() {
+    if (this._ended) this.emit('error', new Error('_read called twice'));
+    this._ended = true;
+    this.push(null);
+  };
+
+  return TestReadable;
+}(Readable);
+
+var TestWritable = function (_Writable) {
+  _inherits(TestWritable, _Writable);
+
+  function TestWritable(opt) {
+    _classCallCheck(this, TestWritable);
+
+    var _this2 = _possibleConstructorReturn(this, _Writable.call(this, opt));
+
+    _this2._written = [];
+    return _this2;
+  }
+
+  TestWritable.prototype._write = function _write(chunk, encoding, cb) {
+    this._written.push(chunk);
+    cb();
+  };
+
+  return TestWritable;
+}(Writable);
 
 // this one should not emit 'end' until we read() from it later.
+
+
 var ender = new TestReadable();
 
 // what happens when you pipe() a Readable that's already ended?

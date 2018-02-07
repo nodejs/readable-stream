@@ -8,9 +8,9 @@ var _require = require('../../'),
     Readable = _require.Readable,
     Writable = _require.Writable;
 
-var source = Readable({ read: common.noop });
-var dest1 = Writable({ write: common.noop });
-var dest2 = Writable({ write: common.noop });
+var source = Readable({ read: function () {} });
+var dest1 = Writable({ write: function () {} });
+var dest2 = Writable({ write: function () {} });
 
 source.pipe(dest1);
 source.pipe(dest2);

@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,32 +32,42 @@ require('../common');
 var assert = require('assert/');
 
 var Readable = require('../../').Readable;
-var util = require('util');
 
-util.inherits(MyStream, Readable);
-function MyStream(options) {
-  Readable.call(this, options);
-  this._chunks = 3;
-}
+var MyStream = function (_Readable) {
+  _inherits(MyStream, _Readable);
 
-MyStream.prototype._read = function (n) {
-  switch (this._chunks--) {
-    case 0:
-      return this.push(null);
-    case 1:
-      return setTimeout(function () {
-        this.push('last chunk');
-      }.bind(this), 100);
-    case 2:
-      return this.push('second to last chunk');
-    case 3:
-      return process.nextTick(function () {
-        this.push('first chunk');
-      }.bind(this));
-    default:
-      throw new Error('?');
+  function MyStream(options) {
+    _classCallCheck(this, MyStream);
+
+    var _this = _possibleConstructorReturn(this, _Readable.call(this, options));
+
+    _this._chunks = 3;
+    return _this;
   }
-};
+
+  MyStream.prototype._read = function _read(n) {
+    var _this2 = this;
+
+    switch (this._chunks--) {
+      case 0:
+        return this.push(null);
+      case 1:
+        return setTimeout(function () {
+          _this2.push('last chunk');
+        }, 100);
+      case 2:
+        return this.push('second to last chunk');
+      case 3:
+        return process.nextTick(function () {
+          _this2.push('first chunk');
+        });
+      default:
+        throw new Error('?');
+    }
+  };
+
+  return MyStream;
+}(Readable);
 
 var ms = new MyStream();
 var results = [];

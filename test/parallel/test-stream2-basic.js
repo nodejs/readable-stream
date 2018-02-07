@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -27,66 +33,83 @@ var common = require('../common');
 var R = require('../../lib/_stream_readable');
 var assert = require('assert/');
 
-var util = require('util');
 var EE = require('events').EventEmitter;
 
-function TestReader(n) {
-  R.apply(this);
-  this._buffer = bufferShim.alloc(n || 100, 'x');
-  this._pos = 0;
-  this._bufs = 10;
-}
+var TestReader = function (_R) {
+  _inherits(TestReader, _R);
 
-util.inherits(TestReader, R);
+  function TestReader(n) {
+    _classCallCheck(this, TestReader);
 
-TestReader.prototype._read = function (n) {
-  var max = this._buffer.length - this._pos;
-  n = Math.max(n, 0);
-  var toRead = Math.min(n, max);
-  if (toRead === 0) {
-    // simulate the read buffer filling up with some more bytes some time
-    // in the future.
-    setTimeout(function () {
-      this._pos = 0;
-      this._bufs -= 1;
-      if (this._bufs <= 0) {
-        // read them all!
-        if (!this.ended) this.push(null);
-      } else {
-        // now we have more.
-        // kinda cheating by calling _read, but whatever,
-        // it's just fake anyway.
-        this._read(n);
-      }
-    }.bind(this), 10);
-    return;
+    var _this = _possibleConstructorReturn(this, _R.call(this));
+
+    _this._buffer = bufferShim.alloc(n || 100, 'x');
+    _this._pos = 0;
+    _this._bufs = 10;
+    return _this;
   }
 
-  var ret = this._buffer.slice(this._pos, this._pos + toRead);
-  this._pos += toRead;
-  this.push(ret);
-};
+  TestReader.prototype._read = function _read(n) {
+    var _this2 = this;
+
+    var max = this._buffer.length - this._pos;
+    n = Math.max(n, 0);
+    var toRead = Math.min(n, max);
+    if (toRead === 0) {
+      // simulate the read buffer filling up with some more bytes some time
+      // in the future.
+      setTimeout(function () {
+        _this2._pos = 0;
+        _this2._bufs -= 1;
+        if (_this2._bufs <= 0) {
+          // read them all!
+          if (!_this2.ended) _this2.push(null);
+        } else {
+          // now we have more.
+          // kinda cheating by calling _read, but whatever,
+          // it's just fake anyway.
+          _this2._read(n);
+        }
+      }, 10);
+      return;
+    }
+
+    var ret = this._buffer.slice(this._pos, this._pos + toRead);
+    this._pos += toRead;
+    this.push(ret);
+  };
+
+  return TestReader;
+}(R);
 
 /////
 
-function TestWriter() {
-  EE.apply(this);
-  this.received = [];
-  this.flush = false;
-}
+var TestWriter = function (_EE) {
+  _inherits(TestWriter, _EE);
 
-util.inherits(TestWriter, EE);
+  function TestWriter() {
+    _classCallCheck(this, TestWriter);
 
-TestWriter.prototype.write = function (c) {
-  this.received.push(c.toString());
-  this.emit('write', c);
-  return true;
-};
+    var _this3 = _possibleConstructorReturn(this, _EE.call(this));
 
-TestWriter.prototype.end = function (c) {
-  if (c) this.write(c);
-  this.emit('end', this.received);
-};
+    _this3.received = [];
+    _this3.flush = false;
+    return _this3;
+  }
+
+  TestWriter.prototype.write = function write(c) {
+    this.received.push(c.toString());
+    this.emit('write', c);
+    return true;
+  };
+
+  TestWriter.prototype.end = function end(c) {
+    if (c) this.write(c);
+    this.emit('end', this.received);
+  };
+
+  return TestWriter;
+}(EE);
 
 {
   // Test basic functionality

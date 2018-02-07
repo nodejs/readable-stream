@@ -23,9 +23,11 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-var Readable = require('../../').Readable;
-var Writable = require('../../').Writable;
 var assert = require('assert/');
+
+var _require = require('../../'),
+    Readable = _require.Readable,
+    Writable = _require.Writable;
 
 var EE = require('events').EventEmitter;
 

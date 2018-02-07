@@ -159,10 +159,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
       `
     ]
   , safeBufferFix = [
-    /(?:var|const) Buffer = require\('buffer'\)\.Buffer;/,
+    /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/,
     `/*<replacement>*/
-  var Buffer = require('safe-buffer').Buffer
-/*</replacement>*/`
+  var Buffer = require('safe-buffer').Buffer;
+/*</replacement>*/
+`
   ]
   , internalDirectory = [
     /require\('internal\/streams\/([a-zA-z]+)'\)/g,
@@ -177,8 +178,8 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , `function(er) { onwrite(stream, er); }`
   ]
   , addUintStuff = [
-      /(?:var|const) Buffer = require\('buffer'\)\.Buffer;/
-    , `/*<replacement>*/
+      /(?:var|const) Buffer = require\('safe-buffer'\)\.Buffer;/
+    , `
   const Buffer = require('safe-buffer').Buffer
   const OurUint8Array = global.Uint8Array || function () {}
 function _uint8ArrayToBuffer(chunk) {
@@ -187,7 +188,6 @@ function _uint8ArrayToBuffer(chunk) {
 function _isUint8Array(obj) {
   return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
-/*</replacement>*/
   `
   ]
   , addConstructors = [
@@ -276,6 +276,7 @@ module.exports['_stream_readable.js'] = [
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
   , internalDirectory
+  , safeBufferFix
   , fixUintStuff
   , addUintStuff
 ]
@@ -310,6 +311,7 @@ module.exports['_stream_writable.js'] = [
   , fixInstanceCheck
   , removeOnWriteBind
   , internalDirectory
+  , safeBufferFix
   , fixUintStuff
   , addUintStuff
   , fixBufferCheck
