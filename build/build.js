@@ -56,21 +56,30 @@ function processFile (inputLoc, out, replacements) {
       data = data.replace(regexp, arg2)
     })
     if (inputLoc.slice(-3) === '.js') {
-      const transformed = babel.transform(data, {
-        plugins: [
-          'transform-es2015-parameters',
-          'transform-es2015-arrow-functions',
-          'transform-es2015-block-scoping',
-          'transform-es2015-template-literals',
-          'transform-es2015-shorthand-properties',
-          'transform-es2015-for-of',
-          ['transform-es2015-classes', { loose: true }],
-          'transform-es2015-destructuring',
-          'transform-es2015-computed-properties',
-          'transform-es2015-spread'
-        ]
-      })
-      data = transformed.code
+      try {
+        const transformed = babel.transform(data, {
+          plugins: [
+            'transform-es2015-parameters',
+            'transform-es2015-arrow-functions',
+            'transform-es2015-block-scoping',
+            'transform-es2015-template-literals',
+            'transform-es2015-shorthand-properties',
+            'transform-es2015-for-of',
+            ['transform-es2015-classes', { loose: true }],
+            'transform-es2015-destructuring',
+            'transform-es2015-computed-properties',
+            'transform-es2015-spread'
+          ]
+        })
+        data = transformed.code
+      } catch (err) {
+        fs.writeFile(out + '.errored.js', data, encoding, function () {
+          console.log('Wrote errored', out)
+
+          throw err
+        })
+        return
+      }
     }
     fs.writeFile(out, data, encoding, function (err) {
       if (err) throw err
@@ -150,11 +159,20 @@ pump(
     //--------------------------------------------------------------------
     // Grab the nodejs/node test/common.js
 
-    processFile(
-        testsrcurl.replace(/parallel\/$/, 'common/index.js')
-      , path.join(testourroot, '../common.js')
-      , testReplace['common.js']
-    )
+  glob(path.join(src, 'test/common/*'), function (err, list) {
+      if (err) {
+        throw err
+      }
+
+      list.forEach(function (file) {
+        file = path.basename(file)
+        processFile(
+            path.join(testsrcurl.replace(/parallel\/$/, 'common/'), file)
+          , path.join(testourroot.replace('parallel', 'common'), file)
+          , testReplace['common.js']
+        )
+      })
+    })
 
     //--------------------------------------------------------------------
     // Update Node version in README

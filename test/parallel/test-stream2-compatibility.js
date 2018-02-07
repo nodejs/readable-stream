@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -27,25 +33,31 @@ var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
 var assert = require('assert/');
 
-var util = require('util');
-
 var ondataCalled = 0;
 
-function TestReader() {
-  R.apply(this);
-  this._buffer = bufferShim.alloc(100, 'x');
+var TestReader = function (_R) {
+  _inherits(TestReader, _R);
 
-  this.on('data', function () {
-    ondataCalled++;
-  });
-}
+  function TestReader() {
+    _classCallCheck(this, TestReader);
 
-util.inherits(TestReader, R);
+    var _this = _possibleConstructorReturn(this, _R.call(this));
 
-TestReader.prototype._read = function (n) {
-  this.push(this._buffer);
-  this._buffer = bufferShim.alloc(0);
-};
+    _this._buffer = bufferShim.alloc(100, 'x');
+
+    _this.on('data', function () {
+      ondataCalled++;
+    });
+    return _this;
+  }
+
+  TestReader.prototype._read = function _read(n) {
+    this.push(this._buffer);
+    this._buffer = bufferShim.alloc(0);
+  };
+
+  return TestReader;
+}(R);
 
 var reader = new TestReader();
 setImmediate(function () {
@@ -54,17 +66,25 @@ setImmediate(function () {
   reader.push(null);
 });
 
-function TestWriter() {
-  W.apply(this);
-  this.write('foo');
-  this.end();
-}
+var TestWriter = function (_W) {
+  _inherits(TestWriter, _W);
 
-util.inherits(TestWriter, W);
+  function TestWriter() {
+    _classCallCheck(this, TestWriter);
 
-TestWriter.prototype._write = function (chunk, enc, cb) {
-  cb();
-};
+    var _this2 = _possibleConstructorReturn(this, _W.call(this));
+
+    _this2.write('foo');
+    _this2.end();
+    return _this2;
+  }
+
+  TestWriter.prototype._write = function _write(chunk, enc, cb) {
+    cb();
+  };
+
+  return TestWriter;
+}(W);
 
 var writer = new TestWriter();
 

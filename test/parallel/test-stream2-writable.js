@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28,23 +34,32 @@ var W = require('../../lib/_stream_writable');
 var D = require('../../lib/_stream_duplex');
 var assert = require('assert/');
 
-var util = require('util');
-util.inherits(TestWriter, W);
+var TestWriter = function (_W) {
+  _inherits(TestWriter, _W);
 
-function TestWriter() {
-  W.apply(this, arguments);
-  this.buffer = [];
-  this.written = 0;
-}
+  function TestWriter(opts) {
+    _classCallCheck(this, TestWriter);
 
-TestWriter.prototype._write = function (chunk, encoding, cb) {
-  // simulate a small unpredictable latency
-  setTimeout(function () {
-    this.buffer.push(chunk.toString());
-    this.written += chunk.length;
-    cb();
-  }.bind(this), Math.floor(Math.random() * 10));
-};
+    var _this = _possibleConstructorReturn(this, _W.call(this, opts));
+
+    _this.buffer = [];
+    _this.written = 0;
+    return _this;
+  }
+
+  TestWriter.prototype._write = function _write(chunk, encoding, cb) {
+    var _this2 = this;
+
+    // simulate a small unpredictable latency
+    setTimeout(function () {
+      _this2.buffer.push(chunk.toString());
+      _this2.written += chunk.length;
+      cb();
+    }, Math.floor(Math.random() * 10));
+  };
+
+  return TestWriter;
+}(W);
 
 var chunks = new Array(50);
 for (var i = 0; i < chunks.length; i++) {

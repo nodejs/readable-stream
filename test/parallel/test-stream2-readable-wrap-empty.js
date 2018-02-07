@@ -28,11 +28,11 @@ var Readable = require('../../lib/_stream_readable');
 var EE = require('events').EventEmitter;
 
 var oldStream = new EE();
-oldStream.pause = common.noop;
-oldStream.resume = common.noop;
+oldStream.pause = function () {};
+oldStream.resume = function () {};
 
 var newStream = new Readable().wrap(oldStream);
 
-newStream.on('readable', common.noop).on('end', common.mustCall());
+newStream.on('readable', function () {}).on('end', common.mustCall());
 
 oldStream.emit('end');

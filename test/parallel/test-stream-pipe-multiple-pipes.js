@@ -6,7 +6,7 @@ var stream = require('../../');
 var assert = require('assert/');
 
 var readable = new stream.Readable({
-  read: common.noop
+  read: function () {}
 });
 
 var writables = [];

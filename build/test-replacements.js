@@ -161,7 +161,7 @@ module.exports['common.js'] = [
     ],
     [
         /require\(['"]stream['"]\)/g
-      , 'require(\'../\')'
+      , 'require(\'../../\')'
     ],
     [
     /^var util = require\('util'\);/m
@@ -194,8 +194,13 @@ module.exports['common.js'] = [
   '}).enable();*/'
 ],
 [
-  /const async_wrap = process.binding\('async_wrap'\);/,
-  '//const async_wrap = process.binding(\'async_wrap\');'
+  /const async_wrap = process\.binding\('async_wrap'\);\n.*var kCheck = async_wrap\.constants\.kCheck;/gm,
+  '// const async_wrap = process.binding(\'async_wrap\');' +
+  '  // var kCheck = async_wrap.constants.kCheck;'
+],
+[
+  /async_wrap\.async_hook_fields\[kCheck\] \+= 1;/,
+  '// async_wrap.async_hook_fields[kCheck] += 1;'
 ]
 ]
 

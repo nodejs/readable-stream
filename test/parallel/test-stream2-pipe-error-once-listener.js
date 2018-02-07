@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,34 +29,47 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-var common = require('../common');
-var util = require('util');
+require('../common');
 var stream = require('../../');
 
-function Read() {
-  stream.Readable.call(this);
-}
-util.inherits(Read, stream.Readable);
+var Read = function (_stream$Readable) {
+  _inherits(Read, _stream$Readable);
 
-Read.prototype._read = function (size) {
-  this.push('x');
-  this.push(null);
-};
+  function Read() {
+    _classCallCheck(this, Read);
 
-function Write() {
-  stream.Writable.call(this);
-}
-util.inherits(Write, stream.Writable);
+    return _possibleConstructorReturn(this, _stream$Readable.apply(this, arguments));
+  }
 
-Write.prototype._write = function (buffer, encoding, cb) {
-  this.emit('error', new Error('boom'));
-  this.emit('alldone');
-};
+  Read.prototype._read = function _read(size) {
+    this.push('x');
+    this.push(null);
+  };
+
+  return Read;
+}(stream.Readable);
+
+var Write = function (_stream$Writable) {
+  _inherits(Write, _stream$Writable);
+
+  function Write() {
+    _classCallCheck(this, Write);
+
+    return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+  }
+
+  Write.prototype._write = function _write(buffer, encoding, cb) {
+    this.emit('error', new Error('boom'));
+    this.emit('alldone');
+  };
+
+  return Write;
+}(stream.Writable);
 
 var read = new Read();
 var write = new Write();
 
-write.once('error', common.noop);
+write.once('error', function () {});
 write.once('alldone', function (err) {
   console.log('ok');
 });

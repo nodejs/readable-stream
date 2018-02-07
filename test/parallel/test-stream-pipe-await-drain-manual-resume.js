@@ -26,16 +26,17 @@ var readable = new stream.Readable({
 readable.pipe(writable);
 
 readable.once('pause', common.mustCall(function () {
-  assert.strictEqual(readable._readableState.awaitDrain, 1, 'awaitDrain doesn\'t increase');
+  assert.strictEqual(readable._readableState.awaitDrain, 1, 'Expected awaitDrain to equal 1 but instead got ' + ('' + readable._readableState.awaitDrain));
   // First pause, resume manually. The next write() to writable will still
   // return false, because chunks are still being buffered, so it will increase
   // the awaitDrain counter again.
+
   process.nextTick(common.mustCall(function () {
     readable.resume();
   }));
 
   readable.once('pause', common.mustCall(function () {
-    assert.strictEqual(readable._readableState.awaitDrain, 1, '.resume() does not reset counter');
+    assert.strictEqual(readable._readableState.awaitDrain, 1, '.resume() should not reset the counter but instead got ' + ('' + readable._readableState.awaitDrain));
     // Second pause, handle all chunks from now on. Once all callbacks that
     // are currently queued up are handled, the awaitDrain drain counter should
     // fall back to 0 and all chunks that are pending on the readable side
@@ -74,6 +75,6 @@ readable.push(bufferShim.alloc(100)); // Should get through to the writable.
 readable.push(null);
 
 writable.on('finish', common.mustCall(function () {
-  assert.strictEqual(readable._readableState.awaitDrain, 0, 'awaitDrain not 0 after all chunks are written');
+  assert.strictEqual(readable._readableState.awaitDrain, 0, 'awaitDrain should equal 0 after all chunks are written but instead got' + ('' + readable._readableState.awaitDrain));
   // Everything okay, all chunks were written.
 }));

@@ -1,3 +1,9 @@
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28,29 +34,44 @@ var stream = require('../../');
 
 var chunk = bufferShim.from('hallo');
 
-var util = require('util');
+var TestWriter = function (_stream$Writable) {
+  _inherits(TestWriter, _stream$Writable);
 
-function TestWriter() {
-  stream.Writable.call(this);
-}
-util.inherits(TestWriter, stream.Writable);
+  function TestWriter() {
+    _classCallCheck(this, TestWriter);
 
-TestWriter.prototype._write = function (buffer, encoding, callback) {
-  callback(null);
-};
+    return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+  }
+
+  TestWriter.prototype._write = function _write(buffer, encoding, callback) {
+    callback(null);
+  };
+
+  return TestWriter;
+}(stream.Writable);
 
 var dest = new TestWriter();
 
 // Set this high so that we'd trigger a nextTick warning
 // and/or RangeError if we do maybeReadMore wrong.
-function TestReader() {
-  stream.Readable.call(this, { highWaterMark: 0x10000 });
-}
-util.inherits(TestReader, stream.Readable);
 
-TestReader.prototype._read = function (size) {
-  this.push(chunk);
-};
+var TestReader = function (_stream$Readable) {
+  _inherits(TestReader, _stream$Readable);
+
+  function TestReader() {
+    _classCallCheck(this, TestReader);
+
+    return _possibleConstructorReturn(this, _stream$Readable.call(this, {
+      highWaterMark: 0x10000
+    }));
+  }
+
+  TestReader.prototype._read = function _read(size) {
+    this.push(chunk);
+  };
+
+  return TestReader;
+}(stream.Readable);
 
 var src = new TestReader();
 

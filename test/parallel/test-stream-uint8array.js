@@ -5,7 +5,6 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
 var assert = require('assert/');
-var Buffer = require('buffer').Buffer;
 
 var _require = require('../../'),
     Readable = _require.Readable,
