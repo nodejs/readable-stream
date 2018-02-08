@@ -105,8 +105,8 @@ exports.projectDir = path.resolve(__dirname, '..', '..');
 
 // Always enable async_hooks checks in tests
 {
-  var async_wrap = process.binding('async_wrap');
-  var kCheck = async_wrap.constants.kCheck;
+  // const async_wrap = process.binding('async_wrap');
+  // const kCheck = async_wrap.constants.kCheck;
   // async_wrap.async_hook_fields[kCheck] += 1;
 
   exports.revert_force_async_hooks_checks = function () {

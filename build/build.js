@@ -149,6 +149,8 @@ pump(
             file !== 'test-stream-base-no-abort.js' &&
             file !== 'test-stream-preprocess.js' &&
             file !== 'test-stream-inheritance.js' &&
+            file !== 'test-stream-base-prototype-accessors.js' &&
+            file !== 'test-stream-base-prototype-accessors-enumerability.js'  &&
             file !== 'test-stream-base-typechecking.js') {
           processTestFile(file)
         }
