@@ -7,19 +7,19 @@
     "core-util-is": "~1.0.0",
     "inherits": "~2.0.3",
     "isarray": "~1.0.0",
-    "process-nextick-args": "~1.0.6",
+    "process-nextick-args": "~2.0.0",
     "safe-buffer": "~5.1.1",
     "string_decoder": "~1.0.3",
     "util-deprecate": "~1.0.1"
   },
   "devDependencies": {
-    "assert": "~1.4.0",
+    "assert": "^1.4.0",
     "babel-polyfill": "^6.9.1",
     "buffer": "^4.9.0",
     "nyc": "^6.4.0",
-    "tap": "~0.7.1",
-    "tape": "~4.5.1",
-    "zuul": "~3.10.0"
+    "tap": "^0.7.0",
+    "tape": "^4.8.0",
+    "zuul": "^3.11.1"
   },
   "scripts": {
     "test": "tap test/parallel/*.js test/ours/*.js && node test/verify-dependencies.js",

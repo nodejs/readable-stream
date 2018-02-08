@@ -125,7 +125,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , `$1
 
 /*<replacement>*/
-  var processNextTick = require(\'process-nextick-args\');
+  var processNextTick = require(\'process-nextick-args\').nextTick;
 /*</replacement>*/
 `
     ]
