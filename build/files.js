@@ -333,7 +333,7 @@ const util = require('util')
     /$/,
     `
 
-if (util && util.inspect.custom) {
+if (util && util.inspect && util.inspect.custom) {
   module.exports.prototype[util.inspect.custom] = function () {
     const obj = util.inspect({ length: this.length });
     return \`\${this.constructor.name} \${obj}\`;
