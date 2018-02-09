@@ -89,10 +89,10 @@ assert.strictEqual(dest.listeners('error').length, 0);
 assert.strictEqual(dest.listeners('close').length, 0);
 assert.strictEqual(dest.listeners('finish').length, 0);
 
-console.error(src._readableState);
+// console.error(src._readableState);
 process.on('exit', function () {
   src._readableState.buffer.length = 0;
-  console.error(src._readableState);
+  // console.error(src._readableState);
   assert(src._readableState.length >= src._readableState.highWaterMark);
   console.log('ok');
 });
