@@ -337,10 +337,3 @@ module.exports['test-stream-unpipe-event.js'] = [
     'if (process.version.indexOf(\'v0.8\') === 0) { process.exit(0) }\n'
   ]
 ]
-
-module.exports['test-stream2-unpipe-leak.js'] = [
-  [
-    /console\.error\(src\._readableState\);/g,
-    '// console.error(src._readableState);'
-  ]
-]
