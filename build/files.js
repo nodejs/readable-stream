@@ -319,9 +319,28 @@ module.exports['_stream_writable.js'] = [
   , useCorkedRequest
   , addConstructors
 ]
+
 module.exports['internal/streams/BufferList.js'] = [
-    safeBufferFix
+    [
+      /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/,
+      `
+const Buffer = require('safe-buffer').Buffer
+const util = require('util')
+      `
+    ]
   , fixCopyBuffer
+  , [
+    /$/,
+    `
+
+if (util && util.inspect.custom) {
+  module.exports.prototype[util.inspect.custom] = function () {
+    const obj = util.inspect({ length: this.length });
+    return \`\${this.constructor.name} \${obj}\`;
+  }
+}
+`
+  ]
 
 ]
 module.exports['internal/streams/destroy.js'] = [
