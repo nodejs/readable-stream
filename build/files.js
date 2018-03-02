@@ -125,14 +125,14 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , `$1
 
 /*<replacement>*/
-  var processNextTick = require(\'process-nextick-args\').nextTick;
+  var pna = require(\'process-nextick-args\');
 /*</replacement>*/
 `
     ]
 
     , processNextTickReplacement = [
       /process.nextTick\(/g
-    , 'processNextTick('
+    , 'pna.nextTick('
     ]
 
     , internalUtilReplacement = [
@@ -145,12 +145,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
       , `$1
 
 /*<replacement>*/
-  var asyncWrite = !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : processNextTick;
+  var asyncWrite = !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
 /*</replacement>*/
 `
       ]
     , fixSyncWrite = [
-      /if \(sync\) {\n\s+processNextTick\(afterWrite, stream, state, finished, cb\);\n\s+}/
+      /if \(sync\) {\n\s+pna.nextTick\(afterWrite, stream, state, finished, cb\);\n\s+}/
       , `if (sync) {
       /*<replacement>*/
         asyncWrite(afterWrite, stream, state, finished, cb);
