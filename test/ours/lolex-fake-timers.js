@@ -11,8 +11,8 @@ function MyTransform() {
 
 util.inherits(MyTransform, Transform);
 
-const clock = lolex.install({toFake: [ 'setImmediate', 'nextTick' ]});
-let stream2DataCalled = false;
+var clock = lolex.install({toFake: [ 'setImmediate', 'nextTick' ]});
+var stream2DataCalled = false;
 
 var stream = new MyTransform();
 stream.on('data', function() {
