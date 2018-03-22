@@ -5,9 +5,10 @@
   "main": "readable.js",
   "dependencies": {
     "core-util-is": "~1.0.0",
+    "inherits": "~2.0.1",
     "isarray": "0.0.1",
-    "string_decoder": "~0.10.x",
-    "inherits": "~2.0.1"
+    "safe-buffer": "^5.1.1",
+    "string_decoder": "~0.10.x"
   },
   "devDependencies": {
     "tap": "~0.2.6"

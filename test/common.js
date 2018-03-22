@@ -29,6 +29,19 @@ exports.libDir = path.join(exports.testDir, '../lib');
 exports.tmpDir = path.join(exports.testDir, 'tmp');
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 
+/*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn, 0);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+  return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+
 if (process.platform === 'win32') {
   exports.PIPE = '\\\\.\\pipe\\libuv-test';
   exports.opensslCli = path.join(process.execPath, '..', 'openssl-cli.exe');
@@ -112,8 +125,10 @@ if (global.DTRACE_HTTP_SERVER_RESPONSE) {
   knownGlobals.push(DTRACE_HTTP_CLIENT_REQUEST);
   knownGlobals.push(DTRACE_NET_STREAM_END);
   knownGlobals.push(DTRACE_NET_SERVER_CONNECTION);
-  knownGlobals.push(DTRACE_NET_SOCKET_READ);
-  knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
+  if (global.DTRACE_NET_SOCKET_READ) {
+    knownGlobals.push(DTRACE_NET_SOCKET_READ);
+    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
+  }
 }
 
 if (global.COUNTER_NET_SERVER_CONNECTION) {
@@ -147,6 +162,8 @@ if (global.Proxy) {
 if (global.Symbol) {
   knownGlobals.push(Symbol);
 }
+
+knownGlobals.push('errno');
 
   /*<replacement>*/
   if (typeof constructor == 'function')
@@ -243,15 +260,3 @@ if (!util._errnoException) {
     return e;
   };
 }
-/*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn, 0);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-  return clearTimeout(i);
-  };
-}
-/*</replacement>*/

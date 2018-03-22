@@ -28,6 +28,7 @@
 var util = require('util');
 var pathModule = require('path');
 
+var Buffer = require('safe-buffer').Buffer;
 var binding = process.binding('fs');
 var constants = process.binding('constants');
 var fs = exports;
@@ -193,14 +194,14 @@ fs.readFile = function(path, encoding_) {
         return read();
       }
 
-      buffer = new Buffer(size);
+      buffer = Buffer.allocUnsafe(size);
       read();
     });
   });
 
   function read() {
     if (size === 0) {
-      buffer = new Buffer(8192);
+      buffer = Buffer.allocUnsafe(8192);
       fs.read(fd, buffer, 0, 8192, -1, afterRead);
     } else {
       fs.read(fd, buffer, pos, size - pos, -1, afterRead);
@@ -265,7 +266,7 @@ fs.readFileSync = function(path, encoding) {
   if (size === 0) {
     buffers = [];
   } else {
-    buffer = new Buffer(size);
+    buffer = Buffer.allocUnsafe(size);
   }
 
   var done = false;
@@ -277,7 +278,7 @@ fs.readFileSync = function(path, encoding) {
       } else {
         // the kernel lies about many files.
         // Go ahead and try to read some bytes.
-        buffer = new Buffer(8192);
+        buffer = Buffer.allocUnsafe(8192);
         var bytesRead = fs.readSync(fd, buffer, 0, 8192);
         if (bytesRead) {
           buffers.push(buffer.slice(0, bytesRead));
@@ -403,7 +404,7 @@ fs.read = function(fd, buffer, offset, length, position, callback) {
 
     position = arguments[2];
     length = arguments[1];
-    buffer = new Buffer(length);
+    buffer = Buffer.allocUnsafe(length);
     offset = 0;
 
     callback = function(err, bytesRead) {
@@ -434,7 +435,7 @@ fs.readSync = function(fd, buffer, offset, length, position) {
 
     position = arguments[2];
     length = arguments[1];
-    buffer = new Buffer(length);
+    buffer = Buffer.allocUnsafe(length);
 
     offset = 0;
   }
@@ -455,7 +456,7 @@ fs.write = function(fd, buffer, offset, length, position, callback) {
     position = arguments[2];
     assertEncoding(arguments[3]);
 
-    buffer = new Buffer('' + arguments[1], arguments[3]);
+    buffer = Buffer.from('' + arguments[1], arguments[3]);
     offset = 0;
     length = buffer.length;
   }
@@ -485,7 +486,7 @@ fs.writeSync = function(fd, buffer, offset, length, position) {
     position = arguments[2];
     assertEncoding(arguments[3]);
 
-    buffer = new Buffer('' + arguments[1], arguments[3]);
+    buffer = Buffer.from('' + arguments[1], arguments[3]);
     offset = 0;
     length = buffer.length;
   }
@@ -906,7 +907,7 @@ fs.writeFile = function(path, data, encoding_, callback) {
     if (openErr) {
       if (callback) callback(openErr);
     } else {
-      var buffer = Buffer.isBuffer(data) ? data : new Buffer('' + data,
+      var buffer = Buffer.isBuffer(data) ? data : Buffer.from('' + data,
           encoding);
       writeAll(fd, buffer, 0, buffer.length, 0, callback);
     }
@@ -918,7 +919,7 @@ fs.writeFileSync = function(path, data, encoding) {
 
   var fd = fs.openSync(path, 'w');
   if (!Buffer.isBuffer(data)) {
-    data = new Buffer('' + data, encoding || 'utf8');
+    data = Buffer.from('' + data, encoding || 'utf8');
   }
   var written = 0;
   var length = data.length;
@@ -939,7 +940,7 @@ fs.appendFile = function(path, data, encoding_, callback) {
 
   fs.open(path, 'a', 438 /*=0666*/, function(err, fd) {
     if (err) return callback(err);
-    var buffer = Buffer.isBuffer(data) ? data : new Buffer('' + data, encoding);
+    var buffer = Buffer.isBuffer(data) ? data : Buffer.from('' + data, encoding);
     writeAll(fd, buffer, 0, buffer.length, null, callback);
   });
 };
@@ -949,7 +950,7 @@ fs.appendFileSync = function(path, data, encoding) {
 
   var fd = fs.openSync(path, 'a');
   if (!Buffer.isBuffer(data)) {
-    data = new Buffer('' + data, encoding || 'utf8');
+    data = Buffer.from('' + data, encoding || 'utf8');
   }
   var written = 0;
   var position = null;
@@ -1379,7 +1380,7 @@ fs.realpath = function realpath(p, cache, cb) {
 var pool;
 
 function allocNewPool() {
-  pool = new Buffer(kPoolSize);
+  pool = Buffer.allocUnsafe(kPoolSize);
   pool.used = 0;
 }
 
@@ -1674,7 +1675,7 @@ SyncWriteStream.prototype.write = function(data, arg1, arg2) {
 
   // Change strings to buffers. SLOW
   if (typeof data == 'string') {
-    data = new Buffer(data, encoding);
+    data = Buffer.from(data, encoding);
   }
 
   fs.writeSync(this.fd, data, 0, data.length);

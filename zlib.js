@@ -21,6 +21,7 @@
 
 var Transform = require('./lib/_stream_transform.js');
 
+var Buffer = require('safe-buffer').Buffer;
 var binding = process.binding('zlib');
 var util = require('util');
 var assert = require('assert').ok;
@@ -294,7 +295,7 @@ function Zlib(opts, mode) {
                      opts.strategy || exports.Z_DEFAULT_STRATEGY,
                      opts.dictionary);
 
-  this._buffer = new Buffer(this._chunkSize);
+  this._buffer = Buffer.allocUnsafe(this._chunkSize);
   this._offset = 0;
   this._closed = false;
 
@@ -415,7 +416,7 @@ Zlib.prototype._transform = function(chunk, output, cb) {
     if (availOutAfter === 0 || self._offset >= self._chunkSize) {
       availOutBefore = self._chunkSize;
       self._offset = 0;
-      self._buffer = new Buffer(self._chunkSize);
+      self._buffer = Buffer.allocUnsafe(self._chunkSize);
     }
 
     if (availOutAfter === 0) {
