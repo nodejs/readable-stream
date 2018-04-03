@@ -271,7 +271,7 @@ var InspectorSession = function () {
   InspectorSession.prototype.waitForNotification = function waitForNotification(methodOrPredicate, description) {
     var desc = description || methodOrPredicate;
     var message = 'Timed out waiting for matching notification (' + desc + '))';
-    return common.fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
+    return fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
   };
 
   InspectorSession.prototype._asyncWaitForNotification = async function _asyncWaitForNotification(methodOrPredicate) {
@@ -409,7 +409,7 @@ var NodeInstance = function () {
   NodeInstance.startViaSignal = async function startViaSignal(scriptContents) {
     var instance = new NodeInstance([], scriptContents + '\nprocess._rawDebug(\'started\');', undefined);
     var msg = 'Timed out waiting for process to start';
-    while ((await common.fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
+    while ((await fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
     process._debugProcess(instance._process.pid);
     return instance;
   };
@@ -506,6 +506,45 @@ var NodeInstance = function () {
 
 function readMainScriptSource() {
   return fs.readFileSync(_MAINSCRIPT, 'utf8');
+}
+
+function onResolvedOrRejected(promise, callback) {
+  return promise.then(function (result) {
+    callback();
+    return result;
+  }, function (error) {
+    callback();
+    throw error;
+  });
+}
+
+function timeoutPromise(error, timeoutMs) {
+  var clearCallback = null;
+  var done = false;
+  var promise = onResolvedOrRejected(new Promise(function (resolve, reject) {
+    var timeout = setTimeout(function () {
+      return reject(error);
+    }, timeoutMs);
+    clearCallback = function () {
+      if (done) return;
+      clearTimeout(timeout);
+      resolve();
+    };
+  }), function () {
+    return done = true;
+  });
+  promise.clear = clearCallback;
+  return promise;
+}
+
+// Returns a new promise that will propagate `promise` resolution or rejection
+// if that happens within the `timeoutMs` timespan, or rejects with `error` as
+// a reason otherwise.
+function fires(promise, error, timeoutMs) {
+  var timeout = timeoutPromise(error, timeoutMs);
+  return Promise.race([onResolvedOrRejected(promise, function () {
+    return timeout.clear();
+  }), timeout]);
 }
 
 module.exports = {

@@ -85,7 +85,7 @@ var written = [];
 var expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
 
 writer._write = function (chunk, encoding, cb) {
-  console.error('WRITE %s', chunk);
+  console.error('WRITE ' + chunk);
   written.push(chunk);
   process.nextTick(cb);
 };

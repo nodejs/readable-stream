@@ -562,8 +562,11 @@ function _mustCallInner(fn) {
 }
 
 exports.hasMultiLocalhost = function hasMultiLocalhost() {
-  var TCP = process.binding('tcp_wrap').TCP;
-  var t = new TCP();
+  var _process$binding = process.binding('tcp_wrap'),
+      TCP = _process$binding.TCP,
+      TCPConstants = _process$binding.constants;
+
+  var t = new TCP(TCPConstants.SOCKET);
   var ret = t.bind('127.0.0.2', 0);
   t.close();
   return ret === 0;
@@ -575,6 +578,12 @@ exports.fileExists = function (pathname) {
     return true;
   } catch (err) {
     return false;
+  }
+};
+
+exports.skipIfEslintMissing = function () {
+  if (!exports.fileExists(path.join('..', '..', 'tools', 'node_modules', 'eslint'))) {
+    exports.skip('missing ESLint');
   }
 };
 
@@ -769,7 +778,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
     settings = fn;
     fn = undefined;
   }
-  var innerFn = exports.mustCall(function (error) {
+  function innerFn(error) {
     assert.strictEqual(error.code, settings.code);
     if ('type' in settings) {
       var type = settings.type;
@@ -799,12 +808,12 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       });
     }
     return true;
-  }, exact);
+  }
   if (fn) {
     assert.throws(fn, innerFn);
     return;
   }
-  return innerFn;
+  return exports.mustCall(innerFn, exact);
 };
 
 exports.skipIfInspectorDisabled = function skipIfInspectorDisabled() {
@@ -819,8 +828,6 @@ exports.skipIf32Bits = function skipIf32Bits() {
   }
 };
 
-var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
-
 exports.getArrayBufferViews = function getArrayBufferViews(buf) {
   var buffer = buf.buffer,
       byteOffset = buf.byteOffset,
@@ -828,6 +835,9 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
 
 
   var out = [];
+
+  var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
+
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
   var _iteratorError = undefined;
@@ -909,35 +919,6 @@ function restoreWritable(name) {
   delete process[name].writeTimes;
 }
 
-function onResolvedOrRejected(promise, callback) {
-  return promise.then(function (result) {
-    callback();
-    return result;
-  }, function (error) {
-    callback();
-    throw error;
-  });
-}
-
-function timeoutPromise(error, timeoutMs) {
-  var clearCallback = null;
-  var done = false;
-  var promise = onResolvedOrRejected(new Promise(function (resolve, reject) {
-    var timeout = setTimeout(function () {
-      return reject(error);
-    }, timeoutMs);
-    clearCallback = function () {
-      if (done) return;
-      clearTimeout(timeout);
-      resolve();
-    };
-  }), function () {
-    return done = true;
-  });
-  promise.clear = clearCallback;
-  return promise;
-}
-
 exports.hijackStdout = hijackStdWritable.bind(null, 'stdout');
 exports.hijackStderr = hijackStdWritable.bind(null, 'stderr');
 exports.restoreStdout = restoreWritable.bind(null, 'stdout');
@@ -950,19 +931,6 @@ exports.firstInvalidFD = function firstInvalidFD() {
     while (fs.fstatSync(++fd)) {}
   } catch (e) {}
   return fd;
-};
-
-exports.fires = function fires(promise, error, timeoutMs) {
-  if (!timeoutMs && util.isNumber(error)) {
-    timeoutMs = error;
-    error = null;
-  }
-  if (!error) error = 'timeout';
-  if (!timeoutMs) timeoutMs = 100;
-  var timeout = timeoutPromise(error, timeoutMs);
-  return Promise.race([onResolvedOrRejected(promise, function () {
-    return timeout.clear();
-  }), timeout]);
 };
 
 function forEach(xs, f) {

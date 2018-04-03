@@ -45,9 +45,9 @@ r.on('readable', function () {
   ;false && console.error('>> readable');
   var ret = void 0;
   do {
-    ;false && console.error('  > read(%d)', READSIZE);
+    ;false && console.error('  > read(' + READSIZE + ')');
     ret = r.read(READSIZE);
-    ;false && console.error('  < %j (%d remain)', ret && ret.length, rs.length);
+    ;false && console.error('  < ' + (ret && ret.length) + ' (' + rs.length + ' remain)');
   } while (ret && ret.length === READSIZE);
 
   ;false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
@@ -66,6 +66,6 @@ function push() {
     return r.push(null);
   }
 
-  ;false && console.error('   push #%d', pushes);
+  ;false && console.error('   push #' + pushes);
   if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
 }
