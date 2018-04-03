@@ -36,8 +36,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         , '\n$1\n  Duplex = Duplex || require(\'./_stream_duplex\');\n'
       ]
 
-    , altForEachImplReplacement = require('./common-replacements').altForEachImplReplacement
-    , altForEachUseReplacement  = require('./common-replacements').altForEachUseReplacement
     , altIndexOfImplReplacement = require('./common-replacements').altIndexOfImplReplacement
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
@@ -238,8 +236,6 @@ module.exports['_stream_duplex.js'] = [
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
-  , altForEachImplReplacement
-  , altForEachUseReplacement
   , objectKeysReplacement
   , objectKeysDefine
   , processNextTickImport
@@ -258,11 +254,8 @@ module.exports['_stream_readable.js'] = [
   , addDuplexDec
   , requireReplacement
   , instanceofReplacement
-  , altForEachImplReplacement
-  , altForEachUseReplacement
   , altIndexOfImplReplacement
   , altIndexOfUseReplacement
-  , instanceofReplacement
   , stringDecoderReplacement
   , isArrayReplacement
   , isArrayDefine
