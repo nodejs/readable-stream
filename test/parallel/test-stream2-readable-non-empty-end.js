@@ -53,7 +53,7 @@ test.on('readable', function () {
   var res = test.read(b);
   if (res) {
     bytesread += res.length;
-    console.error('br=%d len=%d', bytesread, len);
+    console.error('br=' + bytesread + ' len=' + len);
     setTimeout(next, 1);
   }
   test.read(0);
