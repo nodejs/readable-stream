@@ -24,3 +24,4 @@ w.on('finish', common.mustCall(function () {
 }));
 w.write(bufferShim.allocUnsafe(1));
 w.end(bufferShim.allocUnsafe(0));
+;require('tap').pass('sync run');

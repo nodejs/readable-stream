@@ -69,3 +69,4 @@ function push() {
   ;false && console.error('   push #' + pushes);
   if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
 }
+;require('tap').pass('sync run');

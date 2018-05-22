@@ -2,21 +2,27 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-require('../common');
+var common = require('../common');
 var stream = require('../../');
-var assert = require('assert/');
 
 var readable = new stream.Readable({
   read: function () {}
 });
 
-var errMessage = /Invalid non-string\/buffer chunk/;
-assert.throws(function () {
+function checkError(fn) {
+  common.expectsError(fn, {
+    code: 'ERR_INVALID_ARG_TYPE',
+    type: TypeError
+  });
+}
+
+checkError(function () {
   return readable.push([]);
-}, errMessage);
-assert.throws(function () {
+});
+checkError(function () {
   return readable.push({});
-}, errMessage);
-assert.throws(function () {
+});
+checkError(function () {
   return readable.push(0);
-}, errMessage);
+});
+;require('tap').pass('sync run');

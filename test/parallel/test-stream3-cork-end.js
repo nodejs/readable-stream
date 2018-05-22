@@ -6,7 +6,7 @@ var assert = require('assert/');
 var stream = require('../../');
 var Writable = stream.Writable;
 
-// Test the buffering behaviour of Writable streams.
+// Test the buffering behavior of Writable streams.
 //
 // The call to cork() triggers storing chunks which are flushed
 // on calling end() and the stream subsequently ended.
@@ -91,3 +91,4 @@ writeChunks(inputChunks, function () {
     assert.ok(seenEnd);
   });
 });
+;require('tap').pass('sync run');

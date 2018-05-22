@@ -84,3 +84,4 @@ process.on('exit', function () {
   assert.deepStrictEqual(results, expect);
   console.log('ok');
 });
+;require('tap').pass('sync run');

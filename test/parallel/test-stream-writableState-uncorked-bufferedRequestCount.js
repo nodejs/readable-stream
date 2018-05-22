@@ -57,3 +57,4 @@ function uncork() {
   assert.strictEqual(writable._writableState.corked, 0);
   assert.strictEqual(writable._writableState.bufferedRequestCount, 0);
 }
+;require('tap').pass('sync run');

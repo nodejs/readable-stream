@@ -110,3 +110,4 @@ var Stream = require('stream').Stream;
   _w.removeListener('error', function () {});
   _removed = true;
 }
+;require('tap').pass('sync run');

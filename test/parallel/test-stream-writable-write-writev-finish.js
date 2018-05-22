@@ -156,3 +156,28 @@ var stream = require('../../');
   };
   _rs.pipe(_ws);
 }
+
+{
+  var w = new stream.Writable();
+  w._write = function (chunk, encoding, cb) {
+    process.nextTick(cb);
+  };
+  w.on('error', common.mustCall());
+  w.on('prefinish', function () {
+    w.write("shouldn't write in prefinish listener");
+  });
+  w.end();
+}
+
+{
+  var _w = new stream.Writable();
+  _w._write = function (chunk, encoding, cb) {
+    process.nextTick(cb);
+  };
+  _w.on('error', common.mustCall());
+  _w.on('finish', function () {
+    _w.write("should't write in finish listener");
+  });
+  _w.end();
+}
+;require('tap').pass('sync run');

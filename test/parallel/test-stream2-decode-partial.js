@@ -23,3 +23,4 @@ readable.on('data', function (data) {
 process.on('exit', function () {
   assert.strictEqual(buf, '€¢');
 });
+;require('tap').pass('sync run');

@@ -57,3 +57,4 @@ src.pipe(dst);
 var timeout = setTimeout(function () {
   assert.fail('timed out waiting for _write');
 }, 100);
+;require('tap').pass('sync run');

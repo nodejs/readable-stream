@@ -17,3 +17,4 @@ w.on('pipe', function () {
 r.on('error', common.mustCall());
 w.on('error', common.mustCall());
 r.pipe(w);
+;require('tap').pass('sync run');

@@ -37,6 +37,7 @@ var expectEndingData = expectTotalData;
 var r = new Readable({ highWaterMark: 1000 });
 var chunks = totalChunks;
 r._read = function (n) {
+  console.log('_read called', chunks);
   if (!(chunks % 2)) setImmediate(push);else if (!(chunks % 3)) process.nextTick(push);else push();
 };
 
@@ -46,6 +47,7 @@ function push() {
   if (chunk) {
     totalPushed += chunk.length;
   }
+  console.log('chunks', chunks);
   r.push(chunk);
 }
 
@@ -61,9 +63,10 @@ function readn(n, then) {
   expectEndingData -= n;
   (function read() {
     var c = r.read(n);
+    console.error('c', c);
     if (!c) r.once('readable', read);else {
       assert.strictEqual(c.length, n);
-      assert(!r._readableState.flowing);
+      assert(!r.readableFlowing);
       then();
     }
   })();
@@ -159,3 +162,4 @@ function pipe() {
   });
   r.pipe(w);
 }
+;require('tap').pass('sync run');

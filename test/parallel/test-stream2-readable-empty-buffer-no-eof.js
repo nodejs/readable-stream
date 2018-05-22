@@ -118,3 +118,4 @@ function test2() {
     console.log('ok');
   });
 }
+;require('tap').pass('sync run');

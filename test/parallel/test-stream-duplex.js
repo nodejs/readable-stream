@@ -31,6 +31,8 @@ var stream = new Duplex({ objectMode: true });
 assert(Duplex() instanceof Duplex);
 assert(stream._readableState.objectMode);
 assert(stream._writableState.objectMode);
+assert(stream.allowHalfOpen);
+assert.strictEqual(stream.listenerCount('end'), 0);
 
 var written = void 0;
 var read = void 0;
@@ -53,3 +55,4 @@ process.on('exit', function () {
   assert.strictEqual(read.val, 1);
   assert.strictEqual(written.val, 2);
 });
+;require('tap').pass('sync run');

@@ -76,3 +76,4 @@ serializer.write({ val: 42 });
 process.on('exit', function () {
   assert.strictEqual(serialized[0], 42);
 });
+;require('tap').pass('sync run');

@@ -301,8 +301,8 @@ module.exports['test-stream3-cork-uncork.js'] = module.exports['test-stream3-cor
 ]
 module.exports['test-stream2-readable-from-list.js'] = [
   [
-    /require\('internal\/streams\/BufferList'\)/,
-    'require(\'../../lib/internal/streams/BufferList\')'
+    /require\('internal\/streams\/buffer_list'\)/,
+    'require(\'../../lib/internal/streams/buffer_list\')'
   ]
 ]
 module.exports['test-stream-writev.js'] = [

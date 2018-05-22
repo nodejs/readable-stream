@@ -21,3 +21,4 @@ writable.end('testing ended state', common.mustCall(function () {
 }));
 
 assert.strictEqual(writable._writableState.ended, true);
+;require('tap').pass('sync run');

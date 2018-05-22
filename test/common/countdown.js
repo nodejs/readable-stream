@@ -19,7 +19,8 @@ if (!global.clearImmediate) {
   };
 }
 /*</replacement>*/
-/* eslint-disable required-modules */
+/* eslint-disable node-core/required-modules */
+
 'use strict';
 
 /*<replacement>*/
@@ -34,6 +35,7 @@ var objectKeys = objectKeys || function (obj) {
 var assert = require('assert');
 var kLimit = Symbol('limit');
 var kCallback = Symbol('callback');
+var common = require('./');
 
 var Countdown = function () {
   function Countdown(limit, cb) {
@@ -42,7 +44,7 @@ var Countdown = function () {
     assert.strictEqual(typeof limit, 'number');
     assert.strictEqual(typeof cb, 'function');
     this[kLimit] = limit;
-    this[kCallback] = cb;
+    this[kCallback] = common.mustCall(cb);
   }
 
   Countdown.prototype.dec = function dec() {

@@ -125,7 +125,7 @@ for (var i = 0; i < chunks.length; i++) {
     } while (ret !== false && _i2 < chunks.length);
 
     if (_i2 < chunks.length) {
-      assert(_tw2._writableState.length >= 50);
+      assert(_tw2.writableLength >= 50);
       _tw2.once('drain', W);
     } else {
       _tw2.end();
@@ -389,3 +389,4 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
+;require('tap').pass('sync run');

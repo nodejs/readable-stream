@@ -82,8 +82,6 @@ var TestReader = function (_R) {
   return TestReader;
 }(R);
 
-/////
-
 var TestWriter = function (_EE) {
   _inherits(TestWriter, _EE);
 
@@ -396,3 +394,4 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
+;require('tap').pass('sync run');

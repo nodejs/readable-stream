@@ -93,3 +93,4 @@ setTimeout(common.mustCall(function () {
   w.on('finish', common.mustCall());
   piper.pipe(w);
 }), 1);
+;require('tap').pass('sync run');

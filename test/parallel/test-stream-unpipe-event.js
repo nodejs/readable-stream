@@ -130,3 +130,4 @@ var NeverEndReadable = function (_Readable2) {
     assert.strictEqual(_src5._readableState.pipesCount, 0);
   });
 }
+;require('tap').pass('sync run');

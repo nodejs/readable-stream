@@ -74,3 +74,4 @@ var _require = require('../../'),
     assert.strictEqual(_r2._readableState.resumeScheduled, false);
   }));
 }
+;require('tap').pass('sync run');

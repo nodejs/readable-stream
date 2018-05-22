@@ -126,4 +126,4 @@ var util = require('util');
   assert.strictEqual(d.listeners('close').length, 0);
   assert.strictEqual(w.listeners('end').length, 0);
   assert.strictEqual(w.listeners('close').length, 0);
-})();
+})();require('tap').pass('sync run');

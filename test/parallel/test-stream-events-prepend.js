@@ -50,3 +50,4 @@ w.on('pipe', common.mustCall());
 
 var r = new Readable();
 r.pipe(w);
+;require('tap').pass('sync run');

@@ -1,12 +1,18 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
-var stream = require('../../');
-var assert = require('assert/');
+var common = require('../common');
 
-var readable = new stream.Readable();
+var _require = require('../../'),
+    Readable = _require.Readable;
 
-assert.throws(function () {
-  return readable.read();
-}, /not implemented/);
+var readable = new Readable();
+
+readable.on('error', common.expectsError({
+  code: 'ERR_METHOD_NOT_IMPLEMENTED',
+  type: Error,
+  message: 'The _read() method is not implemented'
+}));
+
+readable.read();
+;require('tap').pass('sync run');

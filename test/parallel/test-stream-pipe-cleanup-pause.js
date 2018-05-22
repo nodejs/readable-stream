@@ -37,3 +37,4 @@ writer2._write = common.mustCall(function (chunk, encoding, cb) {
 
 reader.pipe(writer1);
 reader.push(buffer);
+;require('tap').pass('sync run');

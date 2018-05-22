@@ -26,11 +26,15 @@ writable.on('finish', function () {
   testStates(true, true, true);
 });
 
-writable.end('testing function end()', function () {
+var result = writable.end('testing function end()', function () {
   // ending, finished, ended = true.
   testStates(true, true, true);
 });
 
+// end returns the writable instance
+assert.strictEqual(result, writable);
+
 // ending, ended = true.
 // finished = false.
 testStates(true, false, true);
+;require('tap').pass('sync run');

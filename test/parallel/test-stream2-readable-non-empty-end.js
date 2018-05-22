@@ -72,3 +72,4 @@ function next() {
   r = test.read();
   assert.strictEqual(r, null);
 }
+;require('tap').pass('sync run');

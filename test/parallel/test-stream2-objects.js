@@ -295,3 +295,4 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
+;require('tap').pass('sync run');

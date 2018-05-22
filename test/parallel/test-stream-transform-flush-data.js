@@ -25,3 +25,4 @@ t.end(bufferShim.from('blerg'));
 t.on('data', function (data) {
   assert.strictEqual(data.toString(), expected);
 });
+;require('tap').pass('sync run');

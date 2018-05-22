@@ -96,4 +96,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     assert.strictEqual(src1.reads, 2);
     assert.strictEqual(src2.reads, 2);
   });
-})();
+})();require('tap').pass('sync run');

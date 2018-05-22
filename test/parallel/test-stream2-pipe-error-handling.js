@@ -106,3 +106,4 @@ var stream = require('../../');
   assert.strictEqual(_unpipedSource, _source);
   assert.strictEqual(_unpipedDest, _dest);
 }
+;require('tap').pass('sync run');

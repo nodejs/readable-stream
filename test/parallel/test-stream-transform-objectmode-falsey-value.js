@@ -51,3 +51,4 @@ var int = setInterval(common.mustCall(function () {
     src.write(i++);
   }
 }, expect.length + 1), 1);
+;require('tap').pass('sync run');

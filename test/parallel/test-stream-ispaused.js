@@ -44,3 +44,4 @@ readable.pause();
 assert.ok(readable.isPaused());
 readable.resume();
 assert.ok(!readable.isPaused());
+;require('tap').pass('sync run');

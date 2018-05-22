@@ -62,3 +62,4 @@ r.on('readable', function () {
 });
 
 r.pipe(w);
+;require('tap').pass('sync run');

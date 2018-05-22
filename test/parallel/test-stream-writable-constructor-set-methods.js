@@ -1,37 +1,43 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
-var assert = require('assert/');
+var common = require('../common');
 
-var Writable = require('../../').Writable;
+var _require = require('assert/'),
+    strictEqual = _require.strictEqual;
 
-var _writeCalled = false;
-function _write(d, e, n) {
-  _writeCalled = true;
-}
+var _require2 = require('../../'),
+    Writable = _require2.Writable;
 
-var w = new Writable({ write: _write });
+var w = new Writable();
+
+w.on('error', common.expectsError({
+  type: Error,
+  code: 'ERR_METHOD_NOT_IMPLEMENTED',
+  message: 'The _write() method is not implemented'
+}));
+
 w.end(bufferShim.from('blerg'));
 
-var _writevCalled = false;
-var dLength = 0;
-function _writev(d, n) {
-  dLength = d.length;
-  _writevCalled = true;
-}
-
-var w2 = new Writable({ writev: _writev });
-w2.cork();
-
-w2.write(bufferShim.from('blerg'));
-w2.write(bufferShim.from('blerg'));
-w2.end();
-
-process.on('exit', function () {
-  assert.strictEqual(w._write, _write);
-  assert(_writeCalled);
-  assert.strictEqual(w2._writev, _writev);
-  assert.strictEqual(dLength, 2);
-  assert(_writevCalled);
+var _write = common.mustCall(function (chunk, _, next) {
+  next();
 });
+
+var _writev = common.mustCall(function (chunks, next) {
+  strictEqual(chunks.length, 2);
+  next();
+});
+
+var w2 = new Writable({ write: _write, writev: _writev });
+
+strictEqual(w2._write, _write);
+strictEqual(w2._writev, _writev);
+
+w2.write(bufferShim.from('blerg'));
+
+w2.cork();
+w2.write(bufferShim.from('blerg'));
+w2.write(bufferShim.from('blerg'));
+
+w2.end();
+;require('tap').pass('sync run');

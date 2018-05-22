@@ -11,3 +11,4 @@ var _read = common.mustCall(function _read(n) {
 
 var r = new Readable({ read: _read });
 r.resume();
+;require('tap').pass('sync run');

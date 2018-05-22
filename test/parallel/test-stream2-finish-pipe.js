@@ -41,3 +41,4 @@ r.pipe(w);
 // `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
 // ends the writable side of net.Socket.
 w.end();
+;require('tap').pass('sync run');

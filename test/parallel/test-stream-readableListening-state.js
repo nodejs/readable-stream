@@ -34,3 +34,4 @@ r2.on('data', common.mustCall(function (chunk) {
 }));
 
 r2.push(bufferShim.from('Testing readableListening state'));
+;require('tap').pass('sync run');

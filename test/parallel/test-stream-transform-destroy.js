@@ -16,9 +16,9 @@ var assert = require('assert/');
 
   transform.resume();
 
-  transform.on('end', common.mustCall());
+  transform.on('end', common.mustNotCall());
   transform.on('close', common.mustCall());
-  transform.on('finish', common.mustCall());
+  transform.on('finish', common.mustNotCall());
 
   transform.destroy();
 }
@@ -31,8 +31,8 @@ var assert = require('assert/');
 
   var expected = new Error('kaboom');
 
-  _transform.on('end', common.mustCall());
-  _transform.on('finish', common.mustCall());
+  _transform.on('end', common.mustNotCall());
+  _transform.on('finish', common.mustNotCall());
   _transform.on('close', common.mustCall());
   _transform.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, expected);
@@ -54,7 +54,7 @@ var assert = require('assert/');
   var _expected = new Error('kaboom');
 
   _transform2.on('finish', common.mustNotCall('no finish event'));
-  _transform2.on('close', common.mustNotCall('no close event'));
+  _transform2.on('close', common.mustCall());
   _transform2.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, _expected);
   }));
@@ -75,7 +75,7 @@ var assert = require('assert/');
   _transform3.resume();
 
   _transform3.on('end', common.mustNotCall('no end event'));
-  _transform3.on('close', common.mustNotCall('no close event'));
+  _transform3.on('close', common.mustCall());
   _transform3.on('finish', common.mustNotCall('no finish event'));
 
   // error is swallowed by the custom _destroy
@@ -118,7 +118,7 @@ var assert = require('assert/');
 
   _transform5.on('finish', fail);
   _transform5.on('end', fail);
-  _transform5.on('close', fail);
+  _transform5.on('close', common.mustCall());
 
   _transform5.destroy();
 
@@ -140,7 +140,7 @@ var assert = require('assert/');
     cb(_expected3);
   }, 1);
 
-  _transform6.on('close', common.mustNotCall('no close event'));
+  _transform6.on('close', common.mustCall());
   _transform6.on('finish', common.mustNotCall('no finish event'));
   _transform6.on('end', common.mustNotCall('no end event'));
   _transform6.on('error', common.mustCall(function (err) {
@@ -149,3 +149,4 @@ var assert = require('assert/');
 
   _transform6.destroy();
 }
+;require('tap').pass('sync run');

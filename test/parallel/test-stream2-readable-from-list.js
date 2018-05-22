@@ -26,7 +26,7 @@ var bufferShim = require('safe-buffer').Buffer;
 require('../common');
 var assert = require('assert/');
 var fromList = require('../../lib/_stream_readable')._fromList;
-var BufferList = require('../../lib/internal/streams/BufferList');
+var BufferList = require('../../lib/internal/streams/buffer_list');
 
 function bufferListFromArray(arr) {
   var bl = new BufferList();
@@ -84,3 +84,4 @@ function bufferListFromArray(arr) {
   // all consumed.
   assert.deepStrictEqual(_list, new BufferList());
 }
+;require('tap').pass('sync run');

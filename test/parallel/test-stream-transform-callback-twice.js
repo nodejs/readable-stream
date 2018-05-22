@@ -2,7 +2,6 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
-var assert = require('assert/');
 
 var _require = require('../../'),
     Transform = _require.Transform;
@@ -13,8 +12,11 @@ var stream = new Transform({
   }
 });
 
-stream.on('error', common.mustCall(function (err) {
-  assert.strictEqual(err.toString(), 'Error: write callback called multiple times');
+stream.on('error', common.expectsError({
+  type: Error,
+  message: 'Callback called multiple times',
+  code: 'ERR_MULTIPLE_CALLBACK'
 }));
 
 stream.write('foo');
+;require('tap').pass('sync run');

@@ -79,3 +79,4 @@ process.on('exit', function (c) {
 });
 
 read.pipe(write);
+;require('tap').pass('sync run');

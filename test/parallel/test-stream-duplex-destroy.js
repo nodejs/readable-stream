@@ -22,8 +22,9 @@ var _require2 = require('util'),
 
   duplex.resume();
 
-  duplex.on('end', common.mustCall());
-  duplex.on('finish', common.mustCall());
+  duplex.on('end', common.mustNotCall());
+  duplex.on('finish', common.mustNotCall());
+  duplex.on('close', common.mustCall());
 
   duplex.destroy();
   assert.strictEqual(duplex.destroyed, true);
@@ -40,8 +41,8 @@ var _require2 = require('util'),
 
   var expected = new Error('kaboom');
 
-  _duplex.on('end', common.mustCall());
-  _duplex.on('finish', common.mustCall());
+  _duplex.on('end', common.mustNotCall());
+  _duplex.on('finish', common.mustNotCall());
   _duplex.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, expected);
   }));
@@ -94,6 +95,7 @@ var _require2 = require('util'),
 
   // error is swallowed by the custom _destroy
   _duplex3.on('error', common.mustNotCall('no error event'));
+  _duplex3.on('close', common.mustCall());
 
   _duplex3.destroy(_expected2);
   assert.strictEqual(_duplex3.destroyed, true);
@@ -186,8 +188,8 @@ var _require2 = require('util'),
   });
   _duplex7.resume();
 
-  _duplex7.on('finish', common.mustCall());
-  _duplex7.on('end', common.mustCall());
+  _duplex7.on('finish', common.mustNotCall());
+  _duplex7.on('end', common.mustNotCall());
 
   _duplex7.destroy();
   assert.strictEqual(_duplex7.destroyed, true);
@@ -221,3 +223,4 @@ var _require2 = require('util'),
 
   new MyDuplex();
 }
+;require('tap').pass('sync run');

@@ -36,3 +36,4 @@ var newStream = new Readable().wrap(oldStream);
 newStream.on('readable', function () {}).on('end', common.mustCall());
 
 oldStream.emit('end');
+;require('tap').pass('sync run');

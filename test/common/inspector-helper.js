@@ -37,7 +37,11 @@ var fixtures = require('../common/fixtures');
 var _require = require('child_process'),
     spawn = _require.spawn;
 
-var url = require('url');
+var _require2 = require('url'),
+    parseURL = _require2.parse;
+
+var _require3 = require('internal/url'),
+    getURLFromFilePath = _require3.getURLFromFilePath;
 
 var _MAINSCRIPT = fixtures.path('loop.js');
 var DEBUG = false;
@@ -204,8 +208,9 @@ var InspectorSession = function () {
     return this._terminationPromise;
   };
 
-  InspectorSession.prototype.disconnect = function disconnect() {
+  InspectorSession.prototype.disconnect = async function disconnect() {
     this._socket.destroy();
+    return this.waitForServerDisconnect();
   };
 
   InspectorSession.prototype._onMessage = function _onMessage(message) {
@@ -218,11 +223,15 @@ var InspectorSession = function () {
       if (message.result) resolve(message.result);else reject(message.error);
     } else {
       if (message.method === 'Debugger.scriptParsed') {
-        var script = message['params'];
-        var scriptId = script['scriptId'];
-        var _url = script['url'];
-        this._scriptsIdsByUrl.set(scriptId, _url);
-        if (_url === _MAINSCRIPT) this.mainScriptId = scriptId;
+        var _message$params = message.params,
+            scriptId = _message$params.scriptId,
+            url = _message$params.url;
+
+        this._scriptsIdsByUrl.set(scriptId, url);
+        var fileUrl = url.startsWith('file:') ? url : getURLFromFilePath(url).toString();
+        if (fileUrl === this.scriptURL().toString()) {
+          this.mainScriptId = scriptId;
+        }
       }
 
       if (this._notificationCallback) {
@@ -240,11 +249,11 @@ var InspectorSession = function () {
     var _this2 = this;
 
     var msg = JSON.parse(JSON.stringify(message)); // Clone!
-    msg['id'] = this._nextId++;
+    msg.id = this._nextId++;
     if (DEBUG) console.log('[sent]', JSON.stringify(msg));
 
     var responsePromise = new Promise(function (resolve, reject) {
-      _this2._commandResponsePromises.set(msg['id'], { resolve: resolve, reject: reject });
+      _this2._commandResponsePromises.set(msg.id, { resolve: resolve, reject: reject });
     });
 
     return new Promise(function (resolve) {
@@ -294,12 +303,13 @@ var InspectorSession = function () {
     return notification;
   };
 
-  InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, url) {
-    if ('Debugger.paused' === message['method']) {
-      var callFrame = message['params']['callFrames'][0];
-      var location = callFrame['location'];
-      assert.strictEqual(url, this._scriptsIdsByUrl.get(location['scriptId']));
-      assert.strictEqual(line, location['lineNumber']);
+  InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
+    if (message.method === 'Debugger.paused') {
+      var callFrame = message.params.callFrames[0];
+      var location = callFrame.location;
+      var scriptPath = this._scriptsIdsByUrl.get(location.scriptId);
+      assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), scriptPath + ' !== ' + expectedScriptPath);
+      assert.strictEqual(line, location.lineNumber);
       return true;
     }
   };
@@ -314,19 +324,19 @@ var InspectorSession = function () {
 
   InspectorSession.prototype._matchesConsoleOutputNotification = function _matchesConsoleOutputNotification(notification, type, values) {
     if (!Array.isArray(values)) values = [values];
-    if ('Runtime.consoleAPICalled' === notification['method']) {
-      var params = notification['params'];
-      if (params['type'] === type) {
+    if (notification.method === 'Runtime.consoleAPICalled') {
+      var params = notification.params;
+      if (params.type === type) {
         var _i2 = 0;
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = params['args'][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var value = _step2.value;
 
-            if (value['value'] !== values[_i2++]) return false;
+            if (value.value !== values[_i2++]) return false;
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -367,6 +377,18 @@ var InspectorSession = function () {
     await this.disconnect();
   };
 
+  InspectorSession.prototype.scriptPath = function scriptPath() {
+    return this._instance.scriptPath();
+  };
+
+  InspectorSession.prototype.script = function script() {
+    return this._instance.script();
+  };
+
+  InspectorSession.prototype.scriptURL = function scriptURL() {
+    return getURLFromFilePath(this.scriptPath());
+  };
+
   return InspectorSession;
 }();
 
@@ -381,6 +403,8 @@ var NodeInstance = function () {
 
     _classCallCheck(this, NodeInstance);
 
+    this._scriptPath = scriptFile;
+    this._script = scriptFile ? null : scriptContents;
     this._portCallback = null;
     this.portPromise = new Promise(function (resolve) {
       return _this7._portCallback = resolve;
@@ -431,11 +455,12 @@ var NodeInstance = function () {
     }
   };
 
-  NodeInstance.prototype.httpGet = function httpGet(host, path) {
+  NodeInstance.prototype.httpGet = function httpGet(host, path, hostHeaderValue) {
     console.log('[test]', 'Testing ' + path);
+    var headers = hostHeaderValue ? { 'Host': hostHeaderValue } : null;
     return this.portPromise.then(function (port) {
       return new Promise(function (resolve, reject) {
-        var req = http.get({ host: host, port: port, path: path }, function (res) {
+        var req = http.get({ host: host, port: port, path: path, headers: headers }, function (res) {
           var response = '';
           res.setEncoding('utf8');
           res.on('data', function (data) {
@@ -456,32 +481,44 @@ var NodeInstance = function () {
     });
   };
 
-  NodeInstance.prototype.wsHandshake = function wsHandshake(devtoolsUrl) {
-    var _this8 = this;
-
-    return this.portPromise.then(function (port) {
-      return new Promise(function (resolve) {
-        http.get({
-          port: port,
-          path: url.parse(devtoolsUrl).path,
-          headers: {
-            'Connection': 'Upgrade',
-            'Upgrade': 'websocket',
-            'Sec-WebSocket-Version': 13,
-            'Sec-WebSocket-Key': 'key=='
-          }
-        }).on('upgrade', function (message, socket) {
-          resolve(new InspectorSession(socket, _this8));
-        }).on('response', common.mustNotCall('Upgrade was not received'));
-      });
+  NodeInstance.prototype.sendUpgradeRequest = async function sendUpgradeRequest() {
+    var response = await this.httpGet(null, '/json/list');
+    var devtoolsUrl = response[0].webSocketDebuggerUrl;
+    var port = await this.portPromise;
+    return http.get({
+      port: port,
+      path: parseURL(devtoolsUrl).path,
+      headers: {
+        'Connection': 'Upgrade',
+        'Upgrade': 'websocket',
+        'Sec-WebSocket-Version': 13,
+        'Sec-WebSocket-Key': 'key=='
+      }
     });
   };
 
   NodeInstance.prototype.connectInspectorSession = async function connectInspectorSession() {
+    var _this8 = this;
+
     console.log('[test]', 'Connecting to a child Node process');
-    var response = await this.httpGet(null, '/json/list');
-    var url = response[0]['webSocketDebuggerUrl'];
-    return this.wsHandshake(url);
+    var upgradeRequest = await this.sendUpgradeRequest();
+    return new Promise(function (resolve, reject) {
+      upgradeRequest.on('upgrade', function (message, socket) {
+        return resolve(new InspectorSession(socket, _this8));
+      }).on('response', common.mustNotCall('Upgrade was not received'));
+    });
+  };
+
+  NodeInstance.prototype.expectConnectionDeclined = async function expectConnectionDeclined() {
+    console.log('[test]', 'Checking upgrade is not possible');
+    var upgradeRequest = await this.sendUpgradeRequest();
+    return new Promise(function (resolve, reject) {
+      upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
+        return response.on('data', function () {}).on('end', function () {
+          return resolve(response.statusCode);
+        });
+      });
+    });
   };
 
   NodeInstance.prototype.expectShutdown = function expectShutdown() {
@@ -497,16 +534,26 @@ var NodeInstance = function () {
     });
   };
 
+  NodeInstance.prototype.write = function write(message) {
+    this._process.stdin.write(message);
+  };
+
   NodeInstance.prototype.kill = function kill() {
     this._process.kill();
+    return this.expectShutdown();
+  };
+
+  NodeInstance.prototype.scriptPath = function scriptPath() {
+    return this._scriptPath;
+  };
+
+  NodeInstance.prototype.script = function script() {
+    if (this._script === null) this._script = fs.readFileSync(this.scriptPath(), 'utf8');
+    return this._script;
   };
 
   return NodeInstance;
 }();
-
-function readMainScriptSource() {
-  return fs.readFileSync(_MAINSCRIPT, 'utf8');
-}
 
 function onResolvedOrRejected(promise, callback) {
   return promise.then(function (result) {
@@ -548,8 +595,6 @@ function fires(promise, error, timeoutMs) {
 }
 
 module.exports = {
-  mainScriptPath: _MAINSCRIPT,
-  readMainScriptSource: readMainScriptSource,
   NodeInstance: NodeInstance
 };
 

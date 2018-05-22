@@ -225,3 +225,4 @@ var TestReader = function (_R) {
   var _tr8 = new TestReader(100);
   assert.deepStrictEqual(_tr8.setEncoding('utf8'), _tr8);
 }
+;require('tap').pass('sync run');

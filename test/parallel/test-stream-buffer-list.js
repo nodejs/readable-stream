@@ -4,7 +4,7 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-var BufferList = require('../../lib/internal/streams/BufferList');
+var BufferList = require('internal/streams/buffer_list');
 
 // Test empty buffer list.
 var emptyList = new BufferList();
@@ -16,14 +16,20 @@ assert.strictEqual(emptyList.join(','), '');
 
 assert.deepStrictEqual(emptyList.concat(0), bufferShim.alloc(0));
 
+var buf = bufferShim.from('foo');
+
 // Test buffer list with one element.
 var list = new BufferList();
-list.push('foo');
+list.push(buf);
 
-assert.strictEqual(list.concat(1), 'foo');
+var copy = list.concat(3);
+
+assert.notStrictEqual(copy, buf);
+assert.deepStrictEqual(copy, buf);
 
 assert.strictEqual(list.join(','), 'foo');
 
 var shifted = list.shift();
-assert.strictEqual(shifted, 'foo');
+assert.strictEqual(shifted, buf);
 assert.deepStrictEqual(list, new BufferList());
+;require('tap').pass('sync run');

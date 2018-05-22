@@ -12,30 +12,33 @@ var readable = new Readable({
 // Initialized to false.
 assert.strictEqual(readable._readableState.emittedReadable, false);
 
+var expected = [bufferShim.from('foobar'), bufferShim.from('quo'), null];
 readable.on('readable', common.mustCall(function () {
   // emittedReadable should be true when the readable event is emitted
   assert.strictEqual(readable._readableState.emittedReadable, true);
-  readable.read();
+  assert.deepStrictEqual(readable.read(), expected.shift());
   // emittedReadable is reset to false during read()
   assert.strictEqual(readable._readableState.emittedReadable, false);
-}, 4));
+}, 3));
 
 // When the first readable listener is just attached,
 // emittedReadable should be false
 assert.strictEqual(readable._readableState.emittedReadable, false);
 
-// Each one of these should trigger a readable event.
+// These trigger a single 'readable', as things are batched up
 process.nextTick(common.mustCall(function () {
   readable.push('foo');
 }));
 process.nextTick(common.mustCall(function () {
   readable.push('bar');
 }));
-process.nextTick(common.mustCall(function () {
+
+// these triggers two readable events
+setImmediate(common.mustCall(function () {
   readable.push('quo');
-}));
-process.nextTick(common.mustCall(function () {
-  readable.push(null);
+  process.nextTick(common.mustCall(function () {
+    readable.push(null);
+  }));
 }));
 
 var noRead = new Readable({
@@ -70,3 +73,4 @@ flowing.push('quo');
 process.nextTick(common.mustCall(function () {
   flowing.push(null);
 }));
+;require('tap').pass('sync run');

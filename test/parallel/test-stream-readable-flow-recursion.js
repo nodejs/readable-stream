@@ -66,8 +66,9 @@ process.on('exit', function (code) {
   // we pushed up the high water mark
   assert.strictEqual(stream.readableHighWaterMark, 8192);
   // length is 0 right now, because we pulled it all out.
-  assert.strictEqual(stream._readableState.length, 0);
+  assert.strictEqual(stream.readableLength, 0);
   assert(!code);
   assert.strictEqual(depth, 0);
   console.log('ok');
 });
+;require('tap').pass('sync run');

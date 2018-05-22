@@ -36,7 +36,7 @@ if (!usageVersionRegex.test(nodeVersion)) {
 }
 
 // `inputLoc`: URL or local path.
-function processFile (inputLoc, out, replacements) {
+function processFile (inputLoc, out, replacements, addAtEnd) {
   var file = fs.createReadStream(inputLoc, encoding)
 
   file.pipe(bl(function (err, data) {
@@ -55,6 +55,10 @@ function processFile (inputLoc, out, replacements) {
       }
       data = data.replace(regexp, arg2)
     })
+
+    if (addAtEnd) {
+      data += addAtEnd
+    }
     if (inputLoc.slice(-3) === '.js') {
       try {
         const transformed = babel.transform(data, {
@@ -65,6 +69,7 @@ function processFile (inputLoc, out, replacements) {
             'transform-es2015-template-literals',
             'transform-es2015-shorthand-properties',
             'transform-es2015-for-of',
+            'transform-async-generator-functions',
             ['transform-es2015-classes', { loose: true }],
             'transform-es2015-destructuring',
             'transform-es2015-computed-properties',
@@ -113,7 +118,7 @@ function processTestFile (file) {
   if (testReplace[file])
     replacements = replacements.concat(testReplace[file])
 
-  processFile(url, out, replacements)
+  processFile(url, out, replacements, ';require(\'tap\').pass(\'sync run\');')
 }
 
 //--------------------------------------------------------------------

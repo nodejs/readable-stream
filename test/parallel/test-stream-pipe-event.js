@@ -50,3 +50,4 @@ var r = new Readable();
 r.pipe(w);
 
 assert.ok(passed);
+;require('tap').pass('sync run');

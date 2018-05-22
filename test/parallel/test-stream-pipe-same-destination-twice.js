@@ -81,3 +81,4 @@ var _require = require('../../'),
 
   _passThrough2.write('foobar');
 }
+;require('tap').pass('sync run');

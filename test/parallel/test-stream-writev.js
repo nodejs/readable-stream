@@ -102,3 +102,4 @@ function test(decode, uncork, multi, next) {
     next();
   });
 }
+;require('tap').pass('sync run');

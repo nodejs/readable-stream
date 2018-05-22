@@ -19,7 +19,8 @@ var _require2 = require('util'),
     }
   });
 
-  write.on('finish', common.mustCall());
+  write.on('finish', common.mustNotCall());
+  write.on('close', common.mustCall());
 
   write.destroy();
   assert.strictEqual(write.destroyed, true);
@@ -34,7 +35,8 @@ var _require2 = require('util'),
 
   var expected = new Error('kaboom');
 
-  _write.on('finish', common.mustCall());
+  _write.on('finish', common.mustNotCall());
+  _write.on('close', common.mustCall());
   _write.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, expected);
   }));
@@ -58,6 +60,7 @@ var _require2 = require('util'),
   var _expected = new Error('kaboom');
 
   _write2.on('finish', common.mustNotCall('no finish event'));
+  _write2.on('close', common.mustCall());
   _write2.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, _expected);
   }));
@@ -81,6 +84,7 @@ var _require2 = require('util'),
   var _expected2 = new Error('kaboom');
 
   _write3.on('finish', common.mustNotCall('no finish event'));
+  _write3.on('close', common.mustCall());
 
   // error is swallowed by the custom _destroy
   _write3.on('error', common.mustNotCall('no error event'));
@@ -125,6 +129,7 @@ var _require2 = require('util'),
   var fail = common.mustNotCall('no finish event');
 
   _write5.on('finish', fail);
+  _write5.on('close', common.mustCall());
 
   _write5.destroy();
 
@@ -147,6 +152,7 @@ var _require2 = require('util'),
     cb(_expected3);
   });
 
+  _write6.on('close', common.mustCall());
   _write6.on('finish', common.mustNotCall('no finish event'));
   _write6.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, _expected3);
@@ -164,6 +170,7 @@ var _require2 = require('util'),
     }
   });
 
+  _write7.on('close', common.mustCall());
   _write7.on('error', common.mustCall());
 
   _write7.destroy(new Error('kaboom 1'));
@@ -183,7 +190,7 @@ var _require2 = require('util'),
   assert.strictEqual(_write8.destroyed, true);
 
   // the internal destroy() mechanism should not be triggered
-  _write8.on('finish', common.mustNotCall());
+  _write8.on('close', common.mustNotCall());
   _write8.destroy();
 }
 
@@ -215,3 +222,20 @@ var _require2 = require('util'),
     assert.strictEqual(_expected4, err);
   }));
 }
+
+{
+  // Checks that `._undestroy()` restores the state so that `final` will be
+  // called again.
+  var _write10 = new Writable({
+    write: common.mustNotCall(),
+    final: common.mustCall(function (cb) {
+      return cb();
+    }, 2)
+  });
+
+  _write10.end();
+  _write10.destroy();
+  _write10._undestroy();
+  _write10.end();
+}
+;require('tap').pass('sync run');

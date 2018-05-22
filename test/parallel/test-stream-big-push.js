@@ -74,3 +74,4 @@ r.once('readable', function () {
   chunk = r.read();
   assert.strictEqual(chunk, null);
 });
+;require('tap').pass('sync run');

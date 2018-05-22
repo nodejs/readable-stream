@@ -62,3 +62,4 @@ r.on('end', function () {
   assert.deepStrictEqual(seen, expect);
   console.log('ok');
 });
+;require('tap').pass('sync run');

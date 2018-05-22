@@ -28,7 +28,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var stream = require('../../');
@@ -70,12 +70,16 @@ var MyWritable = function (_stream$Writable) {
   m.end();
 })();
 
-assert.throws(function changeDefaultEncodingToInvalidValue() {
+common.expectsError(function changeDefaultEncodingToInvalidValue() {
   var m = new MyWritable(function (isBuffer, type, enc) {}, { decodeStrings: false });
   m.setDefaultEncoding({});
   m.write('bar');
   m.end();
-}, /^TypeError: Unknown encoding: \[object Object\]$/);
+}, {
+  type: TypeError,
+  code: 'ERR_UNKNOWN_ENCODING',
+  message: 'Unknown encoding: [object Object]'
+});
 
 (function checkVairableCaseEncoding() {
   var m = new MyWritable(function (isBuffer, type, enc) {
@@ -85,3 +89,4 @@ assert.throws(function changeDefaultEncodingToInvalidValue() {
   m.write('bar');
   m.end();
 })();
+;require('tap').pass('sync run');

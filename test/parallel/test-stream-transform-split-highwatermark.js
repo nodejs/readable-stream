@@ -1,7 +1,7 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var _require = require('../../'),
@@ -59,13 +59,32 @@ testTransform(0, 0, {
   writableHighWaterMark: 777
 });
 
-// test undefined, null, NaN
-[undefined, null, NaN].forEach(function (v) {
+// test undefined, null
+[undefined, null].forEach(function (v) {
   testTransform(DEFAULT, DEFAULT, { readableHighWaterMark: v });
   testTransform(DEFAULT, DEFAULT, { writableHighWaterMark: v });
   testTransform(666, DEFAULT, { highWaterMark: v, readableHighWaterMark: 666 });
   testTransform(DEFAULT, 777, { highWaterMark: v, writableHighWaterMark: 777 });
 });
+
+// test NaN
+{
+  common.expectsError(function () {
+    new Transform({ readableHighWaterMark: NaN });
+  }, {
+    type: TypeError,
+    code: 'ERR_INVALID_OPT_VALUE',
+    message: 'The value "NaN" is invalid for option "readableHighWaterMark"'
+  });
+
+  common.expectsError(function () {
+    new Transform({ writableHighWaterMark: NaN });
+  }, {
+    type: TypeError,
+    code: 'ERR_INVALID_OPT_VALUE',
+    message: 'The value "NaN" is invalid for option "writableHighWaterMark"'
+  });
+}
 
 // test non Duplex streams ignore the options
 {
@@ -74,3 +93,4 @@ testTransform(0, 0, {
   var w = new Writable({ writableHighWaterMark: 777 });
   assert.strictEqual(w._writableState.highWaterMark, DEFAULT);
 }
+;require('tap').pass('sync run');

@@ -93,3 +93,4 @@ process.on('exit', function () {
   assert.strictEqual(writer.writable, false);
   console.log('ok');
 });
+;require('tap').pass('sync run');

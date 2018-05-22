@@ -20,3 +20,4 @@ readable.push(null);
 assert.strictEqual(readable.read(), 'abc');
 assert.strictEqual(readable.read(), 'def');
 assert.strictEqual(readable.read(), null);
+;require('tap').pass('sync run');

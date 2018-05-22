@@ -72,16 +72,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         + '}catch(_){}}());\n'
       ]
 
-    , isArrayDefine = [
-          headRegexp
-        , '$1\n\n/*<replacement>*/\nvar isArray = require(\'isarray\');\n/*</replacement>*/\n'
-      ]
-
-    , isArrayReplacement = [
-          /Array\.isArray/g
-        , 'isArray'
-      ]
-
     , objectKeysDefine = require('./common-replacements').objectKeysDefine
 
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
@@ -230,6 +220,18 @@ function CorkedRequest(state) {
       /Buffer\.prototype\.copy\.call\(src, target, offset\);/
     , 'src.copy(target, offset);'
   ]
+  , errorsOneLevel = [
+        /internal\/errors/
+    ,   '../errors'
+  ]
+  , errorsTwoLevel = [
+        /internal\/errors/
+    ,   '../../../errors'
+  ]
+  , warnings = [
+        /^const { emitExperimentalWarning } = require\('internal\/util'\);/m,
+        'const { emitExperimentalWarning } = require(\'../experimentalWarning\');'
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -240,6 +242,7 @@ module.exports['_stream_duplex.js'] = [
   , objectKeysDefine
   , processNextTickImport
   , processNextTickReplacement
+  , errorsOneLevel
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -247,6 +250,7 @@ module.exports['_stream_passthrough.js'] = [
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
+  , errorsOneLevel
 ]
 
 module.exports['_stream_readable.js'] = [
@@ -257,8 +261,6 @@ module.exports['_stream_readable.js'] = [
   , altIndexOfImplReplacement
   , altIndexOfUseReplacement
   , stringDecoderReplacement
-  , isArrayReplacement
-  , isArrayDefine
   , debugLogReplacement
   , utilReplacement
   , stringDecoderReplacement
@@ -272,6 +274,8 @@ module.exports['_stream_readable.js'] = [
   , safeBufferFix
   , fixUintStuff
   , addUintStuff
+  , errorsOneLevel
+  , warnings
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -279,6 +283,7 @@ module.exports['_stream_transform.js'] = [
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
+  , errorsOneLevel
 ]
 
 module.exports['_stream_writable.js'] = [
@@ -311,9 +316,10 @@ module.exports['_stream_writable.js'] = [
   , useWriteReq
   , useCorkedRequest
   , addConstructors
+  , errorsOneLevel
 ]
 
-module.exports['internal/streams/BufferList.js'] = [
+module.exports['internal/streams/buffer_list.js'] = [
     [
       /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/,
       `
@@ -339,4 +345,17 @@ if (util && util.inspect && util.inspect.custom) {
 module.exports['internal/streams/destroy.js'] = [
     processNextTickImport
   , processNextTickReplacement
+  , errorsTwoLevel
+]
+
+module.exports['internal/streams/state.js'] = [
+    processNextTickImport
+  , processNextTickReplacement
+  , errorsTwoLevel
+]
+
+module.exports['internal/streams/async_iterator.js'] = [
+    processNextTickImport
+  , processNextTickReplacement
+  , errorsTwoLevel
 ]

@@ -85,3 +85,38 @@ var Readable = require('../../').Readable;
     _r2.on('readable', common.mustCall());
   }, 1);
 }
+
+{
+  // pushing a empty string in non-objectMode should
+  // trigger next `read()`.
+  var underlyingData = ['', 'x', 'y', '', 'z'];
+  var expected = underlyingData.filter(function (data) {
+    return data;
+  });
+  var result = [];
+
+  var _r3 = new Readable({
+    encoding: 'utf8'
+  });
+  _r3._read = function () {
+    var _this = this;
+
+    process.nextTick(function () {
+      if (!underlyingData.length) {
+        _this.push(null);
+      } else {
+        _this.push(underlyingData.shift());
+      }
+    });
+  };
+
+  _r3.on('readable', function () {
+    var data = _r3.read();
+    if (data !== null) result.push(data);
+  });
+
+  _r3.on('end', common.mustCall(function () {
+    assert.deepStrictEqual(result, expected);
+  }));
+}
+;require('tap').pass('sync run');

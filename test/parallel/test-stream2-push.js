@@ -52,7 +52,7 @@ stream.on('end', function () {
 
 source.on('data', function (chunk) {
   var ret = stream.push(chunk);
-  console.error('data', stream._readableState.length);
+  console.error('data', stream.readableLength);
   if (!ret) readStop();
 });
 
@@ -126,3 +126,4 @@ function end() {
     assert(ended);
   });
 }
+;require('tap').pass('sync run');

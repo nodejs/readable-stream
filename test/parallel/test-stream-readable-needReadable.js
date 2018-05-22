@@ -40,7 +40,7 @@ asyncReadable.on('readable', common.mustCall(function () {
     // then we need to notify the reader on future changes.
     assert.strictEqual(asyncReadable._readableState.needReadable, true);
   }
-}, 3));
+}, 2));
 
 process.nextTick(common.mustCall(function () {
   asyncReadable.push('foooo');
@@ -48,8 +48,9 @@ process.nextTick(common.mustCall(function () {
 process.nextTick(common.mustCall(function () {
   asyncReadable.push('bar');
 }));
-process.nextTick(common.mustCall(function () {
+setImmediate(common.mustCall(function () {
   asyncReadable.push(null);
+  assert.strictEqual(asyncReadable._readableState.needReadable, false);
 }));
 
 var flowing = new Readable({
@@ -86,13 +87,14 @@ slowProducer.on('readable', common.mustCall(function () {
 
 process.nextTick(common.mustCall(function () {
   slowProducer.push('foo');
+  process.nextTick(common.mustCall(function () {
+    slowProducer.push('foo');
+    process.nextTick(common.mustCall(function () {
+      slowProducer.push('foo');
+      process.nextTick(common.mustCall(function () {
+        slowProducer.push(null);
+      }));
+    }));
+  }));
 }));
-process.nextTick(common.mustCall(function () {
-  slowProducer.push('foo');
-}));
-process.nextTick(common.mustCall(function () {
-  slowProducer.push('foo');
-}));
-process.nextTick(common.mustCall(function () {
-  slowProducer.push(null);
-}));
+;require('tap').pass('sync run');

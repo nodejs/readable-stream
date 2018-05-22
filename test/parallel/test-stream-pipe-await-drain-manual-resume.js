@@ -78,3 +78,4 @@ writable.on('finish', common.mustCall(function () {
   assert.strictEqual(readable._readableState.awaitDrain, 0, 'awaitDrain should equal 0 after all chunks are written but instead got' + ('' + readable._readableState.awaitDrain));
   // Everything okay, all chunks were written.
 }));
+;require('tap').pass('sync run');

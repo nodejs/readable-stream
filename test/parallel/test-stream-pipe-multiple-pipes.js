@@ -96,3 +96,4 @@ readable.on('end', common.mustCall(function () {
     }
   }
 }));
+;require('tap').pass('sync run');

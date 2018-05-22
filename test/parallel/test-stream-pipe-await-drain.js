@@ -52,3 +52,4 @@ reader.pipe(writer1);
 reader.pipe(writer2);
 reader.pipe(writer3);
 reader.push(buffer);
+;require('tap').pass('sync run');

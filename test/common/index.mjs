@@ -15,7 +15,7 @@ if (!global.clearImmediate) {
 }
 /*</replacement>*/
 // Flags: --experimental-modules
-/* eslint-disable required-modules */
+/* eslint-disable node-core/required-modules */
 
 import assert from 'assert';
 
@@ -43,7 +43,7 @@ export function allowGlobals(...whitelist) {
 }
 
 export function leakedGlobals() {
-  //add possible expected globals
+  // Add possible expected globals
   if (global.gc) {
     knownGlobals.push(global.gc);
   }
@@ -64,15 +64,6 @@ export function leakedGlobals() {
     knownGlobals.push(COUNTER_HTTP_SERVER_RESPONSE);
     knownGlobals.push(COUNTER_HTTP_CLIENT_REQUEST);
     knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
-  }
-
-  if (global.LTTNG_HTTP_SERVER_RESPONSE) {
-    knownGlobals.push(LTTNG_HTTP_SERVER_RESPONSE);
-    knownGlobals.push(LTTNG_HTTP_SERVER_REQUEST);
-    knownGlobals.push(LTTNG_HTTP_CLIENT_RESPONSE);
-    knownGlobals.push(LTTNG_HTTP_CLIENT_REQUEST);
-    knownGlobals.push(LTTNG_NET_STREAM_END);
-    knownGlobals.push(LTTNG_NET_SERVER_CONNECTION);
   }
 
   if (global.ArrayBuffer) {

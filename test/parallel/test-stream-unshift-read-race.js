@@ -70,9 +70,13 @@ r._read = function (n) {
 };
 
 function pushError() {
-  assert.throws(function () {
+  common.expectsError(function () {
     r.push(bufferShim.allocUnsafe(1));
-  }, /^Error: stream\.push\(\) after EOF$/);
+  }, {
+    code: 'ERR_STREAM_PUSH_AFTER_EOF',
+    type: Error,
+    message: 'stream.push() after EOF'
+  });
 }
 
 var w = stream.Writable();
@@ -83,9 +87,13 @@ w._write = function (chunk, encoding, cb) {
 };
 
 r.on('end', common.mustCall(function () {
-  assert.throws(function () {
+  common.expectsError(function () {
     r.unshift(bufferShim.allocUnsafe(1));
-  }, /^Error: stream\.unshift\(\) after end event$/);
+  }, {
+    code: 'ERR_STREAM_UNSHIFT_AFTER_END_EVENT',
+    type: Error,
+    message: 'stream.unshift() after end event'
+  });
   w.end();
 }));
 
@@ -128,3 +136,4 @@ process.on('exit', function () {
   assert.strictEqual(written.length, 18);
   console.log('ok');
 });
+;require('tap').pass('sync run');

@@ -105,3 +105,4 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
   var out = _readable.read();
   assert.strictEqual(out, 'ABCDEF');
 }
+;require('tap').pass('sync run');

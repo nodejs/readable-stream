@@ -2,39 +2,45 @@
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 var common = require('../common');
-var assert = require('assert/');
 
-var Transform = require('../../').Transform;
+var _require = require('assert/'),
+    strictEqual = _require.strictEqual;
 
-var _transform = common.mustCall(function _transform(d, e, n) {
-  n();
+var _require2 = require('../../'),
+    Transform = _require2.Transform;
+
+var t = new Transform();
+
+t.on('error', common.expectsError({
+  type: Error,
+  code: 'ERR_METHOD_NOT_IMPLEMENTED',
+  message: 'The _transform() method is not implemented'
+}));
+
+t.end(bufferShim.from('blerg'));
+
+var _transform = common.mustCall(function (chunk, _, next) {
+  next();
 });
 
-var _final = common.mustCall(function _final(n) {
-  n();
+var _final = common.mustCall(function (next) {
+  next();
 });
 
-var _flush = common.mustCall(function _flush(n) {
-  n();
+var _flush = common.mustCall(function (next) {
+  next();
 });
 
-var t = new Transform({
+var t2 = new Transform({
   transform: _transform,
   flush: _flush,
   final: _final
 });
 
-var t2 = new Transform({});
+strictEqual(t2._transform, _transform);
+strictEqual(t2._flush, _flush);
+strictEqual(t2._final, _final);
 
-t.end(bufferShim.from('blerg'));
-t.resume();
-
-assert.throws(function () {
-  t2.end(bufferShim.from('blerg'));
-}, /^Error: .*[Nn]ot implemented$/);
-
-process.on('exit', function () {
-  assert.strictEqual(t._transform, _transform);
-  assert.strictEqual(t._flush, _flush);
-  assert.strictEqual(t._final, _final);
-});
+t2.end(bufferShim.from('blerg'));
+t2.resume();
+;require('tap').pass('sync run');

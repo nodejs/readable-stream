@@ -9,7 +9,7 @@ var state = 0;
 
 /*
 What you do
-var stream = new tream.Transform({
+var stream = new stream.Transform({
   transform: function transformCallback(chunk, _, next) {
     // part 1
     this.push(chunk);
@@ -100,3 +100,4 @@ t.end(7, common.mustCall(function () {
   state++;
   assert.strictEqual(state, 14, 'endMethodCallback');
 }, 1));
+;require('tap').pass('sync run');

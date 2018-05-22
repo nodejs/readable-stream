@@ -84,3 +84,4 @@ function indexOf(xs, x) {
   }
   return -1;
 }
+;require('tap').pass('sync run');

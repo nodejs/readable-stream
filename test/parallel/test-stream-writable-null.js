@@ -7,7 +7,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
+var common = require('../common');
 var assert = require('assert/');
 
 var stream = require('../../');
@@ -29,47 +29,50 @@ var MyWritable = function (_stream$Writable) {
   return MyWritable;
 }(stream.Writable);
 
-assert.throws(function () {
+common.expectsError(function () {
   var m = new MyWritable({ objectMode: true });
   m.write(null, function (err) {
     return assert.ok(err);
   });
-}, /^TypeError: May not write null values to stream$/);
-assert.doesNotThrow(function () {
-  var m = new MyWritable({ objectMode: true }).on('error', function (e) {
-    assert.ok(e);
-  });
-  m.write(null, function (err) {
-    assert.ok(err);
-  });
+}, {
+  code: 'ERR_STREAM_NULL_VALUES',
+  type: TypeError,
+  message: 'May not write null values to stream'
 });
 
-assert.throws(function () {
+{
+  // Should not throw.
+  var m = new MyWritable({ objectMode: true }).on('error', assert);
+  m.write(null, assert);
+}
+
+common.expectsError(function () {
   var m = new MyWritable();
   m.write(false, function (err) {
     return assert.ok(err);
   });
-}, /^TypeError: Invalid non-string\/buffer chunk$/);
-assert.doesNotThrow(function () {
-  var m = new MyWritable().on('error', function (e) {
-    assert.ok(e);
-  });
-  m.write(false, function (err) {
-    assert.ok(err);
-  });
+}, {
+  code: 'ERR_INVALID_ARG_TYPE',
+  type: TypeError
 });
 
-assert.doesNotThrow(function () {
-  var m = new MyWritable({ objectMode: true });
-  m.write(false, function (err) {
-    return assert.ifError(err);
-  });
-});
-assert.doesNotThrow(function () {
-  var m = new MyWritable({ objectMode: true }).on('error', function (e) {
+{
+  // Should not throw.
+  var _m = new MyWritable().on('error', assert);
+  _m.write(false, assert);
+}
+
+{
+  // Should not throw.
+  var _m2 = new MyWritable({ objectMode: true });
+  _m2.write(false, assert.ifError);
+}
+
+{
+  // Should not throw.
+  var _m3 = new MyWritable({ objectMode: true }).on('error', function (e) {
     assert.ifError(e || new Error('should not get here'));
   });
-  m.write(false, function (err) {
-    assert.ifError(err);
-  });
-});
+  _m3.write(false, assert.ifError);
+}
+;require('tap').pass('sync run');

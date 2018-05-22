@@ -72,3 +72,4 @@ var MyWritable = function (_stream$Writable) {
   _m.write('some-text', 'utf8');
   _m.end();
 }
+;require('tap').pass('sync run');

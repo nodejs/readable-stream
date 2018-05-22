@@ -48,3 +48,4 @@ var _require = require('../../'),
 
   _stream2.write(undefined);
 }
+;require('tap').pass('sync run');

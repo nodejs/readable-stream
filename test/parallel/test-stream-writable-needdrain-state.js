@@ -23,3 +23,4 @@ transform.write('asdasd', common.mustCall(function () {
 }));
 
 assert.strictEqual(transform._writableState.needDrain, true);
+;require('tap').pass('sync run');
