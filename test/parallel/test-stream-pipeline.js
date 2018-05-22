@@ -14,7 +14,13 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 var http = require('http');
-var http2 = require('http2');
+var http2 = {
+  createServer: function () {
+    return {
+      listen: function () {}
+    };
+  }
+};
 
 var _require2 = require('util'),
     promisify = _require2.promisify;

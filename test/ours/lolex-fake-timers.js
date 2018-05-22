@@ -1,4 +1,5 @@
 require('../common');
+var tap = require('tap');
 var util = require('util');
 var assert = require('assert');
 var lolex = require('lolex');
@@ -37,3 +38,4 @@ stream.emit('data');
 clock.runAll()
 clock.uninstall();
 assert(stream2DataCalled);
+t.pass('ok');

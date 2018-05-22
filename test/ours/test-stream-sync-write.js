@@ -34,3 +34,5 @@ var externalStream = new ExternalStream(internalStream);
 for (var i = 0; i < 2000; i++) {
     externalStream.write(i.toString());
 }
+
+require('tap').pass('sync done');

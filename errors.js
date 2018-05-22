@@ -22,5 +22,6 @@ createErrorType('ERR_INVALID_ARG_TYPE');
 createErrorType('ERR_STREAM_PUSH_AFTER_EOF');
 createErrorType('ERR_METHOD_NOT_IMPLEMENTED');
 createErrorType('ERR_STREAM_PUSH_AFTER_EOF');
+createErrorType('ERR_STREAM_PREMATURE_CLOSE');
 
 module.exports.codes = codes;

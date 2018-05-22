@@ -319,8 +319,8 @@ module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
 ]
 module.exports['test-stream-buffer-list.js'] = [
   [
-    /require\('internal\/streams\/BufferList'\);/,
-    'require(\'../../lib/internal/streams/BufferList\');'
+    /require\('internal\/streams\/buffer_list'\);/,
+    'require(\'../../lib/internal/streams/buffer_list\');'
   ]
 ]
 
@@ -335,5 +335,12 @@ module.exports['test-stream-unpipe-event.js'] = [
   [
     /^/,
     'if (process.version.indexOf(\'v0.8\') === 0) { process.exit(0) }\n'
+  ]
+]
+
+module.exports['test-stream-pipeline.js'] = [
+  [
+    /require\('http2'\)/g,
+    '{ createServer() { return { listen() {} } } }'
   ]
 ]

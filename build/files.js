@@ -359,3 +359,19 @@ module.exports['internal/streams/async_iterator.js'] = [
   , processNextTickReplacement
   , errorsTwoLevel
 ]
+
+module.exports['internal/streams/end-of-stream.js'] = [
+    processNextTickImport
+  , processNextTickReplacement
+  , errorsTwoLevel
+]
+
+module.exports['internal/streams/pipeline.js'] = [
+    processNextTickImport
+  , processNextTickReplacement
+  , errorsTwoLevel
+  , [
+      /require\('internal\/streams\/end-of-stream'\)/,
+      'require(\'.\/end-of-stream\')'
+    ]
+]

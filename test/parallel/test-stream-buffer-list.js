@@ -4,7 +4,7 @@ var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
 var assert = require('assert/');
-var BufferList = require('internal/streams/buffer_list');
+var BufferList = require('../../lib/internal/streams/buffer_list');
 
 // Test empty buffer list.
 var emptyList = new BufferList();
