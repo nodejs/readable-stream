@@ -119,4 +119,17 @@ var Readable = require('../../').Readable;
     assert.deepStrictEqual(result, expected);
   }));
 }
+
+{
+  // #20923
+  var _r4 = new Readable();
+  _r4._read = function () {
+    // actually doing thing here
+  };
+  _r4.on('data', function () {});
+
+  _r4.removeAllListeners();
+
+  assert.strictEqual(_r4.eventNames().length, 0);
+}
 ;require('tap').pass('sync run');

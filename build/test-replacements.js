@@ -12,6 +12,11 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').bufferStaticMethods
     , specialForEachReplacment =
     require('./common-replacements').specialForEachReplacment
+    , deepStrictEqual = [
+        /util\.isDeepStrictEqual/,
+        'require(\'deep-strict-equal\')'
+      ]
+
 
 module.exports.all = [
     [
@@ -78,6 +83,7 @@ module.exports['common.js'] = [
   , objectKeysReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
+  , deepStrictEqual
 
   , [
         /(exports.mustCall[\s\S]*)/m
@@ -110,7 +116,7 @@ module.exports['common.js'] = [
         + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
         + '  if (global.__coverage__)\n'
         + '    knownGlobals.push(__coverage__);\n'
-        + '\'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
+        + '\'core,__core-js_shared__,console,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
         + '  /*</replacement>*/\n\n$1'
     ]
 
@@ -336,6 +342,22 @@ module.exports['test-stream-unpipe-event.js'] = [
     /^/,
     'if (process.version.indexOf(\'v0.8\') === 0) { process.exit(0) }\n'
   ]
+]
+
+module.exports['test-stream-readable-flow-recursion.js'] = [
+  deepStrictEqual
+]
+
+module.exports['test-stream-readable-with-unimplemented-_read.js'] = [
+  deepStrictEqual
+]
+
+module.exports['test-stream-writable-needdrain-state.js'] = [
+  deepStrictEqual
+]
+
+module.exports['test-stream-readable-setEncoding-null.js'] = [
+  deepStrictEqual
 ]
 
 module.exports['test-stream-pipeline.js'] = [

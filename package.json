@@ -15,6 +15,7 @@
     "assert": "^1.4.0",
     "babel-polyfill": "^6.9.1",
     "buffer": "^5.1.0",
+    "deep-strict-equal": "^0.2.0",
     "lolex": "^2.6.0",
     "nyc": "^11.0.0",
     "tap": "^11.0.0",

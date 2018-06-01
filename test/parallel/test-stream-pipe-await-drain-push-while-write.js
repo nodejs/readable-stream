@@ -7,7 +7,7 @@ var assert = require('assert/');
 
 var writable = new stream.Writable({
   write: common.mustCall(function (chunk, encoding, cb) {
-    assert.strictEqual(readable._readableState.awaitDrain, 0, 'State variable awaitDrain is not correct.');
+    assert.strictEqual(readable._readableState.awaitDrain, 0);
 
     if (chunk.length === 32 * 1024) {
       // first chunk
@@ -15,7 +15,7 @@ var writable = new stream.Writable({
       // We should check if awaitDrain counter is increased in the next
       // tick, because awaitDrain is incremented after this method finished
       process.nextTick(function () {
-        assert.strictEqual(readable._readableState.awaitDrain, 1, 'Counter is not increased for awaitDrain');
+        assert.strictEqual(readable._readableState.awaitDrain, 1);
       });
     }
 

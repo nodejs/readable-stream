@@ -348,8 +348,7 @@ exports.platformTimeout = function (ms) {
   return ms; // ARMv8+
 };
 
-var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, console, constructor, // Enumerable in V8 3.21.
-global, process, setImmediate, setInterval, setTimeout];
+var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
 
 if (global.gc) {
   knownGlobals.push(global.gc);
@@ -373,31 +372,6 @@ if (global.COUNTER_NET_SERVER_CONNECTION) {
   knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
 }
 
-/*<replacement>*/if (!process.browser) {
-  if (global.ArrayBuffer) {
-    knownGlobals.push(ArrayBuffer);
-    knownGlobals.push(Int8Array);
-    knownGlobals.push(Uint8Array);
-    knownGlobals.push(Uint8ClampedArray);
-    knownGlobals.push(Int16Array);
-    knownGlobals.push(Uint16Array);
-    knownGlobals.push(Int32Array);
-    knownGlobals.push(Uint32Array);
-    knownGlobals.push(Float32Array);
-    knownGlobals.push(Float64Array);
-    knownGlobals.push(DataView);
-  }
-} /*</replacement>*/
-
-// Harmony features.
-if (global.Proxy) {
-  knownGlobals.push(Proxy);
-}
-
-if (global.Symbol) {
-  knownGlobals.push(Symbol);
-}
-
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
   var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
   allowGlobals.apply(undefined, _toConsumableArray(knownFromEnv));
@@ -417,7 +391,7 @@ if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
 if (global.__coverage__) knownGlobals.push(__coverage__);
-'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
+'core,__core-js_shared__,console,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
   return typeof global[item] !== undefined;
 }).forEach(function (item) {
   knownGlobals.push(global[item]);
@@ -442,11 +416,7 @@ function leakedGlobals() {
 }
 exports.leakedGlobals = leakedGlobals;
 
-// Turn this off if the test should not check for global leaks.
-exports.globalCheck = true;
-
 process.on('exit', function () {
-  if (!exports.globalCheck) return;
   var leaked = leakedGlobals();
   if (leaked.length > 0) {
     assert.fail('Unexpected global(s) found: ' + leaked.join(', '));
@@ -820,7 +790,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
         var key = _step2.value;
 
-        if (!util.isDeepStrictEqual(error[key], innerSettings[key])) {
+        if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
           // Create placeholder objects to create a nice output.
           var a = new Comparison(error, keys);
           var b = new Comparison(innerSettings, keys);

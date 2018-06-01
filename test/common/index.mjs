@@ -24,8 +24,6 @@ let knownGlobals = [
   clearImmediate,
   clearInterval,
   clearTimeout,
-  console,
-  constructor, // Enumerable in V8 3.21.
   global,
   process,
   setImmediate,
@@ -66,29 +64,6 @@ export function leakedGlobals() {
     knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
   }
 
-  if (global.ArrayBuffer) {
-    knownGlobals.push(ArrayBuffer);
-    knownGlobals.push(Int8Array);
-    knownGlobals.push(Uint8Array);
-    knownGlobals.push(Uint8ClampedArray);
-    knownGlobals.push(Int16Array);
-    knownGlobals.push(Uint16Array);
-    knownGlobals.push(Int32Array);
-    knownGlobals.push(Uint32Array);
-    knownGlobals.push(Float32Array);
-    knownGlobals.push(Float64Array);
-    knownGlobals.push(DataView);
-  }
-
-  // Harmony features.
-  if (global.Proxy) {
-    knownGlobals.push(Proxy);
-  }
-
-  if (global.Symbol) {
-    knownGlobals.push(Symbol);
-  }
-
   const leaked = [];
 
   for (const val in global) {
@@ -104,11 +79,7 @@ export function leakedGlobals() {
   }
 }
 
-// Turn this off if the test should not check for global leaks.
-export let globalCheck = true;  // eslint-disable-line
-
 process.on('exit', function() {
-  if (!globalCheck) return;
   const leaked = leakedGlobals();
   if (leaked.length > 0) {
     assert.fail(`Unexpected global(s) found: ${leaked.join(', ')}`);
