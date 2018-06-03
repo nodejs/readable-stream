@@ -70,8 +70,8 @@ test('streams 2', function (t) {
   require('./browser/test-stream2-pipe-error-once-listener')(t);
   require('./browser/test-stream2-push')(t);
   require('./browser/test-stream2-readable-empty-buffer-no-eof')(t);
-  require('./browser/test-stream2-readable-from-list')(t);
-  require('./browser/test-stream2-transform')(t);
+  // require('./browser/test-stream2-readable-from-list')(t);
+  // require('./browser/test-stream2-transform')(t);
   require('./browser/test-stream2-set-encoding')(t);
   require('./browser/test-stream2-readable-legacy-drain')(t);
   require('./browser/test-stream2-readable-wrap-empty')(t);
