@@ -6,10 +6,20 @@ matrix:
   fast_finish: true
   include:
   - node_js: 6
+    env: CMD=test
   - node_js: 8
+    env: CMD=test
   - node_js: 9
+    env: CMD=test
   - node_js: 10
-script: "npm test"
+    env: CMD=test
+  - node_js: stable
+    env: CMD=test-browsers
+    addons:
+      sauce_connect: true
+      hosts:
+        - airtap.local
+script: npm run $CMD
 env:
   global:
   - secure: rE2Vvo7vnjabYNULNyLFxOyt98BoJexDqsiOnfiD6kLYYsiQGfr/sbZkPMOFm9qfQG7pjqx+zZWZjGSswhTt+626C0t/njXqug7Yps4c3dFblzGfreQHp7wNX5TFsvrxd6dAowVasMp61sJcRnB2w8cUzoe3RAYUDHyiHktwqMc=
