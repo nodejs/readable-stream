@@ -40,11 +40,11 @@ run();
 
 function run() {
   var t = queue.pop();
-  if (t) test(t[0], t[1], t[2], run);else console.log('ok');
+  if (t) test(t[0], t[1], t[2], run);else require('tap').pass();
 }
 
 function test(decode, uncork, multi, next) {
-  console.log('# decode=' + decode + ' uncork=' + uncork + ' multi=' + multi);
+  require('tap').test('# decode=' + decode + ' uncork=' + uncork + ' multi=' + multi);
   var counter = 0;
   var expectCount = 0;
   function cnt(msg) {
@@ -65,7 +65,7 @@ function test(decode, uncork, multi, next) {
     chunk: [119, 111, 114, 108, 100] }, { encoding: 'buffer',
     chunk: [33] }, { encoding: 'buffer',
     chunk: [10, 97, 110, 100, 32, 116, 104, 101, 110, 46, 46, 46] }, { encoding: 'buffer',
-    chunk: [250, 206, 190, 167, 222, 173, 190, 239, 222, 202, 251, 173] }] : [{ encoding: 'ascii', chunk: 'hello, ' }, { encoding: 'utf8', chunk: 'world' }, { encoding: 'buffer', chunk: [33] }, { encoding: 'binary', chunk: '\nand then...' }, { encoding: 'hex', chunk: 'facebea7deadbeefdecafbad' }];
+    chunk: [250, 206, 190, 167, 222, 173, 190, 239, 222, 202, 251, 173] }] : [{ encoding: 'ascii', chunk: 'hello, ' }, { encoding: 'utf8', chunk: 'world' }, { encoding: 'buffer', chunk: [33] }, { encoding: 'latin1', chunk: '\nand then...' }, { encoding: 'hex', chunk: 'facebea7deadbeefdecafbad' }];
 
   var actualChunks = void 0;
   w._writev = function (chunks, cb) {
@@ -85,7 +85,7 @@ function test(decode, uncork, multi, next) {
   if (multi) w.cork();
 
   w.write(bufferShim.from('!'), 'buffer', cnt('!'));
-  w.write('\nand then...', 'binary', cnt('and then'));
+  w.write('\nand then...', 'latin1', cnt('and then'));
 
   if (multi) w.uncork();
 

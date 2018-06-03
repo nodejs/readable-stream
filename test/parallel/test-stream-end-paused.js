@@ -48,6 +48,5 @@ setTimeout(common.mustCall(function () {
 
 process.on('exit', function () {
   assert(calledRead);
-  console.log('ok');
 });
 ;require('tap').pass('sync run');

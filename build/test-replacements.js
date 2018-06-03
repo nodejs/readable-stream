@@ -78,6 +78,13 @@ module.exports['test-stream-big-packet.js'] = [
   , altIndexOfUseReplacement
 ]
 
+module.exports['test-stream-end-paused.js'] = [
+    [
+      /console.log\('ok'\);/,
+      ''
+    ]
+]
+
 module.exports['common.js'] = [
     objectKeysDefine
   , objectKeysReplacement
@@ -313,8 +320,12 @@ module.exports['test-stream2-readable-from-list.js'] = [
 ]
 module.exports['test-stream-writev.js'] = [
   [
-    /'latin1'/g,
-    `'binary'`
+    /console\.log\('ok'\);/,
+    'require(\'tap\').pass();'
+  ],
+  [
+    /console.log\(`# decode=/,
+    'require(\'tap\').test(`# decode='
   ]
 ]
 module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
