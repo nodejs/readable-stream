@@ -15,7 +15,6 @@ function createErrorType(code, message, Base) {
     }
   }
 
-  // TODO(mcollina) make this a function
   class NodeError extends Base {
     constructor (arg1, arg2) {
       super(getMessage(arg1, arg2));
