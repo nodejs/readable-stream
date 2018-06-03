@@ -7,7 +7,7 @@ browsers:
     version: -3..latest
   - name: firefox
     version: -3..latest
-  # - name: safari
-  #   version: 5..latest
+  - name: safari
+    version: 5..latest
   - name: microsoftedge
     version: -3..latest
