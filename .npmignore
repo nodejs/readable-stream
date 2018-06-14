@@ -6,4 +6,4 @@ zlib.js
 .zuul.yml
 .nyc_output
 coverage
-docs/
+doc/
