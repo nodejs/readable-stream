@@ -241,4 +241,6 @@ var TestReader = function (_R) {
   var _tr8 = new TestReader(100);
   assert.deepStrictEqual(_tr8.setEncoding('utf8'), _tr8);
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

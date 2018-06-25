@@ -26,6 +26,7 @@
     "tar-fs": "^1.16.2"
   },
   "devDependencies": {
-    "babel-plugin-transform-async-generator-functions": "^6.24.1"
+    "babel-plugin-transform-async-generator-functions": "^6.24.1",
+    "babel-plugin-transform-async-to-generator": "^6.24.1"
   }
 }

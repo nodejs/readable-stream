@@ -1,5 +1,11 @@
 'use strict';
 
+var _asyncToGenerator2;
+
+function _load_asyncToGenerator() {
+  return _asyncToGenerator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncToGenerator'));
+}
+
 var _promise;
 
 function _load_promise() {
@@ -228,10 +234,18 @@ var InspectorSession = function () {
     return this._terminationPromise;
   };
 
-  InspectorSession.prototype.disconnect = async function disconnect() {
-    this._socket.destroy();
-    return this.waitForServerDisconnect();
-  };
+  InspectorSession.prototype.disconnect = function () {
+    var _ref = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      this._socket.destroy();
+      return this.waitForServerDisconnect();
+    });
+
+    function disconnect() {
+      return _ref.apply(this, arguments);
+    }
+
+    return disconnect;
+  }();
 
   InspectorSession.prototype._onMessage = function _onMessage(message) {
     if (message.id) {
@@ -303,25 +317,33 @@ var InspectorSession = function () {
     return fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
   };
 
-  InspectorSession.prototype._asyncWaitForNotification = async function _asyncWaitForNotification(methodOrPredicate) {
-    var _this4 = this;
+  InspectorSession.prototype._asyncWaitForNotification = function () {
+    var _ref2 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* (methodOrPredicate) {
+      var _this4 = this;
 
-    function matchMethod(notification) {
-      return notification.method === methodOrPredicate;
-    }
-    var predicate = typeof methodOrPredicate === 'string' ? matchMethod : methodOrPredicate;
-    var notification = null;
-    do {
-      if (this._unprocessedNotifications.length) {
-        notification = this._unprocessedNotifications.shift();
-      } else {
-        notification = await new (_promise || _load_promise()).default(function (resolve) {
-          return _this4._notificationCallback = resolve;
-        });
+      function matchMethod(notification) {
+        return notification.method === methodOrPredicate;
       }
-    } while (!predicate(notification));
-    return notification;
-  };
+      var predicate = typeof methodOrPredicate === 'string' ? matchMethod : methodOrPredicate;
+      var notification = null;
+      do {
+        if (this._unprocessedNotifications.length) {
+          notification = this._unprocessedNotifications.shift();
+        } else {
+          notification = yield new (_promise || _load_promise()).default(function (resolve) {
+            return _this4._notificationCallback = resolve;
+          });
+        }
+      } while (!predicate(notification));
+      return notification;
+    });
+
+    function _asyncWaitForNotification(_x) {
+      return _ref2.apply(this, arguments);
+    }
+
+    return _asyncWaitForNotification;
+  }();
 
   InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
     if (message.method === 'Debugger.paused') {
@@ -387,15 +409,23 @@ var InspectorSession = function () {
     }, desc);
   };
 
-  InspectorSession.prototype.runToCompletion = async function runToCompletion() {
-    console.log('[test]', 'Verify node waits for the frontend to disconnect');
-    await this.send({ 'method': 'Debugger.resume' });
-    await this.waitForNotification(function (notification) {
-      return notification.method === 'Runtime.executionContextDestroyed' && notification.params.executionContextId === 1;
+  InspectorSession.prototype.runToCompletion = function () {
+    var _ref3 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      console.log('[test]', 'Verify node waits for the frontend to disconnect');
+      yield this.send({ 'method': 'Debugger.resume' });
+      yield this.waitForNotification(function (notification) {
+        return notification.method === 'Runtime.executionContextDestroyed' && notification.params.executionContextId === 1;
+      });
+      while ((yield this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {}
+      yield this.disconnect();
     });
-    while ((await this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {}
-    await this.disconnect();
-  };
+
+    function runToCompletion() {
+      return _ref3.apply(this, arguments);
+    }
+
+    return runToCompletion;
+  }();
 
   InspectorSession.prototype.scriptPath = function scriptPath() {
     return this._instance.scriptPath();
@@ -449,13 +479,21 @@ var NodeInstance = function () {
     });
   }
 
-  NodeInstance.startViaSignal = async function startViaSignal(scriptContents) {
-    var instance = new NodeInstance([], scriptContents + '\nprocess._rawDebug(\'started\');', undefined);
-    var msg = 'Timed out waiting for process to start';
-    while ((await fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
-    process._debugProcess(instance._process.pid);
-    return instance;
-  };
+  NodeInstance.startViaSignal = function () {
+    var _ref4 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* (scriptContents) {
+      var instance = new NodeInstance([], scriptContents + '\nprocess._rawDebug(\'started\');', undefined);
+      var msg = 'Timed out waiting for process to start';
+      while ((yield fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
+      process._debugProcess(instance._process.pid);
+      return instance;
+    });
+
+    function startViaSignal(_x5) {
+      return _ref4.apply(this, arguments);
+    }
+
+    return startViaSignal;
+  }();
 
   NodeInstance.prototype.onStderrLine = function onStderrLine(line) {
     console.log('[err]', line);
@@ -500,45 +538,69 @@ var NodeInstance = function () {
     });
   };
 
-  NodeInstance.prototype.sendUpgradeRequest = async function sendUpgradeRequest() {
-    var response = await this.httpGet(null, '/json/list');
-    var devtoolsUrl = response[0].webSocketDebuggerUrl;
-    var port = await this.portPromise;
-    return http.get({
-      port: port,
-      path: parseURL(devtoolsUrl).path,
-      headers: {
-        'Connection': 'Upgrade',
-        'Upgrade': 'websocket',
-        'Sec-WebSocket-Version': 13,
-        'Sec-WebSocket-Key': 'key=='
-      }
+  NodeInstance.prototype.sendUpgradeRequest = function () {
+    var _ref5 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      var response = yield this.httpGet(null, '/json/list');
+      var devtoolsUrl = response[0].webSocketDebuggerUrl;
+      var port = yield this.portPromise;
+      return http.get({
+        port: port,
+        path: parseURL(devtoolsUrl).path,
+        headers: {
+          'Connection': 'Upgrade',
+          'Upgrade': 'websocket',
+          'Sec-WebSocket-Version': 13,
+          'Sec-WebSocket-Key': 'key=='
+        }
+      });
     });
-  };
 
-  NodeInstance.prototype.connectInspectorSession = async function connectInspectorSession() {
-    var _this8 = this;
+    function sendUpgradeRequest() {
+      return _ref5.apply(this, arguments);
+    }
 
-    console.log('[test]', 'Connecting to a child Node process');
-    var upgradeRequest = await this.sendUpgradeRequest();
-    return new (_promise || _load_promise()).default(function (resolve, reject) {
-      upgradeRequest.on('upgrade', function (message, socket) {
-        return resolve(new InspectorSession(socket, _this8));
-      }).on('response', common.mustNotCall('Upgrade was not received'));
+    return sendUpgradeRequest;
+  }();
+
+  NodeInstance.prototype.connectInspectorSession = function () {
+    var _ref6 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      var _this8 = this;
+
+      console.log('[test]', 'Connecting to a child Node process');
+      var upgradeRequest = yield this.sendUpgradeRequest();
+      return new (_promise || _load_promise()).default(function (resolve, reject) {
+        upgradeRequest.on('upgrade', function (message, socket) {
+          return resolve(new InspectorSession(socket, _this8));
+        }).on('response', common.mustNotCall('Upgrade was not received'));
+      });
     });
-  };
 
-  NodeInstance.prototype.expectConnectionDeclined = async function expectConnectionDeclined() {
-    console.log('[test]', 'Checking upgrade is not possible');
-    var upgradeRequest = await this.sendUpgradeRequest();
-    return new (_promise || _load_promise()).default(function (resolve, reject) {
-      upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
-        return response.on('data', function () {}).on('end', function () {
-          return resolve(response.statusCode);
+    function connectInspectorSession() {
+      return _ref6.apply(this, arguments);
+    }
+
+    return connectInspectorSession;
+  }();
+
+  NodeInstance.prototype.expectConnectionDeclined = function () {
+    var _ref7 = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      console.log('[test]', 'Checking upgrade is not possible');
+      var upgradeRequest = yield this.sendUpgradeRequest();
+      return new (_promise || _load_promise()).default(function (resolve, reject) {
+        upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
+          return response.on('data', function () {}).on('end', function () {
+            return resolve(response.statusCode);
+          });
         });
       });
     });
-  };
+
+    function expectConnectionDeclined() {
+      return _ref7.apply(this, arguments);
+    }
+
+    return expectConnectionDeclined;
+  }();
 
   NodeInstance.prototype.expectShutdown = function expectShutdown() {
     return this._shutdownPromise;

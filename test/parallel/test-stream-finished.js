@@ -1,5 +1,13 @@
 'use strict';
 
+var _asyncToGenerator2;
+
+function _load_asyncToGenerator() {
+  return _asyncToGenerator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncToGenerator'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -83,21 +91,27 @@ common.crashOnUnhandledRejection();
 }
 
 {
-  var finishedPromise = promisify(finished);
+  var run = function () {
+    var _ref = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      var rs = fs.createReadStream(__filename);
+      var done = common.mustCall();
 
-  async function run() {
-    var rs = fs.createReadStream(__filename);
-    var done = common.mustCall();
-
-    var ended = false;
-    rs.resume();
-    rs.on('end', function () {
-      ended = true;
+      var ended = false;
+      rs.resume();
+      rs.on('end', function () {
+        ended = true;
+      });
+      yield finishedPromise(rs);
+      assert(ended);
+      done();
     });
-    await finishedPromise(rs);
-    assert(ended);
-    done();
-  }
+
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var finishedPromise = promisify(finished);
 
   run();
 }
@@ -133,4 +147,6 @@ common.crashOnUnhandledRejection();
   _rs4.push(null);
   _rs4.resume();
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

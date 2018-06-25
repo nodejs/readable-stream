@@ -45,4 +45,6 @@ strictEqual(t2._final, _final);
 
 t2.end(bufferShim.from('blerg'));
 t2.resume();
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -113,4 +113,6 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
   var out = _readable.read();
   assert.strictEqual(out, 'ABCDEF');
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

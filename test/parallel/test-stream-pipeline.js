@@ -1,5 +1,11 @@
 'use strict';
 
+var _asyncToGenerator2;
+
+function _load_asyncToGenerator() {
+  return _asyncToGenerator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncToGenerator'));
+}
+
 var _setImmediate2;
 
 function _load_setImmediate() {
@@ -123,7 +129,7 @@ common.crashOnUnhandledRejection();
   });
 
   var dst = pipeline(_read3, _write2, common.mustCall(function (err) {
-    assert.deepStrictEqual(err, new Error('kaboom'));
+    assert.strictEqual(err.message, 'kaboom');
   }));
 
   assert.strictEqual(dst, _write2);
@@ -136,7 +142,7 @@ common.crashOnUnhandledRejection();
 
   var transform = new Transform({
     transform: function (data, enc, cb) {
-      cb(new Error('kaboom'));
+      process.nextTick(cb, new Error('kaboom'));
     }
   });
 
@@ -151,7 +157,7 @@ common.crashOnUnhandledRejection();
   _write3.on('close', common.mustCall());
 
   var _dst = pipeline(_read4, transform, _write3, common.mustCall(function (err) {
-    assert.deepStrictEqual(err, new Error('kaboom'));
+    assert.strictEqual(err.message, 'kaboom');
   }));
 
   assert.strictEqual(_dst, _write3);
@@ -241,7 +247,7 @@ common.crashOnUnhandledRejection();
   var badSink = new Writable({
     write: function (data, enc, cb) {
       cnt--;
-      if (cnt === 0) cb(new Error('kaboom'));else cb();
+      if (cnt === 0) process.nextTick(cb, new Error('kaboom'));else cb();
     }
   });
 
@@ -253,7 +259,7 @@ common.crashOnUnhandledRejection();
     req.end();
     req.on('response', function (res) {
       pipeline(res, badSink, common.mustCall(function (err) {
-        assert.deepStrictEqual(err, new Error('kaboom'));
+        assert.strictEqual(err.message, 'kaboom');
         _server2.close();
       }));
     });
@@ -342,7 +348,7 @@ common.crashOnUnhandledRejection();
   var ws = new Writable({
     write: function (data, enc, cb) {
       _cnt--;
-      if (_cnt === 0) return cb(new Error('kaboom'));
+      if (_cnt === 0) return process.nextTick(cb, new Error('kaboom'));
       cb();
     }
   });
@@ -351,7 +357,7 @@ common.crashOnUnhandledRejection();
   ws.on('close', common.mustCall());
 
   pipeline(rs, makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), ws, common.mustCall(function (err) {
-    assert.deepStrictEqual(err, new Error('kaboom'));
+    assert.strictEqual(err.message, 'kaboom');
   }));
 }
 
@@ -448,32 +454,38 @@ common.crashOnUnhandledRejection();
 }
 
 {
+  var run = function () {
+    var _ref = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+      var read = new Readable({
+        read: function () {}
+      });
+
+      var write = new Writable({
+        write: function (data, enc, cb) {
+          cb();
+        }
+      });
+
+      read.push('data');
+      read.push(null);
+
+      var finished = false;
+
+      write.on('finish', function () {
+        finished = true;
+      });
+
+      yield pipelinePromise(read, write);
+
+      assert(finished);
+    });
+
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
   var pipelinePromise = promisify(pipeline);
-
-  async function run() {
-    var read = new Readable({
-      read: function () {}
-    });
-
-    var write = new Writable({
-      write: function (data, enc, cb) {
-        cb();
-      }
-    });
-
-    read.push('data');
-    read.push(null);
-
-    var finished = false;
-
-    write.on('finish', function () {
-      finished = true;
-    });
-
-    await pipelinePromise(read, write);
-
-    assert(finished);
-  }
 
   run();
 }
@@ -485,7 +497,7 @@ common.crashOnUnhandledRejection();
 
   var _transform = new Transform({
     transform: function (data, enc, cb) {
-      cb(new Error('kaboom'));
+      process.nextTick(cb, new Error('kaboom'));
     }
   });
 
@@ -500,7 +512,7 @@ common.crashOnUnhandledRejection();
   _write4.on('close', common.mustCall());
 
   process.on('uncaughtException', common.mustCall(function (err) {
-    assert.deepStrictEqual(err, new Error('kaboom'));
+    assert.strictEqual(err.message, 'kaboom');
   }));
 
   var _dst2 = pipeline(_read5, _transform, _write4);
@@ -509,4 +521,6 @@ common.crashOnUnhandledRejection();
 
   _read5.push('hello');
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

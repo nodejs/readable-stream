@@ -108,4 +108,6 @@ var stream = require('../../');
   assert.strictEqual(_unpipedSource, _source);
   assert.strictEqual(_unpipedDest, _dest);
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -404,5 +404,20 @@ module.exports['test-stream-pipeline.js'] = [
   [
     /require\('http2'\)/g,
     '{ createServer() { return { listen() {} } } }'
+  ],
+  [
+    /assert\.deepStrictEqual\(err, new Error\('kaboom'\)\);/g,
+    'assert.strictEqual(err.message, \'kaboom\');'
+  ],
+  [
+    /cb\(new Error\('kaboom'\)\)/g,
+    'process.nextTick(cb, new Error(\'kaboom\'))'
+  ]
+]
+
+module.exports['test-stream-readable-async-iterators.js'] = [
+  [
+    /assert.rejects\(/g,
+    '(function(f, e) { let success = false; f().then(function() { success = true; throw new Error(\'should not succeeed\') }).catch(function(e2) { if (success) { throw e2; } assert.strictEqual(e.message, e2.message); })})('
   ]
 ]

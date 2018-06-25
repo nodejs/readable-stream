@@ -75,6 +75,7 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
             'transform-es2015-spread',
             'transform-optional-catch-binding',
             'transform-inline-imports-commonjs',
+            'transform-async-to-generator',
             'transform-async-generator-functions',
             'transform-runtime',
           ]
@@ -121,7 +122,7 @@ function processTestFile (file) {
   if (testReplace[file])
     replacements = replacements.concat(testReplace[file])
 
-  processFile(url, out, replacements, ';require(\'tap\').pass(\'sync run\');')
+  processFile(url, out, replacements, ';require(\'tap\').pass(\'sync run\');var _list = process.listeners(\'uncaughtException\'); process.removeAllListeners(\'uncaughtException\'); _list.pop(); _list.forEach((e) => process.on(\'uncaughtException\', e));')
 }
 
 //--------------------------------------------------------------------

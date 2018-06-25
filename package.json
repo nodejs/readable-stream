@@ -22,8 +22,8 @@
     "tape": "^4.9.0"
   },
   "scripts": {
-    "test": "tap -j 4 test/parallel/*.js test/ours/*.js && node test/verify-dependencies.js",
-    "ci": "TAP=1 tap test/parallel/*.js test/ours/*.js | tee test.tap && node test/verify-dependencies.js",
+    "test": "tap -j 4 test/parallel/*.js test/ours/*.js",
+    "ci": "TAP=1 tap test/parallel/*.js test/ours/*.js | tee test.tap",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov"
   },

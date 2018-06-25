@@ -81,4 +81,6 @@ var _require = require('../../'),
   wrapper.resume();
   wrapper.on('end', common.mustCall());
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

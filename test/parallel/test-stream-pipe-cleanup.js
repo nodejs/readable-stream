@@ -128,4 +128,6 @@ var util = require('util');
   assert.strictEqual(d.listeners('close').length, 0);
   assert.strictEqual(w.listeners('end').length, 0);
   assert.strictEqual(w.listeners('close').length, 0);
-})();require('tap').pass('sync run');
+})();require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

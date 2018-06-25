@@ -102,9 +102,9 @@ function fromArray(list) {
 {
   // Verify that objects can be asynchronously read
   var _r4 = new Readable({ objectMode: true });
-  var _list = [{ one: '1' }, { two: '2' }];
+  var _list2 = [{ one: '1' }, { two: '2' }];
   _r4._read = function (n) {
-    var item = _list.shift();
+    var item = _list2.shift();
     process.nextTick(function () {
       _r4.push(item || null);
     });
@@ -121,14 +121,14 @@ function fromArray(list) {
     objectMode: true
   });
   _r5._read = common.mustNotCall();
-  var _list2 = ['one', 'two', 'three'];
-  forEach(_list2, function (str) {
+  var _list3 = ['one', 'two', 'three'];
+  forEach(_list3, function (str) {
     _r5.push(str);
   });
   _r5.push(null);
 
   _r5.pipe(toArray(common.mustCall(function (array) {
-    assert.deepStrictEqual(array, _list2);
+    assert.deepStrictEqual(array, _list3);
   })));
 }
 
@@ -171,13 +171,13 @@ function fromArray(list) {
     objectMode: true
   });
   var calls = 0;
-  var _list3 = ['1', '2', '3', '4', '5', '6', '7', '8'];
+  var _list4 = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
   _r8._read = function (n) {
     calls++;
   };
 
-  forEach(_list3, function (c) {
+  forEach(_list4, function (c) {
     _r8.push(c);
   });
 
@@ -225,15 +225,15 @@ function fromArray(list) {
 {
   // Verify that multiple objects can be written to stream
   var _w = new Writable({ objectMode: true });
-  var _list4 = [];
+  var _list5 = [];
 
   _w._write = function (chunk, encoding, cb) {
-    _list4.push(chunk);
+    _list5.push(chunk);
     cb();
   };
 
   _w.on('finish', common.mustCall(function () {
-    assert.deepStrictEqual(_list4, [0, 1, 2, 3, 4]);
+    assert.deepStrictEqual(_list5, [0, 1, 2, 3, 4]);
   }));
 
   _w.write(0);
@@ -249,15 +249,15 @@ function fromArray(list) {
   var _w2 = new Writable({
     objectMode: true
   });
-  var _list5 = [];
+  var _list6 = [];
 
   _w2._write = function (chunk, encoding, cb) {
-    _list5.push(chunk);
+    _list6.push(chunk);
     process.nextTick(cb);
   };
 
   _w2.on('finish', common.mustCall(function () {
-    assert.deepStrictEqual(_list5, ['0', '1', '2', '3', '4']);
+    assert.deepStrictEqual(_list6, ['0', '1', '2', '3', '4']);
   }));
 
   _w2.write('0');
@@ -297,4 +297,6 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

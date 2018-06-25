@@ -72,4 +72,6 @@ r.on('end', function () {
   assert.deepStrictEqual(seen, expect);
   require('tap').pass();
 });
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

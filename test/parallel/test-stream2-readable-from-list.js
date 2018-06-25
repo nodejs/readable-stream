@@ -64,26 +64,28 @@ function bufferListFromArray(arr) {
 
 {
   // Verify behavior with strings
-  var _list = ['foog', 'bark', 'bazy', 'kuel'];
-  _list = bufferListFromArray(_list);
+  var _list2 = ['foog', 'bark', 'bazy', 'kuel'];
+  _list2 = bufferListFromArray(_list2);
 
   // read more than the first element.
-  var _ret = fromList(6, { buffer: _list, length: 16, decoder: true });
+  var _ret = fromList(6, { buffer: _list2, length: 16, decoder: true });
   assert.strictEqual(_ret, 'foogba');
 
   // read exactly the first element.
-  _ret = fromList(2, { buffer: _list, length: 10, decoder: true });
+  _ret = fromList(2, { buffer: _list2, length: 10, decoder: true });
   assert.strictEqual(_ret, 'rk');
 
   // read less than the first element.
-  _ret = fromList(2, { buffer: _list, length: 8, decoder: true });
+  _ret = fromList(2, { buffer: _list2, length: 8, decoder: true });
   assert.strictEqual(_ret, 'ba');
 
   // read more than we have.
-  _ret = fromList(100, { buffer: _list, length: 6, decoder: true });
+  _ret = fromList(100, { buffer: _list2, length: 6, decoder: true });
   assert.strictEqual(_ret, 'zykuel');
 
   // all consumed.
-  assert.deepStrictEqual(_list, new BufferList());
+  assert.deepStrictEqual(_list2, new BufferList());
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

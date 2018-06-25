@@ -115,4 +115,6 @@ process.on('exit', function () {
   assert.strictEqual(writer.writable, false);
   require('tap').pass();
 });
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

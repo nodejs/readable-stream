@@ -111,4 +111,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     assert.strictEqual(src1.reads, 2);
     assert.strictEqual(src2.reads, 2);
   });
-})();require('tap').pass('sync run');
+})();require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

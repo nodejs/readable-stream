@@ -18,4 +18,6 @@ var _require = require('../../'),
 
   assert.strictEqual(readable._readableState.encoding, 'utf8');
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

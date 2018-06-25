@@ -71,4 +71,6 @@ function push() {
   ;false && console.error('   push #' + pushes);
   if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
 }
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

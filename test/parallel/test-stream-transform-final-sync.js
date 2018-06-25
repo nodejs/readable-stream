@@ -102,4 +102,6 @@ t.end(7, common.mustCall(function () {
   state++;
   assert.strictEqual(state, 14, 'endMethodCallback');
 }, 1));
-;require('tap').pass('sync run');
+;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});
