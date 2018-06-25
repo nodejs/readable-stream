@@ -1,3 +1,13 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38,7 +48,7 @@ var r = new Readable({ highWaterMark: 1000 });
 var chunks = totalChunks;
 r._read = function (n) {
   console.log('_read called', chunks);
-  if (!(chunks % 2)) setImmediate(push);else if (!(chunks % 3)) process.nextTick(push);else push();
+  if (!(chunks % 2)) (0, (_setImmediate2 || _load_setImmediate()).default)(push);else if (!(chunks % 3)) process.nextTick(push);else push();
 };
 
 var totalPushed = 0;
@@ -92,7 +102,7 @@ function onData() {
       }
 
       // Nothing should be lost in between
-      setImmediate(pipeLittle);
+      (0, (_setImmediate2 || _load_setImmediate()).default)(pipeLittle);
     }
   });
 }
@@ -105,7 +115,7 @@ function pipeLittle() {
   var written = 0;
   w.on('finish', function () {
     assert.strictEqual(written, 200);
-    setImmediate(read1234);
+    (0, (_setImmediate2 || _load_setImmediate()).default)(read1234);
   });
   w._write = function (chunk, encoding, cb) {
     written += chunk.length;
@@ -119,7 +129,7 @@ function pipeLittle() {
         r.unshift(chunk.slice(chunk.length - diff));
       }
     } else {
-      setImmediate(cb);
+      (0, (_setImmediate2 || _load_setImmediate()).default)(cb);
     }
   };
   r.pipe(w);
@@ -143,7 +153,7 @@ function resumePause() {
   r.pause();
   r.resume();
   r.pause();
-  setImmediate(pipe);
+  (0, (_setImmediate2 || _load_setImmediate()).default)(pipe);
 }
 
 function pipe() {
@@ -158,7 +168,7 @@ function pipe() {
     console.error('written', written, totalPushed);
     assert.strictEqual(written, expectEndingData);
     assert.strictEqual(totalPushed, expectTotalData);
-    console.log('ok');
+    require('tap').pass();
   });
   r.pipe(w);
 }

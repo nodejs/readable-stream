@@ -1,21 +1,19 @@
+'use strict';
+
+var _getIterator2;
+
+function _load_getIterator() {
+  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-/* eslint-disable node-core/required-modules */
+} /*</replacement>*/ /* eslint-disable node-core/required-modules */
 'use strict';
 
 /*<replacement>*/
@@ -73,7 +71,7 @@ var _didIteratorError = false;
 var _iteratorError = undefined;
 
 try {
-  for (var _iterator = objectKeys(addresses)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+  for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(objectKeys(addresses)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
     var key = _step.value;
 
     var envName = 'NODE_TEST_' + key;

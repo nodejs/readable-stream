@@ -15,6 +15,8 @@
     "babel-plugin-transform-es2015-shorthand-properties": "^6.24.1",
     "babel-plugin-transform-es2015-spread": "^6.22.0",
     "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babel-plugin-transform-inline-imports-commonjs": "^1.2.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "bl": "^2.0.0",
     "glob": "^7.1.2",
     "gunzip-maybe": "^1.4.1",

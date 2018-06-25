@@ -1,27 +1,37 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _classCallCheck2;
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _possibleConstructorReturn2;
+
+function _load_possibleConstructorReturn() {
+  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
+}
+
+var _inherits2;
+
+function _load_inherits() {
+  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
+}
+
+var _symbol;
+
+function _load_symbol() {
+  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-/* eslint-disable node-core/required-modules */
+} /*</replacement>*/ /* eslint-disable node-core/required-modules */
 'use strict';
 
 /*<replacement>*/
@@ -38,16 +48,16 @@ var _require = require('../../'),
 
 var assert = require('assert');
 
-var kCallback = Symbol('Callback');
-var kOtherSide = Symbol('Other');
+var kCallback = (0, (_symbol || _load_symbol()).default)('Callback');
+var kOtherSide = (0, (_symbol || _load_symbol()).default)('Other');
 
 var DuplexSocket = function (_Duplex) {
-  _inherits(DuplexSocket, _Duplex);
+  (0, (_inherits2 || _load_inherits()).default)(DuplexSocket, _Duplex);
 
   function DuplexSocket() {
-    _classCallCheck(this, DuplexSocket);
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, DuplexSocket);
 
-    var _this = _possibleConstructorReturn(this, _Duplex.call(this));
+    var _this = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Duplex.call(this));
 
     _this[kCallback] = null;
     _this[kOtherSide] = null;

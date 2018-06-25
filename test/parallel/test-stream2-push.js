@@ -1,3 +1,13 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -115,14 +125,14 @@ function data() {
 function finish() {
   console.error('finish');
   assert.deepStrictEqual(written, expectWritten);
-  console.log('ok');
+  require('tap').pass();
 }
 
 function end() {
   source.emit('end');
   assert(!reading);
   writer.end(stream.read());
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     assert(ended);
   });
 }

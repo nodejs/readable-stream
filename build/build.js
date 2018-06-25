@@ -69,11 +69,14 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
             'transform-es2015-template-literals',
             'transform-es2015-shorthand-properties',
             'transform-es2015-for-of',
-            'transform-async-generator-functions',
             ['transform-es2015-classes', { loose: true }],
             'transform-es2015-destructuring',
             'transform-es2015-computed-properties',
-            'transform-es2015-spread'
+            'transform-es2015-spread',
+            'transform-optional-catch-binding',
+            'transform-inline-imports-commonjs',
+            'transform-async-generator-functions',
+            'transform-runtime',
           ]
         })
         data = transformed.code

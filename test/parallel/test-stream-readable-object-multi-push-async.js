@@ -1,3 +1,13 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -192,7 +202,7 @@ var BATCH = 10;
 
   _readable4.on('end', common.mustCall());
 
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     _readable4.push('aaa');
     _readable4.push(null);
   });

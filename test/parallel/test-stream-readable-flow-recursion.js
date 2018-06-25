@@ -1,3 +1,5 @@
+'use strict';
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -69,6 +71,6 @@ process.on('exit', function (code) {
   assert.strictEqual(stream.readableLength, 0);
   assert(!code);
   assert.strictEqual(depth, 0);
-  console.log('ok');
+  require('tap').pass();
 });
 ;require('tap').pass('sync run');

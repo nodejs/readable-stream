@@ -1,3 +1,5 @@
+'use strict';
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/

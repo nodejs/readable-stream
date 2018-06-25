@@ -1,21 +1,19 @@
+'use strict';
+
+var _assign;
+
+function _load_assign() {
+  return _assign = _interopRequireDefault(require('babel-runtime/core-js/object/assign'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-/* eslint-disable node-core/required-modules */
+} /*</replacement>*/ /* eslint-disable node-core/required-modules */
 
 'use strict';
 
@@ -44,7 +42,7 @@ function runBenchmark(name, args, env) {
 
   argv.push(name);
 
-  var mergedEnv = Object.assign({}, process.env, env);
+  var mergedEnv = (0, (_assign || _load_assign()).default)({}, process.env, env);
 
   var child = fork(runjs, argv, { env: mergedEnv });
   child.on('exit', function (code, signal) {

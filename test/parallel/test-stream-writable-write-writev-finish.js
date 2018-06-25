@@ -1,3 +1,13 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -35,7 +45,7 @@ var stream = require('../../');
   var _writable = new stream.Writable();
 
   _writable._write = function (chunks, encoding, cb) {
-    setImmediate(cb, new Error('write test error'));
+    (0, (_setImmediate2 || _load_setImmediate()).default)(cb, new Error('write test error'));
   };
 
   var _firstError = false;
@@ -79,7 +89,7 @@ var stream = require('../../');
   _writable2.cork();
   _writable2.write('test');
 
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     _writable2.end('test');
   });
 }
@@ -88,11 +98,11 @@ var stream = require('../../');
   var _writable3 = new stream.Writable();
 
   _writable3._write = function (chunks, encoding, cb) {
-    setImmediate(cb, new Error('write test error'));
+    (0, (_setImmediate2 || _load_setImmediate()).default)(cb, new Error('write test error'));
   };
 
   _writable3._writev = function (chunks, cb) {
-    setImmediate(cb, new Error('writev test error'));
+    (0, (_setImmediate2 || _load_setImmediate()).default)(cb, new Error('writev test error'));
   };
 
   var _firstError3 = false;
@@ -110,7 +120,7 @@ var stream = require('../../');
   _writable3.cork();
   _writable3.write('test');
 
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     _writable3.end('test');
   });
 }
@@ -135,7 +145,7 @@ var stream = require('../../');
   }));
 
   ws._write = function (chunk, encoding, done) {
-    setImmediate(done, new Error());
+    (0, (_setImmediate2 || _load_setImmediate()).default)(done, new Error());
   };
   rs.pipe(ws);
 }

@@ -1,27 +1,85 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+var _getOwnPropertyDescriptors;
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+function _load_getOwnPropertyDescriptors() {
+  return _getOwnPropertyDescriptors = _interopRequireDefault(require('babel-runtime/core-js/object/get-own-property-descriptors'));
+}
+
+var _create;
+
+function _load_create() {
+  return _create = _interopRequireDefault(require('babel-runtime/core-js/object/create'));
+}
+
+var _getPrototypeOf;
+
+function _load_getPrototypeOf() {
+  return _getPrototypeOf = _interopRequireDefault(require('babel-runtime/core-js/object/get-prototype-of'));
+}
+
+var _getOwnPropertyDescriptor;
+
+function _load_getOwnPropertyDescriptor() {
+  return _getOwnPropertyDescriptor = _interopRequireDefault(require('babel-runtime/core-js/object/get-own-property-descriptor'));
+}
+
+var _getIterator2;
+
+function _load_getIterator() {
+  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
+}
+
+var _classCallCheck2;
+
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _map;
+
+function _load_map() {
+  return _map = _interopRequireDefault(require('babel-runtime/core-js/map'));
+}
+
+var _defineProperty2;
+
+function _load_defineProperty() {
+  return _defineProperty2 = _interopRequireDefault(require('babel-runtime/helpers/defineProperty'));
+}
+
+var _promise;
+
+function _load_promise() {
+  return _promise = _interopRequireDefault(require('babel-runtime/core-js/promise'));
+}
+
+var _toConsumableArray2;
+
+function _load_toConsumableArray() {
+  return _toConsumableArray2 = _interopRequireDefault(require('babel-runtime/helpers/toConsumableArray'));
+}
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+var _clearImmediate2;
+
+function _load_clearImmediate() {
+  return _clearImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/clear-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-// Copyright Joyent, Inc. and other Node contributors.
+} /*</replacement>*/ // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -97,6 +155,15 @@ var noop = function () {};
   });
 } /*</replacement>*/
 
+exports.isMainThread = function () {
+  try {
+    return require('worker_threads').isMainThread;
+  } catch (_e) {
+    // Worker module not enabled → only a single main thread exists.
+    return true;
+  }
+}();
+
 exports.isWindows = process.platform === 'win32';
 exports.isWOW64 = exports.isWindows && process.env.PROCESSOR_ARCHITEW6432 !== undefined;
 exports.isAIX = process.platform === 'aix';
@@ -106,6 +173,23 @@ exports.isFreeBSD = process.platform === 'freebsd';
 exports.isOpenBSD = process.platform === 'openbsd';
 exports.isLinux = process.platform === 'linux';
 exports.isOSX = process.platform === 'darwin';
+
+var isGlibc = void 0;
+exports.isGlibc = function () {
+  if (isGlibc !== undefined) return isGlibc;
+  try {
+    var lddOut = spawnSync('ldd', [process.execPath]).stdout;
+    var libcInfo = lddOut.toString().split('\n').map(function (line) {
+      return line.match(/libc\.so.+=>\s*(\S+)\s/);
+    }).filter(function (info) {
+      return info;
+    });
+    if (libcInfo.length === 0) return isGlibc = false;
+    var nmOut = spawnSync('nm', ['-D', libcInfo[0][1]]).stdout;
+    if (/gnu_get_libc_version/.test(nmOut)) return isGlibc = true;
+  } catch (_e) {}
+  return isGlibc = false;
+};
 
 exports.enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
 var cpus = os.cpus();
@@ -348,7 +432,7 @@ exports.platformTimeout = function (ms) {
   return ms; // ARMv8+
 };
 
-var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
+var knownGlobals = [Buffer, (_clearImmediate2 || _load_clearImmediate()).default, clearInterval, clearTimeout, global, process, (_setImmediate2 || _load_setImmediate()).default, setInterval, setTimeout];
 
 if (global.gc) {
   knownGlobals.push(global.gc);
@@ -374,7 +458,7 @@ if (global.COUNTER_NET_SERVER_CONNECTION) {
 
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
   var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
-  allowGlobals.apply(undefined, _toConsumableArray(knownFromEnv));
+  allowGlobals.apply(undefined, (0, (_toConsumableArray2 || _load_toConsumableArray()).default)(knownFromEnv));
 }
 
 function allowGlobals() {
@@ -391,7 +475,7 @@ if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
 if (global.__coverage__) knownGlobals.push(__coverage__);
-'core,__core-js_shared__,console,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
+'console,clearImmediate,setImmediate,core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
   return typeof global[item] !== undefined;
 }).forEach(function (item) {
   knownGlobals.push(global[item]);
@@ -456,7 +540,7 @@ exports.mustCallAtLeast = function (fn, minimum) {
 
 exports.mustCallAsync = function (fn, exact) {
   return exports.mustCall(function () {
-    return Promise.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
+    return (_promise || _load_promise()).default.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
       return val;
     }));
   }, exact);
@@ -478,7 +562,7 @@ function _mustCallInner(fn) {
 
   if (typeof criteria !== 'number') throw new TypeError('Invalid ' + field + ' value: ' + criteria);
 
-  var context = (_context = {}, _defineProperty(_context, field, criteria), _defineProperty(_context, 'actual', 0), _defineProperty(_context, 'stack', new Error().stack), _defineProperty(_context, 'name', fn.name || '<anonymous>'), _context);
+  var context = (_context = {}, (0, (_defineProperty2 || _load_defineProperty()).default)(_context, field, criteria), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'actual', 0), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'stack', new Error().stack), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'name', fn.name || '<anonymous>'), _context);
 
   // add the exit listener only once to avoid listener leak warnings
   if (mustCallChecks.length === 0) process.on('exit', runCallChecks);
@@ -637,20 +721,15 @@ exports.isAlive = function isAlive(pid) {
   }
 };
 
-exports.noWarnCode = 'no_expected_warning_code';
+exports.noWarnCode = undefined;
 
 function expectWarning(name, expected) {
-  var map = new Map(expected);
+  var map = new (_map || _load_map()).default(expected);
   return exports.mustCall(function (warning) {
     assert.strictEqual(warning.name, name);
     assert.ok(map.has(warning.message), 'unexpected error message: "' + warning.message + '"');
     var code = map.get(warning.message);
-    if (code === undefined) {
-      throw new Error('An error code must be specified or use ' + 'common.noWarnCode if there is no error code. The error  ' + ('code for this warning was ' + warning.code));
-    }
-    if (code !== exports.noWarnCode) {
-      assert.strictEqual(warning.code, code);
-    }
+    assert.strictEqual(warning.code, code);
     // Remove a warning message after it is seen so that we guarantee that we
     // get each message only once.
     map.delete(expected);
@@ -712,14 +791,13 @@ exports.expectWarning = function (nameOrMap, expected, code) {
 } /*</replacement>*/
 
 var Comparison = function Comparison(obj, keys) {
-  _classCallCheck(this, Comparison);
-
+  (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Comparison);
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+    for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(keys), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var key = _step.value;
 
       if (key in obj) this[key] = obj[key];
@@ -756,7 +834,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       // always being called.
       assert.fail('Expected one argument, got ' + util.inspect(arguments));
     }
-    var descriptor = Object.getOwnPropertyDescriptor(error, 'message');
+    var descriptor = (0, (_getOwnPropertyDescriptor || _load_getOwnPropertyDescriptor()).default)(error, 'message');
     assert.strictEqual(descriptor.enumerable, false, 'The error message should be non-enumerable');
 
     var innerSettings = settings;
@@ -767,7 +845,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       }
       var _constructor = error.constructor;
       if (_constructor.name === 'NodeError' && type.name !== 'NodeError') {
-        _constructor = Object.getPrototypeOf(error.constructor);
+        _constructor = (0, (_getPrototypeOf || _load_getPrototypeOf()).default)(error.constructor);
       }
       // Add the `type` to the error to properly compare and visualize it.
       if (!('type' in error)) error.type = _constructor;
@@ -775,7 +853,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
 
     if ('message' in settings && typeof settings.message === 'object' && settings.message.test(error.message)) {
       // Make a copy so we are able to modify the settings.
-      innerSettings = Object.create(settings, Object.getOwnPropertyDescriptors(settings));
+      innerSettings = (0, (_create || _load_create()).default)(settings, (0, (_getOwnPropertyDescriptors || _load_getOwnPropertyDescriptors()).default)(settings));
       // Visualize the message as identical in case of other errors.
       innerSettings.message = error.message;
     }
@@ -787,7 +865,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
     var _iteratorError2 = undefined;
 
     try {
-      for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      for (var _iterator2 = (0, (_getIterator2 || _load_getIterator()).default)(keys), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
         var key = _step2.value;
 
         if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
@@ -841,6 +919,10 @@ exports.skipIfInspectorDisabled = function skipIfInspectorDisabled() {
   if (process.config.variables.v8_enable_inspector === 0) {
     exports.skip('V8 inspector is disabled');
   }
+  if (!exports.isMainThread) {
+    // TODO(addaleax): Fix me.
+    exports.skip('V8 inspector is not available in Workers');
+  }
 };
 
 exports.skipIf32Bits = function skipIf32Bits() {
@@ -864,7 +946,7 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
   var _iteratorError3 = undefined;
 
   try {
-    for (var _iterator3 = arrayBufferViews[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+    for (var _iterator3 = (0, (_getIterator2 || _load_getIterator()).default)(arrayBufferViews), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
       var type = _step3.value;
       var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
           BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === undefined ? 1 : _type$BYTES_PER_ELEME;
@@ -892,7 +974,7 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
 };
 
 exports.getBufferSources = function getBufferSources(buf) {
-  return [].concat(_toConsumableArray(exports.getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
+  return [].concat((0, (_toConsumableArray2 || _load_toConsumableArray()).default)(exports.getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
 };
 
 // Crash the process on unhandled rejections.

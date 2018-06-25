@@ -1,3 +1,5 @@
+'use strict';
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -53,7 +55,7 @@ r._read = function (n) {
 
   function push(fast) {
     assert(!pushedNull, 'push() after null push');
-    var c = pos >= data.length ? null : data.slice(pos, Math.min(pos + n, data.length));
+    var c = pos >= data.length ? null : data.slice(pos, pos + n);
     pushedNull = c === null;
     if (fast) {
       pos += n;
@@ -134,6 +136,6 @@ w.on('finish', common.mustCall(function () {
 
 process.on('exit', function () {
   assert.strictEqual(written.length, 18);
-  console.log('ok');
+  require('tap').pass();
 });
 ;require('tap').pass('sync run');

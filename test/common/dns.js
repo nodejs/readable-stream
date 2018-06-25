@@ -1,23 +1,25 @@
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+'use strict';
+
+var _slicedToArray2;
+
+function _load_slicedToArray() {
+  return _slicedToArray2 = _interopRequireDefault(require('babel-runtime/helpers/slicedToArray'));
+}
+
+var _getIterator2;
+
+function _load_getIterator() {
+  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-/* eslint-disable node-core/required-modules */
+} /*</replacement>*/ /* eslint-disable node-core/required-modules */
 'use strict';
 
 /*<replacement>*/
@@ -96,8 +98,8 @@ function parseDNSPacket(buffer) {
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = counts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _step$value = _slicedToArray(_step.value, 2),
+    for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(counts), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var _step$value = (0, (_slicedToArray2 || _load_slicedToArray()).default)(_step.value, 2),
           sectionName = _step$value[0],
           count = _step$value[1];
 
@@ -228,7 +230,7 @@ function writeIPv6(ip) {
   var _iteratorError2 = undefined;
 
   try {
-    for (var _iterator2 = parts[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+    for (var _iterator2 = (0, (_getIterator2 || _load_getIterator()).default)(parts), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
       var part = _step2.value;
 
       if (part === '') {
@@ -274,7 +276,7 @@ function writeDNSPacket(parsed) {
   var _iteratorError3 = undefined;
 
   try {
-    for (var _iterator3 = parsed.questions[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+    for (var _iterator3 = (0, (_getIterator2 || _load_getIterator()).default)(parsed.questions), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
       var q = _step3.value;
 
       assert(types[q.type]);
@@ -301,7 +303,7 @@ function writeDNSPacket(parsed) {
   var _iteratorError4 = undefined;
 
   try {
-    for (var _iterator4 = [].concat(parsed.answers, parsed.authorityAnswers, parsed.additionalRecords)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+    for (var _iterator4 = (0, (_getIterator2 || _load_getIterator()).default)([].concat(parsed.answers, parsed.authorityAnswers, parsed.additionalRecords)), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
       var rr = _step4.value;
 
       if (!rr) continue;
@@ -336,7 +338,7 @@ function writeDNSPacket(parsed) {
           var _iteratorError5 = undefined;
 
           try {
-            for (var _iterator5 = rr.entries[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            for (var _iterator5 = (0, (_getIterator2 || _load_getIterator()).default)(rr.entries), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               var txt = _step5.value;
 
               buffers.push(new Uint8Array([Buffer.byteLength(txt)]));

@@ -1,3 +1,5 @@
+'use strict';
+
 // Flags: --expose_internals
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;

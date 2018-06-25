@@ -1,8 +1,24 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _classCallCheck2;
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _possibleConstructorReturn2;
+
+function _load_possibleConstructorReturn() {
+  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
+}
+
+var _inherits2;
+
+function _load_inherits() {
+  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -33,12 +49,12 @@ var assert = require('assert/');
 var R = require('../../lib/_stream_readable');
 
 var TestReader = function (_R) {
-  _inherits(TestReader, _R);
+  (0, (_inherits2 || _load_inherits()).default)(TestReader, _R);
 
   function TestReader(n, opts) {
-    _classCallCheck(this, TestReader);
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestReader);
 
-    var _this = _possibleConstructorReturn(this, _R.call(this, opts));
+    var _this = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _R.call(this, opts));
 
     _this.pos = 0;
     _this.len = n || 100;

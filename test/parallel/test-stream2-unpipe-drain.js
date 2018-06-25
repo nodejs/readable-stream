@@ -1,8 +1,24 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _classCallCheck2;
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _possibleConstructorReturn2;
+
+function _load_possibleConstructorReturn() {
+  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
+}
+
+var _inherits2;
+
+function _load_inherits() {
+  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (function () {
   // Copyright Joyent, Inc. and other Node contributors.
@@ -35,12 +51,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   var stream = require('../../');
 
   var TestWriter = function (_stream$Writable) {
-    _inherits(TestWriter, _stream$Writable);
+    (0, (_inherits2 || _load_inherits()).default)(TestWriter, _stream$Writable);
 
     function TestWriter() {
-      _classCallCheck(this, TestWriter);
-
-      return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+      (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestWriter);
+      return (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _stream$Writable.apply(this, arguments));
     }
 
     TestWriter.prototype._write = function _write(buffer, encoding, callback) {
@@ -54,12 +69,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   var dest = new TestWriter();
 
   var TestReader = function (_stream$Readable) {
-    _inherits(TestReader, _stream$Readable);
+    (0, (_inherits2 || _load_inherits()).default)(TestReader, _stream$Readable);
 
     function TestReader() {
-      _classCallCheck(this, TestReader);
+      (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestReader);
 
-      var _this2 = _possibleConstructorReturn(this, _stream$Readable.call(this));
+      var _this2 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _stream$Readable.call(this));
 
       _this2.reads = 0;
       return _this2;

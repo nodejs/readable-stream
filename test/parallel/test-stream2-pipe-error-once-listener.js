@@ -1,8 +1,24 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _classCallCheck2;
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _possibleConstructorReturn2;
+
+function _load_possibleConstructorReturn() {
+  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
+}
+
+var _inherits2;
+
+function _load_inherits() {
+  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -33,12 +49,11 @@ require('../common');
 var stream = require('../../');
 
 var Read = function (_stream$Readable) {
-  _inherits(Read, _stream$Readable);
+  (0, (_inherits2 || _load_inherits()).default)(Read, _stream$Readable);
 
   function Read() {
-    _classCallCheck(this, Read);
-
-    return _possibleConstructorReturn(this, _stream$Readable.apply(this, arguments));
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Read);
+    return (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _stream$Readable.apply(this, arguments));
   }
 
   Read.prototype._read = function _read(size) {
@@ -50,12 +65,11 @@ var Read = function (_stream$Readable) {
 }(stream.Readable);
 
 var Write = function (_stream$Writable) {
-  _inherits(Write, _stream$Writable);
+  (0, (_inherits2 || _load_inherits()).default)(Write, _stream$Writable);
 
   function Write() {
-    _classCallCheck(this, Write);
-
-    return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Write);
+    return (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _stream$Writable.apply(this, arguments));
   }
 
   Write.prototype._write = function _write(buffer, encoding, cb) {
@@ -71,7 +85,7 @@ var write = new Write();
 
 write.once('error', function () {});
 write.once('alldone', function (err) {
-  console.log('ok');
+  require('tap').pass();
 });
 
 process.on('exit', function (c) {

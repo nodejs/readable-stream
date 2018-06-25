@@ -16,6 +16,18 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
         /util\.isDeepStrictEqual/,
         'require(\'deep-strict-equal\')'
       ]
+    , tapOk = [
+        /console\.log\('ok'\);/g,
+        'require(\'tap\').pass();'
+      ]
+    , catchES7 = [
+        /} catch {/,
+        '} catch(_e) {'
+      ]
+    , catchES7OpenClose = [
+        /} catch {}/,
+        '} catch(_e) {}'
+      ]
 
 
 module.exports.all = [
@@ -91,6 +103,22 @@ module.exports['common.js'] = [
   , altForEachImplReplacement
   , altForEachUseReplacement
   , deepStrictEqual
+  , catchES7
+  , catchES7OpenClose
+  , [
+        /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
+      ,   '  /*<replacement>*/\n'
+        + '  if (typeof constructor == \'function\')\n'
+        + '    knownGlobals.push(constructor);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_READ == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
+        + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
+        + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
+        + '  if (global.__coverage__)\n'
+        + '    knownGlobals.push(__coverage__);\n'
+        + '\'console,clearImmediate,setImmediate,core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
+        + '  /*</replacement>*/\n\n$1'
+    ]
 
   , [
         /(exports.mustCall[\s\S]*)/m
@@ -109,41 +137,6 @@ module.exports['common.js'] = [
         + '}\n'
     ]
 
-    // for streams2 on node 0.11
-    // and dtrace in 0.10
-    // and coverage in all
-  , [
-        /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
-      ,   '  /*<replacement>*/\n'
-        + '  if (typeof constructor == \'function\')\n'
-        + '    knownGlobals.push(constructor);\n'
-        + '  if (typeof DTRACE_NET_SOCKET_READ == \'function\')\n'
-        + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
-        + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
-        + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
-        + '  if (global.__coverage__)\n'
-        + '    knownGlobals.push(__coverage__);\n'
-        + '\'core,__core-js_shared__,console,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
-        + '  /*</replacement>*/\n\n$1'
-    ]
-
-    // for node 0.8
-  , [
-        /^/
-      ,   '/*<replacement>*/'
-        + '\nif (!global.setImmediate) {\n'
-        + '  global.setImmediate = function setImmediate(fn) {\n'
-
-        + '    return setTimeout(fn.bind.apply(fn, arguments), 4);\n'
-        + '  };\n'
-        + '}\n'
-        + 'if (!global.clearImmediate) {\n'
-        + '  global.clearImmediate = function clearImmediate(i) {\n'
-        + '  return clearTimeout(i);\n'
-        + '  };\n'
-        + '}\n'
-        + '/*</replacement>*/\n'
-    ]
   , [
         /^if \(global\.ArrayBuffer\) \{([^\}]+)\}$/m
       ,   '/*<replacement>*/if (!process.browser) {'
@@ -319,16 +312,51 @@ module.exports['test-stream2-readable-from-list.js'] = [
   ]
 ]
 module.exports['test-stream-writev.js'] = [
-  [
-    /console\.log\('ok'\);/,
-    'require(\'tap\').pass();'
-  ],
+  tapOk,
   [
     /console.log\(`# decode=/,
     'require(\'tap\').test(`# decode='
   ]
 ]
+
+module.exports['test-stream3-pause-then-read.js'] = [
+  tapOk
+]
+
+module.exports['test-stream-unshift-read-race.js'] = [
+  tapOk
+]
+
+module.exports['test-stream2-unpipe-leak.js'] = [
+  tapOk
+]
+
+module.exports['test-stream2-compatibility.js'] = [
+  tapOk
+]
+
+module.exports['test-stream-push-strings.js'] = [
+  tapOk
+]
+
+module.exports['test-stream-unshift-empty-chunk.js'] = [
+  tapOk
+]
+
+module.exports['test-stream2-pipe-error-once-listener.js'] = [
+  tapOk
+]
+
+module.exports['test-stream-push-order.js'] = [
+  tapOk
+]
+
+module.exports['test-stream2-push.js'] = [
+  tapOk
+]
+
 module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
+  tapOk,
   [
     /case 3:\n(\s+)setImmediate\(r\.read\.bind\(r, 0\)\);/,
     'case 3:\n$1setTimeout(r.read.bind(r, 0), 50);'
@@ -356,6 +384,7 @@ module.exports['test-stream-unpipe-event.js'] = [
 ]
 
 module.exports['test-stream-readable-flow-recursion.js'] = [
+  tapOk,
   deepStrictEqual
 ]
 

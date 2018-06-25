@@ -1,25 +1,31 @@
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _classCallCheck2;
+
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _createClass2;
+
+function _load_createClass() {
+  return _createClass2 = _interopRequireDefault(require('babel-runtime/helpers/createClass'));
+}
+
+var _symbol;
+
+function _load_symbol() {
+  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-/* eslint-disable node-core/required-modules */
+} /*</replacement>*/ /* eslint-disable node-core/required-modules */
 
 'use strict';
 
@@ -33,13 +39,13 @@ var objectKeys = objectKeys || function (obj) {
 /*</replacement>*/
 
 var assert = require('assert');
-var kLimit = Symbol('limit');
-var kCallback = Symbol('callback');
+var kLimit = (0, (_symbol || _load_symbol()).default)('limit');
+var kCallback = (0, (_symbol || _load_symbol()).default)('callback');
 var common = require('./');
 
 var Countdown = function () {
   function Countdown(limit, cb) {
-    _classCallCheck(this, Countdown);
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Countdown);
 
     assert.strictEqual(typeof limit, 'number');
     assert.strictEqual(typeof cb, 'function');
@@ -53,13 +59,12 @@ var Countdown = function () {
     return this[kLimit];
   };
 
-  _createClass(Countdown, [{
+  (0, (_createClass2 || _load_createClass()).default)(Countdown, [{
     key: 'remaining',
     get: function () {
       return this[kLimit];
     }
   }]);
-
   return Countdown;
 }();
 

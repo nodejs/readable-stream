@@ -1,23 +1,43 @@
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+'use strict';
+
+var _promise;
+
+function _load_promise() {
+  return _promise = _interopRequireDefault(require('babel-runtime/core-js/promise'));
+}
+
+var _map;
+
+function _load_map() {
+  return _map = _interopRequireDefault(require('babel-runtime/core-js/map'));
+}
+
+var _classCallCheck2;
+
+function _load_classCallCheck() {
+  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
+}
+
+var _stringify;
+
+function _load_stringify() {
+  return _stringify = _interopRequireDefault(require('babel-runtime/core-js/json/stringify'));
+}
+
+var _getIterator2;
+
+function _load_getIterator() {
+  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-    return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-'use strict';
+} /*</replacement>*/'use strict';
 
 /*<replacement>*/
 var objectKeys = objectKeys || function (obj) {
@@ -77,7 +97,7 @@ function makeBufferingDataCallback(dataCallback) {
     var _iteratorError = undefined;
 
     try {
-      for (var _iterator = lines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(lines), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var line = _step.value;
 
         dataCallback(line);
@@ -134,12 +154,12 @@ function parseWSFrame(buffer) {
     console.error('JSON.parse() failed for: ' + jsonPayload);
     throw e;
   }
-  if (DEBUG) console.log('[received]', JSON.stringify(message));
+  if (DEBUG) console.log('[received]', (0, (_stringify || _load_stringify()).default)(message));
   return { length: bodyOffset + dataLen, message: message };
 }
 
 function formatWSFrame(message) {
-  var messageBuf = Buffer.from(JSON.stringify(message));
+  var messageBuf = Buffer.from((0, (_stringify || _load_stringify()).default)(message));
 
   var wsHeaderBuf = Buffer.allocUnsafe(16);
   wsHeaderBuf.writeUInt8(0x81, 0);
@@ -171,15 +191,15 @@ var InspectorSession = function () {
   function InspectorSession(socket, instance) {
     var _this = this;
 
-    _classCallCheck(this, InspectorSession);
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, InspectorSession);
 
     this._instance = instance;
     this._socket = socket;
     this._nextId = 1;
-    this._commandResponsePromises = new Map();
+    this._commandResponsePromises = new (_map || _load_map()).default();
     this._unprocessedNotifications = [];
     this._notificationCallback = null;
-    this._scriptsIdsByUrl = new Map();
+    this._scriptsIdsByUrl = new (_map || _load_map()).default();
 
     var buffer = Buffer.alloc(0);
     socket.on('data', function (data) {
@@ -199,7 +219,7 @@ var InspectorSession = function () {
         if (message) _this._onMessage(message);
       } while (true);
     });
-    this._terminationPromise = new Promise(function (resolve) {
+    this._terminationPromise = new (_promise || _load_promise()).default(function (resolve) {
       socket.once('close', resolve);
     });
   }
@@ -248,15 +268,15 @@ var InspectorSession = function () {
   InspectorSession.prototype._sendMessage = function _sendMessage(message) {
     var _this2 = this;
 
-    var msg = JSON.parse(JSON.stringify(message)); // Clone!
+    var msg = JSON.parse((0, (_stringify || _load_stringify()).default)(message)); // Clone!
     msg.id = this._nextId++;
-    if (DEBUG) console.log('[sent]', JSON.stringify(msg));
+    if (DEBUG) console.log('[sent]', (0, (_stringify || _load_stringify()).default)(msg));
 
-    var responsePromise = new Promise(function (resolve, reject) {
+    var responsePromise = new (_promise || _load_promise()).default(function (resolve, reject) {
       _this2._commandResponsePromises.set(msg.id, { resolve: resolve, reject: reject });
     });
 
-    return new Promise(function (resolve) {
+    return new (_promise || _load_promise()).default(function (resolve) {
       return _this2._socket.write(formatWSFrame(msg), resolve);
     }).then(function () {
       return responsePromise;
@@ -269,7 +289,7 @@ var InspectorSession = function () {
     if (Array.isArray(commands)) {
       // Multiple commands means the response does not matter. There might even
       // never be a response.
-      return Promise.all(commands.map(function (command) {
+      return (_promise || _load_promise()).default.all(commands.map(function (command) {
         return _this3._sendMessage(command);
       })).then(function () {});
     } else {
@@ -295,7 +315,7 @@ var InspectorSession = function () {
       if (this._unprocessedNotifications.length) {
         notification = this._unprocessedNotifications.shift();
       } else {
-        notification = await new Promise(function (resolve) {
+        notification = await new (_promise || _load_promise()).default(function (resolve) {
           return _this4._notificationCallback = resolve;
         });
       }
@@ -333,7 +353,7 @@ var InspectorSession = function () {
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = (0, (_getIterator2 || _load_getIterator()).default)(params.args), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var value = _step2.value;
 
             if (value.value !== values[_i2++]) return false;
@@ -361,7 +381,7 @@ var InspectorSession = function () {
   InspectorSession.prototype.waitForConsoleOutput = function waitForConsoleOutput(type, values) {
     var _this6 = this;
 
-    var desc = 'Console output matching ' + JSON.stringify(values);
+    var desc = 'Console output matching ' + (0, (_stringify || _load_stringify()).default)(values);
     return this.waitForNotification(function (notification) {
       return _this6._matchesConsoleOutputNotification(notification, type, values);
     }, desc);
@@ -400,13 +420,12 @@ var NodeInstance = function () {
 
     var scriptContents = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var scriptFile = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _MAINSCRIPT;
-
-    _classCallCheck(this, NodeInstance);
+    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, NodeInstance);
 
     this._scriptPath = scriptFile;
     this._script = scriptFile ? null : scriptContents;
     this._portCallback = null;
-    this.portPromise = new Promise(function (resolve) {
+    this.portPromise = new (_promise || _load_promise()).default(function (resolve) {
       return _this7._portCallback = resolve;
     });
     this._process = spawnChildProcess(inspectorFlags, scriptContents, scriptFile);
@@ -422,7 +441,7 @@ var NodeInstance = function () {
       return _this7.onStderrLine(message);
     }));
 
-    this._shutdownPromise = new Promise(function (resolve) {
+    this._shutdownPromise = new (_promise || _load_promise()).default(function (resolve) {
       _this7._process.once('exit', function (exitCode, signal) {
         resolve({ exitCode: exitCode, signal: signal });
         _this7._running = false;
@@ -459,7 +478,7 @@ var NodeInstance = function () {
     console.log('[test]', 'Testing ' + path);
     var headers = hostHeaderValue ? { 'Host': hostHeaderValue } : null;
     return this.portPromise.then(function (port) {
-      return new Promise(function (resolve, reject) {
+      return new (_promise || _load_promise()).default(function (resolve, reject) {
         var req = http.get({ host: host, port: port, path: path, headers: headers }, function (res) {
           var response = '';
           res.setEncoding('utf8');
@@ -502,7 +521,7 @@ var NodeInstance = function () {
 
     console.log('[test]', 'Connecting to a child Node process');
     var upgradeRequest = await this.sendUpgradeRequest();
-    return new Promise(function (resolve, reject) {
+    return new (_promise || _load_promise()).default(function (resolve, reject) {
       upgradeRequest.on('upgrade', function (message, socket) {
         return resolve(new InspectorSession(socket, _this8));
       }).on('response', common.mustNotCall('Upgrade was not received'));
@@ -512,7 +531,7 @@ var NodeInstance = function () {
   NodeInstance.prototype.expectConnectionDeclined = async function expectConnectionDeclined() {
     console.log('[test]', 'Checking upgrade is not possible');
     var upgradeRequest = await this.sendUpgradeRequest();
-    return new Promise(function (resolve, reject) {
+    return new (_promise || _load_promise()).default(function (resolve, reject) {
       upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
         return response.on('data', function () {}).on('end', function () {
           return resolve(response.statusCode);
@@ -528,8 +547,8 @@ var NodeInstance = function () {
   NodeInstance.prototype.nextStderrString = function nextStderrString() {
     var _this9 = this;
 
-    if (this._unprocessedStderrLines.length) return Promise.resolve(this._unprocessedStderrLines.shift());
-    return new Promise(function (resolve) {
+    if (this._unprocessedStderrLines.length) return (_promise || _load_promise()).default.resolve(this._unprocessedStderrLines.shift());
+    return new (_promise || _load_promise()).default(function (resolve) {
       return _this9._stderrLineCallback = resolve;
     });
   };
@@ -568,7 +587,7 @@ function onResolvedOrRejected(promise, callback) {
 function timeoutPromise(error, timeoutMs) {
   var clearCallback = null;
   var done = false;
-  var promise = onResolvedOrRejected(new Promise(function (resolve, reject) {
+  var promise = onResolvedOrRejected(new (_promise || _load_promise()).default(function (resolve, reject) {
     var timeout = setTimeout(function () {
       return reject(error);
     }, timeoutMs);
@@ -589,7 +608,7 @@ function timeoutPromise(error, timeoutMs) {
 // a reason otherwise.
 function fires(promise, error, timeoutMs) {
   var timeout = timeoutPromise(error, timeoutMs);
-  return Promise.race([onResolvedOrRejected(promise, function () {
+  return (_promise || _load_promise()).default.race([onResolvedOrRejected(promise, function () {
     return timeout.clear();
   }), timeout]);
 }

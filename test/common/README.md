@@ -2,19 +2,7 @@
       require('babel-polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
-      /*</replacement>*//*<replacement>*/
-if (!global.setImmediate) {
-  global.setImmediate = function setImmediate(fn) {
-    return setTimeout(fn.bind.apply(fn, arguments), 4);
-  };
-}
-if (!global.clearImmediate) {
-  global.clearImmediate = function clearImmediate(i) {
-  return clearTimeout(i);
-  };
-}
-/*</replacement>*/
-# Node.js Core Test Common Modules
+      /*</replacement>*/# Node.js Core Test Common Modules
 
 This directory contains modules used to test the Node.js implementation.
 

@@ -1,3 +1,5 @@
+'use strict';
+
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -50,6 +52,6 @@ s.read(0);
 
 process.on('exit', function () {
   assert.deepStrictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6');
-  console.log('ok');
+  require('tap').pass();
 });
 ;require('tap').pass('sync run');

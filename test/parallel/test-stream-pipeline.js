@@ -1,3 +1,13 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -87,7 +97,7 @@ common.crashOnUnhandledRejection();
   });
 
   _read2.push('data');
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     return _read2.destroy();
   });
 
@@ -108,7 +118,7 @@ common.crashOnUnhandledRejection();
   });
 
   _read3.push('data');
-  setImmediate(function () {
+  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
     return _read3.destroy(new Error('kaboom'));
   });
 
@@ -158,7 +168,7 @@ common.crashOnUnhandledRejection();
       }
     });
 
-    pipeline(rs, res);
+    pipeline(rs, res, function () {});
   });
 
   server.listen(0, function () {
@@ -193,7 +203,7 @@ common.crashOnUnhandledRejection();
       })
     });
 
-    pipeline(rs, res);
+    pipeline(rs, res, function () {});
   });
 
   _server.listen(0, function () {
@@ -203,7 +213,7 @@ common.crashOnUnhandledRejection();
 
     req.end();
     req.on('response', function (res) {
-      setImmediate(function () {
+      (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
         res.destroy();
         _server.close();
       });
@@ -223,7 +233,7 @@ common.crashOnUnhandledRejection();
       })
     });
 
-    pipeline(rs, res);
+    pipeline(rs, res, function () {});
   });
 
   var cnt = 10;
@@ -297,12 +307,6 @@ common.crashOnUnhandledRejection();
     });
 
     pipeline(rs, req, common.mustCall(function (err) {
-      // TODO: this is working around an http2 bug
-      // where the client keeps the event loop going
-      // (replacing the rs.destroy() with req.end()
-      // exits it so seems to be a destroy bug there
-      client.unref();
-
       _server4.close();
       client.close();
     }));
@@ -472,5 +476,37 @@ common.crashOnUnhandledRejection();
   }
 
   run();
+}
+
+{
+  var _read5 = new Readable({
+    read: function () {}
+  });
+
+  var _transform = new Transform({
+    transform: function (data, enc, cb) {
+      cb(new Error('kaboom'));
+    }
+  });
+
+  var _write4 = new Writable({
+    write: function (data, enc, cb) {
+      cb();
+    }
+  });
+
+  _read5.on('close', common.mustCall());
+  _transform.on('close', common.mustCall());
+  _write4.on('close', common.mustCall());
+
+  process.on('uncaughtException', common.mustCall(function (err) {
+    assert.deepStrictEqual(err, new Error('kaboom'));
+  }));
+
+  var _dst2 = pipeline(_read5, _transform, _write4);
+
+  assert.strictEqual(_dst2, _write4);
+
+  _read5.push('hello');
 }
 ;require('tap').pass('sync run');

@@ -1,3 +1,25 @@
+'use strict';
+
+var _setImmediate2;
+
+function _load_setImmediate() {
+  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
+}
+
+var _promise;
+
+function _load_promise() {
+  return _promise = _interopRequireDefault(require('babel-runtime/core-js/promise'));
+}
+
+var _symbol;
+
+function _load_symbol() {
+  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -20,13 +42,13 @@ async function tests() {
       read: function () {}
     });
 
-    var iter = readable[Symbol.asyncIterator]();
+    var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
     assert.strictEqual(iter.stream, readable);
     var values = [];
     for (var i = 0; i < max; i++) {
       values.push(iter.next());
     }
-    Promise.all(values).then(common.mustCall(function (values) {
+    (_promise || _load_promise()).default.all(values).then(common.mustCall(function (values) {
       values.forEach(common.mustCall(function (item, i) {
         return assert.strictEqual(item.value, 'hello-' + i);
       }, 5));
@@ -50,7 +72,7 @@ async function tests() {
       read: function () {}
     });
 
-    var iter = readable[Symbol.asyncIterator]();
+    var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
     assert.strictEqual(iter.stream, readable);
     var values = [];
     for (var i = 0; i < 3; i++) {
@@ -62,7 +84,7 @@ async function tests() {
     readable.push('hello-2');
 
     var k = 0;
-    var results1 = await Promise.all(values);
+    var results1 = await (_promise || _load_promise()).default.all(values);
     results1.forEach(common.mustCall(function (item) {
       return assert.strictEqual(item.value, 'hello-' + k++);
     }, 3));
@@ -76,7 +98,7 @@ async function tests() {
     readable.push('hello-4');
     readable.push(null);
 
-    var results2 = await Promise.all(values);
+    var results2 = await (_promise || _load_promise()).default.all(values);
     results2.forEach(common.mustCall(function (item) {
       return assert.strictEqual(item.value, 'hello-' + k++);
     }, 2));
@@ -93,7 +115,7 @@ async function tests() {
       read: function () {}
     });
 
-    var iter = readable[Symbol.asyncIterator]();
+    var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
     assert.strictEqual(iter.stream, readable);
     var values = [];
     var errors = [];
@@ -109,7 +131,7 @@ async function tests() {
     readable.push('hello-1');
     readable.push('hello-2');
 
-    var resolved = await Promise.all(values);
+    var resolved = await (_promise || _load_promise()).default.all(values);
 
     resolved.forEach(common.mustCall(function (item, i) {
       return assert.strictEqual(item.value, 'hello-' + i);
@@ -129,7 +151,7 @@ async function tests() {
     var readable = new Readable({
       read: function () {}
     });
-    var iterator = readable[Symbol.asyncIterator]();
+    var iterator = readable[(_symbol || _load_symbol()).default.asyncIterator]();
 
     var err = new Error('kaboom');
     readable.destroy(new Error('kaboom'));
@@ -189,7 +211,7 @@ async function tests() {
           this.push('hello');
           this.pushed = true;
 
-          setImmediate(function () {
+          (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
             _this.destroy(new Error('kaboom'));
           });
         }
@@ -271,7 +293,7 @@ async function tests() {
       read: function () {
         var _this2 = this;
 
-        setImmediate(function () {
+        (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
           _this2.push('hello');
           if (++readed === max) {
             _this2.push(null);
@@ -296,7 +318,7 @@ async function tests() {
       read: function () {
         var _this3 = this;
 
-        setImmediate(function () {
+        (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
           _this3.push('hello');
           if (++readed === max) {
             _this3.push(null);
