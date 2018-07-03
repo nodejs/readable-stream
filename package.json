@@ -4,12 +4,11 @@
   "description": "Streams3, a user-land copy of the stream library from Node.js",
   "main": "readable.js",
   "dependencies": {
-    "core-util-is": "~1.0.0",
-    "inherits": "~2.0.3",
-    "process-nextick-args": "~2.0.0",
+    "inherits": "^2.0.3",
+    "process-nextick-args": "^2.0.0",
     "safe-buffer": "^5.1.2",
-    "string_decoder": "~1.1.1",
-    "util-deprecate": "~1.0.1"
+    "string_decoder": "^1.1.1",
+    "util-deprecate": "^1.0.1"
   },
   "devDependencies": {
     "assert": "^1.4.0",

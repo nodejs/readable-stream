@@ -41,8 +41,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , utilReplacement = [
           /^const util = require\('util'\);/m
-        ,   '\n/*<replacement>*/\nconst util = require(\'core-util-is\');\n'
-          + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
+        , ''
+      ]
+
+    , inherits = [
+          /^util.inherits/m
+        , 'require(\'inherits\')'
       ]
 
     , debugLogReplacement = [
@@ -237,6 +241,7 @@ module.exports['_stream_duplex.js'] = [
     requireReplacement
   , instanceofReplacement
   , utilReplacement
+  , inherits
   , stringDecoderReplacement
   , objectKeysReplacement
   , objectKeysDefine
@@ -249,6 +254,7 @@ module.exports['_stream_passthrough.js'] = [
     requireReplacement
   , instanceofReplacement
   , utilReplacement
+  , inherits
   , stringDecoderReplacement
   , errorsOneLevel
 ]
@@ -263,6 +269,7 @@ module.exports['_stream_readable.js'] = [
   , stringDecoderReplacement
   , debugLogReplacement
   , utilReplacement
+  , inherits
   , stringDecoderReplacement
   , eventEmittterReplacement
   , requireStreamReplacement
@@ -282,6 +289,7 @@ module.exports['_stream_transform.js'] = [
     requireReplacement
   , instanceofReplacement
   , utilReplacement
+  , inherits
   , stringDecoderReplacement
   , errorsOneLevel
 ]
@@ -292,6 +300,7 @@ module.exports['_stream_writable.js'] = [
   , requireReplacement
   , instanceofReplacement
   , utilReplacement
+  , inherits
   , stringDecoderReplacement
   , debugLogReplacement
   , deprecateReplacement
