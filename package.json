@@ -40,6 +40,7 @@
   ],
   "browser": {
     "util": false,
+    "worker_threads": false,
     "./readable.js": "./readable-browser.js",
     "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
   },

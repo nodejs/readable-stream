@@ -1,13 +1,16 @@
 browsers:
-  - name: ie
-    version: 11..latest
-  - name: opera
-    version: -3..latest
   - name: chrome
-    version: -3..latest
-  - name: firefox
-    version: -3..latest
-  - name: safari
-    version: 5..latest
-  - name: microsoftedge
-    version: -3..latest
+    version: latest
+    platform: Windows 10
+    #  - name: internet explorer
+    #    version: latest
+    #    platform: Windows 10
+    #  - name: firefox
+    #    version: latest
+    #    platform: Windows 10
+    #  - name: safari
+    #    version: latest
+    #    platform: Mac 10.13
+    #  - name: microsoftedge
+    #    version: latest
+    #    platform: Windows 10
