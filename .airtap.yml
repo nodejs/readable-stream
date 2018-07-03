@@ -1,3 +1,4 @@
+sauce_connect: true
 browsers:
   - name: chrome
     version: latest
