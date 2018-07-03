@@ -41,6 +41,7 @@
   ],
   "browser": {
     "util": false,
+    "worker_threads": false,
     "./readable.js": "./readable-browser.js",
     "./writable.js": "./writable-browser.js",
     "./duplex.js": "./duplex-browser.js",
