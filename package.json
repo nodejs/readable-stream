@@ -38,8 +38,6 @@
   "browser": {
     "util": false,
     "./readable.js": "./readable-browser.js",
-    "./writable.js": "./writable-browser.js",
-    "./duplex.js": "./duplex-browser.js",
     "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
   },
   "nyc": {
