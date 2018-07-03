@@ -6,7 +6,6 @@
   "dependencies": {
     "inherits": "^2.0.3",
     "process-nextick-args": "^2.0.0",
-    "safe-buffer": "^5.1.2",
     "string_decoder": "^1.1.1",
     "util-deprecate": "^1.0.1"
   },
