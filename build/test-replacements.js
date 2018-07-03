@@ -412,6 +412,17 @@ module.exports['test-stream-pipeline.js'] = [
   [
     /cb\(new Error\('kaboom'\)\)/g,
     'process.nextTick(cb, new Error(\'kaboom\'))'
+  ],
+  [
+    /const \{ promisify \} = require\('util'\);/g,
+    'const promisify = require(\'util-promisify\');'
+  ]
+]
+
+module.exports['test-stream-finished.js'] = [
+  [
+    /const \{ promisify \} = require\('util'\);/g,
+    'const promisify = require(\'util-promisify\');'
   ]
 ]
 

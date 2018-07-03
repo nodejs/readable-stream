@@ -22,9 +22,7 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 var fs = require('fs');
-
-var _require2 = require('util'),
-    promisify = _require2.promisify;
+var promisify = require('util-promisify');
 
 common.crashOnUnhandledRejection();
 

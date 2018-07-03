@@ -37,9 +37,7 @@ var http2 = {
     };
   }
 };
-
-var _require2 = require('util'),
-    promisify = _require2.promisify;
+var promisify = require('util-promisify');
 
 common.crashOnUnhandledRejection();
 

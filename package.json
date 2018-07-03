@@ -19,7 +19,8 @@
     "lolex": "^2.6.0",
     "nyc": "^11.0.0",
     "tap": "^11.0.0",
-    "tape": "^4.9.0"
+    "tape": "^4.9.0",
+    "util-promisify": "^2.1.0"
   },
   "scripts": {
     "test": "tap -j 4 test/parallel/*.js test/ours/*.js",
