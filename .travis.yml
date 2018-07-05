@@ -20,7 +20,3 @@ matrix:
       hosts:
       - airtap.local
 script: npm run $CMD
-env:
-  global:
-  - secure: MMYiNZ8ICzNkz1OQ3/jFrcBVxG5eIGoUn1/IRL9JeWbB6gWg8kxAMFXZmLDJrJj5Zm6VD31mpX6PS3Ot46syMl+FnnyNCdqcCJUuUYCdRS8PanUnVq2QL1+9f2uT/S3UeQJhTaFXAzHA4cSNcaXlSB0QzbiDi0xZUobAAM/h5sw=
-  - secure: hT7BympfdKgHiTyztArEXLKVYsHlYkLQZ4QAuPwvsvXzmZC+3mPjHmVM/a2CXpdnvfm1ES5v99pIVI849F27/w0fHif8O7iO6UkeNzgjRBU+rKoJsGdjuy74qi01081p8Ax7LoD1Hm5pIvghC0dckqXA6De3ZQige3TSMNZ9iGg=
