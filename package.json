@@ -24,7 +24,7 @@
   "scripts": {
     "test": "tap -j 4 test/parallel/*.js test/ours/*.js",
     "ci": "TAP=1 tap test/parallel/*.js test/ours/*.js | tee test.tap",
-    "test-browsers": "airtap --sauce-connect -- test/browser.js",
+    "test-browsers": "airtap --sauce-connect --loopback airtap.local -- test/browser.js",
     "test-browser-local": "airtap --local --open -- test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov"
