@@ -10,6 +10,7 @@
     "util-deprecate": "^1.0.1"
   },
   "devDependencies": {
+    "airtap": "0.0.9",
     "assert": "^1.4.0",
     "babel-polyfill": "^6.9.1",
     "buffer": "^5.1.0",
@@ -23,6 +24,8 @@
   "scripts": {
     "test": "tap -j 4 test/parallel/*.js test/ours/*.js",
     "ci": "TAP=1 tap test/parallel/*.js test/ours/*.js | tee test.tap",
+    "test-browsers": "airtap --sauce-connect -- test/browser.js",
+    "test-browser-local": "airtap --local --open -- test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov"
   },
@@ -37,6 +40,7 @@
   ],
   "browser": {
     "util": false,
+    "worker_threads": false,
     "./readable.js": "./readable-browser.js",
     "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
   },
