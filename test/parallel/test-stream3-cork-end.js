@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -49,7 +41,7 @@ function writeChunks(remainingChunks, callback) {
   var writeState = void 0;
 
   if (writeChunk) {
-    (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+    setImmediate(function () {
       writeState = w.write(writeChunk);
       // we were not told to stop writing
       assert.ok(writeState);
@@ -96,7 +88,7 @@ writeChunks(inputChunks, function () {
     assert.deepEqual(seen, expected);
   }
 
-  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+  setImmediate(function () {
     // stream should have ended in next tick
     assert.ok(seenEnd);
   });

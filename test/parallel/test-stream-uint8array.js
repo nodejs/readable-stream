@@ -1,12 +1,6 @@
 'use strict';
 
-var _toConsumableArray2;
-
-function _load_toConsumableArray() {
-  return _toConsumableArray2 = _interopRequireDefault(require('babel-runtime/helpers/toConsumableArray'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
@@ -96,7 +90,7 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
 
   var buf = readable.read();
   assert(buf instanceof Buffer);
-  assert.deepStrictEqual([].concat((0, (_toConsumableArray2 || _load_toConsumableArray()).default)(buf)), [].concat((0, (_toConsumableArray2 || _load_toConsumableArray()).default)(ABC), (0, (_toConsumableArray2 || _load_toConsumableArray()).default)(DEF)));
+  assert.deepStrictEqual([].concat(_toConsumableArray(buf)), [].concat(_toConsumableArray(ABC), _toConsumableArray(DEF)));
 }
 
 {

@@ -1,6 +1,6 @@
 # readable-stream
 
-***Node.js core v10.5.0 streams for userland*** [![Build Status](https://travis-ci.com/nodejs/readable-stream.svg?branch=master)](https://travis-ci.com/nodejs/readable-stream)
+***Node.js core streams for userland*** [![Build Status](https://travis-ci.com/nodejs/readable-stream.svg?branch=master)](https://travis-ci.com/nodejs/readable-stream)
 
 
 [![NPM](https://nodei.co/npm/readable-stream.png?downloads=true&downloadRank=true)](https://nodei.co/npm/readable-stream/)
@@ -13,11 +13,9 @@
 npm install --save readable-stream
 ```
 
-***Node.js core streams for userland***
-
 This package is a mirror of the streams implementations in Node.js.
 
-Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v10.5.0/docs/api/stream.html).
+Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v10.6.0/docs/api/stream.html).
 
 If you want to guarantee a stable streams base, regardless of what version of
 Node you, or the users of your libraries are using, use **readable-stream** *only* and avoid the *"stream"* module in Node-core, for background see [this blogpost](http://r.va.gg/2014/06/why-i-dont-use-nodes-core-stream-module.html).

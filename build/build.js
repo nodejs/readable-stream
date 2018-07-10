@@ -76,8 +76,7 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
             'transform-optional-catch-binding',
             'transform-inline-imports-commonjs',
             'transform-async-to-generator',
-            'transform-async-generator-functions',
-            'transform-runtime',
+            'transform-async-generator-functions'
           ]
         })
         data = transformed.code

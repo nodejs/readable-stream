@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -32,7 +24,7 @@ var ws = new Writable({
   highWaterMark: 1,
   write: common.mustCall(function () {
     // Ignore the callback, this write() simply never finishes.
-    (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+    setImmediate(function () {
       return rs.unpipe(ws);
     });
   })

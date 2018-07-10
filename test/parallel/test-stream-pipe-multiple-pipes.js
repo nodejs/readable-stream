@@ -1,13 +1,5 @@
 'use strict';
 
-var _getIterator2;
-
-function _load_getIterator() {
-  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -52,7 +44,7 @@ process.nextTick(common.mustCall(function () {
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(writables), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+    for (var _iterator = writables[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var _target = _step.value;
 
       assert.deepStrictEqual(_target.output, [input]);
@@ -86,7 +78,7 @@ readable.on('end', common.mustCall(function () {
   var _iteratorError2 = undefined;
 
   try {
-    for (var _iterator2 = (0, (_getIterator2 || _load_getIterator()).default)(writables), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+    for (var _iterator2 = writables[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
       var _target2 = _step2.value;
 
       assert.deepStrictEqual(_target2.output, [input]);

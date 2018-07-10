@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -44,7 +36,7 @@ var nChunks = 10;
 var chunk = bufferShim.alloc(10, 'x');
 
 r._read = function (n) {
-  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+  setImmediate(function () {
     r.push(--nChunks === 0 ? null : chunk);
   });
 };

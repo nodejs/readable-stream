@@ -1,13 +1,5 @@
 'use strict';
 
-var _maxSafeInteger;
-
-function _load_maxSafeInteger() {
-  return _maxSafeInteger = _interopRequireDefault(require('babel-runtime/core-js/number/max-safe-integer'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -23,7 +15,7 @@ var stream = require('../../');
 
   // This number exceeds the range of 32 bit integer arithmetic but should still
   // be handled correctly.
-  var ovfl = (_maxSafeInteger || _load_maxSafeInteger()).default;
+  var ovfl = Number.MAX_SAFE_INTEGER;
 
   var readable = stream.Readable({ highWaterMark: ovfl });
   assert.strictEqual(readable._readableState.highWaterMark, ovfl);

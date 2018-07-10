@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -44,7 +36,7 @@ var rs = new stream.Readable({
 
 var ws = stream.Writable({
   write: common.mustCall(function (data, enc, cb) {
-    (0, (_setImmediate2 || _load_setImmediate()).default)(cb);
+    setImmediate(cb);
   }, 41 * 10)
 });
 

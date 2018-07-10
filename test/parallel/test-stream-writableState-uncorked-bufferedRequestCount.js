@@ -11,7 +11,7 @@ var stream = require('../../');
 var writable = new stream.Writable();
 
 writable._writev = common.mustCall(function (chunks, cb) {
-  assert.strictEqual(chunks.length, 2, 'two chunks to write');
+  assert.strictEqual(chunks.length, 2);
   cb();
 }, 1);
 

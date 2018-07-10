@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -33,9 +25,9 @@ writer1.once('chunk-received', function () {
   reader.unpipe(writer1);
   reader.pipe(writer2);
   reader.push(buffer);
-  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+  setImmediate(function () {
     reader.push(buffer);
-    (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+    setImmediate(function () {
       reader.push(buffer);
     });
   });

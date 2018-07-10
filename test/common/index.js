@@ -1,78 +1,10 @@
 'use strict';
 
-var _getOwnPropertyDescriptors;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _load_getOwnPropertyDescriptors() {
-  return _getOwnPropertyDescriptors = _interopRequireDefault(require('babel-runtime/core-js/object/get-own-property-descriptors'));
-}
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var _create;
-
-function _load_create() {
-  return _create = _interopRequireDefault(require('babel-runtime/core-js/object/create'));
-}
-
-var _getPrototypeOf;
-
-function _load_getPrototypeOf() {
-  return _getPrototypeOf = _interopRequireDefault(require('babel-runtime/core-js/object/get-prototype-of'));
-}
-
-var _getOwnPropertyDescriptor;
-
-function _load_getOwnPropertyDescriptor() {
-  return _getOwnPropertyDescriptor = _interopRequireDefault(require('babel-runtime/core-js/object/get-own-property-descriptor'));
-}
-
-var _getIterator2;
-
-function _load_getIterator() {
-  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
-}
-
-var _classCallCheck2;
-
-function _load_classCallCheck() {
-  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
-}
-
-var _map;
-
-function _load_map() {
-  return _map = _interopRequireDefault(require('babel-runtime/core-js/map'));
-}
-
-var _defineProperty2;
-
-function _load_defineProperty() {
-  return _defineProperty2 = _interopRequireDefault(require('babel-runtime/helpers/defineProperty'));
-}
-
-var _promise;
-
-function _load_promise() {
-  return _promise = _interopRequireDefault(require('babel-runtime/core-js/promise'));
-}
-
-var _toConsumableArray2;
-
-function _load_toConsumableArray() {
-  return _toConsumableArray2 = _interopRequireDefault(require('babel-runtime/helpers/toConsumableArray'));
-}
-
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-var _clearImmediate2;
-
-function _load_clearImmediate() {
-  return _clearImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/clear-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /*<replacement>*/
 require('babel-polyfill');
@@ -432,7 +364,7 @@ exports.platformTimeout = function (ms) {
   return ms; // ARMv8+
 };
 
-var knownGlobals = [Buffer, (_clearImmediate2 || _load_clearImmediate()).default, clearInterval, clearTimeout, global, process, (_setImmediate2 || _load_setImmediate()).default, setInterval, setTimeout];
+var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
 
 if (global.gc) {
   knownGlobals.push(global.gc);
@@ -458,7 +390,7 @@ if (global.COUNTER_NET_SERVER_CONNECTION) {
 
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
   var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
-  allowGlobals.apply(undefined, (0, (_toConsumableArray2 || _load_toConsumableArray()).default)(knownFromEnv));
+  allowGlobals.apply(undefined, _toConsumableArray(knownFromEnv));
 }
 
 function allowGlobals() {
@@ -540,7 +472,7 @@ exports.mustCallAtLeast = function (fn, minimum) {
 
 exports.mustCallAsync = function (fn, exact) {
   return exports.mustCall(function () {
-    return (_promise || _load_promise()).default.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
+    return Promise.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
       return val;
     }));
   }, exact);
@@ -562,7 +494,7 @@ function _mustCallInner(fn) {
 
   if (typeof criteria !== 'number') throw new TypeError('Invalid ' + field + ' value: ' + criteria);
 
-  var context = (_context = {}, (0, (_defineProperty2 || _load_defineProperty()).default)(_context, field, criteria), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'actual', 0), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'stack', new Error().stack), (0, (_defineProperty2 || _load_defineProperty()).default)(_context, 'name', fn.name || '<anonymous>'), _context);
+  var context = (_context = {}, _defineProperty(_context, field, criteria), _defineProperty(_context, 'actual', 0), _defineProperty(_context, 'stack', new Error().stack), _defineProperty(_context, 'name', fn.name || '<anonymous>'), _context);
 
   // add the exit listener only once to avoid listener leak warnings
   if (mustCallChecks.length === 0) process.on('exit', runCallChecks);
@@ -724,7 +656,7 @@ exports.isAlive = function isAlive(pid) {
 exports.noWarnCode = undefined;
 
 function expectWarning(name, expected) {
-  var map = new (_map || _load_map()).default(expected);
+  var map = new Map(expected);
   return exports.mustCall(function (warning) {
     assert.strictEqual(warning.name, name);
     assert.ok(map.has(warning.message), 'unexpected error message: "' + warning.message + '"');
@@ -791,13 +723,14 @@ exports.expectWarning = function (nameOrMap, expected, code) {
 } /*</replacement>*/
 
 var Comparison = function Comparison(obj, keys) {
-  (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Comparison);
+  _classCallCheck(this, Comparison);
+
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(keys), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+    for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var key = _step.value;
 
       if (key in obj) this[key] = obj[key];
@@ -834,7 +767,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       // always being called.
       assert.fail('Expected one argument, got ' + util.inspect(arguments));
     }
-    var descriptor = (0, (_getOwnPropertyDescriptor || _load_getOwnPropertyDescriptor()).default)(error, 'message');
+    var descriptor = Object.getOwnPropertyDescriptor(error, 'message');
     assert.strictEqual(descriptor.enumerable, false, 'The error message should be non-enumerable');
 
     var innerSettings = settings;
@@ -845,7 +778,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       }
       var _constructor = error.constructor;
       if (_constructor.name === 'NodeError' && type.name !== 'NodeError') {
-        _constructor = (0, (_getPrototypeOf || _load_getPrototypeOf()).default)(error.constructor);
+        _constructor = Object.getPrototypeOf(error.constructor);
       }
       // Add the `type` to the error to properly compare and visualize it.
       if (!('type' in error)) error.type = _constructor;
@@ -853,7 +786,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
 
     if ('message' in settings && typeof settings.message === 'object' && settings.message.test(error.message)) {
       // Make a copy so we are able to modify the settings.
-      innerSettings = (0, (_create || _load_create()).default)(settings, (0, (_getOwnPropertyDescriptors || _load_getOwnPropertyDescriptors()).default)(settings));
+      innerSettings = Object.create(settings, Object.getOwnPropertyDescriptors(settings));
       // Visualize the message as identical in case of other errors.
       innerSettings.message = error.message;
     }
@@ -865,7 +798,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
     var _iteratorError2 = undefined;
 
     try {
-      for (var _iterator2 = (0, (_getIterator2 || _load_getIterator()).default)(keys), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
         var key = _step2.value;
 
         if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
@@ -946,7 +879,7 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
   var _iteratorError3 = undefined;
 
   try {
-    for (var _iterator3 = (0, (_getIterator2 || _load_getIterator()).default)(arrayBufferViews), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+    for (var _iterator3 = arrayBufferViews[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
       var type = _step3.value;
       var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
           BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === undefined ? 1 : _type$BYTES_PER_ELEME;
@@ -974,7 +907,7 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
 };
 
 exports.getBufferSources = function getBufferSources(buf) {
-  return [].concat((0, (_toConsumableArray2 || _load_toConsumableArray()).default)(exports.getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
+  return [].concat(_toConsumableArray(exports.getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
 };
 
 // Crash the process on unhandled rejections.

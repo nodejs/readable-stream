@@ -1,13 +1,5 @@
 'use strict';
 
-var _getIterator2;
-
-function _load_getIterator() {
-  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
@@ -57,7 +49,7 @@ readable.once('pause', common.mustCall(function () {
     var _iteratorError = undefined;
 
     try {
-      for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(queue), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var queued = _step.value;
 
         queued.cb();

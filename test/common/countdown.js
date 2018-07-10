@@ -1,24 +1,8 @@
 'use strict';
 
-var _classCallCheck2;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _load_classCallCheck() {
-  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
-}
-
-var _createClass2;
-
-function _load_createClass() {
-  return _createClass2 = _interopRequireDefault(require('babel-runtime/helpers/createClass'));
-}
-
-var _symbol;
-
-function _load_symbol() {
-  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*<replacement>*/
 require('babel-polyfill');
@@ -39,13 +23,13 @@ var objectKeys = objectKeys || function (obj) {
 /*</replacement>*/
 
 var assert = require('assert');
-var kLimit = (0, (_symbol || _load_symbol()).default)('limit');
-var kCallback = (0, (_symbol || _load_symbol()).default)('callback');
+var kLimit = Symbol('limit');
+var kCallback = Symbol('callback');
 var common = require('./');
 
 var Countdown = function () {
   function Countdown(limit, cb) {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Countdown);
+    _classCallCheck(this, Countdown);
 
     assert.strictEqual(typeof limit, 'number');
     assert.strictEqual(typeof cb, 'function');
@@ -59,12 +43,13 @@ var Countdown = function () {
     return this[kLimit];
   };
 
-  (0, (_createClass2 || _load_createClass()).default)(Countdown, [{
+  _createClass(Countdown, [{
     key: 'remaining',
     get: function () {
       return this[kLimit];
     }
   }]);
+
   return Countdown;
 }();
 

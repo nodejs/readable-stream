@@ -1,18 +1,6 @@
 'use strict';
 
-var _asyncToGenerator2;
-
-function _load_asyncToGenerator() {
-  return _asyncToGenerator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncToGenerator'));
-}
-
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
@@ -101,7 +89,7 @@ common.crashOnUnhandledRejection();
   });
 
   _read2.push('data');
-  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+  setImmediate(function () {
     return _read2.destroy();
   });
 
@@ -122,7 +110,7 @@ common.crashOnUnhandledRejection();
   });
 
   _read3.push('data');
-  (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+  setImmediate(function () {
     return _read3.destroy(new Error('kaboom'));
   });
 
@@ -217,7 +205,7 @@ common.crashOnUnhandledRejection();
 
     req.end();
     req.on('response', function (res) {
-      (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+      setImmediate(function () {
         res.destroy();
         _server.close();
       });
@@ -453,7 +441,7 @@ common.crashOnUnhandledRejection();
 
 {
   var run = function () {
-    var _ref = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    var _ref = _asyncToGenerator(function* () {
       var read = new Readable({
         read: function () {}
       });

@@ -1,38 +1,8 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-var _asyncIterator2;
-
-function _load_asyncIterator() {
-  return _asyncIterator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncIterator'));
-}
-
-var _promise;
-
-function _load_promise() {
-  return _promise = _interopRequireDefault(require('babel-runtime/core-js/promise'));
-}
-
-var _symbol;
-
-function _load_symbol() {
-  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
-}
-
-var _asyncToGenerator2;
-
-function _load_asyncToGenerator() {
-  return _asyncToGenerator2 = _interopRequireDefault(require('babel-runtime/helpers/asyncToGenerator'));
-}
-
 var tests = function () {
-  var _ref = (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+  var _ref = _asyncToGenerator(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('read without for..await');
       var max = 5;
       var readable = new Readable({
@@ -40,13 +10,13 @@ var tests = function () {
         read: function () {}
       });
 
-      var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
+      var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
       var values = [];
       for (var i = 0; i < max; i++) {
         values.push(iter.next());
       }
-      (_promise || _load_promise()).default.all(values).then(common.mustCall(function (values) {
+      Promise.all(values).then(common.mustCall(function (values) {
         values.forEach(common.mustCall(function (item, i) {
           return assert.strictEqual(item.value, 'hello-' + i);
         }, 5));
@@ -63,14 +33,14 @@ var tests = function () {
       assert.strictEqual(last.done, true);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('read without for..await deferred');
       var readable = new Readable({
         objectMode: true,
         read: function () {}
       });
 
-      var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
+      var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
       var values = [];
       for (var i = 0; i < 3; i++) {
@@ -82,7 +52,7 @@ var tests = function () {
       readable.push('hello-2');
 
       var k = 0;
-      var results1 = yield (_promise || _load_promise()).default.all(values);
+      var results1 = yield Promise.all(values);
       results1.forEach(common.mustCall(function (item) {
         return assert.strictEqual(item.value, 'hello-' + k++);
       }, 3));
@@ -96,7 +66,7 @@ var tests = function () {
       readable.push('hello-4');
       readable.push(null);
 
-      var results2 = yield (_promise || _load_promise()).default.all(values);
+      var results2 = yield Promise.all(values);
       results2.forEach(common.mustCall(function (item) {
         return assert.strictEqual(item.value, 'hello-' + k++);
       }, 2));
@@ -105,7 +75,7 @@ var tests = function () {
       assert.strictEqual(last.done, true);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('read without for..await with errors');
       var max = 3;
       var readable = new Readable({
@@ -113,7 +83,7 @@ var tests = function () {
         read: function () {}
       });
 
-      var iter = readable[(_symbol || _load_symbol()).default.asyncIterator]();
+      var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
       var values = [];
       var errors = [];
@@ -129,7 +99,7 @@ var tests = function () {
       readable.push('hello-1');
       readable.push('hello-2');
 
-      var resolved = yield (_promise || _load_promise()).default.all(values);
+      var resolved = yield Promise.all(values);
 
       resolved.forEach(common.mustCall(function (item, i) {
         return assert.strictEqual(item.value, 'hello-' + i);
@@ -144,12 +114,12 @@ var tests = function () {
       readable.destroy(new Error('kaboom'));
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('call next() after error');
       var readable = new Readable({
         read: function () {}
       });
-      var iterator = readable[(_symbol || _load_symbol()).default.asyncIterator]();
+      var iterator = readable[Symbol.asyncIterator]();
 
       var err = new Error('kaboom');
       readable.destroy(new Error('kaboom'));
@@ -164,7 +134,7 @@ var tests = function () {
       }(iterator.next.bind(iterator), err);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('read object mode');
       var max = 42;
       var readed = 0;
@@ -184,7 +154,7 @@ var tests = function () {
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step, _value; _step = yield _iterator.next(), _iteratorNormalCompletion = _step.done, _value = yield _step.value, !_iteratorNormalCompletion; _iteratorNormalCompletion = true) {
+        for (var _iterator = _asyncIterator(readable), _step, _value; _step = yield _iterator.next(), _iteratorNormalCompletion = _step.done, _value = yield _step.value, !_iteratorNormalCompletion; _iteratorNormalCompletion = true) {
           var k = _value;
 
           received++;
@@ -208,7 +178,7 @@ var tests = function () {
       assert.strictEqual(readed, received);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('destroy sync');
       var readable = new Readable({
         objectMode: true,
@@ -225,7 +195,7 @@ var tests = function () {
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step2, _value2; _step2 = yield _iterator2.next(), _iteratorNormalCompletion2 = _step2.done, _value2 = yield _step2.value, !_iteratorNormalCompletion2; _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = _asyncIterator(readable), _step2, _value2; _step2 = yield _iterator2.next(), _iteratorNormalCompletion2 = _step2.done, _value2 = yield _step2.value, !_iteratorNormalCompletion2; _iteratorNormalCompletion2 = true) {
             var k = _value2;
           }
         } catch (err) {
@@ -248,7 +218,7 @@ var tests = function () {
       assert.strictEqual(err.message, 'kaboom from read');
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('destroy async');
       var readable = new Readable({
         objectMode: true,
@@ -259,7 +229,7 @@ var tests = function () {
             this.push('hello');
             this.pushed = true;
 
-            (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+            setImmediate(function () {
               _this.destroy(new Error('kaboom'));
             });
           }
@@ -276,7 +246,7 @@ var tests = function () {
         var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator3 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step3, _value3; _step3 = yield _iterator3.next(), _iteratorNormalCompletion3 = _step3.done, _value3 = yield _step3.value, !_iteratorNormalCompletion3; _iteratorNormalCompletion3 = true) {
+          for (var _iterator3 = _asyncIterator(readable), _step3, _value3; _step3 = yield _iterator3.next(), _iteratorNormalCompletion3 = _step3.done, _value3 = yield _step3.value, !_iteratorNormalCompletion3; _iteratorNormalCompletion3 = true) {
             var k = _value3;
 
             received++;
@@ -303,7 +273,7 @@ var tests = function () {
       assert.strictEqual(received, 1);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('destroyed by throw');
       var readable = new Readable({
         objectMode: true,
@@ -319,7 +289,7 @@ var tests = function () {
         var _iteratorError4 = undefined;
 
         try {
-          for (var _iterator4 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step4, _value4; _step4 = yield _iterator4.next(), _iteratorNormalCompletion4 = _step4.done, _value4 = yield _step4.value, !_iteratorNormalCompletion4; _iteratorNormalCompletion4 = true) {
+          for (var _iterator4 = _asyncIterator(readable), _step4, _value4; _step4 = yield _iterator4.next(), _iteratorNormalCompletion4 = _step4.done, _value4 = yield _step4.value, !_iteratorNormalCompletion4; _iteratorNormalCompletion4 = true) {
             var k = _value4;
 
             assert.strictEqual(k, 'hello');
@@ -347,7 +317,7 @@ var tests = function () {
       assert.strictEqual(readable.destroyed, true);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('destroyed sync after push');
       var readable = new Readable({
         objectMode: true,
@@ -366,7 +336,7 @@ var tests = function () {
         var _iteratorError5 = undefined;
 
         try {
-          for (var _iterator5 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step5, _value5; _step5 = yield _iterator5.next(), _iteratorNormalCompletion5 = _step5.done, _value5 = yield _step5.value, !_iteratorNormalCompletion5; _iteratorNormalCompletion5 = true) {
+          for (var _iterator5 = _asyncIterator(readable), _step5, _value5; _step5 = yield _iterator5.next(), _iteratorNormalCompletion5 = _step5.done, _value5 = yield _step5.value, !_iteratorNormalCompletion5; _iteratorNormalCompletion5 = true) {
             var k = _value5;
 
             assert.strictEqual(k, 'hello');
@@ -394,7 +364,7 @@ var tests = function () {
       assert.strictEqual(received, 1);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('push async');
       var max = 42;
       var readed = 0;
@@ -404,7 +374,7 @@ var tests = function () {
         read: function () {
           var _this2 = this;
 
-          (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+          setImmediate(function () {
             _this2.push('hello');
             if (++readed === max) {
               _this2.push(null);
@@ -418,7 +388,7 @@ var tests = function () {
       var _iteratorError6 = undefined;
 
       try {
-        for (var _iterator6 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step6, _value6; _step6 = yield _iterator6.next(), _iteratorNormalCompletion6 = _step6.done, _value6 = yield _step6.value, !_iteratorNormalCompletion6; _iteratorNormalCompletion6 = true) {
+        for (var _iterator6 = _asyncIterator(readable), _step6, _value6; _step6 = yield _iterator6.next(), _iteratorNormalCompletion6 = _step6.done, _value6 = yield _step6.value, !_iteratorNormalCompletion6; _iteratorNormalCompletion6 = true) {
           var k = _value6;
 
           received++;
@@ -442,7 +412,7 @@ var tests = function () {
       assert.strictEqual(readed, received);
     })();
 
-    yield (0, (_asyncToGenerator2 || _load_asyncToGenerator()).default)(function* () {
+    yield _asyncToGenerator(function* () {
       console.log('push binary async');
       var max = 42;
       var readed = 0;
@@ -450,7 +420,7 @@ var tests = function () {
         read: function () {
           var _this3 = this;
 
-          (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+          setImmediate(function () {
             _this3.push('hello');
             if (++readed === max) {
               _this3.push(null);
@@ -472,7 +442,7 @@ var tests = function () {
       var _iteratorError7 = undefined;
 
       try {
-        for (var _iterator7 = (0, (_asyncIterator2 || _load_asyncIterator()).default)(readable), _step7, _value7; _step7 = yield _iterator7.next(), _iteratorNormalCompletion7 = _step7.done, _value7 = yield _step7.value, !_iteratorNormalCompletion7; _iteratorNormalCompletion7 = true) {
+        for (var _iterator7 = _asyncIterator(readable), _step7, _value7; _step7 = yield _iterator7.next(), _iteratorNormalCompletion7 = _step7.done, _value7 = yield _step7.value, !_iteratorNormalCompletion7; _iteratorNormalCompletion7 = true) {
           var k = _value7;
 
           data += k;
@@ -504,7 +474,9 @@ var tests = function () {
 // to avoid missing some tests if a promise does not resolve
 
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncIterator(iterable) { if (typeof Symbol === "function") { if (Symbol.asyncIterator) { var method = iterable[Symbol.asyncIterator]; if (method != null) return method.call(iterable); } if (Symbol.iterator) { return iterable[Symbol.iterator](); } } throw new TypeError("Object is not async iterable"); }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;

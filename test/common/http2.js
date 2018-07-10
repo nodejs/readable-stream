@@ -1,36 +1,12 @@
 'use strict';
 
-var _possibleConstructorReturn2;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _load_possibleConstructorReturn() {
-  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
-}
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var _inherits2;
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _load_inherits() {
-  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
-}
-
-var _classCallCheck2;
-
-function _load_classCallCheck() {
-  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
-}
-
-var _createClass2;
-
-function _load_createClass() {
-  return _createClass2 = _interopRequireDefault(require('babel-runtime/helpers/createClass'));
-}
-
-var _symbol;
-
-function _load_symbol() {
-  return _symbol = _interopRequireDefault(require('babel-runtime/core-js/symbol'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*<replacement>*/
 require('babel-polyfill');
@@ -52,7 +28,7 @@ var objectKeys = objectKeys || function (obj) {
 // An HTTP/2 testing tool used to create mock frames for direct testing
 // of HTTP/2 endpoints.
 
-var kFrameData = (0, (_symbol || _load_symbol()).default)('frame-data');
+var kFrameData = Symbol('frame-data');
 var FLAG_EOS = 0x1;
 var FLAG_ACK = 0x1;
 var FLAG_EOH = 0x4;
@@ -99,7 +75,7 @@ function write8(array, pos, val) {
 
 var Frame = function () {
   function Frame(length, type, flags, id) {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, Frame);
+    _classCallCheck(this, Frame);
 
     this[kFrameData] = Buffer.alloc(9);
     write24BE(this[kFrameData], 0, length);
@@ -108,37 +84,40 @@ var Frame = function () {
     write32BE(this[kFrameData], 5, id);
   }
 
-  (0, (_createClass2 || _load_createClass()).default)(Frame, [{
+  _createClass(Frame, [{
     key: 'data',
     get: function () {
       return this[kFrameData];
     }
   }]);
+
   return Frame;
 }();
 
 var SettingsFrame = function (_Frame) {
-  (0, (_inherits2 || _load_inherits()).default)(SettingsFrame, _Frame);
+  _inherits(SettingsFrame, _Frame);
 
   function SettingsFrame() {
     var ack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, SettingsFrame);
+
+    _classCallCheck(this, SettingsFrame);
 
     var flags = 0;
     if (ack) flags |= FLAG_ACK;
-    return (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Frame.call(this, 0, 4, flags, 0));
+    return _possibleConstructorReturn(this, _Frame.call(this, 0, 4, flags, 0));
   }
 
   return SettingsFrame;
 }(Frame);
 
 var DataFrame = function (_Frame2) {
-  (0, (_inherits2 || _load_inherits()).default)(DataFrame, _Frame2);
+  _inherits(DataFrame, _Frame2);
 
   function DataFrame(id, payload) {
     var padlen = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var final = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, DataFrame);
+
+    _classCallCheck(this, DataFrame);
 
     var len = payload.length;
     var flags = 0;
@@ -151,7 +130,7 @@ var DataFrame = function (_Frame2) {
       flags |= FLAG_PADDED;
     }
 
-    var _this2 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Frame2.call(this, len, 0, flags, id));
+    var _this2 = _possibleConstructorReturn(this, _Frame2.call(this, len, 0, flags, id));
 
     buffers.unshift(_this2[kFrameData]);
     _this2[kFrameData] = Buffer.concat(buffers);
@@ -162,12 +141,13 @@ var DataFrame = function (_Frame2) {
 }(Frame);
 
 var HeadersFrame = function (_Frame3) {
-  (0, (_inherits2 || _load_inherits()).default)(HeadersFrame, _Frame3);
+  _inherits(HeadersFrame, _Frame3);
 
   function HeadersFrame(id, payload) {
     var padlen = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var final = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, HeadersFrame);
+
+    _classCallCheck(this, HeadersFrame);
 
     var len = payload.length;
     var flags = FLAG_EOH;
@@ -180,7 +160,7 @@ var HeadersFrame = function (_Frame3) {
       flags |= FLAG_PADDED;
     }
 
-    var _this3 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Frame3.call(this, len, 1, flags, id));
+    var _this3 = _possibleConstructorReturn(this, _Frame3.call(this, len, 1, flags, id));
 
     buffers.unshift(_this3[kFrameData]);
     _this3[kFrameData] = Buffer.concat(buffers);
@@ -191,15 +171,16 @@ var HeadersFrame = function (_Frame3) {
 }(Frame);
 
 var PingFrame = function (_Frame4) {
-  (0, (_inherits2 || _load_inherits()).default)(PingFrame, _Frame4);
+  _inherits(PingFrame, _Frame4);
 
   function PingFrame() {
     var ack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, PingFrame);
+
+    _classCallCheck(this, PingFrame);
 
     var buffers = [Buffer.alloc(8)];
 
-    var _this4 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Frame4.call(this, 8, 6, ack ? 1 : 0, 0));
+    var _this4 = _possibleConstructorReturn(this, _Frame4.call(this, 8, 6, ack ? 1 : 0, 0));
 
     buffers.unshift(_this4[kFrameData]);
     _this4[kFrameData] = Buffer.concat(buffers);
@@ -210,14 +191,14 @@ var PingFrame = function (_Frame4) {
 }(Frame);
 
 var AltSvcFrame = function (_Frame5) {
-  (0, (_inherits2 || _load_inherits()).default)(AltSvcFrame, _Frame5);
+  _inherits(AltSvcFrame, _Frame5);
 
   function AltSvcFrame(size) {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, AltSvcFrame);
+    _classCallCheck(this, AltSvcFrame);
 
     var buffers = [Buffer.alloc(size)];
 
-    var _this5 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Frame5.call(this, size, 10, 0, 0));
+    var _this5 = _possibleConstructorReturn(this, _Frame5.call(this, size, 10, 0, 0));
 
     buffers.unshift(_this5[kFrameData]);
     _this5[kFrameData] = Buffer.concat(buffers);

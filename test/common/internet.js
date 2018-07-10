@@ -1,13 +1,5 @@
 'use strict';
 
-var _getIterator2;
-
-function _load_getIterator() {
-  return _getIterator2 = _interopRequireDefault(require('babel-runtime/core-js/get-iterator'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*<replacement>*/
 require('babel-polyfill');
 var util = require('util');
@@ -71,7 +63,7 @@ var _didIteratorError = false;
 var _iteratorError = undefined;
 
 try {
-  for (var _iterator = (0, (_getIterator2 || _load_getIterator()).default)(objectKeys(addresses)), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+  for (var _iterator = objectKeys(addresses)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
     var key = _step.value;
 
     var envName = 'NODE_TEST_' + key;

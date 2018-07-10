@@ -1,30 +1,10 @@
 'use strict';
 
-var _setImmediate2;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var _classCallCheck2;
-
-function _load_classCallCheck() {
-  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
-}
-
-var _possibleConstructorReturn2;
-
-function _load_possibleConstructorReturn() {
-  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
-}
-
-var _inherits2;
-
-function _load_inherits() {
-  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -57,11 +37,12 @@ var stream = require('../../');
 var passed = false;
 
 var TestStream = function (_stream$Transform) {
-  (0, (_inherits2 || _load_inherits()).default)(TestStream, _stream$Transform);
+  _inherits(TestStream, _stream$Transform);
 
   function TestStream() {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestStream);
-    return (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _stream$Transform.apply(this, arguments));
+    _classCallCheck(this, TestStream);
+
+    return _possibleConstructorReturn(this, _stream$Transform.apply(this, arguments));
   }
 
   TestStream.prototype._transform = function _transform(chunk, encoding, done) {
@@ -92,7 +73,7 @@ assert(s2.write('tiny'));
 
 // Write some small data in next IO loop, which will never be written to s3
 // Because 'drain' event is not emitted from s1 and s1 is still paused
-(0, (_setImmediate2 || _load_setImmediate()).default)(s1.write.bind(s1), 'later');
+setImmediate(s1.write.bind(s1), 'later');
 
 // Assert after two IO loops when all operations have been done.
 process.on('exit', function () {

@@ -1,24 +1,10 @@
 'use strict';
 
-var _classCallCheck2;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _load_classCallCheck() {
-  return _classCallCheck2 = _interopRequireDefault(require('babel-runtime/helpers/classCallCheck'));
-}
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var _possibleConstructorReturn2;
-
-function _load_possibleConstructorReturn() {
-  return _possibleConstructorReturn2 = _interopRequireDefault(require('babel-runtime/helpers/possibleConstructorReturn'));
-}
-
-var _inherits2;
-
-function _load_inherits() {
-  return _inherits2 = _interopRequireDefault(require('babel-runtime/helpers/inherits'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -50,12 +36,12 @@ var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
 
 var TestReadable = function (_Readable) {
-  (0, (_inherits2 || _load_inherits()).default)(TestReadable, _Readable);
+  _inherits(TestReadable, _Readable);
 
   function TestReadable(opt) {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestReadable);
+    _classCallCheck(this, TestReadable);
 
-    var _this = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Readable.call(this, opt));
+    var _this = _possibleConstructorReturn(this, _Readable.call(this, opt));
 
     _this._ended = false;
     return _this;
@@ -71,12 +57,12 @@ var TestReadable = function (_Readable) {
 }(Readable);
 
 var TestWritable = function (_Writable) {
-  (0, (_inherits2 || _load_inherits()).default)(TestWritable, _Writable);
+  _inherits(TestWritable, _Writable);
 
   function TestWritable(opt) {
-    (0, (_classCallCheck2 || _load_classCallCheck()).default)(this, TestWritable);
+    _classCallCheck(this, TestWritable);
 
-    var _this2 = (0, (_possibleConstructorReturn2 || _load_possibleConstructorReturn()).default)(this, _Writable.call(this, opt));
+    var _this2 = _possibleConstructorReturn(this, _Writable.call(this, opt));
 
     _this2._written = [];
     return _this2;

@@ -1,13 +1,5 @@
 'use strict';
 
-var _stringify;
-
-function _load_stringify() {
-  return _stringify = _interopRequireDefault(require('babel-runtime/core-js/json/stringify'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -140,7 +132,7 @@ var Transform = require('../../lib/_stream_transform');
   // Verify simple object transform
   var _pt5 = new Transform({ objectMode: true });
   _pt5._transform = function (c, e, cb) {
-    _pt5.push((0, (_stringify || _load_stringify()).default)(c));
+    _pt5.push(JSON.stringify(c));
     cb();
   };
 
@@ -422,7 +414,7 @@ var Transform = require('../../lib/_stream_transform');
   });
 
   forEach(objects, function (obj) {
-    jp.write((0, (_stringify || _load_stringify()).default)(obj));
+    jp.write(JSON.stringify(obj));
     var res = jp.read();
     assert.deepStrictEqual(res, obj);
   });
@@ -441,7 +433,7 @@ var Transform = require('../../lib/_stream_transform');
   var js = new Transform({ objectMode: true });
   js._transform = function (data, encoding, cb) {
     try {
-      js.push((0, (_stringify || _load_stringify()).default)(data));
+      js.push(JSON.stringify(data));
       cb();
     } catch (er) {
       cb(er);
@@ -460,7 +452,7 @@ var Transform = require('../../lib/_stream_transform');
   forEach(_objects, function (obj) {
     js.write(obj);
     var res = js.read();
-    assert.strictEqual(res, (0, (_stringify || _load_stringify()).default)(obj));
+    assert.strictEqual(res, JSON.stringify(obj));
   });
 
   js.end();

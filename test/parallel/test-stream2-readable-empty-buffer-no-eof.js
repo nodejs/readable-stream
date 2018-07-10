@@ -1,13 +1,5 @@
 'use strict';
 
-var _setImmediate2;
-
-function _load_setImmediate() {
-  return _setImmediate2 = _interopRequireDefault(require('babel-runtime/core-js/set-immediate'));
-}
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -58,21 +50,21 @@ function test1() {
   r._read = function (n) {
     switch (reads--) {
       case 5:
-        return (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+        return setImmediate(function () {
           return r.push(buf);
         });
       case 4:
-        (0, (_setImmediate2 || _load_setImmediate()).default)(function () {
+        setImmediate(function () {
           return r.push(bufferShim.alloc(0));
         });
-        return (0, (_setImmediate2 || _load_setImmediate()).default)(r.read.bind(r, 0));
+        return setImmediate(r.read.bind(r, 0));
       case 3:
         setTimeout(r.read.bind(r, 0), 50);
         return process.nextTick(function () {
           return r.push(bufferShim.alloc(0));
         });
       case 2:
-        (0, (_setImmediate2 || _load_setImmediate()).default)(r.read.bind(r, 0));
+        setImmediate(r.read.bind(r, 0));
         return r.push(bufferShim.alloc(0)); // Not-EOF!
       case 1:
         return r.push(buf);
