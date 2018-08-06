@@ -28,6 +28,10 @@ evergreen browsers and IE 11.
 v2.x.x of `readable-stream` supports all Node.js version from 0.8, as well as
 evergreen browsers and IE 10 & 11.
 
+### Big Thanks
+
+Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs][sauce]
+
 # Streams Working Group
 
 `readable-stream` is maintained by the Streams Working Group, which
@@ -59,3 +63,5 @@ Node.js. The responsibilities of the Streams Working Group include:
 * **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
 * **Irina Shestak** ([@lrlna](https://github.com/lrlna)) &lt;shestak.irina@gmail.com&gt;
+
+[sauce]: https://saucelabs.com
