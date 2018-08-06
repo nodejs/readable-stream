@@ -27,8 +27,6 @@ var http2 = {
 };
 var promisify = require('util-promisify');
 
-common.crashOnUnhandledRejection();
-
 {
   var finished = false;
   var processed = [];

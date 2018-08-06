@@ -489,8 +489,6 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 
-common.crashOnUnhandledRejection();
-
 tests().then(common.mustCall());
 ;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
   return process.on('uncaughtException', e);

@@ -1,5 +1,9 @@
 'use strict';
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -35,6 +39,9 @@ var _require2 = require('url'),
 var _require3 = require('internal/url'),
     getURLFromFilePath = _require3.getURLFromFilePath;
 
+var _require4 = require('events'),
+    EventEmitter = _require4.EventEmitter;
+
 var _MAINSCRIPT = fixtures.path('loop.js');
 var DEBUG = false;
 var TIMEOUT = common.platformTimeout(15 * 1000);
@@ -51,6 +58,7 @@ function spawnChildProcess(inspectorFlags, scriptContents, scriptFile) {
   var handler = tearDown.bind(null, child);
   process.on('exit', handler);
   process.on('uncaughtException', handler);
+  common.disableCrashOnUnhandledRejection();
   process.on('unhandledRejection', handler);
   process.on('SIGINT', handler);
 
@@ -408,42 +416,45 @@ var InspectorSession = function () {
   return InspectorSession;
 }();
 
-var NodeInstance = function () {
+var NodeInstance = function (_EventEmitter) {
+  _inherits(NodeInstance, _EventEmitter);
+
   function NodeInstance() {
     var inspectorFlags = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ['--inspect-brk=0'];
-
-    var _this7 = this;
-
     var scriptContents = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var scriptFile = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _MAINSCRIPT;
 
     _classCallCheck(this, NodeInstance);
 
-    this._scriptPath = scriptFile;
-    this._script = scriptFile ? null : scriptContents;
-    this._portCallback = null;
-    this.portPromise = new Promise(function (resolve) {
+    var _this7 = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this7._scriptPath = scriptFile;
+    _this7._script = scriptFile ? null : scriptContents;
+    _this7._portCallback = null;
+    _this7.portPromise = new Promise(function (resolve) {
       return _this7._portCallback = resolve;
     });
-    this._process = spawnChildProcess(inspectorFlags, scriptContents, scriptFile);
-    this._running = true;
-    this._stderrLineCallback = null;
-    this._unprocessedStderrLines = [];
+    _this7._process = spawnChildProcess(inspectorFlags, scriptContents, scriptFile);
+    _this7._running = true;
+    _this7._stderrLineCallback = null;
+    _this7._unprocessedStderrLines = [];
 
-    this._process.stdout.on('data', makeBufferingDataCallback(function (line) {
-      return console.log('[out]', line);
+    _this7._process.stdout.on('data', makeBufferingDataCallback(function (line) {
+      _this7.emit('stdout', line);
+      console.log('[out]', line);
     }));
 
-    this._process.stderr.on('data', makeBufferingDataCallback(function (message) {
+    _this7._process.stderr.on('data', makeBufferingDataCallback(function (message) {
       return _this7.onStderrLine(message);
     }));
 
-    this._shutdownPromise = new Promise(function (resolve) {
+    _this7._shutdownPromise = new Promise(function (resolve) {
       _this7._process.once('exit', function (exitCode, signal) {
         resolve({ exitCode: exitCode, signal: signal });
         _this7._running = false;
       });
     });
+    return _this7;
   }
 
   NodeInstance.startViaSignal = function () {
@@ -601,7 +612,7 @@ var NodeInstance = function () {
   };
 
   return NodeInstance;
-}();
+}(EventEmitter);
 
 function onResolvedOrRejected(promise, callback) {
   return promise.then(function (result) {

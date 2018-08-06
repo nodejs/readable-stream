@@ -18,8 +18,6 @@ var assert = require('assert/');
 var fs = require('fs');
 var promisify = require('util-promisify');
 
-common.crashOnUnhandledRejection();
-
 {
   var rs = new Readable({
     read: function () {}

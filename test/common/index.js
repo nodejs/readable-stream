@@ -911,12 +911,12 @@ exports.getBufferSources = function getBufferSources(buf) {
 };
 
 // Crash the process on unhandled rejections.
-exports.crashOnUnhandledRejection = function () {
-  process.on('unhandledRejection', function (err) {
-    return process.nextTick(function () {
-      throw err;
-    });
-  });
+var crashOnUnhandledRejection = function (err) {
+  throw err;
+};
+process.on('unhandledRejection', crashOnUnhandledRejection);
+exports.disableCrashOnUnhandledRejection = function () {
+  process.removeListener('unhandledRejection', crashOnUnhandledRejection);
 };
 
 exports.getTTYfd = function getTTYfd() {
@@ -980,6 +980,33 @@ exports.hijackStderr = hijackStdWritable.bind(null, 'stderr');
 exports.restoreStdout = restoreWritable.bind(null, 'stdout');
 exports.restoreStderr = restoreWritable.bind(null, 'stderr');
 exports.isCPPSymbolsNotMapped = exports.isWindows || exports.isSunOS || exports.isAIX || exports.isLinuxPPCBE || exports.isFreeBSD;
+
+var gcTrackerMap = new WeakMap();
+var gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
+
+exports.onGC = function (obj, gcListener) {
+  var async_hooks = require('async_hooks');
+
+  var onGcAsyncHook = async_hooks.createHook({
+    init: exports.mustCallAtLeast(function (id, type, trigger, resource) {
+      if (this.trackedId === undefined) {
+        assert.strictEqual(type, gcTrackerTag);
+        this.trackedId = id;
+      }
+    }),
+    destroy: function (id) {
+      assert.notStrictEqual(this.trackedId, -1);
+      if (id === this.trackedId) {
+        this.gcListener.ongc();
+        onGcAsyncHook.disable();
+      }
+    }
+  }).enable();
+  onGcAsyncHook.gcListener = gcListener;
+
+  gcTrackerMap.set(obj, new async_hooks.AsyncResource(gcTrackerTag));
+  obj = null;
+};
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
