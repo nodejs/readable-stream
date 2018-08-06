@@ -985,7 +985,7 @@ var gcTrackerMap = new WeakMap();
 var gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
 
 exports.onGC = function (obj, gcListener) {
-  var async_hooks = require('async_hooks');
+  var async_hooks = require('async_' + 'hooks');
 
   var onGcAsyncHook = async_hooks.createHook({
     init: exports.mustCallAtLeast(function (id, type, trigger, resource) {

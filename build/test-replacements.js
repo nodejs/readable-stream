@@ -200,6 +200,10 @@ module.exports['common.js'] = [
   '}).enable();*/'
 ],
 [
+  /const async_hooks = require\('async_hooks'\)/,
+  'var async_hooks = require(\'async_\' + \'hooks\')'
+],
+[
   /(?:var|const) async_wrap = process\.binding\('async_wrap'\);\n.*(?:var|const) (?:{ )?kCheck(?: })? = async_wrap\.constants(?:\.kCheck)?;/gm,
   '// const async_wrap = process.binding(\'async_wrap\');\n' +
   '  // const kCheck = async_wrap.constants.kCheck;'
