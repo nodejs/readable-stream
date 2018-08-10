@@ -22,8 +22,35 @@ Node you, or the users of your libraries are using, use **readable-stream** *onl
 
 As of version 2.0.0 **readable-stream** uses semantic versioning.
 
+## Version 3.x.x
+
 v3.x.x of `readable-stream` supports Node 6, 8, and 10, as well as
-evergreen browsers, IE 11 and latest Safari.
+evergreen browsers, IE 11 and latest Safari. The breaking changes
+introduced by v3 are composed by the combined breaking changes in [Node v9](https://nodejs.org/en/blog/release/v9.0.0/)
+and [Node v10](https://nodejs.org/en/blog/release/v10.0.0/), as follows:
+
+1. Error codes: https://github.com/nodejs/node/pull/13310,
+   https://github.com/nodejs/node/pull/13291,
+   https://github.com/nodejs/node/pull/16589,
+   https://github.com/nodejs/node/pull/15042,
+   https://github.com/nodejs/node/pull/15665,
+   https://github.com/nodejs/readable-stream/pull/344
+2. 'readable' have precedence over flowing
+   https://github.com/nodejs/node/pull/18994
+3. make virtual methods errors consistent
+   https://github.com/nodejs/node/pull/18813
+4. updated streams error handling
+   https://github.com/nodejs/node/pull/18438
+5. writable.end should return this.
+   https://github.com/nodejs/node/pull/18780
+6. readable continues to read when push('')
+   https://github.com/nodejs/node/pull/18211
+7. add custom inspect to BufferList
+   https://github.com/nodejs/node/pull/17907
+8. always defer 'readable' with nextTick
+   https://github.com/nodejs/node/pull/17979
+
+## Version 2.x.x
 
 v2.x.x of `readable-stream` supports all Node.js version from 0.8, as well as
 evergreen browsers and IE 10 & 11.
