@@ -100,17 +100,12 @@ Node.js. The responsibilities of the Streams Working Group include:
 <a name="members"></a>
 ## Team Members
 
-* **Chris Dickinson** ([@chrisdickinson](https://github.com/chrisdickinson)) &lt;christopher.s.dickinson@gmail.com&gt;
-  - Release GPG key: 9554F04D7259F04124DE6B476D5A82AC7E37093B
 * **Calvin Metcalf** ([@calvinmetcalf](https://github.com/calvinmetcalf)) &lt;calvin.metcalf@gmail.com&gt;
   - Release GPG key: F3EF5F62A87FC27A22E643F714CE4FF5015AA242
-* **Rod Vagg** ([@rvagg](https://github.com/rvagg)) &lt;rod@vagg.org&gt;
-  - Release GPG key: DD8F2338BAE7501E3DD5AC78C273792F7D83545D
-* **Sam Newman** ([@sonewman](https://github.com/sonewman)) &lt;newmansam@outlook.com&gt;
 * **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
-* **Domenic Denicola** ([@domenic](https://github.com/domenic)) &lt;d@domenic.me&gt;
 * **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
 * **Irina Shestak** ([@lrlna](https://github.com/lrlna)) &lt;shestak.irina@gmail.com&gt;
+* **Yoshua Wyuts** ([@yoshuawuyts](https://github.com/yoshuawuyts)) &lt;yoshuawuyts@gmail.com&gt;
 
 [sauce]: https://saucelabs.com
