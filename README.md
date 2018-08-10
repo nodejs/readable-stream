@@ -23,7 +23,7 @@ Node you, or the users of your libraries are using, use **readable-stream** *onl
 As of version 2.0.0 **readable-stream** uses semantic versioning.
 
 v3.x.x of `readable-stream` supports Node 6, 8, and 10, as well as
-evergreen browsers and IE 11.
+evergreen browsers, IE 11 and latest Safari.
 
 v2.x.x of `readable-stream` supports all Node.js version from 0.8, as well as
 evergreen browsers and IE 10 & 11.
@@ -31,6 +31,28 @@ evergreen browsers and IE 10 & 11.
 ### Big Thanks
 
 Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs][sauce]
+
+# Usage
+
+You can swap your `require('stream')` with `require('readable-stream')`
+without any changes, if you are just using one of the main classes and
+functions.
+
+```js
+const {
+  Readable,
+  Writable,
+  Transform,
+  Duplex,
+  pipeline,
+  finished
+} = require('readable-stream')
+````
+
+Note that `require('stream')` will return `Stream`, while
+`require('readable-stream')` will return `Readable`. We discourage using
+whatever is exported directly, but rather use one of the properties as
+shown in the example above.
 
 # Streams Working Group
 
