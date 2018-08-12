@@ -112,44 +112,11 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , 'Buffer.isBuffer($1)'
     ]
 
-    , processNextTickImport = [
-      /^('use strict';)$/m
-    , `$1
-
-/*<replacement>*/
-  var pna = require(\'process-nextick-args\');
-/*</replacement>*/
-`
-    ]
-
-    , processNextTickReplacement = [
-      /process.nextTick\(/g
-    , 'pna.nextTick('
-    ]
-
     , internalUtilReplacement = [
           /^const internalUtil = require\('internal\/util'\);/m
         ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
           + '/*</replacement>*/\n'
       ]
-    , isNode10 = [
-        headRegexp
-      , `$1
-
-/*<replacement>*/
-  var asyncWrite = !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
-/*</replacement>*/
-`
-      ]
-    , fixSyncWrite = [
-      /if \(sync\) {\n\s+pna.nextTick\(afterWrite, stream, state, finished, cb\);\n\s+}/
-      , `if (sync) {
-      /*<replacement>*/
-        asyncWrite(afterWrite, stream, state, finished, cb);
-      /*</replacement>*/
-    }
-      `
-    ]
   , internalDirectory = [
     /require\('internal\/streams\/([a-zA-z]+)'\)/g,
     'require(\'./internal/streams/$1\')'
@@ -238,8 +205,6 @@ module.exports['_stream_duplex.js'] = [
   , stringDecoderReplacement
   , objectKeysReplacement
   , objectKeysDefine
-  , processNextTickImport
-  , processNextTickReplacement
   , errorsOneLevel
 ]
 
@@ -267,8 +232,6 @@ module.exports['_stream_readable.js'] = [
   , eventEmittterReplacement
   , requireStreamReplacement
   , isBufferReplacement
-  , processNextTickImport
-  , processNextTickReplacement
   , eventEmittterListenerCountReplacement
   , internalDirectory
   , fixUintStuff
@@ -302,11 +265,7 @@ module.exports['_stream_writable.js'] = [
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement
   , isBufferReplacement
-  , isNode10
-  , processNextTickImport
-  , processNextTickReplacement
   , internalUtilReplacement
-  , fixSyncWrite
   , fixInstanceCheck
   , removeOnWriteBind
   , internalDirectory
@@ -343,32 +302,22 @@ if (util && util.inspect && util.inspect.custom) {
 
 ]
 module.exports['internal/streams/destroy.js'] = [
-    processNextTickImport
-  , processNextTickReplacement
-  , errorsTwoLevel
+    errorsTwoLevel
 ]
 
 module.exports['internal/streams/state.js'] = [
-    processNextTickImport
-  , processNextTickReplacement
   , errorsTwoLevel
 ]
 
 module.exports['internal/streams/async_iterator.js'] = [
-    processNextTickImport
-  , processNextTickReplacement
   , errorsTwoLevel
 ]
 
 module.exports['internal/streams/end-of-stream.js'] = [
-    processNextTickImport
-  , processNextTickReplacement
   , errorsTwoLevel
 ]
 
 module.exports['internal/streams/pipeline.js'] = [
-    processNextTickImport
-  , processNextTickReplacement
   , errorsTwoLevel
   , [
       /require\('internal\/streams\/end-of-stream'\)/,
