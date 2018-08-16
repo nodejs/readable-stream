@@ -180,10 +180,6 @@ function CorkedRequest(state) {
       /Object\.getPrototypeOf\((chunk)\) !== Buffer\.prototype/g
     , '!Buffer.isBuffer($1)'
   ]
-  , fixCopyBuffer = [
-      /Buffer\.prototype\.copy\.call\(src, target, offset\);/
-    , 'src.copy(target, offset);'
-  ]
   , errorsOneLevel = [
         /internal\/errors/
     ,   '../errors'
@@ -280,24 +276,15 @@ module.exports['_stream_writable.js'] = [
 
 module.exports['internal/streams/buffer_list.js'] = [
     [
-      /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/,
+      /const \{ inspect \} = require\('util'\);/,
       `
-const Buffer = require('buffer').Buffer
-const util = require('util')
+const { inspect } = require('util')
+const custom = inspect && inspect.custom || Symbol('useless')
       `
     ]
-  , fixCopyBuffer
   , [
-    /$/,
-    `
-
-if (util && util.inspect && util.inspect.custom) {
-  module.exports.prototype[util.inspect.custom] = function () {
-    const obj = util.inspect({ length: this.length });
-    return \`\${this.constructor.name} \${obj}\`;
-  }
-}
-`
+    /inspect.custom/g,
+    'custom'
   ]
 
 ]

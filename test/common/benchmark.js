@@ -36,7 +36,10 @@ function runBenchmark(name, args, env) {
 
   var mergedEnv = Object.assign({}, process.env, env);
 
-  var child = fork(runjs, argv, { env: mergedEnv, stdio: 'pipe' });
+  var child = fork(runjs, argv, {
+    env: mergedEnv,
+    stdio: ['inherit', 'pipe', 'inherit', 'ipc']
+  });
   child.stdout.setEncoding('utf8');
 
   var stdout = '';
