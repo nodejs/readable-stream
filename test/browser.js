@@ -14,12 +14,6 @@ var test = require('tape');
 var util = require('util');
 
 // TODO: add replacements instead
-if (!util.inspect) {
-  util.inspect = function () {};
-  util.inspect.custom = 'custom';
-}
-
-// TODO: add replacements instead
 global.process = {
   env: {},
   on: function () {},

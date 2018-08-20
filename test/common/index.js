@@ -518,17 +518,8 @@ exports.hasMultiLocalhost = function hasMultiLocalhost() {
   return ret === 0;
 };
 
-exports.fileExists = function (pathname) {
-  try {
-    fs.accessSync(pathname);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
-
 exports.skipIfEslintMissing = function () {
-  if (!exports.fileExists(path.join(__dirname, '..', '..', 'tools', 'node_modules', 'eslint'))) {
+  if (!fs.existsSync(path.join(__dirname, '..', '..', 'tools', 'node_modules', 'eslint'))) {
     exports.skip('missing ESLint');
   }
 };
@@ -768,7 +759,8 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       assert.fail('Expected one argument, got ' + util.inspect(arguments));
     }
     var descriptor = Object.getOwnPropertyDescriptor(error, 'message');
-    assert.strictEqual(descriptor.enumerable, false, 'The error message should be non-enumerable');
+    // The error message should be non-enumerable
+    assert.strictEqual(descriptor.enumerable, false);
 
     var innerSettings = settings;
     if ('type' in settings) {

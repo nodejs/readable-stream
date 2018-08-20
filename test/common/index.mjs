@@ -7,7 +7,6 @@
 import common from './index.js';
 
 const {
-  PORT,
   isMainThread,
   isWindows,
   isWOW64,
@@ -38,7 +37,6 @@ const {
   mustCallAtLeast,
   mustCallAsync,
   hasMultiLocalhost,
-  fileExists,
   skipIfEslintMissing,
   canCreateSymLink,
   getCallSite,
@@ -67,7 +65,6 @@ const {
 } = common;
 
 export {
-  PORT,
   isMainThread,
   isWindows,
   isWOW64,
@@ -98,7 +95,6 @@ export {
   mustCallAtLeast,
   mustCallAsync,
   hasMultiLocalhost,
-  fileExists,
   skipIfEslintMissing,
   canCreateSymLink,
   getCallSite,
