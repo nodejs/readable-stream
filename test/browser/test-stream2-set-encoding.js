@@ -36,7 +36,7 @@ module.exports = function (t) {
       }
 
       this.pos += n;
-      var ret = new Buffer(n);
+      var ret = Buffer.alloc(n);
       ret.fill('a');
 
       //console.log('this.push(ret)', ret);

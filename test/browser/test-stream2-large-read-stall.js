@@ -51,7 +51,7 @@ module.exports = function (t) {
       }
 
       ;false && console.error('   push #%d', pushes);
-      if (r.push(new Buffer(PUSHSIZE)))
+      if (r.push(Buffer.alloc(PUSHSIZE)))
         setTimeout(push);
     }
 

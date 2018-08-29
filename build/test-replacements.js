@@ -279,7 +279,7 @@ module.exports['test-stream-pipe-without-listenerCount.js'] = [
 module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
   [
     `const buf = Buffer(5).fill('x');`,
-    `const buf = new Buffer(5);
+    `const buf = Buffer.alloc(5);
   buf.fill('x');`
   ]
 ]

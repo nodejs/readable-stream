@@ -18,7 +18,7 @@ module.exports = function (t) {
     // r.read(0) again later, otherwise there is no more work being done
     // and the process just exits.
 
-    var buf = new Buffer(5);
+    var buf = Buffer.alloc(5);
     buf.fill('x');
     var reads = 5;
     r._read = function(n) {
@@ -29,16 +29,16 @@ module.exports = function (t) {
           return r.push(buf);
         case 2:
           setTimeout(r.read.bind(r, 0), 50);
-          return r.push(new Buffer(0)); // Not-EOF!
+          return r.push(Buffer.alloc(0)); // Not-EOF!
         case 3:
           setTimeout(r.read.bind(r, 0), 50);
           return process.nextTick(function() {
-            return r.push(new Buffer(0));
+            return r.push(Buffer.alloc(0));
           });
         case 4:
           setTimeout(r.read.bind(r, 0), 50);
           return setTimeout(function() {
-            return r.push(new Buffer(0));
+            return r.push(Buffer.alloc(0));
           });
         case 5:
           return setTimeout(function() {
@@ -72,7 +72,7 @@ module.exports = function (t) {
       if (!reads--)
         return r.push(null); // EOF
       else
-        return r.push(new Buffer('x'));
+        return r.push(Buffer.alloc('x'));
     };
 
     var results = [];
