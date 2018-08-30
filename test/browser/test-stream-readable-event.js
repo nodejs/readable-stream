@@ -16,7 +16,7 @@ function first(t) {
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(Buffer.alloc('blerg'));
+  r.push(Buffer.from('blerg'));
 
   var caughtReadable = false;
   setTimeout(function() {
@@ -51,7 +51,7 @@ function second(t) {
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(Buffer.alloc('bl'));
+  r.push(Buffer.from('bl'));
 
   var caughtReadable = false;
   setTimeout(function() {
@@ -84,7 +84,7 @@ function third(t) {
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(Buffer.alloc('blerg'));
+  r.push(Buffer.from('blerg'));
   r.push(null);
 
   var caughtReadable = false;
