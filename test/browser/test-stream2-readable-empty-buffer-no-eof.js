@@ -72,7 +72,7 @@ module.exports = function (t) {
       if (!reads--)
         return r.push(null); // EOF
       else
-        return r.push(Buffer.alloc('x'));
+        return r.push(Buffer.from('x'));
     };
 
     var results = [];

@@ -77,7 +77,7 @@ module.exports = function (t) {
       while (null !== (chunk = r.read(10))) {
         w.write(chunk);
         if (chunk.length > 4)
-          r.unshift(Buffer.alloc('1234'));
+          r.unshift(Buffer.from('1234'));
       }
     });
 

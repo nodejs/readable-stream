@@ -77,7 +77,7 @@ function runTest(t, highWaterMark, objectMode, produce) {
 module.exports = function (t) {
   t.test('readable wrap', function (t) {
     runTest(t, 100, false, function() { return Buffer.alloc(100); });
-    runTest(t, 10, false, function() { return Buffer.alloc('xxxxxxxxxx'); });
+    runTest(t, 10, false, function() { return Buffer.from('xxxxxxxxxx'); });
     runTest(t, 1, true, function() { return { foo: 'bar' }; });
 
     var objectChunks = [ 5, 'a', false, 0, '', 'xyz', { x: 4 }, 7, [], 555 ];

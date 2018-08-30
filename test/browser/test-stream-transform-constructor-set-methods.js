@@ -21,7 +21,7 @@ module.exports = function (t) {
       flush: _flush
     });
 
-    tr.end(Buffer.alloc('blerg'));
+    tr.end(Buffer.from('blerg'));
     tr.resume();
 
     tr.on('end', function() {

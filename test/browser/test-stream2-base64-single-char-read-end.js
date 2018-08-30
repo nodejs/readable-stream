@@ -15,7 +15,7 @@ module.exports = function (t) {
     if(!hasRead) {
       hasRead = true;
       process.nextTick(function() {
-        src.push(Buffer.alloc('1'));
+        src.push(Buffer.from('1'));
         src.push(null);
       });
     };
