@@ -11,7 +11,7 @@ module.exports = function (t) {
     // 560000 is chosen here because it is larger than the (default) highWaterMark
     // and will cause `.write()` to return false
     // See: https://github.com/nodejs/node/issues/2323
-    var buffer = new Buffer(560000);
+    var buffer = Buffer.alloc(560000);
 
     reader._read = function() {};
 

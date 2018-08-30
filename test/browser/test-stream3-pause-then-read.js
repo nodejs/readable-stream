@@ -25,7 +25,7 @@ module.exports = function (t){
 
     var totalPushed = 0;
     function push() {
-      var chunk = chunks-- > 0 ? new Buffer(chunkSize) : null;
+      var chunk = chunks-- > 0 ? Buffer.alloc(chunkSize) : null;
       if (chunk) {
         totalPushed += chunk.length;
         chunk.fill('x');

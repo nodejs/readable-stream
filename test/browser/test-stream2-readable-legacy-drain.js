@@ -9,7 +9,7 @@ module.exports = function (t) {
     var N = 256;
     var reads = 0;
     r._read = function(n) {
-      return r.push(++reads === N ? null : new Buffer(1));
+      return r.push(++reads === N ? null : Buffer.alloc(1));
     };
     t.plan(2);
     r.on('end', function() {

@@ -10,7 +10,7 @@ module.exports = function (t) {
 
     function TestReader() {
       R.apply(this);
-      this._buffer = new Buffer(100);
+      this._buffer = Buffer.alloc(100);
       this._buffer.fill('x');
 
       this.on('data', function() {
@@ -22,7 +22,7 @@ module.exports = function (t) {
 
     TestReader.prototype._read = function(n) {
       this.push(this._buffer);
-      this._buffer = new Buffer(0);
+      this._buffer = Buffer.alloc(0);
     };
 
     var reader = new TestReader();

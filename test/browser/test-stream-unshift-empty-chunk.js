@@ -9,7 +9,7 @@ module.exports = function (t) {
     t.plan(1);
     var r = new Readable();
     var nChunks = 10;
-    var chunk = new Buffer(10);
+    var chunk = Buffer.alloc(10);
     chunk.fill('x');
 
     r._read = function(n) {
@@ -29,7 +29,7 @@ module.exports = function (t) {
         // stream, like a parser might do.  We just fill it with
         // 'y' so that it's easy to see which bits were touched,
         // and which were not.
-        var putBack = new Buffer(readAll ? 0 : 5);
+        var putBack = Buffer.alloc(readAll ? 0 : 5);
         putBack.fill('y');
         readAll = !readAll;
         r.unshift(putBack);

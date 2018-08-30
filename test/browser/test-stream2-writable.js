@@ -137,7 +137,7 @@ module.exports = function (t) {
 
     forEach(chunks, function(chunk, i) {
       var enc = encodings[ i % encodings.length ];
-      chunk = new Buffer(chunk);
+      chunk = Buffer.alloc(chunk);
       tw.write(chunk.toString(enc), enc);
     });
     t.end();
@@ -151,7 +151,7 @@ module.exports = function (t) {
 
     tw._write = function(chunk, encoding, cb) {
       t.equals(typeof chunk, 'string');
-      chunk = new Buffer(chunk, encoding);
+      chunk = Buffer.from(chunk, encoding);
       return TestWriter.prototype._write.call(this, chunk, encoding, cb);
     };
 
@@ -174,7 +174,7 @@ module.exports = function (t) {
 
     forEach(chunks, function(chunk, i) {
       var enc = encodings[ i % encodings.length ];
-      chunk = new Buffer(chunk);
+      chunk = Buffer.alloc(chunk);
       tw.write(chunk.toString(enc), enc);
     });
     t.end();
@@ -218,7 +218,7 @@ module.exports = function (t) {
 
   test('end callback with chunk', function(t) {
     var tw = new TestWriter();
-    tw.end(new Buffer('hello world'), function() {
+    tw.end(Buffer.alloc('hello world'), function() {
       t.end();
     });
   });
@@ -232,7 +232,7 @@ module.exports = function (t) {
 
   test('end callback after .write() call', function(t) {
     var tw = new TestWriter();
-    tw.write(new Buffer('hello world'));
+    tw.write(Buffer.alloc('hello world'));
     tw.end(function() {
       t.end();
     });
@@ -241,7 +241,7 @@ module.exports = function (t) {
   test('end callback called after write callback', function(t) {
     var tw = new TestWriter();
     var writeCalledback = false;
-    tw.write(new Buffer('hello world'),  function() {
+    tw.write(Buffer.alloc('hello world'),  function() {
       writeCalledback = true;
     });
     tw.end(function() {
@@ -257,7 +257,7 @@ module.exports = function (t) {
       t.equal(chunk.toString('hex'), hex);
       t.end();
     };
-    var buf = new Buffer(hex, 'hex');
+    var buf = Buffer.from(hex, 'hex');
     tw.write(buf, 'binary');
   });
 

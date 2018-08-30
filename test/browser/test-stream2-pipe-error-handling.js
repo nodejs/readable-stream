@@ -10,7 +10,7 @@ module.exports = function (t) {
     source._read = function(n) {
       n = Math.min(count, n);
       count -= n;
-      source.push(new Buffer(n));
+      source.push(Buffer.alloc(n));
     };
 
     var unpipedDest;
@@ -51,7 +51,7 @@ module.exports = function (t) {
     source._read = function(n) {
       n = Math.min(count, n);
       count -= n;
-      source.push(new Buffer(n));
+      source.push(Buffer.alloc(n));
     };
 
     var unpipedDest;

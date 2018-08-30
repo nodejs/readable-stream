@@ -18,7 +18,7 @@ module.exports = function (t) {
     };
 
     for (var i = 1; i <= 10; i++) {
-      tx.write(new Buffer(i));
+      tx.write(Buffer.alloc(i));
     }
     tx.end();
 
@@ -35,10 +35,10 @@ module.exports = function (t) {
   t.test('passthrough', function(t) {
     var pt = new PassThrough();
 
-    pt.write(new Buffer('foog'));
-    pt.write(new Buffer('bark'));
-    pt.write(new Buffer('bazy'));
-    pt.write(new Buffer('kuel'));
+    pt.write(Buffer.alloc('foog'));
+    pt.write(Buffer.alloc('bark'));
+    pt.write(Buffer.alloc('bazy'));
+    pt.write(Buffer.alloc('kuel'));
     pt.end();
 
     t.equal(pt.read(5).toString(), 'foogb');
@@ -73,16 +73,16 @@ module.exports = function (t) {
   t.test('simple transform', function(t) {
     var pt = new Transform();
     pt._transform = function(c, e, cb) {
-      var ret = new Buffer(c.length);
+      var ret = Buffer.alloc(c.length);
       ret.fill('x');
       pt.push(ret);
       cb();
     };
 
-    pt.write(new Buffer('foog'));
-    pt.write(new Buffer('bark'));
-    pt.write(new Buffer('bazy'));
-    pt.write(new Buffer('kuel'));
+    pt.write(Buffer.alloc('foog'));
+    pt.write(Buffer.alloc('bark'));
+    pt.write(Buffer.alloc('bazy'));
+    pt.write(Buffer.alloc('kuel'));
     pt.end();
 
     t.equal(pt.read(5).toString(), 'xxxxx');
@@ -127,10 +127,10 @@ module.exports = function (t) {
       }, 10);
     };
 
-    pt.write(new Buffer('foog'));
-    pt.write(new Buffer('bark'));
-    pt.write(new Buffer('bazy'));
-    pt.write(new Buffer('kuel'));
+    pt.write(Buffer.alloc('foog'));
+    pt.write(Buffer.alloc('bark'));
+    pt.write(Buffer.alloc('bazy'));
+    pt.write(Buffer.alloc('kuel'));
     pt.end();
 
     pt.on('finish', function() {
@@ -156,10 +156,10 @@ module.exports = function (t) {
       }, 10);
     };
 
-    pt.write(new Buffer('foog'));
-    pt.write(new Buffer('bark'));
-    pt.write(new Buffer('bazy'));
-    pt.write(new Buffer('kuel'));
+    pt.write(Buffer.alloc('foog'));
+    pt.write(Buffer.alloc('bark'));
+    pt.write(Buffer.alloc('bazy'));
+    pt.write(Buffer.alloc('kuel'));
     pt.end();
 
     pt.on('finish', function() {
@@ -188,7 +188,7 @@ module.exports = function (t) {
       setTimeout(function() {
         this.state += s.charAt(0);
         if (this.state.length === 3) {
-          pt.push(new Buffer(this.state));
+          pt.push(Buffer.alloc(this.state));
           this.state = '';
         }
         cb();
@@ -197,25 +197,25 @@ module.exports = function (t) {
 
     pt._flush = function(cb) {
       // just output whatever we have.
-      pt.push(new Buffer(this.state));
+      pt.push(Buffer.alloc(this.state));
       this.state = '';
       cb();
     };
 
-    pt.write(new Buffer('aaaa'));
-    pt.write(new Buffer('bbbb'));
-    pt.write(new Buffer('cccc'));
-    pt.write(new Buffer('dddd'));
-    pt.write(new Buffer('eeee'));
-    pt.write(new Buffer('aaaa'));
-    pt.write(new Buffer('bbbb'));
-    pt.write(new Buffer('cccc'));
-    pt.write(new Buffer('dddd'));
-    pt.write(new Buffer('eeee'));
-    pt.write(new Buffer('aaaa'));
-    pt.write(new Buffer('bbbb'));
-    pt.write(new Buffer('cccc'));
-    pt.write(new Buffer('dddd'));
+    pt.write(Buffer.alloc('aaaa'));
+    pt.write(Buffer.alloc('bbbb'));
+    pt.write(Buffer.alloc('cccc'));
+    pt.write(Buffer.alloc('dddd'));
+    pt.write(Buffer.alloc('eeee'));
+    pt.write(Buffer.alloc('aaaa'));
+    pt.write(Buffer.alloc('bbbb'));
+    pt.write(Buffer.alloc('cccc'));
+    pt.write(Buffer.alloc('dddd'));
+    pt.write(Buffer.alloc('eeee'));
+    pt.write(Buffer.alloc('aaaa'));
+    pt.write(Buffer.alloc('bbbb'));
+    pt.write(Buffer.alloc('cccc'));
+    pt.write(Buffer.alloc('dddd'));
     pt.end();
 
     // 'abcdeabcdeabcd'
@@ -249,8 +249,8 @@ module.exports = function (t) {
 
     pt.once('readable', function() {
       process.nextTick(function() {
-        pt.write(new Buffer('d'));
-        pt.write(new Buffer('ef'), function() {
+        pt.write(Buffer.alloc('d'));
+        pt.write(Buffer.alloc('ef'), function() {
           pt.end();
           t.end();
         });
@@ -259,7 +259,7 @@ module.exports = function (t) {
       });
     });
 
-    pt.write(new Buffer('abc'));
+    pt.write(Buffer.alloc('abc'));
   });
 
 
@@ -274,10 +274,10 @@ module.exports = function (t) {
 
     var i = 0;
 
-    pt.write(new Buffer('foog'));
+    pt.write(Buffer.alloc('foog'));
 
     //console.error('need emit 0');
-    pt.write(new Buffer('bark'));
+    pt.write(Buffer.alloc('bark'));
 
     //console.error('should have emitted readable now 1 === %d', emits);
     t.equal(emits, 1);
@@ -287,9 +287,9 @@ module.exports = function (t) {
 
     //console.error('need emit 1');
 
-    pt.write(new Buffer('bazy'));
+    pt.write(Buffer.alloc('bazy'));
     //console.error('should have emitted, but not again');
-    pt.write(new Buffer('kuel'));
+    pt.write(Buffer.alloc('kuel'));
 
     //console.error('should have emitted readable now 2 === %d', emits);
     t.equal(emits, 2);
@@ -320,9 +320,9 @@ module.exports = function (t) {
       emits++;
     });
 
-    pt.write(new Buffer('foog'));
+    pt.write(Buffer.alloc('foog'));
     //console.error('need emit 0');
-    pt.write(new Buffer('bark'));
+    pt.write(Buffer.alloc('bark'));
     //console.error('should have emitted readable now 1 === %d', emits);
     t.equal(emits, 1);
 
@@ -347,10 +347,10 @@ module.exports = function (t) {
         });
         pt.end();
       });
-      pt.write(new Buffer('kuel'));
+      pt.write(Buffer.alloc('kuel'));
     });
 
-    pt.write(new Buffer('bazy'));
+    pt.write(Buffer.alloc('bazy'));
   });
 
   t.test('passthrough facaded', function(t) {
@@ -366,13 +366,13 @@ module.exports = function (t) {
       t.end();
     });
 
-    pt.write(new Buffer('foog'));
+    pt.write(Buffer.alloc('foog'));
     setTimeout(function() {
-      pt.write(new Buffer('bark'));
+      pt.write(Buffer.alloc('bark'));
       setTimeout(function() {
-        pt.write(new Buffer('bazy'));
+        pt.write(Buffer.alloc('bazy'));
         setTimeout(function() {
-          pt.write(new Buffer('kuel'));
+          pt.write(Buffer.alloc('kuel'));
           setTimeout(function() {
             pt.end();
           }, 10);

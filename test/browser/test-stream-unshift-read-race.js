@@ -16,7 +16,7 @@ module.exports = function (t) {
     var chunks = 10;
     var t = (chunks * 5);
 
-    var data = new Buffer(chunks * hwm + Math.ceil(hwm / 2));
+    var data = Buffer.alloc(chunks * hwm + Math.ceil(hwm / 2));
     for (var i = 0; i < data.length; i++) {
       var c = 'asdf'.charCodeAt(i % 4);
       data[i] = c;
@@ -50,7 +50,7 @@ module.exports = function (t) {
 
     function pushError() {
       tape.throws(function() {
-        r.push(new Buffer(1));
+        r.push(Buffer.alloc(1));
       });
     }
 
@@ -66,7 +66,7 @@ module.exports = function (t) {
     r.on('end', function() {
       tape.notOk(ended, 'end emitted more than once');
       tape.throws(function() {
-        r.unshift(new Buffer(1));
+        r.unshift(Buffer.alloc(1));
       });
       ended = true;
       w.end();
@@ -77,7 +77,7 @@ module.exports = function (t) {
       while (null !== (chunk = r.read(10))) {
         w.write(chunk);
         if (chunk.length > 4)
-          r.unshift(new Buffer('1234'));
+          r.unshift(Buffer.alloc('1234'));
       }
     });
 
