@@ -3,6 +3,9 @@
   "version": "3.0.2",
   "description": "Streams3, a user-land copy of the stream library from Node.js",
   "main": "readable.js",
+  "engines": {
+    "node": ">= 6"
+  },
   "dependencies": {
     "inherits": "^2.0.3",
     "string_decoder": "^1.1.1",
