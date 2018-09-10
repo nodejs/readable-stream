@@ -182,8 +182,13 @@ var promisify = require('util-promisify');
 
 {
   var _server = http.createServer(function (req, res) {
+    var sent = false;
     var rs = new Readable({
       read: function () {
+        if (sent) {
+          return;
+        }
+        sent = true;
         rs.push('hello');
       },
 
@@ -213,8 +218,12 @@ var promisify = require('util-promisify');
 
 {
   var _server2 = http.createServer(function (req, res) {
+    var sent = 0;
     var rs = new Readable({
       read: function () {
+        if (sent++ > 10) {
+          return;
+        }
         rs.push('hello');
       },
 
@@ -260,8 +269,12 @@ var promisify = require('util-promisify');
       port: _server3.address().port
     });
 
+    var sent = 0;
     var rs = new Readable({
       read: function () {
+        if (sent++ > 10) {
+          return;
+        }
         rs.push('hello');
       }
     });
