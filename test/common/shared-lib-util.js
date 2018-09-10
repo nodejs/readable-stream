@@ -19,38 +19,48 @@ var objectKeys = objectKeys || function (obj) {
 var common = require('../common');
 var path = require('path');
 
+var kNodeShared = Boolean(process.config.variables.node_shared);
+var kShlibSuffix = process.config.variables.shlib_suffix;
+var kExecPath = path.dirname(process.execPath);
+
 // If node executable is linked to shared lib, need to take care about the
 // shared lib path.
-exports.addLibraryPath = function (env) {
-  if (!process.config.variables.node_shared) {
+function addLibraryPath(env) {
+  if (!kNodeShared) {
     return;
   }
 
   env = env || process.env;
 
-  env.LD_LIBRARY_PATH = (env.LD_LIBRARY_PATH ? env.LD_LIBRARY_PATH + path.delimiter : '') + path.join(path.dirname(process.execPath), 'lib.target');
+  env.LD_LIBRARY_PATH = (env.LD_LIBRARY_PATH ? env.LD_LIBRARY_PATH + path.delimiter : '') + path.join(kExecPath, 'lib.target');
   // For AIX.
-  env.LIBPATH = (env.LIBPATH ? env.LIBPATH + path.delimiter : '') + path.join(path.dirname(process.execPath), 'lib.target');
+  env.LIBPATH = (env.LIBPATH ? env.LIBPATH + path.delimiter : '') + path.join(kExecPath, 'lib.target');
   // For Mac OSX.
-  env.DYLD_LIBRARY_PATH = (env.DYLD_LIBRARY_PATH ? env.DYLD_LIBRARY_PATH + path.delimiter : '') + path.dirname(process.execPath);
+  env.DYLD_LIBRARY_PATH = (env.DYLD_LIBRARY_PATH ? env.DYLD_LIBRARY_PATH + path.delimiter : '') + kExecPath;
   // For Windows.
-  env.PATH = (env.PATH ? env.PATH + path.delimiter : '') + path.dirname(process.execPath);
-};
+  env.PATH = (env.PATH ? env.PATH + path.delimiter : '') + kExecPath;
+}
 
 // Get the full path of shared lib.
-exports.getSharedLibPath = function () {
+function getSharedLibPath() {
   if (common.isWindows) {
-    return path.join(path.dirname(process.execPath), 'node.dll');
+    return path.join(kExecPath, 'node.dll');
   } else if (common.isOSX) {
-    return path.join(path.dirname(process.execPath), 'libnode.' + process.config.variables.shlib_suffix);
+    return path.join(kExecPath, 'libnode.' + kShlibSuffix);
   } else {
-    return path.join(path.dirname(process.execPath), 'lib.target', 'libnode.' + process.config.variables.shlib_suffix);
+    return path.join(kExecPath, 'lib.target', 'libnode.' + kShlibSuffix);
   }
-};
+}
 
 // Get the binary path of stack frames.
-exports.getBinaryPath = function () {
-  return process.config.variables.node_shared ? exports.getSharedLibPath() : process.execPath;
+function getBinaryPath() {
+  return kNodeShared ? getSharedLibPath() : process.execPath;
+}
+
+module.exports = {
+  addLibraryPath: addLibraryPath,
+  getBinaryPath: getBinaryPath,
+  getSharedLibPath: getSharedLibPath
 };
 
 function forEach(xs, f) {

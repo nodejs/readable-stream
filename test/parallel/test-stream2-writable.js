@@ -75,7 +75,8 @@ for (var i = 0; i < chunks.length; i++) {
   });
 
   tw.on('finish', common.mustCall(function () {
-    assert.deepStrictEqual(tw.buffer, chunks, 'got chunks in the right order');
+    // got chunks in the right order
+    assert.deepStrictEqual(tw.buffer, chunks);
   }));
 
   forEach(chunks, function (chunk) {
@@ -92,7 +93,8 @@ for (var i = 0; i < chunks.length; i++) {
   });
 
   _tw.on('finish', common.mustCall(function () {
-    assert.deepStrictEqual(_tw.buffer, chunks, 'got chunks in the right order');
+    //  got chunks in the right order
+    assert.deepStrictEqual(_tw.buffer, chunks);
   }));
 
   var _i = 0;
@@ -111,7 +113,8 @@ for (var i = 0; i < chunks.length; i++) {
   var drains = 0;
 
   _tw2.on('finish', common.mustCall(function () {
-    assert.deepStrictEqual(_tw2.buffer, chunks, 'got chunks in the right order');
+    // got chunks in the right order
+    assert.deepStrictEqual(_tw2.buffer, chunks);
     assert.strictEqual(drains, 17);
   }));
 
@@ -144,7 +147,8 @@ for (var i = 0; i < chunks.length; i++) {
   var encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
 
   _tw3.on('finish', function () {
-    assert.deepStrictEqual(_tw3.buffer, chunks, 'got the expected chunks');
+    // got the expected chunks
+    assert.deepStrictEqual(_tw3.buffer, chunks);
   });
 
   forEach(chunks, function (chunk, i) {
@@ -170,7 +174,8 @@ for (var i = 0; i < chunks.length; i++) {
   var _encodings = ['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', undefined];
 
   _tw4.on('finish', function () {
-    assert.deepStrictEqual(_tw4.buffer, chunks, 'got the expected chunks');
+    // got the expected chunks
+    assert.deepStrictEqual(_tw4.buffer, chunks);
   });
 
   forEach(chunks, function (chunk, i) {
@@ -198,8 +203,10 @@ for (var i = 0; i < chunks.length; i++) {
 
   _tw5.on('finish', common.mustCall(function () {
     process.nextTick(common.mustCall(function () {
-      assert.deepStrictEqual(_tw5.buffer, chunks, 'got chunks in the right order');
-      assert.deepStrictEqual(callbacks._called, chunks, 'called all callbacks');
+      // got chunks in the right order
+      assert.deepStrictEqual(_tw5.buffer, chunks);
+      // called all callbacks
+      assert.deepStrictEqual(callbacks._called, chunks);
     }));
   }));
 

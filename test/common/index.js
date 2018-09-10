@@ -53,20 +53,16 @@ var os = require('os');
 var _require = require('child_process'),
     exec = _require.exec,
     execSync = _require.execSync,
-    spawn = _require.spawn,
     spawnSync = _require.spawnSync;
 
-var stream = require('../../');
-
 /*<replacement>*/
+
+
 var util = require('core-util-is');
 util.inherits = require('inherits');
 /*</replacement>*/
 
 var Timer = { now: function () {} };
-
-var _process$binding = process.binding('config'),
-    hasTracing = _process$binding.hasTracing;
 
 var _require2 = require('./fixtures'),
     fixturesDir = _require2.fixturesDir;
@@ -105,23 +101,6 @@ exports.isFreeBSD = process.platform === 'freebsd';
 exports.isOpenBSD = process.platform === 'openbsd';
 exports.isLinux = process.platform === 'linux';
 exports.isOSX = process.platform === 'darwin';
-
-var isGlibc = void 0;
-exports.isGlibc = function () {
-  if (isGlibc !== undefined) return isGlibc;
-  try {
-    var lddOut = spawnSync('ldd', [process.execPath]).stdout;
-    var libcInfo = lddOut.toString().split('\n').map(function (line) {
-      return line.match(/libc\.so.+=>\s*(\S+)\s/);
-    }).filter(function (info) {
-      return info;
-    });
-    if (libcInfo.length === 0) return isGlibc = false;
-    var nmOut = spawnSync('nm', ['-D', libcInfo[0][1]]).stdout;
-    if (/gnu_get_libc_version/.test(nmOut)) return isGlibc = true;
-  } catch (_e) {}
-  return isGlibc = false;
-};
 
 exports.enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
 var cpus = os.cpus();
@@ -235,6 +214,14 @@ if (exports.isLinux) {
   });
 } /*</replacement>*/
 
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'localhostIPv6', {
+    get: function () {
+      return '::1';
+    }
+  });
+} /*</replacement>*/
+
 // opensslCli defined lazily to reduce overhead of spawnSync
 /*<replacement>*/if (!process.browser) {
   Object.defineProperty(exports, 'opensslCli', { get: function () {
@@ -263,14 +250,6 @@ if (exports.isLinux) {
   Object.defineProperty(exports, 'hasCrypto', {
     get: function () {
       return Boolean(process.versions.openssl);
-    }
-  });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'hasTracing', {
-    get: function () {
-      return Boolean(hasTracing);
     }
   });
 } /*</replacement>*/
@@ -330,21 +309,7 @@ exports.ddCommand = function (filename, kilobytes) {
   }
 };
 
-exports.spawnPwd = function (options) {
-  if (exports.isWindows) {
-    return spawn('cmd.exe', ['/d', '/c', 'cd'], options);
-  } else {
-    return spawn('pwd', [], options);
-  }
-};
-
-exports.spawnSyncPwd = function (options) {
-  if (exports.isWindows) {
-    return spawnSync('cmd.exe', ['/d', '/c', 'cd'], options);
-  } else {
-    return spawnSync('pwd', [], options);
-  }
-};
+exports.pwdCommand = exports.isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
 
 exports.platformTimeout = function (ms) {
   if (process.features.debug) ms = 2 * ms;
@@ -508,9 +473,9 @@ function _mustCallInner(fn) {
 }
 
 exports.hasMultiLocalhost = function hasMultiLocalhost() {
-  var _process$binding2 = process.binding('tcp_wrap'),
-      TCP = _process$binding2.TCP,
-      TCPConstants = _process$binding2.constants;
+  var _process$binding = process.binding('tcp_wrap'),
+      TCP = _process$binding.TCP,
+      TCPConstants = _process$binding.constants;
 
   var t = new TCP(TCPConstants.SOCKET);
   var ret = t.bind('127.0.0.2', 0);
@@ -573,25 +538,6 @@ exports.skip = function (msg) {
   exports.printSkipMessage(msg);
   process.exit(0);
 };
-
-// A stream to push an array into a REPL
-function ArrayStream() {
-  this.run = function (data) {
-    var _this = this;
-
-    forEach(data, function (line) {
-      _this.emit('data', line + '\n');
-    });
-  };
-}
-
-util.inherits(ArrayStream, stream.Stream);
-exports.ArrayStream = ArrayStream;
-ArrayStream.prototype.readable = true;
-ArrayStream.prototype.writable = true;
-ArrayStream.prototype.pause = noop;
-ArrayStream.prototype.resume = noop;
-ArrayStream.prototype.write = noop;
 
 // Returns true if the exit code "exitCode" and/or signal name "signal"
 // represent the exit code and/or signal name of a node process that aborted,
@@ -928,32 +874,6 @@ exports.getTTYfd = function getTTYfd() {
   return ttyFd;
 };
 
-// Hijack stdout and stderr
-var stdWrite = {};
-function hijackStdWritable(name, listener) {
-  var stream = process[name];
-  var _write = stdWrite[name] = stream.write;
-
-  stream.writeTimes = 0;
-  stream.write = function (data, callback) {
-    try {
-      listener(data);
-    } catch (e) {
-      process.nextTick(function () {
-        throw e;
-      });
-    }
-
-    _write.call(stream, data, callback);
-    stream.writeTimes++;
-  };
-}
-
-function restoreWritable(name) {
-  process[name].write = stdWrite[name];
-  delete process[name].writeTimes;
-}
-
 exports.runWithInvalidFD = function (func) {
   var fd = 1 << 30;
   // Get first known bad file descriptor. 1 << 30 is usually unlikely to
@@ -965,39 +885,6 @@ exports.runWithInvalidFD = function (func) {
   }
 
   exports.printSkipMessage('Could not generate an invalid fd');
-};
-
-exports.hijackStdout = hijackStdWritable.bind(null, 'stdout');
-exports.hijackStderr = hijackStdWritable.bind(null, 'stderr');
-exports.restoreStdout = restoreWritable.bind(null, 'stdout');
-exports.restoreStderr = restoreWritable.bind(null, 'stderr');
-exports.isCPPSymbolsNotMapped = exports.isWindows || exports.isSunOS || exports.isAIX || exports.isLinuxPPCBE || exports.isFreeBSD;
-
-var gcTrackerMap = new WeakMap();
-var gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
-
-exports.onGC = function (obj, gcListener) {
-  var async_hooks = require('async_' + 'hooks');
-
-  var onGcAsyncHook = async_hooks.createHook({
-    init: exports.mustCallAtLeast(function (id, type, trigger, resource) {
-      if (this.trackedId === undefined) {
-        assert.strictEqual(type, gcTrackerTag);
-        this.trackedId = id;
-      }
-    }),
-    destroy: function (id) {
-      assert.notStrictEqual(this.trackedId, -1);
-      if (id === this.trackedId) {
-        this.gcListener.ongc();
-        onGcAsyncHook.disable();
-      }
-    }
-  }).enable();
-  onGcAsyncHook.gcListener = gcListener;
-
-  gcTrackerMap.set(obj, new async_hooks.AsyncResource(gcTrackerTag));
-  obj = null;
 };
 
 function forEach(xs, f) {

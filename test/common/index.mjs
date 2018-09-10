@@ -17,7 +17,6 @@ const {
   isOpenBSD,
   isLinux,
   isOSX,
-  isGlibc,
   enoughTestMem,
   enoughTestCpu,
   rootDir,
@@ -56,12 +55,7 @@ const {
   getBufferSources,
   disableCrashOnUnhandledRejection,
   getTTYfd,
-  runWithInvalidFD,
-  hijackStdout,
-  hijackStderr,
-  restoreStdout,
-  restoreStderr,
-  isCPPSymbolsNotMapped
+  runWithInvalidFD
 } = common;
 
 export {
@@ -75,7 +69,6 @@ export {
   isOpenBSD,
   isLinux,
   isOSX,
-  isGlibc,
   enoughTestMem,
   enoughTestCpu,
   rootDir,
@@ -114,12 +107,7 @@ export {
   getBufferSources,
   disableCrashOnUnhandledRejection,
   getTTYfd,
-  runWithInvalidFD,
-  hijackStdout,
-  hijackStderr,
-  restoreStdout,
-  restoreStderr,
-  isCPPSymbolsNotMapped
+  runWithInvalidFD
 };
 
 function forEach (xs, f) {
