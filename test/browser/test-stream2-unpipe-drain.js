@@ -58,7 +58,7 @@ module.exports = function (t) {
 
     dest.on('unpipe', function() {
       t.equal(src1.reads, 2);
-      t.equal(src2.reads, 2);
+      t.equal(src2.reads, 1);
       t.end();
     });
   });
