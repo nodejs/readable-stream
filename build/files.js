@@ -192,6 +192,22 @@ function CorkedRequest(state) {
         /^const { emitExperimentalWarning } = require\('internal\/util'\);/m,
         'const { emitExperimentalWarning } = require(\'../experimentalWarning\');'
   ]
+  , numberIE11 = [
+          /Number.isNaN(n)/g
+      ,   'n !== n'
+  ]
+  , noAsyncIterators1 = [
+          /Readable\.prototype\[Symbol\.asyncIterator\] = function\(\) \{/g
+      ,   'if (typeof Symbol === \'function\' ) {\nReadable.prototype[Symbol.asyncIterator] = function () {'
+  ]
+  , noAsyncIterators2 = [
+          /return new ReadableAsyncIterator\(this\);\n};/m
+      ,   'return new ReadableAsyncIterator(this);\n};\n}'
+  ]
+  , once = [
+          /const \{ once \} = require\('internal\/util'\);/
+      ,  'function once(callback) { let called = false; return function(...args) { if (called) return; called = true; callback(...args); }; }'
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -234,6 +250,9 @@ module.exports['_stream_readable.js'] = [
   , addUintStuff
   , errorsOneLevel
   , warnings
+  , numberIE11
+  , noAsyncIterators1
+  , noAsyncIterators2
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -305,6 +324,7 @@ module.exports['internal/streams/end-of-stream.js'] = [
 ]
 
 module.exports['internal/streams/pipeline.js'] = [
+    once
   , errorsTwoLevel
   , [
       /require\('internal\/streams\/end-of-stream'\)/,

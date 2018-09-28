@@ -68,11 +68,17 @@ var State = function () {
               return [expectedChild.name, 'Node / ' + expectedChild.name].includes(node.name);
             };
 
-            assert(snapshot.some(function (node) {
+            var hasChild = snapshot.some(function (node) {
               return node.outgoingEdges.map(function (edge) {
                 return edge.toNode;
               }).some(check);
-            }), 'expected to find child ' + util.inspect(expectedChild) + ' ' + ('in ' + util.inspect(snapshot)));
+            });
+            // Don't use assert with a custom message here. Otherwise the
+            // inspection in the message is done eagerly and wastes a lot of CPU
+            // time.
+            if (!hasChild) {
+              throw new Error('expected to find child ' + (util.inspect(expectedChild) + ' in ' + util.inspect(snapshot)));
+            }
           };
 
           var _iteratorNormalCompletion3 = true;
@@ -134,9 +140,15 @@ var State = function () {
               return node.name === _expectedChild.name || node.value && node.value.constructor && node.value.constructor.name === _expectedChild.name;
             };
 
-            assert(graph.some(function (node) {
+            // Don't use assert with a custom message here. Otherwise the
+            // inspection in the message is done eagerly and wastes a lot of CPU
+            // time.
+            var hasChild = graph.some(function (node) {
               return node.edges.some(check);
-            }), 'expected to find child ' + util.inspect(_expectedChild) + ' ' + ('in ' + util.inspect(snapshot)));
+            });
+            if (!hasChild) {
+              throw new Error('expected to find child ' + (util.inspect(_expectedChild) + ' in ' + util.inspect(snapshot)));
+            }
           };
 
           var _iteratorNormalCompletion4 = true;
