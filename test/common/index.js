@@ -96,14 +96,14 @@ var isLinux = process.platform === 'linux';
 var isOSX = process.platform === 'darwin';
 
 var enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
-var cpus = os.cpus();
+var cpus = os.cpus().length === 0 ? [{ speed: 1000 }] : os.cpus();
 var enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
 
 var rootDir = isWindows ? 'c:\\' : '/';
 
-var buildType = process.config.target_defaults.default_configuration;
+var buildType = 'readable-stream';
 
-var hasCrypto = Boolean(process.versions.openssl);
+var hasCrypto = !!process.browser;
 
 // If env var is set then enable async_hook hooks for all tests.
 if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
