@@ -211,6 +211,18 @@ module.exports['common.js'] = [
 [
   /async_wrap\.async_hook_fields\[kCheck\] \+= 1;/,
   '// async_wrap.async_hook_fields[kCheck] += 1;'
+],
+[
+  /os\.cpus\(\)/,
+  'os.cpus().length === 0 ? [{ speed: 1000 }] : os.cpus()'
+],
+[
+  /const buildType = process.config.target_defaults.default_configuration;/,
+  'const buildType = \'readable-stream\';'
+],
+[
+  /const hasCrypto = Boolean\(process.versions.openssl\);/,
+  'const hasCrypto = !!process.browser;'
 ]
 ]
 

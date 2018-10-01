@@ -69,21 +69,14 @@ var _require2 = require('./fixtures'),
 
 var tmpdir = require('./tmpdir');
 
+var _process$binding = process.binding('config'),
+    bits = _process$binding.bits,
+    hasIntl = _process$binding.hasIntl,
+    hasSmallICU = _process$binding.hasSmallICU;
+
 var noop = function () {};
 
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'PORT', {
-    get: function () {
-      if (+process.env.TEST_PARALLEL) {
-        throw new Error('common.PORT cannot be used in a parallelized test');
-      }
-      return +process.env.NODE_COMMON_PORT || 12346;
-    },
-    enumerable: true
-  });
-} /*</replacement>*/
-
-exports.isMainThread = function () {
+var isMainThread = function () {
   try {
     return require('worker_threads').isMainThread;
   } catch (_e) {
@@ -92,24 +85,25 @@ exports.isMainThread = function () {
   }
 }();
 
-exports.isWindows = process.platform === 'win32';
-exports.isWOW64 = exports.isWindows && process.env.PROCESSOR_ARCHITEW6432 !== undefined;
-exports.isAIX = process.platform === 'aix';
-exports.isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
-exports.isSunOS = process.platform === 'sunos';
-exports.isFreeBSD = process.platform === 'freebsd';
-exports.isOpenBSD = process.platform === 'openbsd';
-exports.isLinux = process.platform === 'linux';
-exports.isOSX = process.platform === 'darwin';
+var isWindows = process.platform === 'win32';
+var isWOW64 = isWindows && process.env.PROCESSOR_ARCHITEW6432 !== undefined;
+var isAIX = process.platform === 'aix';
+var isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
+var isSunOS = process.platform === 'sunos';
+var isFreeBSD = process.platform === 'freebsd';
+var isOpenBSD = process.platform === 'openbsd';
+var isLinux = process.platform === 'linux';
+var isOSX = process.platform === 'darwin';
 
-exports.enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
-var cpus = os.cpus();
-/*exports.enoughTestCpu = Array.isArray(cpus) &&
-                        (cpus.length > 1 || cpus[0].speed > 999);*/
+var enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
+var cpus = os.cpus().length === 0 ? [{ speed: 1000 }] : os.cpus();
+var enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
 
-exports.rootDir = exports.isWindows ? 'c:\\' : '/';
+var rootDir = isWindows ? 'c:\\' : '/';
 
-//exports.buildType = process.config.target_defaults.default_configuration;
+var buildType = 'readable-stream';
+
+var hasCrypto = !!process.browser;
 
 // If env var is set then enable async_hook hooks for all tests.
 if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
@@ -163,130 +157,42 @@ var opensslCli = null;
 var inFreeBSDJail = null;
 var localhostIPv4 = null;
 
-exports.localIPv6Hosts = ['localhost'];
-if (exports.isLinux) {
-  exports.localIPv6Hosts = [
-  // Debian/Ubuntu
-  'ip6-localhost', 'ip6-loopback',
+var localIPv6Hosts = isLinux ? [
+// Debian/Ubuntu
+'ip6-localhost', 'ip6-loopback',
 
-  // SUSE
-  'ipv6-localhost', 'ipv6-loopback',
+// SUSE
+'ipv6-localhost', 'ipv6-loopback',
 
-  // Typically universal
-  'localhost'];
-}
+// Typically universal
+'localhost'] : ['localhost'];
 
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'inFreeBSDJail', {
-    get: function () {
-      if (inFreeBSDJail !== null) return inFreeBSDJail;
-
-      if (exports.isFreeBSD && execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
-        inFreeBSDJail = true;
-      } else {
-        inFreeBSDJail = false;
-      }
-      return inFreeBSDJail;
-    }
-  });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'localhostIPv4', {
-    get: function () {
-      if (localhostIPv4 !== null) return localhostIPv4;
-
-      if (exports.inFreeBSDJail) {
-        // Jailed network interfaces are a bit special - since we need to jump
-        // through loops, as well as this being an exception case, assume the
-        // user will provide this instead.
-        if (process.env.LOCALHOST) {
-          localhostIPv4 = process.env.LOCALHOST;
-        } else {
-          console.error('Looks like we\'re in a FreeBSD Jail. ' + 'Please provide your default interface address ' + 'as LOCALHOST or expect some tests to fail.');
-        }
-      }
-
-      if (localhostIPv4 === null) localhostIPv4 = '127.0.0.1';
-
-      return localhostIPv4;
-    }
-  });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'localhostIPv6', {
-    get: function () {
-      return '::1';
-    }
-  });
-} /*</replacement>*/
-
-// opensslCli defined lazily to reduce overhead of spawnSync
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'opensslCli', { get: function () {
-      if (opensslCli !== null) return opensslCli;
-
-      if (process.config.variables.node_shared_openssl) {
-        // use external command
-        opensslCli = 'openssl';
-      } else {
-        // use command built from sources included in Node.js repository
-        opensslCli = path.join(path.dirname(process.execPath), 'openssl-cli');
-      }
-
-      if (exports.isWindows) opensslCli += '.exe';
-
-      var opensslCmd = spawnSync(opensslCli, ['version']);
-      if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
-        // openssl command cannot be executed
-        opensslCli = false;
-      }
-      return opensslCli;
-    }, enumerable: true });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'hasCrypto', {
-    get: function () {
-      return Boolean(process.versions.openssl);
-    }
-  });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'hasFipsCrypto', {
-    get: function () {
-      return exports.hasCrypto && require('crypto').fips;
-    }
-  });
-} /*</replacement>*/
-
-{
+var PIPE = function () {
   var localRelative = path.relative(process.cwd(), tmpdir.path + '/');
-  var pipePrefix = exports.isWindows ? '\\\\.\\pipe\\' : localRelative;
+  var pipePrefix = isWindows ? '\\\\.\\pipe\\' : localRelative;
   var pipeName = 'node-test.' + process.pid + '.sock';
-  exports.PIPE = path.join(pipePrefix, pipeName);
-}
+  return path.join(pipePrefix, pipeName);
+}();
 
-{
+var hasIPv6 = function () {
   var iFaces = os.networkInterfaces();
-  var re = exports.isWindows ? /Loopback Pseudo-Interface/ : /lo/;
-  exports.hasIPv6 = objectKeys(iFaces).some(function (name) {
-    return re.test(name) && iFaces[name].some(function (info) {
-      return info.family === 'IPv6';
+  var re = isWindows ? /Loopback Pseudo-Interface/ : /lo/;
+  return objectKeys(iFaces).some(function (name) {
+    return re.test(name) && iFaces[name].some(function (_ref) {
+      var family = _ref.family;
+      return family === 'IPv6';
     });
   });
-}
+}();
 
 /*
  * Check that when running a test with
  * `$node --abort-on-uncaught-exception $file child`
  * the process aborts.
  */
-exports.childShouldThrowAndAbort = function () {
+function childShouldThrowAndAbort() {
   var testCmd = '';
-  if (!exports.isWindows) {
+  if (!isWindows) {
     // Do not create core files, as it can take a lot of disk space on
     // continuous testing and developers' machines
     testCmd += 'ulimit -c 0 && ';
@@ -296,27 +202,27 @@ exports.childShouldThrowAndAbort = function () {
   var child = exec(testCmd);
   child.on('exit', function onExit(exitCode, signal) {
     var errMsg = 'Test should have aborted ' + ('but instead exited with exit code ' + exitCode) + (' and signal ' + signal);
-    assert(exports.nodeProcessAborted(exitCode, signal), errMsg);
+    assert(nodeProcessAborted(exitCode, signal), errMsg);
   });
-};
+}
 
-exports.ddCommand = function (filename, kilobytes) {
-  if (exports.isWindows) {
+function ddCommand(filename, kilobytes) {
+  if (isWindows) {
     var p = path.resolve(fixturesDir, 'create-file.js');
     return '"' + process.argv[0] + '" "' + p + '" "' + filename + '" ' + kilobytes * 1024;
   } else {
     return 'dd if=/dev/zero of="' + filename + '" bs=1024 count=' + kilobytes;
   }
-};
+}
 
-exports.pwdCommand = exports.isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
+var pwdCommand = isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
 
-exports.platformTimeout = function (ms) {
+function platformTimeout(ms) {
   if (process.features.debug) ms = 2 * ms;
 
   if (global.__coverage__) ms = 4 * ms;
 
-  if (exports.isAIX) return 2 * ms; // default localhost speed is slower on AIX
+  if (isAIX) return 2 * ms; // default localhost speed is slower on AIX
 
   if (process.arch !== 'arm') return ms;
 
@@ -327,7 +233,7 @@ exports.platformTimeout = function (ms) {
   if (armv === '7') return 2 * ms; // ARMv7
 
   return ms; // ARMv8+
-};
+}
 
 var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
 
@@ -365,7 +271,6 @@ function allowGlobals() {
 
   knownGlobals = knownGlobals.concat(whitelist);
 }
-exports.allowGlobals = allowGlobals;
 
 /*<replacement>*/
 if (typeof constructor == 'function') knownGlobals.push(constructor);
@@ -395,7 +300,6 @@ function leakedGlobals() {
     return leaked;
   }
 }
-exports.leakedGlobals = leakedGlobals;
 
 process.on('exit', function () {
   var leaked = leakedGlobals();
@@ -427,21 +331,21 @@ function runCallChecks(exitCode) {
   if (failed.length) process.exit(1);
 }
 
-exports.mustCall = function (fn, exact) {
+function mustCall(fn, exact) {
   return _mustCallInner(fn, exact, 'exact');
-};
+}
 
-exports.mustCallAtLeast = function (fn, minimum) {
+function mustCallAtLeast(fn, minimum) {
   return _mustCallInner(fn, minimum, 'minimum');
-};
+}
 
-exports.mustCallAsync = function (fn, exact) {
-  return exports.mustCall(function () {
-    return Promise.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
+function mustCallAsync(fn, exact) {
+  return mustCall(function () {
+    return Promise.resolve(fn.apply(undefined, arguments)).then(mustCall(function (val) {
       return val;
     }));
   }, exact);
-};
+}
 
 function _mustCallInner(fn) {
   var _context;
@@ -472,28 +376,28 @@ function _mustCallInner(fn) {
   };
 }
 
-exports.hasMultiLocalhost = function hasMultiLocalhost() {
-  var _process$binding = process.binding('tcp_wrap'),
-      TCP = _process$binding.TCP,
-      TCPConstants = _process$binding.constants;
+function hasMultiLocalhost() {
+  var _process$binding2 = process.binding('tcp_wrap'),
+      TCP = _process$binding2.TCP,
+      TCPConstants = _process$binding2.constants;
 
   var t = new TCP(TCPConstants.SOCKET);
   var ret = t.bind('127.0.0.2', 0);
   t.close();
   return ret === 0;
-};
+}
 
-exports.skipIfEslintMissing = function () {
+function skipIfEslintMissing() {
   if (!fs.existsSync(path.join(__dirname, '..', '..', 'tools', 'node_modules', 'eslint'))) {
-    exports.skip('missing ESLint');
+    skip('missing ESLint');
   }
-};
+}
 
-exports.canCreateSymLink = function () {
+function canCreateSymLink() {
   // On Windows, creating symlinks requires admin privileges.
   // We'll only try to run symlink test if we have enough privileges.
   // On other platforms, creating symlinks shouldn't need admin privileges
-  if (exports.isWindows) {
+  if (isWindows) {
     // whoami.exe needs to be the one from System32
     // If unix tools are in the path, they can shadow the one we want,
     // so use the full path while executing whoami
@@ -508,9 +412,9 @@ exports.canCreateSymLink = function () {
   }
   // On non-Windows platforms, this always returns `true`
   return true;
-};
+}
 
-exports.getCallSite = function getCallSite(top) {
+function getCallSite(top) {
   var originalStackFormatter = Error.prepareStackTrace;
   Error.prepareStackTrace = function (err, stack) {
     return stack[0].getFileName() + ':' + stack[0].getLineNumber();
@@ -521,28 +425,28 @@ exports.getCallSite = function getCallSite(top) {
   err.stack;
   Error.prepareStackTrace = originalStackFormatter;
   return err.stack;
-};
+}
 
-exports.mustNotCall = function (msg) {
-  var callSite = exports.getCallSite(exports.mustNotCall);
+function mustNotCall(msg) {
+  var callSite = getCallSite(mustNotCall);
   return function mustNotCall() {
     assert.fail((msg || 'function should not have been called') + ' at ' + callSite);
   };
-};
+}
 
-exports.printSkipMessage = function (msg) {
+function printSkipMessage(msg) {
   console.log('1..0 # Skipped: ' + msg);
-};
+}
 
-exports.skip = function (msg) {
-  exports.printSkipMessage(msg);
+function skip(msg) {
+  printSkipMessage(msg);
   process.exit(0);
-};
+}
 
 // Returns true if the exit code "exitCode" and/or signal name "signal"
 // represent the exit code and/or signal name of a node process that aborted,
 // false otherwise.
-exports.nodeProcessAborted = function nodeProcessAborted(exitCode, signal) {
+function nodeProcessAborted(exitCode, signal) {
   // Depending on the compiler used, node will exit with either
   // exit code 132 (SIGILL), 133 (SIGTRAP) or 134 (SIGABRT).
   var expectedExitCodes = [132, 133, 134];
@@ -559,7 +463,7 @@ exports.nodeProcessAborted = function nodeProcessAborted(exitCode, signal) {
   // which corresponds to exit code 3221225477 (0xC0000005)
   // (ii) Otherwise, _exit(134) which is called in place of abort() due to
   // raising SIGABRT exiting with ambiguous exit code '3' by default
-  if (exports.isWindows) expectedExitCodes = [0xC0000005, 134];
+  if (isWindows) expectedExitCodes = [0xC0000005, 134];
 
   // When using --abort-on-uncaught-exception, V8 will use
   // base::OS::Abort to terminate the process.
@@ -573,28 +477,26 @@ exports.nodeProcessAborted = function nodeProcessAborted(exitCode, signal) {
   } else {
     return expectedExitCodes.includes(exitCode);
   }
-};
+}
 
-exports.busyLoop = function busyLoop(time) {
+function busyLoop(time) {
   var startTime = Timer.now();
   var stopTime = startTime + time;
   while (Timer.now() < stopTime) {}
-};
+}
 
-exports.isAlive = function isAlive(pid) {
+function isAlive(pid) {
   try {
     process.kill(pid, 'SIGCONT');
     return true;
   } catch (e) {
     return false;
   }
-};
+}
 
-exports.noWarnCode = undefined;
-
-function expectWarning(name, expected) {
+function _expectWarning(name, expected) {
   var map = new Map(expected);
-  return exports.mustCall(function (warning) {
+  return mustCall(function (warning) {
     assert.strictEqual(warning.name, name);
     assert.ok(map.has(warning.message), 'unexpected error message: "' + warning.message + '"');
     var code = map.get(warning.message);
@@ -609,7 +511,7 @@ function expectWarningByName(name, expected, code) {
   if (typeof expected === 'string') {
     expected = [[expected, code]];
   }
-  process.on('warning', expectWarning(name, expected));
+  process.on('warning', _expectWarning(name, expected));
 }
 
 function expectWarningByMap(warningMap) {
@@ -625,7 +527,7 @@ function expectWarningByMap(warningMap) {
       }
       expected = [[expected[0], expected[1]]];
     }
-    catchWarning[name] = expectWarning(name, expected);
+    catchWarning[name] = _expectWarning(name, expected);
   });
   process.on('warning', function (warning) {
     return catchWarning[warning.name](warning);
@@ -635,29 +537,13 @@ function expectWarningByMap(warningMap) {
 // accepts a warning name and description or array of descriptions or a map
 // of warning names to description(s)
 // ensures a warning is generated for each name/description pair
-exports.expectWarning = function (nameOrMap, expected, code) {
+function expectWarning(nameOrMap, expected, code) {
   if (typeof nameOrMap === 'string') {
     expectWarningByName(nameOrMap, expected, code);
   } else {
     expectWarningByMap(nameOrMap);
   }
-};
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'hasIntl', {
-    get: function () {
-      return process.binding('config').hasIntl;
-    }
-  });
-} /*</replacement>*/
-
-/*<replacement>*/if (!process.browser) {
-  Object.defineProperty(exports, 'hasSmallICU', {
-    get: function () {
-      return process.binding('config').hasSmallICU;
-    }
-  });
-} /*</replacement>*/
+}
 
 var Comparison = function Comparison(obj, keys) {
   _classCallCheck(this, Comparison);
@@ -691,7 +577,7 @@ var Comparison = function Comparison(obj, keys) {
 // Useful for testing expected internal/error objects
 
 
-exports.expectsError = function expectsError(fn, settings, exact) {
+function expectsError(fn, settings, exact) {
   if (typeof fn !== 'function') {
     exact = settings;
     settings = fn;
@@ -783,26 +669,26 @@ exports.expectsError = function expectsError(fn, settings, exact) {
     assert.throws(fn, innerFn);
     return;
   }
-  return exports.mustCall(innerFn, exact);
-};
+  return mustCall(innerFn, exact);
+}
 
-exports.skipIfInspectorDisabled = function skipIfInspectorDisabled() {
+function skipIfInspectorDisabled() {
   if (process.config.variables.v8_enable_inspector === 0) {
-    exports.skip('V8 inspector is disabled');
+    skip('V8 inspector is disabled');
   }
-  if (!exports.isMainThread) {
+  if (!isMainThread) {
     // TODO(addaleax): Fix me.
-    exports.skip('V8 inspector is not available in Workers');
+    skip('V8 inspector is not available in Workers');
   }
-};
+}
 
-exports.skipIf32Bits = function skipIf32Bits() {
-  if (process.binding('config').bits < 64) {
-    exports.skip('The tested feature is not available in 32bit builds');
+function skipIf32Bits() {
+  if (bits < 64) {
+    skip('The tested feature is not available in 32bit builds');
   }
-};
+}
 
-exports.getArrayBufferViews = function getArrayBufferViews(buf) {
+function getArrayBufferViews(buf) {
   var buffer = buf.buffer,
       byteOffset = buf.byteOffset,
       byteLength = buf.byteLength;
@@ -842,22 +728,22 @@ exports.getArrayBufferViews = function getArrayBufferViews(buf) {
   }
 
   return out;
-};
+}
 
-exports.getBufferSources = function getBufferSources(buf) {
-  return [].concat(_toConsumableArray(exports.getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
-};
+function getBufferSources(buf) {
+  return [].concat(_toConsumableArray(getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
+}
 
 // Crash the process on unhandled rejections.
 var crashOnUnhandledRejection = function (err) {
   throw err;
 };
 process.on('unhandledRejection', crashOnUnhandledRejection);
-exports.disableCrashOnUnhandledRejection = function () {
+function disableCrashOnUnhandledRejection() {
   process.removeListener('unhandledRejection', crashOnUnhandledRejection);
-};
+}
 
-exports.getTTYfd = function getTTYfd() {
+function getTTYfd() {
   // Do our best to grab a tty fd.
   var tty = require('tty');
   // Don't attempt fd 0 as it is not writable on Windows.
@@ -872,9 +758,9 @@ exports.getTTYfd = function getTTYfd() {
     }
   }
   return ttyFd;
-};
+}
 
-exports.runWithInvalidFD = function (func) {
+function runWithInvalidFD(func) {
   var fd = 1 << 30;
   // Get first known bad file descriptor. 1 << 30 is usually unlikely to
   // be an valid one.
@@ -884,26 +770,131 @@ exports.runWithInvalidFD = function (func) {
     return func(fd);
   }
 
-  exports.printSkipMessage('Could not generate an invalid fd');
+  printSkipMessage('Could not generate an invalid fd');
+}
+
+module.exports = {
+  allowGlobals: allowGlobals,
+  buildType: buildType,
+  busyLoop: busyLoop,
+  canCreateSymLink: canCreateSymLink,
+  childShouldThrowAndAbort: childShouldThrowAndAbort,
+  ddCommand: ddCommand,
+  disableCrashOnUnhandledRejection: disableCrashOnUnhandledRejection,
+  enoughTestCpu: enoughTestCpu,
+  enoughTestMem: enoughTestMem,
+  expectsError: expectsError,
+  expectWarning: expectWarning,
+  getArrayBufferViews: getArrayBufferViews,
+  getBufferSources: getBufferSources,
+  getCallSite: getCallSite,
+  getTTYfd: getTTYfd,
+  hasIntl: hasIntl,
+  hasCrypto: hasCrypto,
+  hasIPv6: hasIPv6,
+  hasSmallICU: hasSmallICU,
+  hasMultiLocalhost: hasMultiLocalhost,
+  isAIX: isAIX,
+  isAlive: isAlive,
+  isFreeBSD: isFreeBSD,
+  isLinux: isLinux,
+  isLinuxPPCBE: isLinuxPPCBE,
+  isMainThread: isMainThread,
+  isOpenBSD: isOpenBSD,
+  isOSX: isOSX,
+  isSunOS: isSunOS,
+  isWindows: isWindows,
+  isWOW64: isWOW64,
+  leakedGlobals: leakedGlobals,
+  localIPv6Hosts: localIPv6Hosts,
+  mustCall: mustCall,
+  mustCallAsync: mustCallAsync,
+  mustCallAtLeast: mustCallAtLeast,
+  mustNotCall: mustNotCall,
+  nodeProcessAborted: nodeProcessAborted,
+  noWarnCode: undefined,
+  PIPE: PIPE,
+  platformTimeout: platformTimeout,
+  printSkipMessage: printSkipMessage,
+  pwdCommand: pwdCommand,
+  rootDir: rootDir,
+  runWithInvalidFD: runWithInvalidFD,
+  skip: skip,
+  skipIf32Bits: skipIf32Bits,
+  skipIfEslintMissing: skipIfEslintMissing,
+  skipIfInspectorDisabled: skipIfInspectorDisabled,
+
+  get localhostIPv6() {
+    return '::1';
+  },
+
+  get hasFipsCrypto() {
+    return hasCrypto && require('crypto').fips;
+  },
+
+  get inFreeBSDJail() {
+    if (inFreeBSDJail !== null) return inFreeBSDJail;
+
+    if (exports.isFreeBSD && execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
+      inFreeBSDJail = true;
+    } else {
+      inFreeBSDJail = false;
+    }
+    return inFreeBSDJail;
+  },
+
+  get localhostIPv4() {
+    if (localhostIPv4 !== null) return localhostIPv4;
+
+    if (this.inFreeBSDJail) {
+      // Jailed network interfaces are a bit special - since we need to jump
+      // through loops, as well as this being an exception case, assume the
+      // user will provide this instead.
+      if (process.env.LOCALHOST) {
+        localhostIPv4 = process.env.LOCALHOST;
+      } else {
+        console.error('Looks like we\'re in a FreeBSD Jail. ' + 'Please provide your default interface address ' + 'as LOCALHOST or expect some tests to fail.');
+      }
+    }
+
+    if (localhostIPv4 === null) localhostIPv4 = '127.0.0.1';
+
+    return localhostIPv4;
+  },
+
+  // opensslCli defined lazily to reduce overhead of spawnSync
+  get opensslCli() {
+    if (opensslCli !== null) return opensslCli;
+
+    if (process.config.variables.node_shared_openssl) {
+      // use external command
+      opensslCli = 'openssl';
+    } else {
+      // use command built from sources included in Node.js repository
+      opensslCli = path.join(path.dirname(process.execPath), 'openssl-cli');
+    }
+
+    if (exports.isWindows) opensslCli += '.exe';
+
+    var opensslCmd = spawnSync(opensslCli, ['version']);
+    if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
+      // openssl command cannot be executed
+      opensslCli = false;
+    }
+    return opensslCli;
+  },
+
+  get PORT() {
+    if (+process.env.TEST_PARALLEL) {
+      throw new Error('common.PORT cannot be used in a parallelized test');
+    }
+    return +process.env.NODE_COMMON_PORT || 12346;
+  }
+
 };
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i);
   }
-}
-
-if (!util._errnoException) {
-  var uv;
-  util._errnoException = function (err, syscall) {
-    if (util.isUndefined(uv)) try {
-      uv = process.binding('uv');
-    } catch (e) {}
-    var errname = uv ? uv.errname(err) : '';
-    var e = new Error(syscall + ' ' + errname);
-    e.code = errname;
-    e.errno = errname;
-    e.syscall = syscall;
-    return e;
-  };
 }
