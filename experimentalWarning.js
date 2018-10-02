@@ -10,4 +10,8 @@ function emitExperimentalWarning(feature) {
   process.emitWarning(msg, 'ExperimentalWarning');
 }
 
-module.exports.emitExperimentalWarning = emitExperimentalWarning;
+function noop() {}
+
+module.exports.emitExperimentalWarning = process.emitWarning
+  ? emitExperimentalWarning
+  : noop;
