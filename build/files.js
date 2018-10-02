@@ -193,7 +193,7 @@ function CorkedRequest(state) {
         'const { emitExperimentalWarning } = require(\'../experimentalWarning\');'
   ]
   , numberIE11 = [
-          /Number.isNaN(n)/g
+          /Number.isNaN\(n\)/g
       ,   'n !== n'
   ]
   , noAsyncIterators1 = [

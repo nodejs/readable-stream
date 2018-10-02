@@ -103,7 +103,7 @@ var rootDir = isWindows ? 'c:\\' : '/';
 
 var buildType = 'readable-stream';
 
-var hasCrypto = !!process.browser;
+var hasCrypto = true;
 
 // If env var is set then enable async_hook hooks for all tests.
 if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {

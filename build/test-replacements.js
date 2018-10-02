@@ -222,7 +222,7 @@ module.exports['common.js'] = [
 ],
 [
   /const hasCrypto = Boolean\(process.versions.openssl\);/,
-  'const hasCrypto = !!process.browser;'
+  'const hasCrypto = true;'
 ]
 ]
 
