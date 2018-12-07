@@ -6,7 +6,6 @@ zlib.js
 .airtap.yml
 .airtaprc
 .travis.yml
-.zuul.yml
 .nyc_output
 coverage
 doc/
