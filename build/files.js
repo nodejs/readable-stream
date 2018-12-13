@@ -193,8 +193,12 @@ function CorkedRequest(state) {
         'const { emitExperimentalWarning } = require(\'../experimentalWarning\');'
   ]
   , numberIE11 = [
-          /Number.isNaN\(n\)/g
+          /Number\.isNaN\(n\)/g
       ,   'n !== n'
+  ]
+  , integerIE11 = [
+          /Number\.isInteger\(hwm\)/g
+    ,     '(isFinite(hwm) && Math.floor(hwm) === hwm)'
   ]
   , noAsyncIterators1 = [
           /Readable\.prototype\[Symbol\.asyncIterator\] = function\(\) \{/g
@@ -313,6 +317,7 @@ module.exports['internal/streams/destroy.js'] = [
 
 module.exports['internal/streams/state.js'] = [
   , errorsTwoLevel
+  , integerIE11
 ]
 
 module.exports['internal/streams/async_iterator.js'] = [
