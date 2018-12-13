@@ -3,7 +3,9 @@ test/
 examples/
 fs.js
 zlib.js
-.zuul.yml
+.airtap.yml
+.airtaprc
+.travis.yml
 .nyc_output
 coverage
 doc/
