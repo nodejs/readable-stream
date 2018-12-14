@@ -1,12 +1,14 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 require('../common');
 
 var assert = require('assert/');
+
 var stream = require('../../');
 
 var writable = new stream.Writable();
@@ -27,18 +29,25 @@ writable.on('finish', function () {
   // ending, finished, ended = true.
   testStates(true, true, true);
 });
-
 var result = writable.end('testing function end()', function () {
   // ending, finished, ended = true.
   testStates(true, true, true);
-});
+}); // end returns the writable instance
 
-// end returns the writable instance
-assert.strictEqual(result, writable);
-
-// ending, ended = true.
+assert.strictEqual(result, writable); // ending, ended = true.
 // finished = false.
+
 testStates(true, false, true);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

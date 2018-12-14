@@ -1,29 +1,44 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 require('babel-polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /* eslint-disable node-core/required-modules */
-'use strict';
-
-/*<replacement>*/
-var objectKeys = objectKeys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
+}
 /*</replacement>*/
 
+/* eslint-disable node-core/required-modules */
+
+
+'use strict';
+/*<replacement>*/
+
+
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+
+  for (var key in obj) {
+    keys.push(key);
+  }
+
+  return keys;
+};
+/*</replacement>*/
 // Hijack stdout and stderr
+
+
 var stdWrite = {};
+
 function hijackStdWritable(name, listener) {
   var stream = process[name];
+
   var _write = stdWrite[name] = stream.write;
 
   stream.writeTimes = 0;
+
   stream.write = function (data, callback) {
     try {
       listener(data);
@@ -34,6 +49,7 @@ function hijackStdWritable(name, listener) {
     }
 
     _write.call(stream, data, callback);
+
     stream.writeTimes++;
   };
 }

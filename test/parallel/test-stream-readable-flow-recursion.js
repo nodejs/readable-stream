@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,22 +24,26 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
-var assert = require('assert/');
 
-// this test verifies that passing a huge number to read(size)
+
+require('../common');
+
+var assert = require('assert/'); // this test verifies that passing a huge number to read(size)
 // will push up the highWaterMark, and cause the stream to read
 // more data continuously, but without triggering a nextTick
 // warning or RangeError.
 
-var Readable = require('../../').Readable;
 
-// throw an error if we trigger a nextTick warning.
+var Readable = require('../../').Readable; // throw an error if we trigger a nextTick warning.
+
+
 process.throwDeprecation = true;
-
-var stream = new Readable({ highWaterMark: 2 });
+var stream = new Readable({
+  highWaterMark: 2
+});
 var reads = 0;
 var total = 5000;
+
 stream._read = function (size) {
   reads++;
   size = Math.min(size, total);
@@ -52,27 +56,35 @@ var depth = 0;
 function flow(stream, size, callback) {
   depth += 1;
   var chunk = stream.read(size);
-
   if (!chunk) stream.once('readable', flow.bind(null, stream, size, callback));else callback(chunk);
-
   depth -= 1;
-  console.log('flow(' + depth + '): exit');
+  console.log("flow(".concat(depth, "): exit"));
 }
 
 flow(stream, 5000, function () {
-  console.log('complete (' + depth + ')');
+  console.log("complete (".concat(depth, ")"));
 });
-
 process.on('exit', function (code) {
-  assert.strictEqual(reads, 2);
-  // we pushed up the high water mark
-  assert.strictEqual(stream.readableHighWaterMark, 8192);
-  // length is 0 right now, because we pulled it all out.
+  assert.strictEqual(reads, 2); // we pushed up the high water mark
+
+  assert.strictEqual(stream.readableHighWaterMark, 8192); // length is 0 right now, because we pulled it all out.
+
   assert.strictEqual(stream.readableLength, 0);
   assert(!code);
   assert.strictEqual(depth, 0);
+
   require('tap').pass();
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -1,10 +1,6 @@
-'use strict';
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -31,19 +27,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 require('../common');
+
 var stream = require('../../');
 
-var Read = function (_stream$Readable) {
-  _inherits(Read, _stream$Readable);
+var Read =
+/*#__PURE__*/
+function (_stream$Readable) {
+  _inheritsLoose(Read, _stream$Readable);
 
   function Read() {
-    _classCallCheck(this, Read);
-
-    return _possibleConstructorReturn(this, _stream$Readable.apply(this, arguments));
+    return _stream$Readable.apply(this, arguments) || this;
   }
 
-  Read.prototype._read = function _read(size) {
+  var _proto = Read.prototype;
+
+  _proto._read = function _read(size) {
     this.push('x');
     this.push(null);
   };
@@ -51,16 +51,18 @@ var Read = function (_stream$Readable) {
   return Read;
 }(stream.Readable);
 
-var Write = function (_stream$Writable) {
-  _inherits(Write, _stream$Writable);
+var Write =
+/*#__PURE__*/
+function (_stream$Writable) {
+  _inheritsLoose(Write, _stream$Writable);
 
   function Write() {
-    _classCallCheck(this, Write);
-
-    return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+    return _stream$Writable.apply(this, arguments) || this;
   }
 
-  Write.prototype._write = function _write(buffer, encoding, cb) {
+  var _proto2 = Write.prototype;
+
+  _proto2._write = function _write(buffer, encoding, cb) {
     this.emit('error', new Error('boom'));
     this.emit('alldone');
   };
@@ -70,17 +72,24 @@ var Write = function (_stream$Writable) {
 
 var read = new Read();
 var write = new Write();
-
 write.once('error', function () {});
 write.once('alldone', function (err) {
   require('tap').pass();
 });
-
 process.on('exit', function (c) {
   console.error('error thrown even with listener');
 });
-
 read.pipe(write);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

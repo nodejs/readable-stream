@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,11 +24,14 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-require('../common');
-var assert = require('assert/');
 
-// This test verifies that stream.unshift(bufferShim.alloc(0)) or
+
+require('../common');
+
+var assert = require('assert/'); // This test verifies that stream.unshift(bufferShim.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
+
+
 var Readable = require('../../').Readable;
 
 var r = new Readable();
@@ -44,26 +47,36 @@ r._read = function (n) {
 var readAll = false;
 var seen = [];
 r.on('readable', function () {
-  var chunk = void 0;
+  var chunk;
+
   while (chunk = r.read()) {
-    seen.push(chunk.toString());
-    // simulate only reading a certain amount of the data,
+    seen.push(chunk.toString()); // simulate only reading a certain amount of the data,
     // and then putting the rest of the chunk back into the
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
+
     var putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
     readAll = !readAll;
     r.unshift(putBack);
   }
 });
-
 var expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
-
 r.on('end', function () {
   assert.deepStrictEqual(seen, expect);
+
   require('tap').pass();
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

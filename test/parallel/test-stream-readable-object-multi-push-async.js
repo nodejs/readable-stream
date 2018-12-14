@@ -1,10 +1,12 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var _require = require('../../'),
@@ -12,7 +14,6 @@ var _require = require('../../'),
 
 var MAX = 42;
 var BATCH = 10;
-
 {
   var readable = new Readable({
     objectMode: true,
@@ -23,12 +24,15 @@ var BATCH = 10;
       fetchData(function (err, data) {
         if (err) {
           _this.destroy(err);
+
           return;
         }
 
         if (data.length === 0) {
           console.log('pushing null');
+
           _this.push(null);
+
           return;
         }
 
@@ -39,34 +43,35 @@ var BATCH = 10;
       });
     }, Math.floor(MAX / BATCH) + 2)
   });
-
   var i = 0;
+
   function fetchData(cb) {
     if (i > MAX) {
       setTimeout(cb, 10, null, []);
     } else {
       var array = [];
       var max = i + BATCH;
+
       for (; i < max; i++) {
         array.push(i);
       }
+
       setTimeout(cb, 10, null, array);
     }
   }
 
   readable.on('readable', function () {
-    var data = void 0;
+    var data;
     console.log('readable emitted');
+
     while (data = readable.read()) {
       console.log(data);
     }
   });
-
   readable.on('end', common.mustCall(function () {
     assert.strictEqual(i, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
-
 {
   var _readable = new Readable({
     objectMode: true,
@@ -77,12 +82,15 @@ var BATCH = 10;
       fetchData(function (err, data) {
         if (err) {
           _this2.destroy(err);
+
           return;
         }
 
         if (data.length === 0) {
           console.log('pushing null');
+
           _this2.push(null);
+
           return;
         }
 
@@ -95,15 +103,18 @@ var BATCH = 10;
   });
 
   var _i = 0;
+
   function fetchData(cb) {
     if (_i > MAX) {
       setTimeout(cb, 10, null, []);
     } else {
       var array = [];
       var max = _i + BATCH;
+
       for (; _i < max; _i++) {
         array.push(_i);
       }
+
       setTimeout(cb, 10, null, array);
     }
   }
@@ -116,7 +127,6 @@ var BATCH = 10;
     assert.strictEqual(_i, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
-
 {
   var _readable2 = new Readable({
     objectMode: true,
@@ -127,6 +137,7 @@ var BATCH = 10;
       fetchData(function (err, data) {
         if (err) {
           _this3.destroy(err);
+
           return;
         }
 
@@ -137,6 +148,7 @@ var BATCH = 10;
 
         if (data[BATCH - 1] >= MAX) {
           console.log('pushing null');
+
           _this3.push(null);
         }
       });
@@ -144,12 +156,15 @@ var BATCH = 10;
   });
 
   var _i2 = 0;
+
   function fetchData(cb) {
     var array = [];
     var max = _i2 + BATCH;
+
     for (; _i2 < max; _i2++) {
       array.push(_i2);
     }
+
     setTimeout(cb, 10, null, array);
   }
 
@@ -161,7 +176,6 @@ var BATCH = 10;
     assert.strictEqual(_i2, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
-
 {
   var _readable3 = new Readable({
     objectMode: true,
@@ -181,7 +195,6 @@ var BATCH = 10;
     assert.strictEqual(nextTickPassed, true);
   }));
 }
-
 {
   var _readable4 = new Readable({
     objectMode: true,
@@ -196,9 +209,20 @@ var BATCH = 10;
 
   setImmediate(function () {
     _readable4.push('aaa');
+
     _readable4.push(null);
   });
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

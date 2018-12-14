@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,25 +24,39 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var stream = require('../../');
 
 var r = new stream.Readable();
+
 r._read = function (size) {
   r.push(bufferShim.allocUnsafe(size));
 };
 
 var w = new stream.Writable();
+
 w._write = function (data, encoding, cb) {
   cb(null);
 };
 
-r.pipe(w);
-
-// This might sound unrealistic, but it happens in net.js. When
+r.pipe(w); // This might sound unrealistic, but it happens in net.js. When
 // `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
 // ends the writable side of net.Socket.
+
 w.end();
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

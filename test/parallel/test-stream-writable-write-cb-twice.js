@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
 
 var _require = require('../../'),
@@ -21,7 +23,6 @@ var _require = require('../../'),
   });
   writable.write('hi');
 }
-
 {
   // Sync + Async
   var _writable = new Writable({
@@ -35,9 +36,9 @@ var _require = require('../../'),
       });
     })
   });
+
   _writable.write('hi');
 }
-
 {
   // Async + Async
   var _writable2 = new Writable({
@@ -51,8 +52,19 @@ var _require = require('../../'),
       });
     })
   });
+
   _writable2.write('hi');
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

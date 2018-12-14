@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
 
 var _require = require('../../'),
@@ -12,7 +14,6 @@ var _require = require('../../'),
 
 {
   var ticks = 17;
-
   var rs = new Readable({
     objectMode: true,
     read: function () {
@@ -23,7 +24,6 @@ var _require = require('../../'),
       rs.push(null);
     }
   });
-
   var ws = new Writable({
     highWaterMark: 0,
     objectMode: true,
@@ -31,12 +31,10 @@ var _require = require('../../'),
       return setImmediate(cb);
     }
   });
-
   rs.on('end', common.mustCall());
   ws.on('finish', common.mustCall());
   rs.pipe(ws);
 }
-
 {
   var missing = 8;
 
@@ -47,17 +45,23 @@ var _require = require('../../'),
     }
   });
 
-  var pt = _rs.pipe(new PassThrough({ objectMode: true, highWaterMark: 2 })).pipe(new PassThrough({ objectMode: true, highWaterMark: 2 }));
+  var pt = _rs.pipe(new PassThrough({
+    objectMode: true,
+    highWaterMark: 2
+  })).pipe(new PassThrough({
+    objectMode: true,
+    highWaterMark: 2
+  }));
 
   pt.on('end', function () {
     wrapper.push(null);
   });
-
   var wrapper = new Readable({
     objectMode: true,
     read: function () {
       process.nextTick(function () {
         var data = pt.read();
+
         if (data === null) {
           pt.once('readable', function () {
             data = pt.read();
@@ -69,10 +73,19 @@ var _require = require('../../'),
       });
     }
   });
-
   wrapper.resume();
   wrapper.on('end', common.mustCall());
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -1,10 +1,6 @@
-'use strict';
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 (function () {
   // Copyright Joyent, Inc. and other Node contributors.
@@ -31,23 +27,27 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
   /*<replacement>*/
   var bufferShim = require('safe-buffer').Buffer;
   /*</replacement>*/
+
+
   require('../common');
+
   var assert = require('assert/');
 
   var stream = require('../../');
 
-  var TestWriter = function (_stream$Writable) {
-    _inherits(TestWriter, _stream$Writable);
+  var TestWriter =
+  /*#__PURE__*/
+  function (_stream$Writable) {
+    _inheritsLoose(TestWriter, _stream$Writable);
 
     function TestWriter() {
-      _classCallCheck(this, TestWriter);
-
-      return _possibleConstructorReturn(this, _stream$Writable.apply(this, arguments));
+      return _stream$Writable.apply(this, arguments) || this;
     }
 
-    TestWriter.prototype._write = function _write(buffer, encoding, callback) {
-      console.log('write called');
-      // super slow write stream (callback never called)
+    var _proto = TestWriter.prototype;
+
+    _proto._write = function _write(buffer, encoding, callback) {
+      console.log('write called'); // super slow write stream (callback never called)
     };
 
     return TestWriter;
@@ -55,19 +55,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   var dest = new TestWriter();
 
-  var TestReader = function (_stream$Readable) {
-    _inherits(TestReader, _stream$Readable);
+  var TestReader =
+  /*#__PURE__*/
+  function (_stream$Readable) {
+    _inheritsLoose(TestReader, _stream$Readable);
 
     function TestReader() {
-      _classCallCheck(this, TestReader);
+      var _this;
 
-      var _this2 = _possibleConstructorReturn(this, _stream$Readable.call(this));
-
-      _this2.reads = 0;
-      return _this2;
+      _this = _stream$Readable.call(this) || this;
+      _this.reads = 0;
+      return _this;
     }
 
-    TestReader.prototype._read = function _read(size) {
+    var _proto2 = TestReader.prototype;
+
+    _proto2._read = function _read(size) {
       this.reads += 1;
       this.push(bufferShim.alloc(size));
     };
@@ -77,27 +80,31 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
   var src1 = new TestReader();
   var src2 = new TestReader();
-
   src1.pipe(dest);
-
   src1.once('readable', function () {
     process.nextTick(function () {
-
       src2.pipe(dest);
-
       src2.once('readable', function () {
         process.nextTick(function () {
-
           src1.unpipe(dest);
         });
       });
     });
   });
-
   process.on('exit', function () {
     assert.strictEqual(src1.reads, 2);
     assert.strictEqual(src2.reads, 2);
   });
-})();require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+})();
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -56,10 +56,9 @@ symlinks
 ([SeCreateSymbolicLinkPrivilege](https://msdn.microsoft.com/en-us/library/windows/desktop/bb530716(v=vs.85).aspx)).
 On non-Windows platforms, this always returns `true`.
 
-### ddCommand(filename, kilobytes)
-* return [&lt;Object>]
+### createZeroFilledFile(filename)
 
-Platform normalizes the `dd` command
+Creates a 10 MB file of all null characters.
 
 ### disableCrashOnUnhandledRejection()
 
@@ -162,11 +161,6 @@ Indicates `hasCrypto` and `crypto` with fips.
 
 Indicates if [internationalization] is supported.
 
-### hasSmallICU
-* [&lt;boolean>]
-
-Indicates `hasIntl` and `small-icu` are supported.
-
 ### hasIPv6
 * [&lt;boolean>]
 
@@ -223,16 +217,6 @@ Platform check for SunOS.
 
 Platform check for Windows.
 
-### isWOW64
-* [&lt;boolean>]
-
-Platform check for Windows 32-bit on Windows 64-bit.
-
-### leakedGlobals()
-* return [&lt;Array>]
-
-Indicates whether any globals are not on the `knownGlobals` list.
-
 ### localhostIPv4
 * [&lt;string>]
 
@@ -253,17 +237,6 @@ exactly `exact` number of times when the test is complete, then the test will
 fail.
 
 If `fn` is not provided, an empty function will be used.
-
-### mustCallAsync([fn][, exact])
-* `fn` [&lt;Function>]
-* `exact` [&lt;number>] default = 1
-* return [&lt;Function>]
-
-The same as `mustCall()`, except that it is also checked that the Promise
-returned by the function is fulfilled for each invocation of the function.
-
-The return value of the wrapped function is the return value of the original
-function, if necessary wrapped as a promise.
 
 ### mustCallAtLeast([fn][, minimum])
 * `fn` [&lt;Function>] default = () => {}
@@ -364,6 +337,11 @@ was disabled at compile time.
 
 Skip the rest of the tests in the current file when the Node.js executable
 was compiled with a pointer size smaller than 64 bits.
+
+### skipIfWorker()
+
+Skip the rest of the tests in the current file when not running on a main
+thread.
 
 ## ArrayStream Module
 

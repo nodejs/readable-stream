@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -20,24 +20,28 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 require('../common');
+
 var assert = require('assert/');
+
 var Duplex = require('../../').Duplex;
 
-var stream = new Duplex({ objectMode: true });
-
+var stream = new Duplex({
+  objectMode: true
+});
 assert(Duplex() instanceof Duplex);
 assert(stream._readableState.objectMode);
 assert(stream._writableState.objectMode);
 assert(stream.allowHalfOpen);
 assert.strictEqual(stream.listenerCount('end'), 0);
-
-var written = void 0;
-var read = void 0;
+var written;
+var read;
 
 stream._write = function (obj, _, cb) {
   written = obj;
@@ -49,14 +53,26 @@ stream._read = function () {};
 stream.on('data', function (obj) {
   read = obj;
 });
-
-stream.push({ val: 1 });
-stream.end({ val: 2 });
-
+stream.push({
+  val: 1
+});
+stream.end({
+  val: 2
+});
 process.on('exit', function () {
   assert.strictEqual(read.val, 1);
   assert.strictEqual(written.val, 2);
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

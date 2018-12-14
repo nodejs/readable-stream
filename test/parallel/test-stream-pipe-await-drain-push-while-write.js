@@ -1,10 +1,14 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var stream = require('../../');
+
 var assert = require('assert/');
 
 var writable = new stream.Writable({
@@ -16,6 +20,7 @@ var writable = new stream.Writable({
       readable.push(bufferShim.alloc(34 * 1024)); // above hwm
       // We should check if awaitDrain counter is increased in the next
       // tick, because awaitDrain is incremented after this method finished
+
       process.nextTick(function () {
         assert.strictEqual(readable._readableState.awaitDrain, 1);
       });
@@ -23,10 +28,10 @@ var writable = new stream.Writable({
 
     cb();
   }, 3)
-});
+}); // A readable stream which produces two buffers.
 
-// A readable stream which produces two buffers.
 var bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
+
 var readable = new stream.Readable({
   read: function () {
     while (bufs.length > 0) {
@@ -34,8 +39,17 @@ var readable = new stream.Readable({
     }
   }
 });
-
 readable.pipe(writable);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

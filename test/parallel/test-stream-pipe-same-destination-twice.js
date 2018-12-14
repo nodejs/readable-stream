@@ -1,13 +1,15 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
 
-// Regression test for https://github.com/nodejs/node/issues/12718.
+
+var common = require('../common'); // Regression test for https://github.com/nodejs/node/issues/12718.
 // Tests that piping a source stream twice to the same destination stream
 // works, and that a subsequent unpipe() call only removes the pipe *once*.
+
+
 var assert = require('assert/');
 
 var _require = require('../../'),
@@ -18,39 +20,35 @@ var _require = require('../../'),
   var passThrough = new PassThrough();
   var dest = new Writable({
     write: common.mustCall(function (chunk, encoding, cb) {
-      assert.strictEqual('' + chunk, 'foobar');
+      assert.strictEqual("".concat(chunk), 'foobar');
       cb();
     })
   });
-
   passThrough.pipe(dest);
   passThrough.pipe(dest);
-
   assert.strictEqual(passThrough._events.data.length, 2);
   assert.strictEqual(passThrough._readableState.pipesCount, 2);
   assert.strictEqual(passThrough._readableState.pipes[0], dest);
   assert.strictEqual(passThrough._readableState.pipes[1], dest);
-
   passThrough.unpipe(dest);
-
   assert.strictEqual(passThrough._events.data.length, 1);
   assert.strictEqual(passThrough._readableState.pipesCount, 1);
   assert.strictEqual(passThrough._readableState.pipes, dest);
-
   passThrough.write('foobar');
   passThrough.pipe(dest);
 }
-
 {
   var _passThrough = new PassThrough();
+
   var _dest = new Writable({
     write: common.mustCall(function (chunk, encoding, cb) {
-      assert.strictEqual('' + chunk, 'foobar');
+      assert.strictEqual("".concat(chunk), 'foobar');
       cb();
     }, 2)
   });
 
   _passThrough.pipe(_dest);
+
   _passThrough.pipe(_dest);
 
   assert.strictEqual(_passThrough._events.data.length, 2);
@@ -60,14 +58,15 @@ var _require = require('../../'),
 
   _passThrough.write('foobar');
 }
-
 {
   var _passThrough2 = new PassThrough();
+
   var _dest2 = new Writable({
     write: common.mustNotCall()
   });
 
   _passThrough2.pipe(_dest2);
+
   _passThrough2.pipe(_dest2);
 
   assert.strictEqual(_passThrough2._events.data.length, 2);
@@ -76,6 +75,7 @@ var _require = require('../../'),
   assert.strictEqual(_passThrough2._readableState.pipes[1], _dest2);
 
   _passThrough2.unpipe(_dest2);
+
   _passThrough2.unpipe(_dest2);
 
   assert.strictEqual(_passThrough2._events.data, undefined);
@@ -83,6 +83,16 @@ var _require = require('../../'),
 
   _passThrough2.write('foobar');
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

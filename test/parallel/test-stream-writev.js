@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,12 +24,16 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var stream = require('../../');
 
 var queue = [];
+
 for (var decode = 0; decode < 2; decode++) {
   for (var uncork = 0; uncork < 2; uncork++) {
     for (var multi = 0; multi < 2; multi++) {
@@ -46,9 +50,11 @@ function run() {
 }
 
 function test(decode, uncork, multi, next) {
-  require('tap').test('# decode=' + decode + ' uncork=' + uncork + ' multi=' + multi);
+  require('tap').test("# decode=".concat(decode, " uncork=").concat(uncork, " multi=").concat(multi));
+
   var counter = 0;
   var expectCount = 0;
+
   function cnt(msg) {
     expectCount++;
     var expect = expectCount;
@@ -59,17 +65,43 @@ function test(decode, uncork, multi, next) {
     };
   }
 
-  var w = new stream.Writable({ decodeStrings: decode });
+  var w = new stream.Writable({
+    decodeStrings: decode
+  });
   w._write = common.mustNotCall('Should not call _write');
+  var expectChunks = decode ? [{
+    encoding: 'buffer',
+    chunk: [104, 101, 108, 108, 111, 44, 32]
+  }, {
+    encoding: 'buffer',
+    chunk: [119, 111, 114, 108, 100]
+  }, {
+    encoding: 'buffer',
+    chunk: [33]
+  }, {
+    encoding: 'buffer',
+    chunk: [10, 97, 110, 100, 32, 116, 104, 101, 110, 46, 46, 46]
+  }, {
+    encoding: 'buffer',
+    chunk: [250, 206, 190, 167, 222, 173, 190, 239, 222, 202, 251, 173]
+  }] : [{
+    encoding: 'ascii',
+    chunk: 'hello, '
+  }, {
+    encoding: 'utf8',
+    chunk: 'world'
+  }, {
+    encoding: 'buffer',
+    chunk: [33]
+  }, {
+    encoding: 'latin1',
+    chunk: '\nand then...'
+  }, {
+    encoding: 'hex',
+    chunk: 'facebea7deadbeefdecafbad'
+  }];
+  var actualChunks;
 
-  var expectChunks = decode ? [{ encoding: 'buffer',
-    chunk: [104, 101, 108, 108, 111, 44, 32] }, { encoding: 'buffer',
-    chunk: [119, 111, 114, 108, 100] }, { encoding: 'buffer',
-    chunk: [33] }, { encoding: 'buffer',
-    chunk: [10, 97, 110, 100, 32, 116, 104, 101, 110, 46, 46, 46] }, { encoding: 'buffer',
-    chunk: [250, 206, 190, 167, 222, 173, 190, 239, 222, 202, 251, 173] }] : [{ encoding: 'ascii', chunk: 'hello, ' }, { encoding: 'utf8', chunk: 'world' }, { encoding: 'buffer', chunk: [33] }, { encoding: 'latin1', chunk: '\nand then...' }, { encoding: 'hex', chunk: 'facebea7deadbeefdecafbad' }];
-
-  var actualChunks = void 0;
   w._writev = function (chunks, cb) {
     actualChunks = chunks.map(function (chunk) {
       return {
@@ -83,20 +115,13 @@ function test(decode, uncork, multi, next) {
   w.cork();
   w.write('hello, ', 'ascii', cnt('hello'));
   w.write('world', 'utf8', cnt('world'));
-
   if (multi) w.cork();
-
   w.write(bufferShim.from('!'), 'buffer', cnt('!'));
   w.write('\nand then...', 'latin1', cnt('and then'));
-
   if (multi) w.uncork();
-
   w.write('facebea7deadbeefdecafbad', 'hex', cnt('hex'));
-
   if (uncork) w.uncork();
-
   w.end(cnt('end'));
-
   w.on('finish', function () {
     // make sure finish comes after all the write cb
     cnt('finish')();
@@ -104,6 +129,17 @@ function test(decode, uncork, multi, next) {
     next();
   });
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

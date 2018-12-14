@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,24 +24,29 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var Stream = require('../../');
+
 var Readable = require('../../').Readable;
 
 var r = new Readable();
 var N = 256;
 var reads = 0;
+
 r._read = function (n) {
   return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
 };
 
 r.on('end', common.mustCall());
-
 var w = new Stream();
 w.writable = true;
 var buffered = 0;
+
 w.write = function (c) {
   buffered += c.length;
   process.nextTick(drain);
@@ -54,16 +59,24 @@ function drain() {
   w.emit('drain');
 }
 
-w.end = common.mustCall();
-
-// Just for kicks, let's mess with the drain count.
+w.end = common.mustCall(); // Just for kicks, let's mess with the drain count.
 // This verifies that even if it gets negative in the
 // pipe() cleanup function, we'll still function properly.
+
 r.on('readable', function () {
   w.emit('drain');
 });
-
 r.pipe(w);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

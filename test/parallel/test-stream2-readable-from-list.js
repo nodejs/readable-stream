@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -20,72 +20,113 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 // Flags: --expose_internals
+
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var assert = require('assert/');
+
 var fromList = require('../../lib/_stream_readable')._fromList;
+
 var BufferList = require('../../lib/internal/streams/buffer_list');
+
+var util = require('util');
 
 function bufferListFromArray(arr) {
   var bl = new BufferList();
+
   for (var i = 0; i < arr.length; ++i) {
     bl.push(arr[i]);
-  }return bl;
+  }
+
+  return bl;
 }
 
 {
   // Verify behavior with buffers
   var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
   list = bufferListFromArray(list);
+  assert.strictEqual(util.inspect([list], {
+    compact: false
+  }), "[\n  BufferList {\n    head: [Object],\n    tail: [Object],\n    length: 4\n  }\n]"); // read more than the first element.
 
-  // read more than the first element.
-  var ret = fromList(6, { buffer: list, length: 16 });
-  assert.strictEqual(ret.toString(), 'foogba');
+  var ret = fromList(6, {
+    buffer: list,
+    length: 16
+  });
+  assert.strictEqual(ret.toString(), 'foogba'); // read exactly the first element.
 
-  // read exactly the first element.
-  ret = fromList(2, { buffer: list, length: 10 });
-  assert.strictEqual(ret.toString(), 'rk');
+  ret = fromList(2, {
+    buffer: list,
+    length: 10
+  });
+  assert.strictEqual(ret.toString(), 'rk'); // read less than the first element.
 
-  // read less than the first element.
-  ret = fromList(2, { buffer: list, length: 8 });
-  assert.strictEqual(ret.toString(), 'ba');
+  ret = fromList(2, {
+    buffer: list,
+    length: 8
+  });
+  assert.strictEqual(ret.toString(), 'ba'); // read more than we have.
 
-  // read more than we have.
-  ret = fromList(100, { buffer: list, length: 6 });
-  assert.strictEqual(ret.toString(), 'zykuel');
+  ret = fromList(100, {
+    buffer: list,
+    length: 6
+  });
+  assert.strictEqual(ret.toString(), 'zykuel'); // all consumed.
 
-  // all consumed.
   assert.deepStrictEqual(list, new BufferList());
 }
-
 {
   // Verify behavior with strings
   var _list2 = ['foog', 'bark', 'bazy', 'kuel'];
-  _list2 = bufferListFromArray(_list2);
+  _list2 = bufferListFromArray(_list2); // read more than the first element.
 
-  // read more than the first element.
-  var _ret = fromList(6, { buffer: _list2, length: 16, decoder: true });
-  assert.strictEqual(_ret, 'foogba');
+  var _ret = fromList(6, {
+    buffer: _list2,
+    length: 16,
+    decoder: true
+  });
 
-  // read exactly the first element.
-  _ret = fromList(2, { buffer: _list2, length: 10, decoder: true });
-  assert.strictEqual(_ret, 'rk');
+  assert.strictEqual(_ret, 'foogba'); // read exactly the first element.
 
-  // read less than the first element.
-  _ret = fromList(2, { buffer: _list2, length: 8, decoder: true });
-  assert.strictEqual(_ret, 'ba');
+  _ret = fromList(2, {
+    buffer: _list2,
+    length: 10,
+    decoder: true
+  });
+  assert.strictEqual(_ret, 'rk'); // read less than the first element.
 
-  // read more than we have.
-  _ret = fromList(100, { buffer: _list2, length: 6, decoder: true });
-  assert.strictEqual(_ret, 'zykuel');
+  _ret = fromList(2, {
+    buffer: _list2,
+    length: 8,
+    decoder: true
+  });
+  assert.strictEqual(_ret, 'ba'); // read more than we have.
 
-  // all consumed.
+  _ret = fromList(100, {
+    buffer: _list2,
+    length: 6,
+    decoder: true
+  });
+  assert.strictEqual(_ret, 'zykuel'); // all consumed.
+
   assert.deepStrictEqual(_list2, new BufferList());
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

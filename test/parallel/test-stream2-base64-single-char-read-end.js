@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,12 +24,19 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var R = require('../../lib/_stream_readable');
+
 var W = require('../../lib/_stream_writable');
+
 var assert = require('assert/');
 
-var src = new R({ encoding: 'base64' });
+var src = new R({
+  encoding: 'base64'
+});
 var dst = new W();
 var hasRead = false;
 var accum = [];
@@ -53,12 +60,20 @@ src.on('end', function () {
   assert.strictEqual(String(Buffer.concat(accum)), 'MQ==');
   clearTimeout(timeout);
 });
-
 src.pipe(dst);
-
 var timeout = setTimeout(function () {
   assert.fail('timed out waiting for _write');
 }, 100);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

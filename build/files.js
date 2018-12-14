@@ -205,8 +205,8 @@ function CorkedRequest(state) {
       ,   'if (typeof Symbol === \'function\' ) {\nReadable.prototype[Symbol.asyncIterator] = function () {'
   ]
   , noAsyncIterators2 = [
-          /return new ReadableAsyncIterator\(this\);\n};/m
-      ,   'return new ReadableAsyncIterator(this);\n};\n}'
+          /return createReadableStreamAsyncIterator\(this\);\n};/m
+      ,   'return createReadableStreamAsyncIterator(this);\n};\n}'
   ]
   , once = [
           /const \{ once \} = require\('internal\/util'\);/
@@ -299,17 +299,16 @@ module.exports['_stream_writable.js'] = [
 
 module.exports['internal/streams/buffer_list.js'] = [
     [
+      /inspect.custom/g,
+      'custom'
+    ],
+    [
       /const \{ inspect \} = require\('util'\);/,
       `
 const { inspect } = require('util')
 const custom = inspect && inspect.custom || 'inspect'
       `
     ]
-  , [
-    /inspect.custom/g,
-    'custom'
-  ]
-
 ]
 module.exports['internal/streams/destroy.js'] = [
     errorsTwoLevel
@@ -322,6 +321,18 @@ module.exports['internal/streams/state.js'] = [
 
 module.exports['internal/streams/async_iterator.js'] = [
   , errorsTwoLevel
+  , [
+      /internal\/streams\/end-of-stream/,
+      './end-of-stream'
+    ]
+  , [
+      /const AsyncIteratorPrototype = Object\.getPrototypeOf\(\n.*Object\.getPrototypeOf\(async function\* \(\) \{\}\).prototype\);/m,
+      'const AsyncIteratorPrototype = Object\.getPrototypeOf(function () {})'
+    ]
+  , [
+      /  return\(\)/,
+      '[Symbol.asyncIterator]() { return this },\n  return\(\)'
+    ]
 ]
 
 module.exports['internal/streams/end-of-stream.js'] = [

@@ -1,11 +1,14 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 var common = require('../common');
+
 var assert = require('assert/');
+
 var stream = require('../../');
 
 var pushes = 0;
@@ -17,30 +20,36 @@ var rs = new stream.Readable({
       return;
     }
 
-    var length = this._readableState.length;
-
-    // We are at most doing two full runs of _reads
+    var length = this._readableState.length; // We are at most doing two full runs of _reads
     // before stopping, because Readable is greedy
     // to keep its buffer full
-    assert(length <= total);
 
+    assert(length <= total);
     this.push(bufferShim.alloc(65500));
+
     for (var i = 0; i < 40; i++) {
       this.push(bufferShim.alloc(1024));
-    }
-
-    // We will be over highWaterMark at this point
+    } // We will be over highWaterMark at this point
     // but a new call to _read is scheduled anyway.
+
   }, 11)
 });
-
 var ws = stream.Writable({
   write: common.mustCall(function (data, enc, cb) {
     setImmediate(cb);
   }, 41 * 10)
 });
-
 rs.pipe(ws);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });
