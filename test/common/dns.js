@@ -9,7 +9,7 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
 
 var util = require('util');
 

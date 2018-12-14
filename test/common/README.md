@@ -1,5 +1,5 @@
 /*<replacement>*/
-      require('babel-polyfill');
+      require('@babel/polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/# Node.js Core Test Common Modules

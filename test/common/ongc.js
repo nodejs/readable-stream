@@ -1,7 +1,7 @@
 "use strict";
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
 
 var util = require('util');
 
