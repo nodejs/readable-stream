@@ -65,6 +65,7 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
           plugins: [
             '@babel/plugin-transform-parameters',
             '@babel/plugin-transform-arrow-functions',
+            '@babel/plugin-proposal-object-rest-spread',
             '@babel/plugin-transform-block-scoping',
             '@babel/plugin-transform-template-literals',
             '@babel/plugin-transform-shorthand-properties',

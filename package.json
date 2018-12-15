@@ -12,12 +12,15 @@
     "util-deprecate": "^1.0.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",
     "@babel/plugin-proposal-async-generator-functions": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/plugin-proposal-optional-catch-binding": "^7.2.0",
     "@babel/plugin-transform-arrow-functions": "^7.2.0",
     "@babel/plugin-transform-async-to-generator": "^7.2.0",
     "@babel/plugin-transform-block-scoping": "^7.2.0",
+    "@babel/plugin-transform-classes": "^7.2.2",
     "@babel/plugin-transform-computed-properties": "^7.2.0",
     "@babel/plugin-transform-destructuring": "^7.2.0",
     "@babel/plugin-transform-for-of": "^7.2.0",
@@ -50,7 +53,7 @@
     "test-browser-local": "airtap --open --local -- test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov",
-    "update-browser-errors": "babel --presets env -o errors-browser.js errors.js"
+    "update-browser-errors": "babel --presets @babel/env -o errors-browser.js errors.js"
   },
   "repository": {
     "type": "git",

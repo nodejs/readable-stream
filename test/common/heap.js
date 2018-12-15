@@ -169,8 +169,8 @@ function () {
         }
       }
     }
-  }; // Validate our internal embedded graph representation
-
+  } // Validate our internal embedded graph representation
+  ;
 
   _proto.validateGraph = function validateGraph(rootName, expected) {
     var _ref3 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},

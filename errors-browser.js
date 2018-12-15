@@ -1,12 +1,18 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var codes = {};
 
@@ -23,13 +29,15 @@ function createErrorType(code, message, Base) {
     }
   }
 
-  var NodeError = function (_Base) {
+  var NodeError =
+  /*#__PURE__*/
+  function (_Base) {
     _inherits(NodeError, _Base);
 
     function NodeError(arg1, arg2, arg3) {
       _classCallCheck(this, NodeError);
 
-      return _possibleConstructorReturn(this, (NodeError.__proto__ || Object.getPrototypeOf(NodeError)).call(this, getMessage(arg1, arg2, arg3)));
+      return _possibleConstructorReturn(this, _getPrototypeOf(NodeError).call(this, getMessage(arg1, arg2, arg3)));
     }
 
     return NodeError;
@@ -37,43 +45,44 @@ function createErrorType(code, message, Base) {
 
   NodeError.prototype.name = Base.name;
   NodeError.prototype.code = code;
-
   codes[code] = NodeError;
-}
+} // https://github.com/nodejs/node/blob/v10.8.0/lib/internal/errors.js
 
-// https://github.com/nodejs/node/blob/v10.8.0/lib/internal/errors.js
+
 function oneOf(expected, thing) {
   if (Array.isArray(expected)) {
     var len = expected.length;
     expected = expected.map(function (i) {
       return String(i);
     });
+
     if (len > 2) {
-      return 'one of ' + thing + ' ' + expected.slice(0, len - 1).join(', ') + ', or ' + expected[len - 1];
+      return "one of ".concat(thing, " ").concat(expected.slice(0, len - 1).join(', '), ", or ") + expected[len - 1];
     } else if (len === 2) {
-      return 'one of ' + thing + ' ' + expected[0] + ' or ' + expected[1];
+      return "one of ".concat(thing, " ").concat(expected[0], " or ").concat(expected[1]);
     } else {
-      return 'of ' + thing + ' ' + expected[0];
+      return "of ".concat(thing, " ").concat(expected[0]);
     }
   } else {
-    return 'of ' + thing + ' ' + String(expected);
+    return "of ".concat(thing, " ").concat(String(expected));
   }
-}
+} // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
+
 function startsWith(str, search, pos) {
   return str.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-}
+} // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
+
 function endsWith(str, search, this_len) {
   if (this_len === undefined || this_len > str.length) {
     this_len = str.length;
   }
-  return str.substring(this_len - search.length, this_len) === search;
-}
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+  return str.substring(this_len - search.length, this_len) === search;
+} // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+
+
 function includes(str, search, start) {
   if (typeof start !== 'number') {
     start = 0;
@@ -91,7 +100,8 @@ createErrorType('ERR_INVALID_OPT_VALUE', function (name, value) {
 }, TypeError);
 createErrorType('ERR_INVALID_ARG_TYPE', function (name, expected, actual) {
   // determiner: 'must be' or 'must not be'
-  var determiner = void 0;
+  var determiner;
+
   if (typeof expected === 'string' && startsWith(expected, 'not ')) {
     determiner = 'must not be';
     expected = expected.replace(/^not /, '');
@@ -99,16 +109,17 @@ createErrorType('ERR_INVALID_ARG_TYPE', function (name, expected, actual) {
     determiner = 'must be';
   }
 
-  var msg = void 0;
+  var msg;
+
   if (endsWith(name, ' argument')) {
     // For cases like 'first argument'
-    msg = 'The ' + name + ' ' + determiner + ' ' + oneOf(expected, 'type');
+    msg = "The ".concat(name, " ").concat(determiner, " ").concat(oneOf(expected, 'type'));
   } else {
     var type = includes(name, '.') ? 'property' : 'argument';
-    msg = 'The "' + name + '" ' + type + ' ' + determiner + ' ' + oneOf(expected, 'type');
+    msg = "The \"".concat(name, "\" ").concat(type, " ").concat(determiner, " ").concat(oneOf(expected, 'type'));
   }
 
-  msg += '. Received type ' + (typeof actual === 'undefined' ? 'undefined' : _typeof(actual));
+  msg += ". Received type ".concat(_typeof(actual));
   return msg;
 }, TypeError);
 createErrorType('ERR_STREAM_PUSH_AFTER_EOF', 'stream.push() after EOF');
@@ -127,5 +138,4 @@ createErrorType('ERR_UNKNOWN_ENCODING', function (arg) {
   return 'Unknown encoding: ' + arg;
 }, TypeError);
 createErrorType('ERR_STREAM_UNSHIFT_AFTER_END_EVENT', 'stream.unshift() after end event');
-
 module.exports.codes = codes;
