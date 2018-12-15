@@ -715,7 +715,7 @@ function getArrayBufferViews(buf) {
 }
 
 function getBufferSources(buf) {
-  return _toConsumableArray(getArrayBufferViews(buf)).concat([new Uint8Array(buf).buffer]);
+  return [].concat(_toConsumableArray(getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
 } // Crash the process on unhandled rejections.
 
 

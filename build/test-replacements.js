@@ -317,6 +317,10 @@ module.exports['test-stream2-readable-from-list.js'] = [
   [
     /require\('internal\/streams\/buffer_list'\)/,
     'require(\'../../lib/internal/streams/buffer_list\')'
+  ],
+  [
+    /assert\.strictEqual\(\n *util.inspect\(\[ list \], \{ compact: false \}\),\n *`\[\n *BufferList \{\n *head: \[Object\],\n *tail: \[Object\],\n *length: 4\n *\}\n *\]`\);/m,
+    'assert.strictEqual(util.inspect([ list ], { compact: false }).indexOf(\'BufferList\') > 0, true)'
   ]
 ]
 module.exports['test-stream-writev.js'] = [

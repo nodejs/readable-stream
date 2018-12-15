@@ -94,7 +94,7 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
   readable.unshift(ABC);
   var buf = readable.read();
   assert(buf instanceof Buffer);
-  assert.deepStrictEqual(_toConsumableArray(buf), _toConsumableArray(ABC).concat(_toConsumableArray(DEF)));
+  assert.deepStrictEqual(_toConsumableArray(buf), [].concat(_toConsumableArray(ABC), _toConsumableArray(DEF)));
 }
 {
   // Readable test, setEncoding.
