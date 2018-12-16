@@ -1,5 +1,5 @@
 /*<replacement>*/
-      require('babel-polyfill');
+      require('@babel/polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/// Flags: --experimental-modules
@@ -9,7 +9,6 @@ import common from './index.js';
 const {
   isMainThread,
   isWindows,
-  isWOW64,
   isAIX,
   isLinuxPPCBE,
   isSunOS,
@@ -26,13 +25,11 @@ const {
   PIPE,
   hasIPv6,
   childShouldThrowAndAbort,
-  ddCommand,
+  createZeroFilledFile,
   platformTimeout,
   allowGlobals,
-  leakedGlobals,
   mustCall,
   mustCallAtLeast,
-  mustCallAsync,
   hasMultiLocalhost,
   skipIfEslintMissing,
   canCreateSymLink,
@@ -59,7 +56,6 @@ const {
 export {
   isMainThread,
   isWindows,
-  isWOW64,
   isAIX,
   isLinuxPPCBE,
   isSunOS,
@@ -76,13 +72,11 @@ export {
   PIPE,
   hasIPv6,
   childShouldThrowAndAbort,
-  ddCommand,
+  createZeroFilledFile,
   platformTimeout,
   allowGlobals,
-  leakedGlobals,
   mustCall,
   mustCallAtLeast,
-  mustCallAsync,
   hasMultiLocalhost,
   skipIfEslintMissing,
   canCreateSymLink,

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,14 +24,18 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
-var assert = require('assert/');
 
-// Make sure we don't miss the end event for paused 0-length streams
+
+var common = require('../common');
+
+var assert = require('assert/'); // Make sure we don't miss the end event for paused 0-length streams
+
 
 var Readable = require('../../').Readable;
+
 var stream = new Readable();
 var calledRead = false;
+
 stream._read = function () {
   assert(!calledRead);
   calledRead = true;
@@ -42,15 +46,23 @@ stream.on('data', function () {
   throw new Error('should not ever get data');
 });
 stream.pause();
-
 setTimeout(common.mustCall(function () {
   stream.on('end', common.mustCall());
   stream.resume();
 }), 1);
-
 process.on('exit', function () {
   assert(calledRead);
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

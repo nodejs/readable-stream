@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,28 +24,37 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var assert = require('assert/');
+
 var stream = require('../../');
 
-var readable = new stream.Readable();
+var readable = new stream.Readable(); // _read is a noop, here.
 
-// _read is a noop, here.
-readable._read = Function();
+readable._read = Function(); // default state of a stream is not "paused"
 
-// default state of a stream is not "paused"
+assert.ok(!readable.isPaused()); // make the stream start flowing...
+
+readable.on('data', Function()); // still not paused.
+
 assert.ok(!readable.isPaused());
-
-// make the stream start flowing...
-readable.on('data', Function());
-
-// still not paused.
-assert.ok(!readable.isPaused());
-
 readable.pause();
 assert.ok(readable.isPaused());
 readable.resume();
 assert.ok(!readable.isPaused());
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

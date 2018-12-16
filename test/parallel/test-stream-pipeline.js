@@ -1,12 +1,16 @@
-'use strict';
+"use strict";
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+
 var common = require('../common');
+
 if (!common.hasCrypto) common.skip('missing crypto');
 
 var _require = require('../../'),
@@ -17,7 +21,9 @@ var _require = require('../../'),
     pipeline = _require.pipeline;
 
 var assert = require('assert/');
+
 var http = require('http');
+
 var http2 = {
   createServer: function () {
     return {
@@ -25,24 +31,22 @@ var http2 = {
     };
   }
 };
+
 var promisify = require('util-promisify');
 
 {
   var finished = false;
   var processed = [];
   var expected = [bufferShim.from('a'), bufferShim.from('b'), bufferShim.from('c')];
-
   var read = new Readable({
     read: function () {}
   });
-
   var write = new Writable({
     write: function (data, enc, cb) {
       processed.push(data);
       cb();
     }
   });
-
   write.on('finish', function () {
     finished = true;
   });
@@ -50,15 +54,14 @@ var promisify = require('util-promisify');
   for (var i = 0; i < expected.length; i++) {
     read.push(expected[i]);
   }
-  read.push(null);
 
+  read.push(null);
   pipeline(read, write, common.mustCall(function (err) {
     assert.ok(!err, 'no error');
     assert.ok(finished);
     assert.deepStrictEqual(processed, expected);
   }));
 }
-
 {
   var _read = new Readable({
     read: function () {}
@@ -74,7 +77,6 @@ var promisify = require('util-promisify');
     pipeline();
   }, /ERR_MISSING_ARGS/);
 }
-
 {
   var _read2 = new Readable({
     read: function () {}
@@ -87,15 +89,14 @@ var promisify = require('util-promisify');
   });
 
   _read2.push('data');
+
   setImmediate(function () {
     return _read2.destroy();
   });
-
   pipeline(_read2, _write, common.mustCall(function (err) {
     assert.ok(err, 'should have an error');
   }));
 }
-
 {
   var _read3 = new Readable({
     read: function () {}
@@ -108,17 +109,15 @@ var promisify = require('util-promisify');
   });
 
   _read3.push('data');
+
   setImmediate(function () {
     return _read3.destroy(new Error('kaboom'));
   });
-
   var dst = pipeline(_read3, _write2, common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
-
   assert.strictEqual(dst, _write2);
 }
-
 {
   var _read4 = new Readable({
     read: function () {}
@@ -137,7 +136,9 @@ var promisify = require('util-promisify');
   });
 
   _read4.on('close', common.mustCall());
+
   transform.on('close', common.mustCall());
+
   _write3.on('close', common.mustCall());
 
   var _dst = pipeline(_read4, transform, _write3, common.mustCall(function (err) {
@@ -148,7 +149,6 @@ var promisify = require('util-promisify');
 
   _read4.push('hello');
 }
-
 {
   var server = http.createServer(function (req, res) {
     var rs = new Readable({
@@ -157,15 +157,12 @@ var promisify = require('util-promisify');
         rs.push(null);
       }
     });
-
     pipeline(rs, res, function () {});
   });
-
   server.listen(0, function () {
     var req = http.request({
       port: server.address().port
     });
-
     req.end();
     req.on('response', function (res) {
       var buf = [];
@@ -179,7 +176,6 @@ var promisify = require('util-promisify');
     });
   });
 }
-
 {
   var _server = http.createServer(function (req, res) {
     var sent = false;
@@ -188,16 +184,15 @@ var promisify = require('util-promisify');
         if (sent) {
           return;
         }
+
         sent = true;
         rs.push('hello');
       },
-
       destroy: common.mustCall(function (err, cb) {
         // prevents fd leaks by destroying http pipelines
         cb();
       })
     });
-
     pipeline(rs, res, function () {});
   });
 
@@ -205,17 +200,16 @@ var promisify = require('util-promisify');
     var req = http.request({
       port: _server.address().port
     });
-
     req.end();
     req.on('response', function (res) {
       setImmediate(function () {
         res.destroy();
+
         _server.close();
       });
     });
   });
 }
-
 {
   var _server2 = http.createServer(function (req, res) {
     var sent = 0;
@@ -224,19 +218,17 @@ var promisify = require('util-promisify');
         if (sent++ > 10) {
           return;
         }
+
         rs.push('hello');
       },
-
       destroy: common.mustCall(function (err, cb) {
         cb();
       })
     });
-
     pipeline(rs, res, function () {});
   });
 
   var cnt = 10;
-
   var badSink = new Writable({
     write: function (data, enc, cb) {
       cnt--;
@@ -248,17 +240,16 @@ var promisify = require('util-promisify');
     var req = http.request({
       port: _server2.address().port
     });
-
     req.end();
     req.on('response', function (res) {
       pipeline(res, badSink, common.mustCall(function (err) {
         assert.strictEqual(err.message, 'kaboom');
+
         _server2.close();
       }));
     });
   });
 }
-
 {
   var _server3 = http.createServer(function (req, res) {
     pipeline(req, res, common.mustCall());
@@ -268,21 +259,19 @@ var promisify = require('util-promisify');
     var req = http.request({
       port: _server3.address().port
     });
-
     var sent = 0;
     var rs = new Readable({
       read: function () {
         if (sent++ > 10) {
           return;
         }
+
         rs.push('hello');
       }
     });
-
     pipeline(rs, req, common.mustCall(function () {
       _server3.close();
     }));
-
     req.on('response', function (res) {
       var cnt = 10;
       res.on('data', function () {
@@ -292,28 +281,27 @@ var promisify = require('util-promisify');
     });
   });
 }
-
 {
   var _server4 = http2.createServer(function (req, res) {
     pipeline(req, res, common.mustCall());
   });
 
   _server4.listen(0, function () {
-    var url = 'http://localhost:' + _server4.address().port;
+    var url = "http://localhost:".concat(_server4.address().port);
     var client = http2.connect(url);
-    var req = client.request({ ':method': 'POST' });
-
+    var req = client.request({
+      ':method': 'POST'
+    });
     var rs = new Readable({
       read: function () {
         rs.push('hello');
       }
     });
-
     pipeline(rs, req, common.mustCall(function (err) {
       _server4.close();
+
       client.close();
     }));
-
     var cnt = 10;
     req.on('data', function (data) {
       cnt--;
@@ -321,7 +309,6 @@ var promisify = require('util-promisify');
     });
   });
 }
-
 {
   var makeTransform = function () {
     var tr = new Transform({
@@ -329,7 +316,6 @@ var promisify = require('util-promisify');
         cb(null, data);
       }
     });
-
     tr.on('close', common.mustCall());
     return tr;
   };
@@ -339,9 +325,7 @@ var promisify = require('util-promisify');
       rs.push('hello');
     }
   });
-
   var _cnt = 10;
-
   var ws = new Writable({
     write: function (data, enc, cb) {
       _cnt--;
@@ -349,23 +333,22 @@ var promisify = require('util-promisify');
       cb();
     }
   });
-
   rs.on('close', common.mustCall());
   ws.on('close', common.mustCall());
-
   pipeline(rs, makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), ws, common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
 }
-
 {
   var oldStream = new Stream();
 
   oldStream.pause = oldStream.resume = function () {};
+
   oldStream.write = function (data) {
     oldStream.emit('data', data);
     return true;
   };
+
   oldStream.end = function () {
     oldStream.emit('end');
   };
@@ -377,6 +360,7 @@ var promisify = require('util-promisify');
       for (var _i = 0; _i < _expected.length; _i++) {
         _rs.push(_expected[_i]);
       }
+
       _rs.push(null);
     }
   });
@@ -399,15 +383,17 @@ var promisify = require('util-promisify');
     assert(_finished, 'last stream finished');
   }));
 }
-
 {
   var _oldStream = new Stream();
 
   _oldStream.pause = _oldStream.resume = function () {};
+
   _oldStream.write = function (data) {
     _oldStream.emit('data', data);
+
     return true;
   };
+
   _oldStream.end = function () {
     _oldStream.emit('end');
   };
@@ -415,13 +401,16 @@ var promisify = require('util-promisify');
   var destroyableOldStream = new Stream();
 
   destroyableOldStream.pause = destroyableOldStream.resume = function () {};
+
   destroyableOldStream.destroy = common.mustCall(function () {
     destroyableOldStream.emit('close');
   });
+
   destroyableOldStream.write = function (data) {
     destroyableOldStream.emit('data', data);
     return true;
   };
+
   destroyableOldStream.end = function () {
     destroyableOldStream.emit('end');
   };
@@ -449,44 +438,37 @@ var promisify = require('util-promisify');
     assert(!_finished2, 'should not finish');
   }));
 }
-
 {
-  var run = function () {
-    var _ref = _asyncToGenerator(function* () {
+  var pipelinePromise = promisify(pipeline);
+
+  function run() {
+    return _run.apply(this, arguments);
+  }
+
+  function _run() {
+    _run = _asyncToGenerator(function* () {
       var read = new Readable({
         read: function () {}
       });
-
       var write = new Writable({
         write: function (data, enc, cb) {
           cb();
         }
       });
-
       read.push('data');
       read.push(null);
-
       var finished = false;
-
       write.on('finish', function () {
         finished = true;
       });
-
       yield pipelinePromise(read, write);
-
       assert(finished);
     });
-
-    return function run() {
-      return _ref.apply(this, arguments);
-    };
-  }();
-
-  var pipelinePromise = promisify(pipeline);
+    return _run.apply(this, arguments);
+  }
 
   run();
 }
-
 {
   var _read5 = new Readable({
     read: function () {}
@@ -505,7 +487,9 @@ var promisify = require('util-promisify');
   });
 
   _read5.on('close', common.mustCall());
+
   _transform.on('close', common.mustCall());
+
   _write4.on('close', common.mustCall());
 
   process.on('uncaughtException', common.mustCall(function (err) {
@@ -518,6 +502,16 @@ var promisify = require('util-promisify');
 
   _read5.push('hello');
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

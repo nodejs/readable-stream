@@ -1,31 +1,43 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /* eslint-disable node-core/required-modules */
-'use strict';
+}
+/*</replacement>*/
 
+/* eslint-disable node-core/required-modules */
+
+
+'use strict';
 /*<replacement>*/
+
+
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
+
   for (var key in obj) {
     keys.push(key);
-  }return keys;
+  }
+
+  return keys;
 };
 /*</replacement>*/
 
-var assert = require('assert');
 
-// https://github.com/w3c/testharness.js/blob/master/testharness.js
+var assert = require('assert'); // https://github.com/w3c/testharness.js/blob/master/testharness.js
+
+
 module.exports = {
   test: function (fn, desc) {
     try {
       fn();
     } catch (err) {
-      console.error('In ' + desc + ':');
+      console.error("In ".concat(desc, ":"));
       throw err;
     }
   },
@@ -43,7 +55,7 @@ module.exports = {
   },
   assert_array_equals: assert.deepStrictEqual,
   assert_unreached: function (desc) {
-    assert.fail('Reached unreachable code: ' + desc);
+    assert.fail("Reached unreachable code: ".concat(desc));
   }
 };
 

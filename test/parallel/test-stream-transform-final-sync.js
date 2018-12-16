@@ -1,14 +1,17 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var stream = require('../../');
-var state = 0;
 
+var state = 0;
 /*
 What you do
 var stream = new stream.Transform({
@@ -65,40 +68,40 @@ var t = new stream.Transform({
   transform: common.mustCall(function (chunk, _, next) {
     // transformCallback part 1
     assert.strictEqual(++state, chunk);
-    this.push(state);
-    // transformCallback part 2
+    this.push(state); // transformCallback part 2
+
     assert.strictEqual(++state, chunk + 2);
     process.nextTick(next);
   }, 3),
   final: common.mustCall(function (done) {
-    state++;
-    // finalCallback part 1
+    state++; // finalCallback part 1
+
     assert.strictEqual(state, 10);
-    state++;
-    // finalCallback part 2
+    state++; // finalCallback part 2
+
     assert.strictEqual(state, 11);
     done();
   }, 1),
   flush: common.mustCall(function (done) {
-    state++;
-    // fluchCallback part 1
+    state++; // fluchCallback part 1
+
     assert.strictEqual(state, 12);
     process.nextTick(function () {
-      state++;
-      // fluchCallback part 2
+      state++; // fluchCallback part 2
+
       assert.strictEqual(state, 15);
       done();
     });
   }, 1)
 });
 t.on('finish', common.mustCall(function () {
-  state++;
-  // finishListener
+  state++; // finishListener
+
   assert.strictEqual(state, 13);
 }, 1));
 t.on('end', common.mustCall(function () {
-  state++;
-  // endEvent
+  state++; // endEvent
+
   assert.strictEqual(state, 16);
 }, 1));
 t.on('data', common.mustCall(function (d) {
@@ -108,10 +111,20 @@ t.on('data', common.mustCall(function (d) {
 t.write(1);
 t.write(4);
 t.end(7, common.mustCall(function () {
-  state++;
-  // endMethodCallback
+  state++; // endMethodCallback
+
   assert.strictEqual(state, 14);
 }, 1));
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -1,8 +1,9 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
 
 var common = require('../common');
 
@@ -15,34 +16,33 @@ var assert = require('assert/');
   var transform = new Transform({
     transform: function (chunk, enc, cb) {}
   });
-
   transform.resume();
-
   transform.on('end', common.mustNotCall());
   transform.on('close', common.mustCall());
   transform.on('finish', common.mustNotCall());
-
   transform.destroy();
 }
-
 {
   var _transform = new Transform({
     transform: function (chunk, enc, cb) {}
   });
+
   _transform.resume();
 
   var expected = new Error('kaboom');
 
   _transform.on('end', common.mustNotCall());
+
   _transform.on('finish', common.mustNotCall());
+
   _transform.on('close', common.mustCall());
+
   _transform.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, expected);
   }));
 
   _transform.destroy(expected);
 }
-
 {
   var _transform2 = new Transform({
     transform: function (chunk, enc, cb) {}
@@ -56,36 +56,39 @@ var assert = require('assert/');
   var _expected = new Error('kaboom');
 
   _transform2.on('finish', common.mustNotCall('no finish event'));
+
   _transform2.on('close', common.mustCall());
+
   _transform2.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, _expected);
   }));
 
   _transform2.destroy(_expected);
 }
-
 {
   var _expected2 = new Error('kaboom');
+
   var _transform3 = new Transform({
     transform: function (chunk, enc, cb) {},
-
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, _expected2);
       cb();
     }, 1)
   });
+
   _transform3.resume();
 
   _transform3.on('end', common.mustNotCall('no end event'));
-  _transform3.on('close', common.mustCall());
-  _transform3.on('finish', common.mustNotCall('no finish event'));
 
-  // error is swallowed by the custom _destroy
+  _transform3.on('close', common.mustCall());
+
+  _transform3.on('finish', common.mustNotCall('no finish event')); // error is swallowed by the custom _destroy
+
+
   _transform3.on('error', common.mustNotCall('no error event'));
 
   _transform3.destroy(_expected2);
 }
-
 {
   var _transform4 = new Transform({
     transform: function (chunk, enc, cb) {}
@@ -98,11 +101,11 @@ var assert = require('assert/');
 
   _transform4.destroy();
 }
-
 {
   var _transform5 = new Transform({
     transform: function (chunk, enc, cb) {}
   });
+
   _transform5.resume();
 
   _transform5._destroy = common.mustCall(function (err, cb) {
@@ -111,25 +114,30 @@ var assert = require('assert/');
     assert.strictEqual(err, null);
     process.nextTick(function () {
       _this.push(null);
+
       _this.end();
+
       cb();
     });
   }, 1);
-
   var fail = common.mustNotCall('no event');
 
   _transform5.on('finish', fail);
+
   _transform5.on('end', fail);
+
   _transform5.on('close', common.mustCall());
 
   _transform5.destroy();
 
   _transform5.removeListener('end', fail);
+
   _transform5.removeListener('finish', fail);
+
   _transform5.on('end', common.mustCall());
+
   _transform5.on('finish', common.mustCall());
 }
-
 {
   var _transform6 = new Transform({
     transform: function (chunk, enc, cb) {}
@@ -143,14 +151,27 @@ var assert = require('assert/');
   }, 1);
 
   _transform6.on('close', common.mustCall());
+
   _transform6.on('finish', common.mustNotCall('no finish event'));
+
   _transform6.on('end', common.mustNotCall('no end event'));
+
   _transform6.on('error', common.mustCall(function (err) {
     assert.strictEqual(err, _expected3);
   }));
 
   _transform6.destroy();
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

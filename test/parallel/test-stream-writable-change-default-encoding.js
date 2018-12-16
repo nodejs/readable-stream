@@ -1,10 +1,6 @@
-'use strict';
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -30,24 +26,30 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var stream = require('../../');
 
-var MyWritable = function (_stream$Writable) {
-  _inherits(MyWritable, _stream$Writable);
+var MyWritable =
+/*#__PURE__*/
+function (_stream$Writable) {
+  _inheritsLoose(MyWritable, _stream$Writable);
 
   function MyWritable(fn, options) {
-    _classCallCheck(this, MyWritable);
+    var _this;
 
-    var _this = _possibleConstructorReturn(this, _stream$Writable.call(this, options));
-
+    _this = _stream$Writable.call(this, options) || this;
     _this.fn = fn;
     return _this;
   }
 
-  MyWritable.prototype._write = function _write(chunk, encoding, callback) {
+  var _proto = MyWritable.prototype;
+
+  _proto._write = function _write(chunk, encoding, callback) {
     this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
     callback();
   };
@@ -58,7 +60,9 @@ var MyWritable = function (_stream$Writable) {
 (function defaultCondingIsUtf8() {
   var m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'utf8');
-  }, { decodeStrings: false });
+  }, {
+    decodeStrings: false
+  });
   m.write('foo');
   m.end();
 })();
@@ -66,14 +70,18 @@ var MyWritable = function (_stream$Writable) {
 (function changeDefaultEncodingToAscii() {
   var m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'ascii');
-  }, { decodeStrings: false });
+  }, {
+    decodeStrings: false
+  });
   m.setDefaultEncoding('ascii');
   m.write('bar');
   m.end();
 })();
 
 common.expectsError(function changeDefaultEncodingToInvalidValue() {
-  var m = new MyWritable(function (isBuffer, type, enc) {}, { decodeStrings: false });
+  var m = new MyWritable(function (isBuffer, type, enc) {}, {
+    decodeStrings: false
+  });
   m.setDefaultEncoding({});
   m.write('bar');
   m.end();
@@ -86,11 +94,24 @@ common.expectsError(function changeDefaultEncodingToInvalidValue() {
 (function checkVairableCaseEncoding() {
   var m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'ascii');
-  }, { decodeStrings: false });
+  }, {
+    decodeStrings: false
+  });
   m.setDefaultEncoding('AsCii');
   m.write('bar');
   m.end();
 })();
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

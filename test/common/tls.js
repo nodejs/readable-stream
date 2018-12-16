@@ -1,46 +1,55 @@
-'use strict';
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /* eslint-disable node-core/required-modules, node-core/crypto-check */
+}
+/*</replacement>*/
+
+/* eslint-disable node-core/required-modules, node-core/crypto-check */
+
 
 'use strict';
-
 /*<replacement>*/
+
+
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
+
   for (var key in obj) {
     keys.push(key);
-  }return keys;
+  }
+
+  return keys;
 };
 /*</replacement>*/
 
+
 var crypto = require('crypto');
+
 var net = require('net');
 
 exports.ccs = Buffer.from('140303000101', 'hex');
 
-var TestTLSSocket = function (_net$Socket) {
-  _inherits(TestTLSSocket, _net$Socket);
+var TestTLSSocket =
+/*#__PURE__*/
+function (_net$Socket) {
+  _inheritsLoose(TestTLSSocket, _net$Socket);
 
   function TestTLSSocket(server_cert) {
-    _classCallCheck(this, TestTLSSocket);
+    var _this;
 
-    var _this = _possibleConstructorReturn(this, _net$Socket.call(this));
-
+    _this = _net$Socket.call(this) || this;
     _this.server_cert = server_cert;
     _this.version = Buffer.from('0303', 'hex');
-    _this.handshake_list = [];
-    // AES128-GCM-SHA256
+    _this.handshake_list = []; // AES128-GCM-SHA256
+
     _this.ciphers = Buffer.from('000002009c0', 'hex');
     _this.pre_master_secret = Buffer.concat([_this.version, crypto.randomBytes(46)]);
     _this.master_secret = null;
@@ -57,17 +66,21 @@ var TestTLSSocket = function (_net$Socket) {
       _this.client_writeKey = key_block.slice(0, 16);
       _this.client_writeIV = key_block.slice(32, 36);
     });
+
     return _this;
   }
 
-  TestTLSSocket.prototype.createClientHello = function createClientHello() {
+  var _proto = TestTLSSocket.prototype;
+
+  _proto.createClientHello = function createClientHello() {
     var compressions = Buffer.from('0100', 'hex'); // null
+
     var msg = addHandshakeHeader(0x01, Buffer.concat([this.version, this.client_random, this.ciphers, compressions]));
     this.emit('handshake', msg);
     return addRecordHeader(0x16, msg);
   };
 
-  TestTLSSocket.prototype.createClientKeyExchange = function createClientKeyExchange() {
+  _proto.createClientKeyExchange = function createClientKeyExchange() {
     var encrypted_pre_master_secret = crypto.publicEncrypt({
       key: this.server_cert,
       padding: crypto.constants.RSA_PKCS1_PADDING
@@ -79,7 +92,7 @@ var TestTLSSocket = function (_net$Socket) {
     return addRecordHeader(0x16, msg);
   };
 
-  TestTLSSocket.prototype.createFinished = function createFinished() {
+  _proto.createFinished = function createFinished() {
     var shasum = crypto.createHash('sha256');
     shasum.update(Buffer.concat(this.handshake_list));
     var message_hash = shasum.digest();
@@ -89,34 +102,38 @@ var TestTLSSocket = function (_net$Socket) {
     return addRecordHeader(0x16, msg);
   };
 
-  TestTLSSocket.prototype.createIllegalHandshake = function createIllegalHandshake() {
+  _proto.createIllegalHandshake = function createIllegalHandshake() {
     var illegal_handshake = Buffer.alloc(5);
     return addRecordHeader(0x16, illegal_handshake);
   };
 
-  TestTLSSocket.prototype.parseTLSFrame = function parseTLSFrame(buf) {
+  _proto.parseTLSFrame = function parseTLSFrame(buf) {
     var offset = 0;
     var record = buf.slice(offset, 5);
     var type = record[0];
     var length = record.slice(3, 5).readUInt16BE(0);
     offset += 5;
     var remaining = buf.slice(offset, offset + length);
+
     if (type === 0x16) {
       do {
         remaining = this.parseTLSHandshake(remaining);
       } while (remaining.length > 0);
     }
+
     offset += length;
     return buf.slice(offset);
   };
 
-  TestTLSSocket.prototype.parseTLSHandshake = function parseTLSHandshake(buf) {
+  _proto.parseTLSHandshake = function parseTLSHandshake(buf) {
     var offset = 0;
     var handshake_type = buf[offset];
+
     if (handshake_type === 0x02) {
       var server_random = buf.slice(6, 6 + 32);
       this.emit('server_random', server_random);
     }
+
     offset += 1;
     var length = buf.readUIntBE(offset, 3);
     offset += 3;
@@ -127,7 +144,7 @@ var TestTLSSocket = function (_net$Socket) {
     return remaining;
   };
 
-  TestTLSSocket.prototype.encrypt = function encrypt(plain) {
+  _proto.encrypt = function encrypt(plain) {
     var type = plain.slice(0, 1);
     var version = plain.slice(1, 3);
     var nonce = crypto.randomBytes(8);
@@ -173,21 +190,25 @@ function P_hash(algo, secret, seed, size) {
   hmac.update(seed);
   var a = hmac.digest();
   var j = 0;
+
   while (j < size) {
     hmac = crypto.createHmac(algo, secret);
     hmac.update(a);
     hmac.update(seed);
     var b = hmac.digest();
     var todo = b.length;
+
     if (j + todo > size) {
       todo = size - j;
     }
+
     b.copy(result, j, 0, todo);
     j += todo;
     hmac = crypto.createHmac(algo, secret);
     hmac.update(a);
     a = hmac.digest();
   }
+
   return result;
 }
 

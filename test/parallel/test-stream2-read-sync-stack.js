@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,16 +24,18 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
-var Readable = require('../../').Readable;
 
-// This tests synchronous read callbacks and verifies that even if they nest
+
+var common = require('../common');
+
+var Readable = require('../../').Readable; // This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error
+
 
 var r = new Readable();
 var N = 256 * 1024;
-
 var reads = 0;
+
 r._read = function (n) {
   var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
   r.push(chunk);
@@ -43,10 +45,18 @@ r.on('readable', function onReadable() {
   if (!(r.readableLength % 256)) console.error('readable', r.readableLength);
   r.read(N * 2);
 });
-
 r.on('end', common.mustCall());
-
 r.read(0);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

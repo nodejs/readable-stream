@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,22 +24,23 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var assert = require('assert/');
 
 var _require = require('../../'),
     Readable = _require.Readable,
     Writable = _require.Writable;
 
-var EE = require('events').EventEmitter;
+var EE = require('events').EventEmitter; // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
-// a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
 var stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
 });
-
 var source = new EE();
 
 stream._read = function () {
@@ -51,17 +52,14 @@ var ended = false;
 stream.on('end', function () {
   ended = true;
 });
-
 source.on('data', function (chunk) {
   var ret = stream.push(chunk);
   console.error('data', stream.readableLength);
   if (!ret) readStop();
 });
-
 source.on('end', function () {
   stream.push(null);
 });
-
 var reading = false;
 
 function readStart() {
@@ -81,26 +79,22 @@ function readStop() {
 var writer = new Writable({
   decodeStrings: false
 });
-
 var written = [];
-
 var expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
 
 writer._write = function (chunk, encoding, cb) {
-  console.error('WRITE ' + chunk);
+  console.error("WRITE ".concat(chunk));
   written.push(chunk);
   process.nextTick(cb);
 };
 
-writer.on('finish', finish);
-
-// now emit some chunks.
+writer.on('finish', finish); // now emit some chunks.
 
 var chunk = 'asdfg';
-
 var set = 0;
 readStart();
 data();
+
 function data() {
   assert(reading);
   source.emit('data', chunk);
@@ -117,6 +111,7 @@ function data() {
 function finish() {
   console.error('finish');
   assert.deepStrictEqual(written, expectWritten);
+
   require('tap').pass();
 }
 
@@ -128,6 +123,17 @@ function end() {
     assert(ended);
   });
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

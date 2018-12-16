@@ -156,7 +156,7 @@ module.exports['common.js'] = [
     , [
       /^/,
       `/*<replacement>*/
-      require('babel-polyfill');
+      require('@babel/polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/`
@@ -317,6 +317,10 @@ module.exports['test-stream2-readable-from-list.js'] = [
   [
     /require\('internal\/streams\/buffer_list'\)/,
     'require(\'../../lib/internal/streams/buffer_list\')'
+  ],
+  [
+    /assert\.strictEqual\(\n *util.inspect\(\[ list \], \{ compact: false \}\),\n *`\[\n *BufferList \{\n *head: \[Object\],\n *tail: \[Object\],\n *length: 4\n *\}\n *\]`\);/m,
+    'assert.strictEqual(util.inspect([ list ], { compact: false }).indexOf(\'BufferList\') > 0, true)'
   ]
 ]
 module.exports['test-stream-writev.js'] = [
@@ -438,5 +442,13 @@ module.exports['test-stream-readable-async-iterators.js'] = [
   [
     /assert.rejects\(/g,
     '(function(f, e) { let success = false; f().then(function() { success = true; throw new Error(\'should not succeeed\') }).catch(function(e2) { if (success) { throw e2; } assert.strictEqual(e.message, e2.message); })})('
+  ],
+  [
+    /tests\(\).then\(common\.mustCall\(\)\)/,
+    'tests().then(common.mustCall(), common.mustNotCall(console.log))'
+  ],
+  [
+    /const AsyncIteratorPrototype = Object\.getPrototypeOf\(\n.*Object\.getPrototypeOf\(async function\* \(\) \{\}\).prototype\);/m,
+    'const AsyncIteratorPrototype = Object\.getPrototypeOf(function () {})'
   ]
 ]

@@ -1,23 +1,34 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /* eslint-disable node-core/required-modules */
-'use strict';
-
-/*<replacement>*/
-var objectKeys = objectKeys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
+}
 /*</replacement>*/
 
+/* eslint-disable node-core/required-modules */
+
+
+'use strict';
+/*<replacement>*/
+
+
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+
+  for (var key in obj) {
+    keys.push(key);
+  }
+
+  return keys;
+};
+/*</replacement>*/
 // Utilities for internet-related tests
+
 
 var addresses = {
   // A generic host that has registered common DNS records,
@@ -57,18 +68,17 @@ var addresses = {
   // An accessible IPv4 DNS server
   DNS6_SERVER: '2001:4860:4860::8888'
 };
-
 var _iteratorNormalCompletion = true;
 var _didIteratorError = false;
 var _iteratorError = undefined;
 
 try {
   for (var _iterator = objectKeys(addresses)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-    var key = _step.value;
+    var _key = _step.value;
+    var envName = "NODE_TEST_".concat(_key);
 
-    var envName = 'NODE_TEST_' + key;
     if (process.env[envName]) {
-      addresses[key] = process.env[envName];
+      addresses[_key] = process.env[envName];
     }
   }
 } catch (err) {
@@ -76,7 +86,7 @@ try {
   _iteratorError = err;
 } finally {
   try {
-    if (!_iteratorNormalCompletion && _iterator.return) {
+    if (!_iteratorNormalCompletion && _iterator.return != null) {
       _iterator.return();
     }
   } finally {

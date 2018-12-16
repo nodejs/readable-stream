@@ -1,9 +1,12 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
+
 var assert = require('assert/');
 
 var _require = require('../../'),
@@ -19,12 +22,10 @@ var _require = require('../../'),
       stream.push(null);
     })
   });
-
   stream.on('data', common.mustCall(function (chunk) {
     assert.strictEqual(chunk, undefined);
   }));
 }
-
 {
   var _stream = new Writable({
     objectMode: true,
@@ -35,7 +36,6 @@ var _require = require('../../'),
 
   _stream.write(undefined);
 }
-
 {
   var _stream2 = new Transform({
     objectMode: true,
@@ -50,6 +50,16 @@ var _require = require('../../'),
 
   _stream2.write(undefined);
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

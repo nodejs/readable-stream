@@ -1,33 +1,46 @@
-'use strict';
+"use strict";
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/'use strict';
+}
+/*</replacement>*/
 
+
+'use strict';
 /*<replacement>*/
+
+
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
+
   for (var key in obj) {
     keys.push(key);
-  }return keys;
+  }
+
+  return keys;
 };
 /*</replacement>*/
 
+
 var common = require('../common');
+
 var assert = require('assert');
+
 var fs = require('fs');
+
 var http = require('http');
+
 var fixtures = require('../common/fixtures');
 
 var _require = require('child_process'),
@@ -37,31 +50,32 @@ var _require2 = require('url'),
     parseURL = _require2.parse;
 
 var _require3 = require('internal/url'),
-    getURLFromFilePath = _require3.getURLFromFilePath;
+    pathToFileURL = _require3.pathToFileURL;
 
 var _require4 = require('events'),
     EventEmitter = _require4.EventEmitter;
 
 var _MAINSCRIPT = fixtures.path('loop.js');
+
 var DEBUG = false;
 var TIMEOUT = common.platformTimeout(15 * 1000);
 
 function spawnChildProcess(inspectorFlags, scriptContents, scriptFile) {
   var args = [].concat(inspectorFlags);
+
   if (scriptContents) {
     args.push('-e', scriptContents);
   } else {
     args.push(scriptFile);
   }
-  var child = spawn(process.execPath, args);
 
+  var child = spawn(process.execPath, args);
   var handler = tearDown.bind(null, child);
   process.on('exit', handler);
   process.on('uncaughtException', handler);
   common.disableCrashOnUnhandledRejection();
   process.on('unhandledRejection', handler);
   process.on('SIGINT', handler);
-
   return child;
 }
 
@@ -78,16 +92,15 @@ function makeBufferingDataCallback(dataCallback) {
 
     try {
       for (var _iterator = lines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var line = _step.value;
-
-        dataCallback(line);
+        var _line = _step.value;
+        dataCallback(_line);
       }
     } catch (err) {
       _didIteratorError = true;
       _iteratorError = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
           _iterator.return();
         }
       } finally {
@@ -101,6 +114,7 @@ function makeBufferingDataCallback(dataCallback) {
 
 function tearDown(child, err) {
   child.kill();
+
   if (err) {
     console.error(err);
     process.exit(1);
@@ -110,14 +124,24 @@ function tearDown(child, err) {
 function parseWSFrame(buffer) {
   // Protocol described in https://tools.ietf.org/html/rfc6455#section-5
   var message = null;
-  if (buffer.length < 2) return { length: 0, message: message };
+  if (buffer.length < 2) return {
+    length: 0,
+    message: message
+  };
+
   if (buffer[0] === 0x88 && buffer[1] === 0x00) {
-    return { length: 2, message: message, closed: true };
+    return {
+      length: 2,
+      message: message,
+      closed: true
+    };
   }
-  assert.strictEqual(0x81, buffer[0]);
+
+  assert.strictEqual(buffer[0], 0x81);
   var dataLen = 0x7F & buffer[1];
   var bodyOffset = 2;
   if (buffer.length < bodyOffset + dataLen) return 0;
+
   if (dataLen === 126) {
     dataLen = buffer.readUInt16BE(2);
     bodyOffset = 4;
@@ -126,27 +150,35 @@ function parseWSFrame(buffer) {
     dataLen = buffer.readUIntBE(4, 6);
     bodyOffset = 10;
   }
-  if (buffer.length < bodyOffset + dataLen) return { length: 0, message: message };
+
+  if (buffer.length < bodyOffset + dataLen) return {
+    length: 0,
+    message: message
+  };
   var jsonPayload = buffer.slice(bodyOffset, bodyOffset + dataLen).toString('utf8');
+
   try {
     message = JSON.parse(jsonPayload);
   } catch (e) {
-    console.error('JSON.parse() failed for: ' + jsonPayload);
+    console.error("JSON.parse() failed for: ".concat(jsonPayload));
     throw e;
   }
+
   if (DEBUG) console.log('[received]', JSON.stringify(message));
-  return { length: bodyOffset + dataLen, message: message };
+  return {
+    length: bodyOffset + dataLen,
+    message: message
+  };
 }
 
 function formatWSFrame(message) {
   var messageBuf = Buffer.from(JSON.stringify(message));
-
   var wsHeaderBuf = Buffer.allocUnsafe(16);
   wsHeaderBuf.writeUInt8(0x81, 0);
   var byte2 = 0x80;
   var bodyLen = messageBuf.length;
-
   var maskOffset = 2;
+
   if (bodyLen < 126) {
     byte2 = 0x80 + bodyLen;
   } else if (bodyLen < 65536) {
@@ -159,19 +191,22 @@ function formatWSFrame(message) {
     wsHeaderBuf.writeUInt32BE(0, 6);
     maskOffset = 10;
   }
+
   wsHeaderBuf.writeUInt8(byte2, 1);
   wsHeaderBuf.writeUInt32BE(0x01020408, maskOffset);
 
   for (var _i = 0; _i < messageBuf.length; _i++) {
     messageBuf[_i] = messageBuf[_i] ^ 1 << _i % 4;
-  }return Buffer.concat([wsHeaderBuf.slice(0, maskOffset + 4), messageBuf]);
+  }
+
+  return Buffer.concat([wsHeaderBuf.slice(0, maskOffset + 4), messageBuf]);
 }
 
-var InspectorSession = function () {
+var InspectorSession =
+/*#__PURE__*/
+function () {
   function InspectorSession(socket, instance) {
     var _this = this;
-
-    _classCallCheck(this, InspectorSession);
 
     this._instance = instance;
     this._socket = socket;
@@ -180,10 +215,10 @@ var InspectorSession = function () {
     this._unprocessedNotifications = [];
     this._notificationCallback = null;
     this._scriptsIdsByUrl = new Map();
-
     var buffer = Buffer.alloc(0);
     socket.on('data', function (data) {
       buffer = Buffer.concat([buffer, data]);
+
       do {
         var _parseWSFrame = parseWSFrame(buffer),
             length = _parseWSFrame.length,
@@ -195,6 +230,7 @@ var InspectorSession = function () {
         if (closed) {
           socket.write(Buffer.from([0x88, 0x00])); // WS close frame
         }
+
         buffer = buffer.slice(length);
         if (message) _this._onMessage(message);
       } while (true);
@@ -204,30 +240,36 @@ var InspectorSession = function () {
     });
   }
 
-  InspectorSession.prototype.waitForServerDisconnect = function waitForServerDisconnect() {
+  var _proto = InspectorSession.prototype;
+
+  _proto.waitForServerDisconnect = function waitForServerDisconnect() {
     return this._terminationPromise;
   };
 
-  InspectorSession.prototype.disconnect = function () {
-    var _ref = _asyncToGenerator(function* () {
+  _proto.disconnect =
+  /*#__PURE__*/
+  function () {
+    var _disconnect = _asyncToGenerator(function* () {
       this._socket.destroy();
+
       return this.waitForServerDisconnect();
     });
 
     function disconnect() {
-      return _ref.apply(this, arguments);
+      return _disconnect.apply(this, arguments);
     }
 
     return disconnect;
   }();
 
-  InspectorSession.prototype._onMessage = function _onMessage(message) {
+  _proto._onMessage = function _onMessage(message) {
     if (message.id) {
-      var _commandResponsePromi = this._commandResponsePromises.get(message.id),
-          resolve = _commandResponsePromi.resolve,
-          reject = _commandResponsePromi.reject;
+      var _this$_commandRespons = this._commandResponsePromises.get(message.id),
+          resolve = _this$_commandRespons.resolve,
+          reject = _this$_commandRespons.reject;
 
       this._commandResponsePromises.delete(message.id);
+
       if (message.result) resolve(message.result);else reject(message.error);
     } else {
       if (message.method === 'Debugger.scriptParsed') {
@@ -236,7 +278,9 @@ var InspectorSession = function () {
             url = _message$params.url;
 
         this._scriptsIdsByUrl.set(scriptId, url);
-        var fileUrl = url.startsWith('file:') ? url : getURLFromFilePath(url).toString();
+
+        var fileUrl = url.startsWith('file:') ? url : pathToFileURL(url).toString();
+
         if (fileUrl === this.scriptURL().toString()) {
           this.mainScriptId = scriptId;
         }
@@ -253,17 +297,19 @@ var InspectorSession = function () {
     }
   };
 
-  InspectorSession.prototype._sendMessage = function _sendMessage(message) {
+  _proto._sendMessage = function _sendMessage(message) {
     var _this2 = this;
 
     var msg = JSON.parse(JSON.stringify(message)); // Clone!
+
     msg.id = this._nextId++;
     if (DEBUG) console.log('[sent]', JSON.stringify(msg));
-
     var responsePromise = new Promise(function (resolve, reject) {
-      _this2._commandResponsePromises.set(msg.id, { resolve: resolve, reject: reject });
+      _this2._commandResponsePromises.set(msg.id, {
+        resolve: resolve,
+        reject: reject
+      });
     });
-
     return new Promise(function (resolve) {
       return _this2._socket.write(formatWSFrame(msg), resolve);
     }).then(function () {
@@ -271,7 +317,7 @@ var InspectorSession = function () {
     });
   };
 
-  InspectorSession.prototype.send = function send(commands) {
+  _proto.send = function send(commands) {
     var _this3 = this;
 
     if (Array.isArray(commands)) {
@@ -285,21 +331,25 @@ var InspectorSession = function () {
     }
   };
 
-  InspectorSession.prototype.waitForNotification = function waitForNotification(methodOrPredicate, description) {
+  _proto.waitForNotification = function waitForNotification(methodOrPredicate, description) {
     var desc = description || methodOrPredicate;
-    var message = 'Timed out waiting for matching notification (' + desc + '))';
+    var message = "Timed out waiting for matching notification (".concat(desc, "))");
     return fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
   };
 
-  InspectorSession.prototype._asyncWaitForNotification = function () {
-    var _ref2 = _asyncToGenerator(function* (methodOrPredicate) {
+  _proto._asyncWaitForNotification =
+  /*#__PURE__*/
+  function () {
+    var _asyncWaitForNotification2 = _asyncToGenerator(function* (methodOrPredicate) {
       var _this4 = this;
 
       function matchMethod(notification) {
         return notification.method === methodOrPredicate;
       }
+
       var predicate = typeof methodOrPredicate === 'string' ? matchMethod : methodOrPredicate;
       var notification = null;
+
       do {
         if (this._unprocessedNotifications.length) {
           notification = this._unprocessedNotifications.shift();
@@ -309,39 +359,44 @@ var InspectorSession = function () {
           });
         }
       } while (!predicate(notification));
+
       return notification;
     });
 
     function _asyncWaitForNotification(_x) {
-      return _ref2.apply(this, arguments);
+      return _asyncWaitForNotification2.apply(this, arguments);
     }
 
     return _asyncWaitForNotification;
   }();
 
-  InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
+  _proto._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
     if (message.method === 'Debugger.paused') {
       var callFrame = message.params.callFrames[0];
       var location = callFrame.location;
+
       var scriptPath = this._scriptsIdsByUrl.get(location.scriptId);
-      assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), scriptPath + ' !== ' + expectedScriptPath);
-      assert.strictEqual(line, location.lineNumber);
+
+      assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), "".concat(scriptPath, " !== ").concat(expectedScriptPath));
+      assert.strictEqual(location.lineNumber, line);
       return true;
     }
   };
 
-  InspectorSession.prototype.waitForBreakOnLine = function waitForBreakOnLine(line, url) {
+  _proto.waitForBreakOnLine = function waitForBreakOnLine(line, url) {
     var _this5 = this;
 
     return this.waitForNotification(function (notification) {
       return _this5._isBreakOnLineNotification(notification, line, url);
-    }, 'break on ' + url + ':' + line);
+    }, "break on ".concat(url, ":").concat(line));
   };
 
-  InspectorSession.prototype._matchesConsoleOutputNotification = function _matchesConsoleOutputNotification(notification, type, values) {
+  _proto._matchesConsoleOutputNotification = function _matchesConsoleOutputNotification(notification, type, values) {
     if (!Array.isArray(values)) values = [values];
+
     if (notification.method === 'Runtime.consoleAPICalled') {
       var params = notification.params;
+
       if (params.type === type) {
         var _i2 = 0;
         var _iteratorNormalCompletion2 = true;
@@ -350,16 +405,15 @@ var InspectorSession = function () {
 
         try {
           for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var value = _step2.value;
-
-            if (value.value !== values[_i2++]) return false;
+            var _value = _step2.value;
+            if (_value.value !== values[_i2++]) return false;
           }
         } catch (err) {
           _didIteratorError2 = true;
           _iteratorError2 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
               _iterator2.return();
             }
           } finally {
@@ -374,60 +428,68 @@ var InspectorSession = function () {
     }
   };
 
-  InspectorSession.prototype.waitForConsoleOutput = function waitForConsoleOutput(type, values) {
+  _proto.waitForConsoleOutput = function waitForConsoleOutput(type, values) {
     var _this6 = this;
 
-    var desc = 'Console output matching ' + JSON.stringify(values);
+    var desc = "Console output matching ".concat(JSON.stringify(values));
     return this.waitForNotification(function (notification) {
       return _this6._matchesConsoleOutputNotification(notification, type, values);
     }, desc);
   };
 
-  InspectorSession.prototype.runToCompletion = function () {
-    var _ref3 = _asyncToGenerator(function* () {
+  _proto.runToCompletion =
+  /*#__PURE__*/
+  function () {
+    var _runToCompletion = _asyncToGenerator(function* () {
       console.log('[test]', 'Verify node waits for the frontend to disconnect');
-      yield this.send({ 'method': 'Debugger.resume' });
+      yield this.send({
+        'method': 'Debugger.resume'
+      });
       yield this.waitForNotification(function (notification) {
         return notification.method === 'Runtime.executionContextDestroyed' && notification.params.executionContextId === 1;
       });
-      while ((yield this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {}
+
+      while ((yield this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {
+        ;
+      }
+
       yield this.disconnect();
     });
 
     function runToCompletion() {
-      return _ref3.apply(this, arguments);
+      return _runToCompletion.apply(this, arguments);
     }
 
     return runToCompletion;
   }();
 
-  InspectorSession.prototype.scriptPath = function scriptPath() {
+  _proto.scriptPath = function scriptPath() {
     return this._instance.scriptPath();
   };
 
-  InspectorSession.prototype.script = function script() {
+  _proto.script = function script() {
     return this._instance.script();
   };
 
-  InspectorSession.prototype.scriptURL = function scriptURL() {
-    return getURLFromFilePath(this.scriptPath());
+  _proto.scriptURL = function scriptURL() {
+    return pathToFileURL(this.scriptPath());
   };
 
   return InspectorSession;
 }();
 
-var NodeInstance = function (_EventEmitter) {
-  _inherits(NodeInstance, _EventEmitter);
+var NodeInstance =
+/*#__PURE__*/
+function (_EventEmitter) {
+  _inheritsLoose(NodeInstance, _EventEmitter);
 
   function NodeInstance() {
+    var _this7;
+
     var inspectorFlags = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ['--inspect-brk=0'];
     var scriptContents = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var scriptFile = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _MAINSCRIPT;
-
-    _classCallCheck(this, NodeInstance);
-
-    var _this7 = _possibleConstructorReturn(this, _EventEmitter.call(this));
-
+    _this7 = _EventEmitter.call(this) || this;
     _this7._scriptPath = scriptFile;
     _this7._script = scriptFile ? null : scriptContents;
     _this7._portCallback = null;
@@ -441,6 +503,7 @@ var NodeInstance = function (_EventEmitter) {
 
     _this7._process.stdout.on('data', makeBufferingDataCallback(function (line) {
       _this7.emit('stdout', line);
+
       console.log('[out]', line);
     }));
 
@@ -450,52 +513,74 @@ var NodeInstance = function (_EventEmitter) {
 
     _this7._shutdownPromise = new Promise(function (resolve) {
       _this7._process.once('exit', function (exitCode, signal) {
-        resolve({ exitCode: exitCode, signal: signal });
+        resolve({
+          exitCode: exitCode,
+          signal: signal
+        });
         _this7._running = false;
       });
     });
     return _this7;
   }
 
-  NodeInstance.startViaSignal = function () {
-    var _ref4 = _asyncToGenerator(function* (scriptContents) {
-      var instance = new NodeInstance([], scriptContents + '\nprocess._rawDebug(\'started\');', undefined);
+  NodeInstance.startViaSignal =
+  /*#__PURE__*/
+  function () {
+    var _startViaSignal = _asyncToGenerator(function* (scriptContents) {
+      var instance = new NodeInstance([], "".concat(scriptContents, "\nprocess._rawDebug('started');"), undefined);
       var msg = 'Timed out waiting for process to start';
+
       while ((yield fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
+
       process._debugProcess(instance._process.pid);
+
       return instance;
     });
 
-    function startViaSignal(_x5) {
-      return _ref4.apply(this, arguments);
+    function startViaSignal(_x2) {
+      return _startViaSignal.apply(this, arguments);
     }
 
     return startViaSignal;
   }();
 
-  NodeInstance.prototype.onStderrLine = function onStderrLine(line) {
+  var _proto2 = NodeInstance.prototype;
+
+  _proto2.onStderrLine = function onStderrLine(line) {
     console.log('[err]', line);
+
     if (this._portCallback) {
       var matches = line.match(/Debugger listening on ws:\/\/.+:(\d+)\/.+/);
+
       if (matches) {
         this._portCallback(matches[1]);
+
         this._portCallback = null;
       }
     }
+
     if (this._stderrLineCallback) {
       this._stderrLineCallback(line);
+
       this._stderrLineCallback = null;
     } else {
       this._unprocessedStderrLines.push(line);
     }
   };
 
-  NodeInstance.prototype.httpGet = function httpGet(host, path, hostHeaderValue) {
-    console.log('[test]', 'Testing ' + path);
-    var headers = hostHeaderValue ? { 'Host': hostHeaderValue } : null;
+  _proto2.httpGet = function httpGet(host, path, hostHeaderValue) {
+    console.log('[test]', "Testing ".concat(path));
+    var headers = hostHeaderValue ? {
+      'Host': hostHeaderValue
+    } : null;
     return this.portPromise.then(function (port) {
       return new Promise(function (resolve, reject) {
-        var req = http.get({ host: host, port: port, path: path, headers: headers }, function (res) {
+        var req = http.get({
+          host: host,
+          port: port,
+          path: path,
+          headers: headers
+        }, function (res) {
           var response = '';
           res.setEncoding('utf8');
           res.on('data', function (data) {
@@ -516,8 +601,10 @@ var NodeInstance = function (_EventEmitter) {
     });
   };
 
-  NodeInstance.prototype.sendUpgradeRequest = function () {
-    var _ref5 = _asyncToGenerator(function* () {
+  _proto2.sendUpgradeRequest =
+  /*#__PURE__*/
+  function () {
+    var _sendUpgradeRequest = _asyncToGenerator(function* () {
       var response = yield this.httpGet(null, '/json/list');
       var devtoolsUrl = response[0].webSocketDebuggerUrl;
       var port = yield this.portPromise;
@@ -534,14 +621,16 @@ var NodeInstance = function (_EventEmitter) {
     });
 
     function sendUpgradeRequest() {
-      return _ref5.apply(this, arguments);
+      return _sendUpgradeRequest.apply(this, arguments);
     }
 
     return sendUpgradeRequest;
   }();
 
-  NodeInstance.prototype.connectInspectorSession = function () {
-    var _ref6 = _asyncToGenerator(function* () {
+  _proto2.connectInspectorSession =
+  /*#__PURE__*/
+  function () {
+    var _connectInspectorSession = _asyncToGenerator(function* () {
       var _this8 = this;
 
       console.log('[test]', 'Connecting to a child Node process');
@@ -554,14 +643,16 @@ var NodeInstance = function (_EventEmitter) {
     });
 
     function connectInspectorSession() {
-      return _ref6.apply(this, arguments);
+      return _connectInspectorSession.apply(this, arguments);
     }
 
     return connectInspectorSession;
   }();
 
-  NodeInstance.prototype.expectConnectionDeclined = function () {
-    var _ref7 = _asyncToGenerator(function* () {
+  _proto2.expectConnectionDeclined =
+  /*#__PURE__*/
+  function () {
+    var _expectConnectionDeclined = _asyncToGenerator(function* () {
       console.log('[test]', 'Checking upgrade is not possible');
       var upgradeRequest = yield this.sendUpgradeRequest();
       return new Promise(function (resolve, reject) {
@@ -574,17 +665,17 @@ var NodeInstance = function (_EventEmitter) {
     });
 
     function expectConnectionDeclined() {
-      return _ref7.apply(this, arguments);
+      return _expectConnectionDeclined.apply(this, arguments);
     }
 
     return expectConnectionDeclined;
   }();
 
-  NodeInstance.prototype.expectShutdown = function expectShutdown() {
+  _proto2.expectShutdown = function expectShutdown() {
     return this._shutdownPromise;
   };
 
-  NodeInstance.prototype.nextStderrString = function nextStderrString() {
+  _proto2.nextStderrString = function nextStderrString() {
     var _this9 = this;
 
     if (this._unprocessedStderrLines.length) return Promise.resolve(this._unprocessedStderrLines.shift());
@@ -593,20 +684,21 @@ var NodeInstance = function (_EventEmitter) {
     });
   };
 
-  NodeInstance.prototype.write = function write(message) {
+  _proto2.write = function write(message) {
     this._process.stdin.write(message);
   };
 
-  NodeInstance.prototype.kill = function kill() {
+  _proto2.kill = function kill() {
     this._process.kill();
+
     return this.expectShutdown();
   };
 
-  NodeInstance.prototype.scriptPath = function scriptPath() {
+  _proto2.scriptPath = function scriptPath() {
     return this._scriptPath;
   };
 
-  NodeInstance.prototype.script = function script() {
+  _proto2.script = function script() {
     if (this._script === null) this._script = fs.readFileSync(this.scriptPath(), 'utf8');
     return this._script;
   };
@@ -631,6 +723,7 @@ function timeoutPromise(error, timeoutMs) {
     var timeout = setTimeout(function () {
       return reject(error);
     }, timeoutMs);
+
     clearCallback = function () {
       if (done) return;
       clearTimeout(timeout);
@@ -641,11 +734,11 @@ function timeoutPromise(error, timeoutMs) {
   });
   promise.clear = clearCallback;
   return promise;
-}
-
-// Returns a new promise that will propagate `promise` resolution or rejection
+} // Returns a new promise that will propagate `promise` resolution or rejection
 // if that happens within the `timeoutMs` timespan, or rejects with `error` as
 // a reason otherwise.
+
+
 function fires(promise, error, timeoutMs) {
   var timeout = timeoutPromise(error, timeoutMs);
   return Promise.race([onResolvedOrRejected(promise, function () {

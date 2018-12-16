@@ -1,16 +1,17 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 var common = require('../common');
 
 var _require = require('../../'),
     Readable = _require.Readable,
-    Writable = _require.Writable;
-
-// Tests that calling .unpipe() un-blocks a stream that is paused because
+    Writable = _require.Writable; // Tests that calling .unpipe() un-blocks a stream that is paused because
 // it is waiting on the writable side to finish a write().
+
 
 var rs = new Readable({
   highWaterMark: 1,
@@ -19,7 +20,6 @@ var rs = new Readable({
     return rs.push('foo');
   }, 20)
 });
-
 var ws = new Writable({
   highWaterMark: 1,
   write: common.mustCall(function () {
@@ -29,14 +29,22 @@ var ws = new Writable({
     });
   })
 });
-
 var chunks = 0;
 rs.on('data', common.mustCallAtLeast(function () {
   chunks++;
   if (chunks >= 20) rs.pause(); // Finish this test.
 }));
-
 rs.pipe(ws);
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

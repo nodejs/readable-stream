@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,11 +24,13 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
-var assert = require('assert/');
 
-// If everything aligns so that you do a read(n) of exactly the
+
+var common = require('../common');
+
+var assert = require('assert/'); // If everything aligns so that you do a read(n) of exactly the
 // remaining buffer, then make sure that 'end' still emits.
+
 
 var READSIZE = 100;
 var PUSHSIZE = 20;
@@ -36,41 +38,57 @@ var PUSHCOUNT = 1000;
 var HWM = 50;
 
 var Readable = require('../../').Readable;
+
 var r = new Readable({
   highWaterMark: HWM
 });
 var rs = r._readableState;
-
 r._read = push;
-
 r.on('readable', function () {
-  ;false && console.error('>> readable');
-  var ret = void 0;
+  ;
+  false && console.error('>> readable');
+  var ret;
+
   do {
-    ;false && console.error('  > read(' + READSIZE + ')');
+    ;
+    false && console.error("  > read(".concat(READSIZE, ")"));
     ret = r.read(READSIZE);
-    ;false && console.error('  < ' + (ret && ret.length) + ' (' + rs.length + ' remain)');
+    ;
+    false && console.error("  < ".concat(ret && ret.length, " (").concat(rs.length, " remain)"));
   } while (ret && ret.length === READSIZE);
 
-  ;false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
+  ;
+  false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
 });
-
 r.on('end', common.mustCall(function () {
   assert.strictEqual(pushes, PUSHCOUNT + 1);
 }));
-
 var pushes = 0;
+
 function push() {
   if (pushes > PUSHCOUNT) return;
 
   if (pushes++ === PUSHCOUNT) {
-    ;false && console.error('   push(EOF)');
+    ;
+    false && console.error('   push(EOF)');
     return r.push(null);
   }
 
-  ;false && console.error('   push #' + pushes);
+  ;
+  false && console.error("   push #".concat(pushes));
   if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
 }
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -1,10 +1,6 @@
-'use strict';
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -30,30 +26,39 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var R = require('../../lib/_stream_readable');
+
 var W = require('../../lib/_stream_writable');
+
 var assert = require('assert/');
 
 var ondataCalled = 0;
 
-var TestReader = function (_R) {
-  _inherits(TestReader, _R);
+var TestReader =
+/*#__PURE__*/
+function (_R) {
+  _inheritsLoose(TestReader, _R);
 
   function TestReader() {
-    _classCallCheck(this, TestReader);
+    var _this;
 
-    var _this = _possibleConstructorReturn(this, _R.call(this));
-
+    _this = _R.call(this) || this;
     _this._buffer = bufferShim.alloc(100, 'x');
 
     _this.on('data', function () {
       ondataCalled++;
     });
+
     return _this;
   }
 
-  TestReader.prototype._read = function _read(n) {
+  var _proto = TestReader.prototype;
+
+  _proto._read = function _read(n) {
     this.push(this._buffer);
     this._buffer = bufferShim.alloc(0);
   };
@@ -64,24 +69,32 @@ var TestReader = function (_R) {
 var reader = new TestReader();
 setImmediate(function () {
   assert.strictEqual(ondataCalled, 1);
+
   require('tap').pass();
+
   reader.push(null);
 });
 
-var TestWriter = function (_W) {
-  _inherits(TestWriter, _W);
+var TestWriter =
+/*#__PURE__*/
+function (_W) {
+  _inheritsLoose(TestWriter, _W);
 
   function TestWriter() {
-    _classCallCheck(this, TestWriter);
+    var _this2;
 
-    var _this2 = _possibleConstructorReturn(this, _W.call(this));
+    _this2 = _W.call(this) || this;
 
     _this2.write('foo');
+
     _this2.end();
+
     return _this2;
   }
 
-  TestWriter.prototype._write = function _write(chunk, enc, cb) {
+  var _proto2 = TestWriter.prototype;
+
+  _proto2._write = function _write(chunk, enc, cb) {
     cb();
   };
 
@@ -89,12 +102,22 @@ var TestWriter = function (_W) {
 }(W);
 
 var writer = new TestWriter();
-
 process.on('exit', function () {
   assert.strictEqual(reader.readable, false);
   assert.strictEqual(writer.writable, false);
+
   require('tap').pass();
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

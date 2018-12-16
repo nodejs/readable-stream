@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,16 +24,19 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-var common = require('../common');
-var assert = require('assert/');
-var stream = require('../../');
-var str = 'asdfasdfasdfasdfasdf';
 
+
+var common = require('../common');
+
+var assert = require('assert/');
+
+var stream = require('../../');
+
+var str = 'asdfasdfasdfasdfasdf';
 var r = new stream.Readable({
   highWaterMark: 5,
   encoding: 'utf8'
 });
-
 var reads = 0;
 
 function _read() {
@@ -44,6 +47,7 @@ function _read() {
     reads++;
   } else if (reads === 1) {
     var _ret = r.push(str);
+
     assert.strictEqual(_ret, false);
     reads++;
   } else {
@@ -52,19 +56,16 @@ function _read() {
 }
 
 r._read = common.mustCall(_read, 3);
-
-r.on('end', common.mustCall());
-
-// push some data in to start.
+r.on('end', common.mustCall()); // push some data in to start.
 // we've never gotten any read event at this point.
-var ret = r.push(str);
-// should be false.  > hwm
+
+var ret = r.push(str); // should be false.  > hwm
+
 assert(!ret);
 var chunk = r.read();
 assert.strictEqual(chunk, str);
 chunk = r.read();
 assert.strictEqual(chunk, null);
-
 r.once('readable', function () {
   // this time, we'll get *all* the remaining data, because
   // it's been added synchronously, as the read WOULD take
@@ -72,10 +73,19 @@ r.once('readable', function () {
   // which synchronously added more, which we then return.
   chunk = r.read();
   assert.strictEqual(chunk, str + str);
-
   chunk = r.read();
   assert.strictEqual(chunk, null);
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

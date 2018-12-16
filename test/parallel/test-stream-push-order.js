@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24,19 +24,23 @@
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+
+
 require('../common');
+
 var Readable = require('../../').Readable;
+
 var assert = require('assert/');
 
 var s = new Readable({
   highWaterMark: 20,
   encoding: 'ascii'
 });
-
 var list = ['1', '2', '3', '4', '5', '6'];
 
 s._read = function (n) {
   var one = list.shift();
+
   if (!one) {
     s.push(null);
   } else {
@@ -46,14 +50,23 @@ s._read = function (n) {
   }
 };
 
-s.read(0);
-
-// ACTUALLY [1, 3, 5, 6, 4, 2]
+s.read(0); // ACTUALLY [1, 3, 5, 6, 4, 2]
 
 process.on('exit', function () {
   assert.deepStrictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6');
+
   require('tap').pass();
 });
-;require('tap').pass('sync run');var _list = process.listeners('uncaughtException');process.removeAllListeners('uncaughtException');_list.pop();_list.forEach(function (e) {
+;
+
+require('tap').pass('sync run');
+
+var _list = process.listeners('uncaughtException');
+
+process.removeAllListeners('uncaughtException');
+
+_list.pop();
+
+_list.forEach(function (e) {
   return process.on('uncaughtException', e);
 });

@@ -1,27 +1,41 @@
-'use strict';
+"use strict";
 
 /*<replacement>*/
-require('babel-polyfill');
+require('@babel/polyfill');
+
 var util = require('util');
+
 for (var i in util) {
   exports[i] = util[i];
-} /*</replacement>*/ /* eslint-disable node-core/required-modules */
-'use strict';
+}
+/*</replacement>*/
 
+/* eslint-disable node-core/required-modules */
+
+
+'use strict';
 /*<replacement>*/
+
+
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
+
   for (var key in obj) {
     keys.push(key);
-  }return keys;
+  }
+
+  return keys;
 };
 /*</replacement>*/
 
+
 var fs = require('fs');
+
 var path = require('path');
 
 function rimrafSync(p) {
-  var st = void 0;
+  var st;
+
   try {
     st = fs.lstatSync(p);
   } catch (e) {
@@ -43,6 +57,7 @@ function rmdirSync(p, originalEr) {
     fs.rmdirSync(p);
   } catch (e) {
     if (e.code === 'ENOTDIR') throw originalEr;
+
     if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
       var enc = process.platform === 'linux' ? 'buffer' : 'utf8';
       forEach(fs.readdirSync(p, enc), function (f) {
@@ -58,13 +73,13 @@ function rmdirSync(p, originalEr) {
   }
 }
 
-var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..');
-
-// Using a `.` prefixed name, which is the convention for "hidden" on POSIX,
+var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..'); // Using a `.` prefixed name, which is the convention for "hidden" on POSIX,
 // gets tools to ignore it by default or by simple rules, especially eslint.
+
 var tmpdirName = '.tmp';
+
 if (process.env.TEST_THREAD_ID) {
-  tmpdirName += '.' + process.env.TEST_THREAD_ID;
+  tmpdirName += ".".concat(process.env.TEST_THREAD_ID);
 }
 
 var tmpPath = path.join(testRoot, tmpdirName);

@@ -6,7 +6,7 @@ const hyperquest  = require('hyperquest')
     , path        = require('path')
     , tar         = require('tar-fs')
     , gunzip      = require('gunzip-maybe')
-    , babel       = require('babel-core')
+    , babel       = require('@babel/core')
     , glob        = require('glob')
     , pump        = require('pump')
     , rimraf      = require('rimraf')
@@ -63,20 +63,21 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
       try {
         const transformed = babel.transform(data, {
           plugins: [
-            'transform-es2015-parameters',
-            'transform-es2015-arrow-functions',
-            'transform-es2015-block-scoping',
-            'transform-es2015-template-literals',
-            'transform-es2015-shorthand-properties',
-            'transform-es2015-for-of',
-            ['transform-es2015-classes', { loose: true }],
-            'transform-es2015-destructuring',
-            'transform-es2015-computed-properties',
-            'transform-es2015-spread',
-            'transform-optional-catch-binding',
-            'transform-inline-imports-commonjs',
-            'transform-async-to-generator',
-            'transform-async-generator-functions'
+            '@babel/plugin-transform-parameters',
+            '@babel/plugin-transform-arrow-functions',
+            '@babel/plugin-proposal-object-rest-spread',
+            '@babel/plugin-transform-block-scoping',
+            '@babel/plugin-transform-template-literals',
+            '@babel/plugin-transform-shorthand-properties',
+            '@babel/plugin-transform-for-of',
+            ['@babel/transform-classes', { loose: true }],
+            '@babel/plugin-transform-destructuring',
+            '@babel/plugin-transform-computed-properties',
+            '@babel/plugin-transform-spread',
+            '@babel/plugin-proposal-optional-catch-binding',
+            '@babel/plugin-transform-modules-commonjs',
+            '@babel/plugin-transform-async-to-generator',
+            '@babel/plugin-proposal-async-generator-functions'
           ]
         })
         data = transformed.code
@@ -159,6 +160,7 @@ pump(
             file !== 'test-stream-inheritance.js' &&
             file !== 'test-stream-base-prototype-accessors.js' &&
             file !== 'test-stream-base-prototype-accessors-enumerability.js'  &&
+            file !== 'test-stream-wrap-drain.js' &&
             file !== 'test-stream-base-typechecking.js') {
           processTestFile(file)
         }
