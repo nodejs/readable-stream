@@ -14,13 +14,13 @@ var _require = require('../../'),
     Writable = _require.Writable;
 
 var source = Readable({
-  read: function () {}
+  read: function read() {}
 });
 var dest1 = Writable({
-  write: function () {}
+  write: function write() {}
 });
 var dest2 = Writable({
-  write: function () {}
+  write: function write() {}
 });
 source.pipe(dest1);
 source.pipe(dest2);
@@ -38,32 +38,7 @@ source.unpipe(dest2);
 source.unpipe(dest1);
 assert.strictEqual(source._readableState.pipes, null);
 {
-  // test `cleanup()` if we unpipe all streams.
-  var _source = Readable({
-    read: function () {}
-  });
-
-  var _dest = Writable({
-    write: function () {}
-  });
-
-  var _dest2 = Writable({
-    write: function () {}
-  });
-
-  var destCount = 0;
-  var srcCheckEventNames = ['end', 'data'];
-  var destCheckEventNames = ['close', 'finish', 'drain', 'error', 'unpipe'];
-  var checkSrcCleanup = common.mustCall(function () {
-    assert.strictEqual(_source._readableState.pipes, null);
-    assert.strictEqual(_source._readableState.pipesCount, 0);
-    assert.strictEqual(_source._readableState.flowing, false);
-    srcCheckEventNames.forEach(function (eventName) {
-      assert.strictEqual(_source.listenerCount(eventName), 0, "source's '".concat(eventName, "' event listeners not removed"));
-    });
-  });
-
-  function checkDestCleanup(dest) {
+  var checkDestCleanup = function checkDestCleanup(dest) {
     var currentDestId = ++destCount;
 
     _source.pipe(dest);
@@ -77,8 +52,32 @@ assert.strictEqual(source._readableState.pipes, null);
       if (--destCount === 0) checkSrcCleanup();
     });
     dest.on('unpipe', unpipeChecker);
-  }
+  };
 
+  // test `cleanup()` if we unpipe all streams.
+  var _source = Readable({
+    read: function read() {}
+  });
+
+  var _dest = Writable({
+    write: function write() {}
+  });
+
+  var _dest2 = Writable({
+    write: function write() {}
+  });
+
+  var destCount = 0;
+  var srcCheckEventNames = ['end', 'data'];
+  var destCheckEventNames = ['close', 'finish', 'drain', 'error', 'unpipe'];
+  var checkSrcCleanup = common.mustCall(function () {
+    assert.strictEqual(_source._readableState.pipes, null);
+    assert.strictEqual(_source._readableState.pipesCount, 0);
+    assert.strictEqual(_source._readableState.flowing, false);
+    srcCheckEventNames.forEach(function (eventName) {
+      assert.strictEqual(_source.listenerCount(eventName), 0, "source's '".concat(eventName, "' event listeners not removed"));
+    });
+  });
   checkDestCleanup(_dest);
   checkDestCleanup(_dest2);
 

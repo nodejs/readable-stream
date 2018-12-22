@@ -12,8 +12,15 @@ var assert = require('assert/');
 var Readable = require('../../').Readable;
 
 {
+  var onStreamEnd = function onStreamEnd() {
+    // End of stream; state.reading is false
+    // And so should be readingMore.
+    assert.strictEqual(state.readingMore, false);
+    assert.strictEqual(state.reading, false);
+  };
+
   var readable = new Readable({
-    read: function (size) {}
+    read: function read(size) {}
   });
   var state = readable._readableState; // Starting off with false initially.
 
@@ -26,14 +33,6 @@ var Readable = require('../../').Readable;
 
     assert.strictEqual(state.reading, !state.ended);
   }, 2));
-
-  function onStreamEnd() {
-    // End of stream; state.reading is false
-    // And so should be readingMore.
-    assert.strictEqual(state.readingMore, false);
-    assert.strictEqual(state.reading, false);
-  }
-
   var expectedReadingMore = [true, false];
   readable.on('readable', common.mustCall(function () {
     // there is only one readingMore scheduled from on('data'),
@@ -57,8 +56,15 @@ var Readable = require('../../').Readable;
   readable.push(null);
 }
 {
+  var _onStreamEnd = function _onStreamEnd() {
+    // End of stream; state.reading is false
+    // And so should be readingMore.
+    assert.strictEqual(_state.readingMore, false);
+    assert.strictEqual(_state.reading, false);
+  };
+
   var _readable = new Readable({
-    read: function (size) {}
+    read: function read(size) {}
   });
 
   var _state = _readable._readableState; // Starting off with false initially.
@@ -74,14 +80,7 @@ var Readable = require('../../').Readable;
     assert.strictEqual(_state.reading, !_state.ended);
   }, 2));
 
-  function onStreamEnd() {
-    // End of stream; state.reading is false
-    // And so should be readingMore.
-    assert.strictEqual(_state.readingMore, false);
-    assert.strictEqual(_state.reading, false);
-  }
-
-  _readable.on('end', common.mustCall(onStreamEnd));
+  _readable.on('end', common.mustCall(_onStreamEnd));
 
   _readable.push('pushed'); // stop emitting 'data' events
 
@@ -105,8 +104,15 @@ var Readable = require('../../').Readable;
   _readable.push(null);
 }
 {
+  var _onStreamEnd2 = function _onStreamEnd2() {
+    // End of stream; state.reading is false
+    // And so should be readingMore.
+    assert.strictEqual(_state2.readingMore, false);
+    assert.strictEqual(_state2.reading, false);
+  };
+
   var _readable2 = new Readable({
-    read: function (size) {}
+    read: function read(size) {}
   });
 
   var _state2 = _readable2._readableState; // Starting off with false initially.
@@ -124,14 +130,7 @@ var Readable = require('../../').Readable;
 
   _readable2.removeListener('readable', onReadable);
 
-  function onStreamEnd() {
-    // End of stream; state.reading is false
-    // And so should be readingMore.
-    assert.strictEqual(_state2.readingMore, false);
-    assert.strictEqual(_state2.reading, false);
-  }
-
-  _readable2.on('end', common.mustCall(onStreamEnd));
+  _readable2.on('end', common.mustCall(_onStreamEnd2));
 
   _readable2.push('pushed'); // we are still not flowing, we will be resuming in the next tick
 

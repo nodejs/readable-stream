@@ -33,7 +33,7 @@ var assert = require('assert'); // https://github.com/w3c/testharness.js/blob/ma
 
 
 module.exports = {
-  test: function (fn, desc) {
+  test: function test(fn, desc) {
     try {
       fn();
     } catch (err) {
@@ -42,19 +42,19 @@ module.exports = {
     }
   },
   assert_equals: assert.strictEqual,
-  assert_true: function (value, message) {
+  assert_true: function assert_true(value, message) {
     return assert.strictEqual(value, true, message);
   },
-  assert_false: function (value, message) {
+  assert_false: function assert_false(value, message) {
     return assert.strictEqual(value, false, message);
   },
-  assert_throws: function (code, func, desc) {
+  assert_throws: function assert_throws(code, func, desc) {
     assert.throws(func, function (err) {
       return typeof err === 'object' && 'name' in err && err.name.startsWith(code.name);
     }, desc);
   },
   assert_array_equals: assert.deepStrictEqual,
-  assert_unreached: function (desc) {
+  assert_unreached: function assert_unreached(desc) {
     assert.fail("Reached unreachable code: ".concat(desc));
   }
 };

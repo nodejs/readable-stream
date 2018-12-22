@@ -18,14 +18,14 @@ var _require = require('../../'),
 {
   var receivedData = '';
   var w = new Writable({
-    write: function (chunk, env, callback) {
+    write: function write(chunk, env, callback) {
       receivedData += chunk;
       callback();
     }
   });
   var data = ['foo', 'bar', 'baz'];
   var r = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   r.once('readable', common.mustCall());
   r.pipe(w);
@@ -41,7 +41,7 @@ var _require = require('../../'),
   var _receivedData = '';
 
   var _w = new Writable({
-    write: function (chunk, env, callback) {
+    write: function write(chunk, env, callback) {
       _receivedData += chunk;
       callback();
     }
@@ -50,7 +50,7 @@ var _require = require('../../'),
   var _data = ['foo', 'bar', 'baz'];
 
   var _r = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _r.pipe(_w);

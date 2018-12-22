@@ -17,7 +17,7 @@ var _require2 = require('util'),
 
 {
   var write = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -28,7 +28,7 @@ var _require2 = require('util'),
 }
 {
   var _write = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -49,7 +49,7 @@ var _require2 = require('util'),
 }
 {
   var _write2 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -75,7 +75,7 @@ var _require2 = require('util'),
 }
 {
   var _write3 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
     destroy: common.mustCall(function (err, cb) {
@@ -99,7 +99,7 @@ var _require2 = require('util'),
 }
 {
   var _write4 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -115,7 +115,7 @@ var _require2 = require('util'),
 }
 {
   var _write5 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -146,7 +146,7 @@ var _require2 = require('util'),
 }
 {
   var _write6 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -173,7 +173,7 @@ var _require2 = require('util'),
 {
   // double error case
   var _write7 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -191,7 +191,7 @@ var _require2 = require('util'),
 }
 {
   var _write8 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });
@@ -204,11 +204,11 @@ var _require2 = require('util'),
   _write8.destroy();
 }
 {
-  function MyWritable() {
+  var MyWritable = function MyWritable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Writable.call(this);
-  }
+  };
 
   inherits(MyWritable, Writable);
   new MyWritable();
@@ -216,7 +216,7 @@ var _require2 = require('util'),
 {
   // destroy and destroy callback
   var _write9 = new Writable({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     }
   });

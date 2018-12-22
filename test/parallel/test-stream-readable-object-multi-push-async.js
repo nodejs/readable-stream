@@ -15,6 +15,21 @@ var _require = require('../../'),
 var MAX = 42;
 var BATCH = 10;
 {
+  var fetchData = function fetchData(cb) {
+    if (i > MAX) {
+      setTimeout(cb, 10, null, []);
+    } else {
+      var array = [];
+      var max = i + BATCH;
+
+      for (; i < max; i++) {
+        array.push(i);
+      }
+
+      setTimeout(cb, 10, null, array);
+    }
+  };
+
   var readable = new Readable({
     objectMode: true,
     read: common.mustCall(function () {
@@ -44,22 +59,6 @@ var BATCH = 10;
     }, Math.floor(MAX / BATCH) + 2)
   });
   var i = 0;
-
-  function fetchData(cb) {
-    if (i > MAX) {
-      setTimeout(cb, 10, null, []);
-    } else {
-      var array = [];
-      var max = i + BATCH;
-
-      for (; i < max; i++) {
-        array.push(i);
-      }
-
-      setTimeout(cb, 10, null, array);
-    }
-  }
-
   readable.on('readable', function () {
     var data;
     console.log('readable emitted');
@@ -73,13 +72,29 @@ var BATCH = 10;
   }));
 }
 {
+  var _fetchData = function _fetchData(cb) {
+    if (_i > MAX) {
+      setTimeout(cb, 10, null, []);
+    } else {
+      var array = [];
+      var max = _i + BATCH;
+
+      for (; _i < max; _i++) {
+        array.push(_i);
+      }
+
+      setTimeout(cb, 10, null, array);
+    }
+  };
+
   var _readable = new Readable({
     objectMode: true,
     read: common.mustCall(function () {
       var _this2 = this;
 
       console.log('>> READ');
-      fetchData(function (err, data) {
+
+      _fetchData(function (err, data) {
         if (err) {
           _this2.destroy(err);
 
@@ -104,21 +119,6 @@ var BATCH = 10;
 
   var _i = 0;
 
-  function fetchData(cb) {
-    if (_i > MAX) {
-      setTimeout(cb, 10, null, []);
-    } else {
-      var array = [];
-      var max = _i + BATCH;
-
-      for (; _i < max; _i++) {
-        array.push(_i);
-      }
-
-      setTimeout(cb, 10, null, array);
-    }
-  }
-
   _readable.on('data', function (data) {
     console.log('data emitted', data);
   });
@@ -128,13 +128,25 @@ var BATCH = 10;
   }));
 }
 {
+  var _fetchData2 = function _fetchData2(cb) {
+    var array = [];
+    var max = _i2 + BATCH;
+
+    for (; _i2 < max; _i2++) {
+      array.push(_i2);
+    }
+
+    setTimeout(cb, 10, null, array);
+  };
+
   var _readable2 = new Readable({
     objectMode: true,
     read: common.mustCall(function () {
       var _this3 = this;
 
       console.log('>> READ');
-      fetchData(function (err, data) {
+
+      _fetchData2(function (err, data) {
         if (err) {
           _this3.destroy(err);
 
@@ -156,17 +168,6 @@ var BATCH = 10;
   });
 
   var _i2 = 0;
-
-  function fetchData(cb) {
-    var array = [];
-    var max = _i2 + BATCH;
-
-    for (; _i2 < max; _i2++) {
-      array.push(_i2);
-    }
-
-    setTimeout(cb, 10, null, array);
-  }
 
   _readable2.on('data', function (data) {
     console.log('data emitted', data);

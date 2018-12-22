@@ -74,11 +74,11 @@ var _iteratorError = undefined;
 
 try {
   for (var _iterator = objectKeys(addresses)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-    var _key = _step.value;
-    var envName = "NODE_TEST_".concat(_key);
+    var key = _step.value;
+    var envName = "NODE_TEST_".concat(key);
 
     if (process.env[envName]) {
-      addresses[_key] = process.env[envName];
+      addresses[key] = process.env[envName];
     }
   }
 } catch (err) {

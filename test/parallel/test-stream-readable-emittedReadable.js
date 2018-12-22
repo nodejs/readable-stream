@@ -12,7 +12,7 @@ var assert = require('assert/');
 var Readable = require('../../').Readable;
 
 var readable = new Readable({
-  read: function () {}
+  read: function read() {}
 }); // Initialized to false.
 
 assert.strictEqual(readable._readableState.emittedReadable, false);
@@ -42,7 +42,7 @@ setImmediate(common.mustCall(function () {
   }));
 }));
 var noRead = new Readable({
-  read: function () {}
+  read: function read() {}
 });
 noRead.on('readable', common.mustCall(function () {
   // emittedReadable should be true when the readable event is emitted
@@ -54,7 +54,7 @@ noRead.on('readable', common.mustCall(function () {
 noRead.push('foo');
 noRead.push(null);
 var flowing = new Readable({
-  read: function () {}
+  read: function read() {}
 });
 flowing.on('data', common.mustCall(function () {
   // When in flowing mode, emittedReadable is always false.

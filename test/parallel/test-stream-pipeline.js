@@ -25,9 +25,9 @@ var assert = require('assert/');
 var http = require('http');
 
 var http2 = {
-  createServer: function () {
+  createServer: function createServer() {
     return {
-      listen: function () {}
+      listen: function listen() {}
     };
   }
 };
@@ -39,10 +39,10 @@ var promisify = require('util-promisify');
   var processed = [];
   var expected = [bufferShim.from('a'), bufferShim.from('b'), bufferShim.from('c')];
   var read = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   var write = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       processed.push(data);
       cb();
     }
@@ -64,7 +64,7 @@ var promisify = require('util-promisify');
 }
 {
   var _read = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   assert.throws(function () {
@@ -79,11 +79,11 @@ var promisify = require('util-promisify');
 }
 {
   var _read2 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   var _write = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });
@@ -99,11 +99,11 @@ var promisify = require('util-promisify');
 }
 {
   var _read3 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   var _write2 = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });
@@ -120,17 +120,17 @@ var promisify = require('util-promisify');
 }
 {
   var _read4 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   var transform = new Transform({
-    transform: function (data, enc, cb) {
+    transform: function transform(data, enc, cb) {
       process.nextTick(cb, new Error('kaboom'));
     }
   });
 
   var _write3 = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });
@@ -152,7 +152,7 @@ var promisify = require('util-promisify');
 {
   var server = http.createServer(function (req, res) {
     var rs = new Readable({
-      read: function () {
+      read: function read() {
         rs.push('hello');
         rs.push(null);
       }
@@ -180,7 +180,7 @@ var promisify = require('util-promisify');
   var _server = http.createServer(function (req, res) {
     var sent = false;
     var rs = new Readable({
-      read: function () {
+      read: function read() {
         if (sent) {
           return;
         }
@@ -214,7 +214,7 @@ var promisify = require('util-promisify');
   var _server2 = http.createServer(function (req, res) {
     var sent = 0;
     var rs = new Readable({
-      read: function () {
+      read: function read() {
         if (sent++ > 10) {
           return;
         }
@@ -230,7 +230,7 @@ var promisify = require('util-promisify');
 
   var cnt = 10;
   var badSink = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cnt--;
       if (cnt === 0) process.nextTick(cb, new Error('kaboom'));else cb();
     }
@@ -261,7 +261,7 @@ var promisify = require('util-promisify');
     });
     var sent = 0;
     var rs = new Readable({
-      read: function () {
+      read: function read() {
         if (sent++ > 10) {
           return;
         }
@@ -293,7 +293,7 @@ var promisify = require('util-promisify');
       ':method': 'POST'
     });
     var rs = new Readable({
-      read: function () {
+      read: function read() {
         rs.push('hello');
       }
     });
@@ -310,9 +310,9 @@ var promisify = require('util-promisify');
   });
 }
 {
-  var makeTransform = function () {
+  var makeTransform = function makeTransform() {
     var tr = new Transform({
-      transform: function (data, enc, cb) {
+      transform: function transform(data, enc, cb) {
         cb(null, data);
       }
     });
@@ -321,13 +321,13 @@ var promisify = require('util-promisify');
   };
 
   var rs = new Readable({
-    read: function () {
+    read: function read() {
       rs.push('hello');
     }
   });
   var _cnt = 10;
   var ws = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       _cnt--;
       if (_cnt === 0) return process.nextTick(cb, new Error('kaboom'));
       cb();
@@ -356,7 +356,7 @@ var promisify = require('util-promisify');
   var _expected = [bufferShim.from('hello'), bufferShim.from('world')];
 
   var _rs = new Readable({
-    read: function () {
+    read: function read() {
       for (var _i = 0; _i < _expected.length; _i++) {
         _rs.push(_expected[_i]);
       }
@@ -366,7 +366,7 @@ var promisify = require('util-promisify');
   });
 
   var _ws = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       assert.deepStrictEqual(data, _expected.shift());
       cb();
     }
@@ -416,13 +416,13 @@ var promisify = require('util-promisify');
   };
 
   var _rs2 = new Readable({
-    read: function () {
+    read: function read() {
       _rs2.destroy(new Error('stop'));
     }
   });
 
   var _ws2 = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });
@@ -439,19 +439,15 @@ var promisify = require('util-promisify');
   }));
 }
 {
-  var pipelinePromise = promisify(pipeline);
-
-  function run() {
-    return _run.apply(this, arguments);
-  }
-
-  function _run() {
-    _run = _asyncToGenerator(function* () {
+  var run =
+  /*#__PURE__*/
+  function () {
+    var _ref = _asyncToGenerator(function* () {
       var read = new Readable({
-        read: function () {}
+        read: function read() {}
       });
       var write = new Writable({
-        write: function (data, enc, cb) {
+        write: function write(data, enc, cb) {
           cb();
         }
       });
@@ -464,24 +460,28 @@ var promisify = require('util-promisify');
       yield pipelinePromise(read, write);
       assert(finished);
     });
-    return _run.apply(this, arguments);
-  }
 
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var pipelinePromise = promisify(pipeline);
   run();
 }
 {
   var _read5 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   var _transform = new Transform({
-    transform: function (data, enc, cb) {
+    transform: function transform(data, enc, cb) {
       process.nextTick(cb, new Error('kaboom'));
     }
   });
 
   var _write4 = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });

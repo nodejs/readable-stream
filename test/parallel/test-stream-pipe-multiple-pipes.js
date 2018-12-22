@@ -12,11 +12,11 @@ var stream = require('../../');
 var assert = require('assert/');
 
 var readable = new stream.Readable({
-  read: function () {}
+  read: function read() {}
 });
 var writables = [];
 
-var _loop = function (i) {
+var _loop = function _loop(i) {
   var target = new stream.Writable({
     write: common.mustCall(function (chunk, encoding, callback) {
       target.output.push(chunk);

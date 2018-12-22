@@ -222,12 +222,12 @@ function writeIPv6(ip) {
 
   try {
     for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _part = _step.value;
+      var part = _step.value;
 
-      if (_part === '') {
+      if (part === '') {
         offset += 16 - 2 * (parts.length - 1);
       } else {
-        buf.writeUInt16BE(parseInt(_part, 16), offset);
+        buf.writeUInt16BE(parseInt(part, 16), offset);
         offset += 2;
       }
     }
@@ -266,10 +266,10 @@ function writeDNSPacket(parsed) {
 
   try {
     for (var _iterator2 = parsed.questions[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-      var _q = _step2.value;
-      assert(types[_q.type]);
-      buffers.push(writeDomainName(_q.domain));
-      buffers.push(new Uint16Array([types[_q.type], _q.cls === undefined ? classes.IN : _q.cls]));
+      var q = _step2.value;
+      assert(types[q.type]);
+      buffers.push(writeDomainName(q.domain));
+      buffers.push(new Uint16Array([types[q.type], q.cls === undefined ? classes.IN : q.cls]));
     }
   } catch (err) {
     _didIteratorError2 = true;
@@ -292,44 +292,43 @@ function writeDNSPacket(parsed) {
 
   try {
     for (var _iterator3 = [].concat(parsed.answers, parsed.authorityAnswers, parsed.additionalRecords)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-      var _rr = _step3.value;
-      if (!_rr) continue;
-      assert(types[_rr.type]);
-      buffers.push(writeDomainName(_rr.domain));
-      buffers.push(new Uint16Array([types[_rr.type], _rr.cls === undefined ? classes.IN : _rr.cls]));
-      buffers.push(new Int32Array([_rr.ttl]));
+      var rr = _step3.value;
+      if (!rr) continue;
+      assert(types[rr.type]);
+      buffers.push(writeDomainName(rr.domain));
+      buffers.push(new Uint16Array([types[rr.type], rr.cls === undefined ? classes.IN : rr.cls]));
+      buffers.push(new Int32Array([rr.ttl]));
       var rdLengthBuf = new Uint16Array(1);
       buffers.push(rdLengthBuf);
 
-      switch (_rr.type) {
+      switch (rr.type) {
         case 'A':
           rdLengthBuf[0] = 4;
-          buffers.push(new Uint8Array(_rr.address.split('.')));
+          buffers.push(new Uint8Array(rr.address.split('.')));
           break;
 
         case 'AAAA':
           rdLengthBuf[0] = 16;
-          buffers.push(writeIPv6(_rr.address));
+          buffers.push(writeIPv6(rr.address));
           break;
 
         case 'TXT':
-          var total = _rr.entries.map(function (s) {
+          var total = rr.entries.map(function (s) {
             return s.length;
           }).reduce(function (a, b) {
             return a + b;
           }); // Total length of all strings + 1 byte each for their lengths.
 
-
-          rdLengthBuf[0] = _rr.entries.length + total;
+          rdLengthBuf[0] = rr.entries.length + total;
           var _iteratorNormalCompletion4 = true;
           var _didIteratorError4 = false;
           var _iteratorError4 = undefined;
 
           try {
-            for (var _iterator4 = _rr.entries[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-              var _txt = _step4.value;
-              buffers.push(new Uint8Array([Buffer.byteLength(_txt)]));
-              buffers.push(Buffer.from(_txt));
+            for (var _iterator4 = rr.entries[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+              var txt = _step4.value;
+              buffers.push(new Uint8Array([Buffer.byteLength(txt)]));
+              buffers.push(Buffer.from(txt));
             }
           } catch (err) {
             _didIteratorError4 = true;
@@ -350,14 +349,14 @@ function writeDNSPacket(parsed) {
 
         case 'MX':
           rdLengthBuf[0] = 2;
-          buffers.push(new Uint16Array([_rr.priority]));
+          buffers.push(new Uint16Array([rr.priority]));
         // fall through
 
         case 'NS':
         case 'CNAME':
         case 'PTR':
           {
-            var domain = writeDomainName(_rr.exchange || _rr.value);
+            var domain = writeDomainName(rr.exchange || rr.value);
             rdLengthBuf[0] += domain.length;
             buffers.push(domain);
             break;
@@ -365,16 +364,16 @@ function writeDNSPacket(parsed) {
 
         case 'SOA':
           {
-            var mname = writeDomainName(_rr.nsname);
-            var rname = writeDomainName(_rr.hostmaster);
+            var mname = writeDomainName(rr.nsname);
+            var rname = writeDomainName(rr.hostmaster);
             rdLengthBuf[0] = mname.length + rname.length + 20;
             buffers.push(mname, rname);
-            buffers.push(new Uint32Array([_rr.serial, _rr.refresh, _rr.retry, _rr.expire, _rr.minttl]));
+            buffers.push(new Uint32Array([rr.serial, rr.refresh, rr.retry, rr.expire, rr.minttl]));
             break;
           }
 
         default:
-          throw new Error("Unknown RR type ".concat(_rr.type));
+          throw new Error("Unknown RR type ".concat(rr.type));
       }
     }
   } catch (err) {

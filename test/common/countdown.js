@@ -60,7 +60,7 @@ function () {
 
   _createClass(Countdown, [{
     key: "remaining",
-    get: function () {
+    get: function get() {
       return this[kLimit];
     }
   }]);

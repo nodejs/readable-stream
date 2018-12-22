@@ -25,7 +25,7 @@ var promisify = require('util-promisify');
 
 {
   var rs = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   finished(rs, common.mustCall(function (err) {
     assert(!err, 'no error');
@@ -35,7 +35,7 @@ var promisify = require('util-promisify');
 }
 {
   var ws = new Writable({
-    write: function (data, enc, cb) {
+    write: function write(data, enc, cb) {
       cb();
     }
   });
@@ -46,7 +46,7 @@ var promisify = require('util-promisify');
 }
 {
   var tr = new Transform({
-    transform: function (data, enc, cb) {
+    transform: function transform(data, enc, cb) {
       cb();
     }
   });
@@ -74,14 +74,10 @@ var promisify = require('util-promisify');
   finished(_rs, common.mustCall());
 }
 {
-  var finishedPromise = promisify(finished);
-
-  function run() {
-    return _run.apply(this, arguments);
-  }
-
-  function _run() {
-    _run = _asyncToGenerator(function* () {
+  var run =
+  /*#__PURE__*/
+  function () {
+    var _ref = _asyncToGenerator(function* () {
       var rs = fs.createReadStream(__filename);
       var done = common.mustCall();
       var ended = false;
@@ -93,9 +89,13 @@ var promisify = require('util-promisify');
       assert(ended);
       done();
     });
-    return _run.apply(this, arguments);
-  }
 
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var finishedPromise = promisify(finished);
   run();
 }
 {
@@ -136,7 +136,7 @@ var promisify = require('util-promisify');
 
 {
   var _ws = new Writable({
-    write: function (data, env, cb) {
+    write: function write(data, env, cb) {
       cb();
     }
   });

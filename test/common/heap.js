@@ -111,33 +111,32 @@ function () {
 
     try {
       for (var _iterator = expected[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var _expectation = _step.value;
+        var expectation = _step.value;
 
-        if (_expectation.children) {
-          var _loop = function (expectedEdge) {
-            var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
-              return isEdge(edge, expectedEdge);
-            };
-            var hasChild = rootNodes.some(function (node) {
-              return node.outgoingEdges.some(check);
-            }); // Don't use assert with a custom message here. Otherwise the
-            // inspection in the message is done eagerly and wastes a lot of CPU
-            // time.
-
-            if (!hasChild) {
-              throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
-            }
-          };
-
+        if (expectation.children) {
           var _iteratorNormalCompletion2 = true;
           var _didIteratorError2 = false;
           var _iteratorError2 = undefined;
 
           try {
-            for (var _iterator2 = _expectation.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var _loop = function _loop() {
               var expectedEdge = _step2.value;
+              var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
+                return isEdge(edge, expectedEdge);
+              };
+              var hasChild = rootNodes.some(function (node) {
+                return node.outgoingEdges.some(check);
+              }); // Don't use assert with a custom message here. Otherwise the
+              // inspection in the message is done eagerly and wastes a lot of CPU
+              // time.
 
-              _loop(expectedEdge);
+              if (!hasChild) {
+                throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
+              }
+            };
+
+            for (var _iterator2 = expectation.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              _loop();
             }
           } catch (err) {
             _didIteratorError2 = true;
@@ -193,34 +192,33 @@ function () {
 
     try {
       for (var _iterator3 = expected[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-        var _expectation2 = _step3.value;
+        var expectation = _step3.value;
 
-        if (_expectation2.children) {
-          var _loop2 = function (expectedEdge) {
-            var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
-              return isEdge(edge, expectedEdge);
-            }; // Don't use assert with a custom message here. Otherwise the
-            // inspection in the message is done eagerly and wastes a lot of CPU
-            // time.
-
-            var hasChild = rootNodes.some(function (node) {
-              return node.edges.some(check);
-            });
-
-            if (!hasChild) {
-              throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
-            }
-          };
-
+        if (expectation.children) {
           var _iteratorNormalCompletion4 = true;
           var _didIteratorError4 = false;
           var _iteratorError4 = undefined;
 
           try {
-            for (var _iterator4 = _expectation2.children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var _loop2 = function _loop2() {
               var expectedEdge = _step4.value;
+              var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
+                return isEdge(edge, expectedEdge);
+              }; // Don't use assert with a custom message here. Otherwise the
+              // inspection in the message is done eagerly and wastes a lot of CPU
+              // time.
 
-              _loop2(expectedEdge);
+              var hasChild = rootNodes.some(function (node) {
+                return node.edges.some(check);
+              });
+
+              if (!hasChild) {
+                throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
+              }
+            };
+
+            for (var _iterator4 = expectation.children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+              _loop2();
             }
           } catch (err) {
             _didIteratorError4 = true;
