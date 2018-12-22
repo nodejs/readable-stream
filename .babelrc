@@ -1,0 +1,23 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": [
+        "last 2 versions",
+        "not dead",
+        "node 6.0"
+      ],
+      "modules": "commonjs",
+      "exclude": [
+        "transform-regenerator",
+        "transform-typeof-symbol"
+      ],
+      "debug": true
+    }]
+  ],
+  "plugins": [
+    // Included in the preset, but we can't specify per-plugin options there
+    ["@babel/plugin-transform-classes", {
+      "loose": true
+    }]
+  ]
+}
