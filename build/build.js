@@ -179,7 +179,7 @@ pump(
       list.forEach(function (file) {
         file = path.basename(file)
         processFile(
-            path.join(testsrcurl.replace(/parallel\/$/, 'common/'), file)
+            path.join(testsrcurl.replace(/parallel[/\\]$/, 'common/'), file)
           , path.join(testourroot.replace('parallel', 'common'), file)
           , testReplace['common.js']
         )
