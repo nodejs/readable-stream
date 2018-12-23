@@ -12,7 +12,7 @@ var assert = require('assert/');
 var stream = require('../../');
 
 var r = new stream.Readable({
-  read: function () {}
+  read: function read() {}
 }); // readableListening state should start in `false`.
 
 assert.strictEqual(r._readableState.readableListening, false);
@@ -22,7 +22,7 @@ r.on('readable', common.mustCall(function () {
 }));
 r.push(bufferShim.from('Testing readableListening state'));
 var r2 = new stream.Readable({
-  read: function () {}
+  read: function read() {}
 }); // readableListening state should start in `false`.
 
 assert.strictEqual(r2._readableState.readableListening, false);

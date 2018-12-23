@@ -92,8 +92,8 @@ function makeBufferingDataCallback(dataCallback) {
 
     try {
       for (var _iterator = lines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var _line = _step.value;
-        dataCallback(_line);
+        var line = _step.value;
+        dataCallback(line);
       }
     } catch (err) {
       _didIteratorError = true;
@@ -405,8 +405,8 @@ function () {
 
         try {
           for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _value = _step2.value;
-            if (_value.value !== values[_i2++]) return false;
+            var value = _step2.value;
+            if (value.value !== values[_i2++]) return false;
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -724,7 +724,7 @@ function timeoutPromise(error, timeoutMs) {
       return reject(error);
     }, timeoutMs);
 
-    clearCallback = function () {
+    clearCallback = function clearCallback() {
       if (done) return;
       clearTimeout(timeout);
       resolve();

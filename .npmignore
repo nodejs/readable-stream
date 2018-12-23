@@ -5,6 +5,7 @@ fs.js
 zlib.js
 .airtap.yml
 .airtaprc
+.babelrc
 .travis.yml
 .nyc_output
 coverage

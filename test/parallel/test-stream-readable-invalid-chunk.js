@@ -10,7 +10,7 @@ var common = require('../common');
 var stream = require('../../');
 
 var readable = new stream.Readable({
-  read: function () {}
+  read: function read() {}
 });
 
 function checkError(fn) {

@@ -26,9 +26,14 @@ var stream = require('../../');
     highWaterMark: ovfl
   });
   assert.strictEqual(writable._writableState.highWaterMark, ovfl);
+  var _arr = [true, false, '5', {}, -5, NaN];
 
-  var _loop = function (invalidHwm) {
-    var _loop2 = function (type) {
+  var _loop = function _loop() {
+    var invalidHwm = _arr[_i];
+    var _arr2 = [stream.Readable, stream.Writable];
+
+    var _loop2 = function _loop2() {
+      var type = _arr2[_i2];
       common.expectsError(function () {
         type({
           highWaterMark: invalidHwm
@@ -40,21 +45,13 @@ var stream = require('../../');
       });
     };
 
-    var _arr2 = [stream.Readable, stream.Writable];
-
     for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-      var type = _arr2[_i2];
-
-      _loop2(type);
+      _loop2();
     }
   };
 
-  var _arr = [true, false, '5', {}, -5, NaN];
-
   for (var _i = 0; _i < _arr.length; _i++) {
-    var invalidHwm = _arr[_i];
-
-    _loop(invalidHwm);
+    _loop();
   }
 }
 {

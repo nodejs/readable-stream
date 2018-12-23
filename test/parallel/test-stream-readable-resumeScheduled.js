@@ -17,7 +17,7 @@ var _require = require('../../'),
 {
   // pipe() test case
   var r = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   var w = new Writable(); // resumeScheduled should start = `false`.
 
@@ -32,7 +32,7 @@ var _require = require('../../'),
 {
   // 'data' listener test case
   var _r = new Readable({
-    read: function () {}
+    read: function read() {}
   }); // resumeScheduled should start = `false`.
 
 
@@ -53,7 +53,7 @@ var _require = require('../../'),
 {
   // resume() test case
   var _r2 = new Readable({
-    read: function () {}
+    read: function read() {}
   }); // resumeScheduled should start = `false`.
 
 

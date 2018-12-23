@@ -35,7 +35,7 @@ function _tests() {
     yield _asyncToGenerator(function* () {
       var readable = new Readable({
         objectMode: true,
-        read: function () {}
+        read: function read() {}
       });
       readable.push(0);
       readable.push(1);
@@ -72,7 +72,7 @@ function _tests() {
       var max = 5;
       var readable = new Readable({
         objectMode: true,
-        read: function () {}
+        read: function read() {}
       });
       var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
@@ -100,7 +100,7 @@ function _tests() {
       console.log('read without for..await deferred');
       var readable = new Readable({
         objectMode: true,
-        read: function () {}
+        read: function read() {}
       });
       var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
@@ -139,7 +139,7 @@ function _tests() {
       var max = 3;
       var readable = new Readable({
         objectMode: true,
-        read: function () {}
+        read: function read() {}
       });
       var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual(iter.stream, readable);
@@ -172,7 +172,7 @@ function _tests() {
     yield _asyncToGenerator(function* () {
       console.log('call next() after error');
       var readable = new Readable({
-        read: function () {}
+        read: function read() {}
       });
       var iterator = readable[Symbol.asyncIterator]();
       var err = new Error('kaboom');
@@ -198,7 +198,7 @@ function _tests() {
       var received = 0;
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.push('hello');
 
           if (++readed === max) {
@@ -238,7 +238,7 @@ function _tests() {
       console.log('destroy sync');
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.destroy(new Error('kaboom from read'));
         }
       });
@@ -279,7 +279,7 @@ function _tests() {
       console.log('destroy async');
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           var _this = this;
 
           if (!this.pushed) {
@@ -331,7 +331,7 @@ function _tests() {
       console.log('destroyed by throw');
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.push('hello');
         }
       });
@@ -374,7 +374,7 @@ function _tests() {
       console.log('destroyed sync after push');
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.push('hello');
           this.destroy(new Error('kaboom'));
         }
@@ -422,7 +422,7 @@ function _tests() {
       var received = 0;
       var readable = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           var _this2 = this;
 
           setImmediate(function () {
@@ -467,7 +467,7 @@ function _tests() {
       var max = 42;
       var readed = 0;
       var readable = new Readable({
-        read: function () {
+        read: function read() {
           var _this3 = this;
 
           setImmediate(function () {
@@ -516,7 +516,7 @@ function _tests() {
     yield _asyncToGenerator(function* () {
       console.log('.next() on destroyed stream');
       var readable = new Readable({
-        read: function () {// no-op
+        read: function read() {// no-op
         }
       });
       readable.destroy();
@@ -529,7 +529,7 @@ function _tests() {
     yield _asyncToGenerator(function* () {
       console.log('.next() on pipelined stream');
       var readable = new Readable({
-        read: function () {// no-op
+        read: function read() {// no-op
         }
       });
       var passthrough = new PassThrough();
@@ -549,7 +549,7 @@ function _tests() {
       console.log('iterating on an ended stream completes');
       var r = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.push('asdf');
           this.push('hehe');
           this.push(null);
@@ -609,7 +609,7 @@ function _tests() {
       console.log('destroy mid-stream does not error');
       var r = new Readable({
         objectMode: true,
-        read: function () {
+        read: function read() {
           this.push('asdf');
           this.push('hehe');
         }

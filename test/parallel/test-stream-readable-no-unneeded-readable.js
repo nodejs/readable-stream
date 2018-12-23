@@ -13,7 +13,7 @@ var _require = require('../../'),
 
 function test(r) {
   var wrapper = new Readable({
-    read: function () {
+    read: function read() {
       var data = r.read();
 
       if (data) {
@@ -40,7 +40,7 @@ function test(r) {
 
 {
   var source = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   source.push('foo');
   source.push('bar');
@@ -52,7 +52,7 @@ function test(r) {
   // This is the underlying cause of the above test case.
   var pushChunks = ['foo', 'bar'];
   var r = new Readable({
-    read: function () {
+    read: function read() {
       var chunk = pushChunks.shift();
 
       if (chunk) {

@@ -64,6 +64,10 @@ var Stream = require('stream').Stream;
   assert.strictEqual(_gotErr, _err);
 }
 {
+  var myOnError = function myOnError() {
+    throw new Error('this should not happen');
+  };
+
   var R = require('../../').Readable;
 
   var W = require('../../').Writable;
@@ -83,10 +87,6 @@ var Stream = require('stream').Stream;
   r.pipe(w);
   w.removeListener('error', myOnError);
   removed = true;
-
-  function myOnError() {
-    throw new Error('this should not happen');
-  }
 }
 {
   var _R = require('../../').Readable;

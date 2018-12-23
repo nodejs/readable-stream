@@ -12,7 +12,7 @@ var stream = require('../../');
 var assert = require('assert/');
 
 var readable = new stream.Readable({
-  read: function () {},
+  read: function read() {},
   encoding: 'utf16le',
   objectMode: true
 });

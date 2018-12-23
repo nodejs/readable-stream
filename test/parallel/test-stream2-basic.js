@@ -120,6 +120,16 @@ function (_EE) {
 }(EE);
 
 {
+  var flow = function flow() {
+    var res;
+
+    while (null !== (res = r.read(readSize++))) {
+      reads.push(res.toString());
+    }
+
+    r.once('readable', flow);
+  };
+
   // Test basic functionality
   var r = new TestReader(20);
   var reads = [];
@@ -128,17 +138,6 @@ function (_EE) {
     assert.deepStrictEqual(reads, expect);
   }));
   var readSize = 1;
-
-  function flow() {
-    var res;
-
-    while (null !== (res = r.read(readSize++))) {
-      reads.push(res.toString());
-    }
-
-    r.once('readable', flow);
-  }
-
   flow();
 }
 {

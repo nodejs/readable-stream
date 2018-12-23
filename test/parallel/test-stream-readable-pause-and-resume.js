@@ -14,7 +14,7 @@ var ticks = 18;
 var expectedData = 19;
 var rs = new Readable({
   objectMode: true,
-  read: function () {
+  read: function read() {
     if (ticks-- > 0) return process.nextTick(function () {
       return rs.push({});
     });

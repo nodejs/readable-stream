@@ -82,7 +82,7 @@ util.inherits = require('inherits');
 /*</replacement>*/
 
 var Timer = {
-  now: function () {}
+  now: function now() {}
 };
 
 var tmpdir = require('./tmpdir');
@@ -91,7 +91,7 @@ var _process$binding = process.binding('config'),
     bits = _process$binding.bits,
     hasIntl = _process$binding.hasIntl;
 
-var noop = function () {};
+var noop = function noop() {};
 
 var isMainThread = function () {
   try {
@@ -556,8 +556,8 @@ var Comparison = function Comparison(obj, keys) {
 
   try {
     for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _key2 = _step.value;
-      if (_key2 in obj) this[_key2] = obj[_key2];
+      var key = _step.value;
+      if (key in obj) this[key] = obj[key];
     }
   } catch (err) {
     _didIteratorError = true;
@@ -627,9 +627,9 @@ function expectsError(fn, settings, exact) {
 
     try {
       for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        var _key3 = _step2.value;
+        var key = _step2.value;
 
-        if (!require('deep-strict-equal')(error[_key3], innerSettings[_key3])) {
+        if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
           // Create placeholder objects to create a nice output.
           var a = new Comparison(error, keys);
           var b = new Comparison(innerSettings, keys);
@@ -719,7 +719,7 @@ function getBufferSources(buf) {
 } // Crash the process on unhandled rejections.
 
 
-var crashOnUnhandledRejection = function (err) {
+var crashOnUnhandledRejection = function crashOnUnhandledRejection(err) {
   throw err;
 };
 

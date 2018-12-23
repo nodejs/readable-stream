@@ -13,7 +13,7 @@ var Duplex = require('../../').Duplex;
 
 {
   var stream = new Duplex({
-    read: function () {}
+    read: function read() {}
   });
   assert.strictEqual(stream.allowHalfOpen, true);
   stream.on('finish', common.mustNotCall());
@@ -23,7 +23,7 @@ var Duplex = require('../../').Duplex;
 }
 {
   var _stream = new Duplex({
-    read: function () {},
+    read: function read() {},
     allowHalfOpen: false
   });
 
@@ -39,7 +39,7 @@ var Duplex = require('../../').Duplex;
 }
 {
   var _stream2 = new Duplex({
-    read: function () {},
+    read: function read() {},
     allowHalfOpen: false
   });
 

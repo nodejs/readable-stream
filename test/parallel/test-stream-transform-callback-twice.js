@@ -11,7 +11,7 @@ var _require = require('../../'),
     Transform = _require.Transform;
 
 var stream = new Transform({
-  transform: function (chunk, enc, cb) {
+  transform: function transform(chunk, enc, cb) {
     cb();
     cb();
   }

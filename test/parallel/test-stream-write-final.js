@@ -20,7 +20,7 @@ var w = new stream.Writable({
       cb();
     }, 100);
   }),
-  write: function (chunk, e, cb) {
+  write: function write(chunk, e, cb) {
     process.nextTick(cb);
   }
 });

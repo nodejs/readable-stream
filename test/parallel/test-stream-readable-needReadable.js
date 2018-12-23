@@ -12,7 +12,7 @@ var assert = require('assert/');
 var Readable = require('../../').Readable;
 
 var readable = new Readable({
-  read: function () {}
+  read: function read() {}
 }); // Initialized to false.
 
 assert.strictEqual(readable._readableState.needReadable, false);
@@ -30,7 +30,7 @@ readable.on('end', common.mustCall(function () {
   assert.strictEqual(readable._readableState.needReadable, false);
 }));
 var asyncReadable = new Readable({
-  read: function () {}
+  read: function read() {}
 });
 asyncReadable.on('readable', common.mustCall(function () {
   if (asyncReadable.read() !== null) {
@@ -51,7 +51,7 @@ setImmediate(common.mustCall(function () {
   assert.strictEqual(asyncReadable._readableState.needReadable, false);
 }));
 var flowing = new Readable({
-  read: function () {}
+  read: function read() {}
 }); // Notice this must be above the on('data') call.
 
 flowing.push('foooo');
@@ -66,7 +66,7 @@ flowing.on('data', common.mustCall(function (data) {
   assert.strictEqual(flowing._readableState.needReadable, false);
 }, 3));
 var slowProducer = new Readable({
-  read: function () {}
+  read: function read() {}
 });
 slowProducer.on('readable', common.mustCall(function () {
   if (slowProducer.read(8) === null) {

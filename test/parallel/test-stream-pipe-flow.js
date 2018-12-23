@@ -16,7 +16,7 @@ var _require = require('../../'),
   var ticks = 17;
   var rs = new Readable({
     objectMode: true,
-    read: function () {
+    read: function read() {
       if (ticks-- > 0) return process.nextTick(function () {
         return rs.push({});
       });
@@ -27,7 +27,7 @@ var _require = require('../../'),
   var ws = new Writable({
     highWaterMark: 0,
     objectMode: true,
-    write: function (data, end, cb) {
+    write: function write(data, end, cb) {
       return setImmediate(cb);
     }
   });
@@ -40,7 +40,7 @@ var _require = require('../../'),
 
   var _rs = new Readable({
     objectMode: true,
-    read: function () {
+    read: function read() {
       if (missing--) _rs.push({});else _rs.push(null);
     }
   });
@@ -58,7 +58,7 @@ var _require = require('../../'),
   });
   var wrapper = new Readable({
     objectMode: true,
-    read: function () {
+    read: function read() {
       process.nextTick(function () {
         var data = pt.read();
 

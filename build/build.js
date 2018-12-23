@@ -62,23 +62,8 @@ function processFile (inputLoc, out, replacements, addAtEnd) {
     if (inputLoc.slice(-3) === '.js') {
       try {
         const transformed = babel.transform(data, {
-          plugins: [
-            '@babel/plugin-transform-parameters',
-            '@babel/plugin-transform-arrow-functions',
-            '@babel/plugin-proposal-object-rest-spread',
-            '@babel/plugin-transform-block-scoping',
-            '@babel/plugin-transform-template-literals',
-            '@babel/plugin-transform-shorthand-properties',
-            '@babel/plugin-transform-for-of',
-            ['@babel/transform-classes', { loose: true }],
-            '@babel/plugin-transform-destructuring',
-            '@babel/plugin-transform-computed-properties',
-            '@babel/plugin-transform-spread',
-            '@babel/plugin-proposal-optional-catch-binding',
-            '@babel/plugin-transform-modules-commonjs',
-            '@babel/plugin-transform-async-to-generator',
-            '@babel/plugin-proposal-async-generator-functions'
-          ]
+          // Required for babel to pick up .babelrc
+          filename: inputLoc
         })
         data = transformed.code
       } catch (err) {
@@ -179,7 +164,7 @@ pump(
       list.forEach(function (file) {
         file = path.basename(file)
         processFile(
-            path.join(testsrcurl.replace(/parallel\/$/, 'common/'), file)
+            path.join(testsrcurl.replace(/parallel[/\\]$/, 'common/'), file)
           , path.join(testourroot.replace('parallel', 'common'), file)
           , testReplace['common.js']
         )

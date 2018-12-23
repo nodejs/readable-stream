@@ -33,7 +33,7 @@ var writable = new stream.Writable({
 var bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
 
 var readable = new stream.Readable({
-  read: function () {
+  read: function read() {
     while (bufs.length > 0) {
       this.push(bufs.shift());
     }

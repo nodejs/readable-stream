@@ -88,7 +88,7 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
 {
   // Simple Readable test.
   var readable = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   readable.push(DEF);
   readable.unshift(ABC);
@@ -99,7 +99,7 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
 {
   // Readable test, setEncoding.
   var _readable = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _readable.setEncoding('utf8');

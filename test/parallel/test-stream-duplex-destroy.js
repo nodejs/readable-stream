@@ -17,10 +17,10 @@ var _require2 = require('util'),
 
 {
   var duplex = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
   duplex.resume();
   duplex.on('end', common.mustNotCall());
@@ -31,10 +31,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   _duplex.resume();
@@ -55,10 +55,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex2 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   _duplex2._destroy = common.mustCall(function (err, cb) {
@@ -82,10 +82,10 @@ var _require2 = require('util'),
   var _expected2 = new Error('kaboom');
 
   var _duplex3 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {},
+    read: function read() {},
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, _expected2);
       cb();
@@ -109,10 +109,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex4 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   _duplex4._destroy = common.mustCall(function (err, cb) {
@@ -126,10 +126,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex5 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   _duplex5.resume();
@@ -166,10 +166,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex6 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   var _expected3 = new Error('kaboom');
@@ -193,10 +193,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex7 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {},
+    read: function read() {},
     allowHalfOpen: true
   });
 
@@ -212,10 +212,10 @@ var _require2 = require('util'),
 }
 {
   var _duplex8 = new Duplex({
-    write: function (chunk, enc, cb) {
+    write: function write(chunk, enc, cb) {
       cb();
     },
-    read: function () {}
+    read: function read() {}
   });
 
   _duplex8.destroyed = true;
@@ -228,11 +228,11 @@ var _require2 = require('util'),
   _duplex8.destroy();
 }
 {
-  function MyDuplex() {
+  var MyDuplex = function MyDuplex() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Duplex.call(this);
-  }
+  };
 
   inherits(MyDuplex, Duplex);
   new MyDuplex();

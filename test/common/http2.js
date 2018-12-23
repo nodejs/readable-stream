@@ -92,7 +92,7 @@ function () {
 
   _createClass(Frame, [{
     key: "data",
-    get: function () {
+    get: function get() {
       return this[kFrameData];
     }
   }]);

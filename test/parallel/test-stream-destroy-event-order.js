@@ -13,7 +13,7 @@ var _require = require('../../'),
     Readable = _require.Readable;
 
 var rs = new Readable({
-  read: function () {}
+  read: function read() {}
 });
 var closed = false;
 var errored = false;

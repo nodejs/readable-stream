@@ -28,7 +28,7 @@ writable._write = function (chunk, encoding, cb) {
 };
 
 var readable = new stream.Readable({
-  read: function () {}
+  read: function read() {}
 });
 readable.pipe(writable);
 readable.once('pause', common.mustCall(function () {

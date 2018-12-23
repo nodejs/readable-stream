@@ -17,7 +17,7 @@ var _require2 = require('util'),
 
 {
   var read = new Readable({
-    read: function () {}
+    read: function read() {}
   });
   read.resume();
   read.on('close', common.mustCall());
@@ -26,7 +26,7 @@ var _require2 = require('util'),
 }
 {
   var _read = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read.resume();
@@ -47,7 +47,7 @@ var _require2 = require('util'),
 }
 {
   var _read2 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read2._destroy = common.mustCall(function (err, cb) {
@@ -71,7 +71,7 @@ var _require2 = require('util'),
 }
 {
   var _read3 = new Readable({
-    read: function () {},
+    read: function read() {},
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, _expected2);
       cb();
@@ -93,7 +93,7 @@ var _require2 = require('util'),
 }
 {
   var _read4 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read4._destroy = common.mustCall(function (err, cb) {
@@ -107,7 +107,7 @@ var _require2 = require('util'),
 }
 {
   var _read5 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read5.resume();
@@ -138,7 +138,7 @@ var _require2 = require('util'),
 }
 {
   var _read6 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   var _expected3 = new Error('kaboom');
@@ -160,7 +160,7 @@ var _require2 = require('util'),
 }
 {
   var _read7 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read7.resume();
@@ -173,11 +173,11 @@ var _require2 = require('util'),
   _read7.destroy();
 }
 {
-  function MyReadable() {
+  var MyReadable = function MyReadable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Readable.call(this);
-  }
+  };
 
   inherits(MyReadable, Readable);
   new MyReadable();
@@ -185,7 +185,7 @@ var _require2 = require('util'),
 {
   // destroy and destroy callback
   var _read8 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read8.resume();
@@ -200,7 +200,7 @@ var _require2 = require('util'),
 }
 {
   var _read9 = new Readable({
-    read: function () {}
+    read: function read() {}
   });
 
   _read9.destroy();
