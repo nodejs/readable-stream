@@ -635,7 +635,7 @@ function (_EventEmitter) {
 
       console.log('[test]', 'Connecting to a child Node process');
       var upgradeRequest = yield this.sendUpgradeRequest();
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         upgradeRequest.on('upgrade', function (message, socket) {
           return resolve(new InspectorSession(socket, _this8));
         }).on('response', common.mustNotCall('Upgrade was not received'));
@@ -655,7 +655,7 @@ function (_EventEmitter) {
     var _expectConnectionDeclined = _asyncToGenerator(function* () {
       console.log('[test]', 'Checking upgrade is not possible');
       var upgradeRequest = yield this.sendUpgradeRequest();
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
           return response.on('data', function () {}).on('end', function () {
             return resolve(response.statusCode);
