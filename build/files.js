@@ -337,6 +337,17 @@ module.exports['internal/streams/async_iterator.js'] = [
 
 module.exports['internal/streams/end-of-stream.js'] = [
   , errorsTwoLevel
+  , [
+    /const \{ once \} = require\('internal\/util'\);/,
+    `function once(callback) {
+  let called = false;
+  return function(...args) {
+    if (called) return;
+    called = true;
+    callback.apply(this, args);
+  };
+}`
+  ]
 ]
 
 module.exports['internal/streams/pipeline.js'] = [
