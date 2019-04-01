@@ -11,8 +11,6 @@ var bufferShim = require('safe-buffer').Buffer;
 
 var common = require('../common');
 
-if (!common.hasCrypto) common.skip('missing crypto');
-
 var _require = require('../../'),
     Stream = _require.Stream,
     Writable = _require.Writable,
@@ -23,14 +21,6 @@ var _require = require('../../'),
 var assert = require('assert/');
 
 var http = require('http');
-
-var http2 = {
-  createServer: function createServer() {
-    return {
-      listen: function listen() {}
-    };
-  }
-};
 
 var promisify = require('util-promisify');
 
@@ -278,34 +268,6 @@ var promisify = require('util-promisify');
         cnt--;
         if (cnt === 0) rs.destroy();
       });
-    });
-  });
-}
-{
-  var _server4 = http2.createServer(function (req, res) {
-    pipeline(req, res, common.mustCall());
-  });
-
-  _server4.listen(0, function () {
-    var url = "http://localhost:".concat(_server4.address().port);
-    var client = http2.connect(url);
-    var req = client.request({
-      ':method': 'POST'
-    });
-    var rs = new Readable({
-      read: function read() {
-        rs.push('hello');
-      }
-    });
-    pipeline(rs, req, common.mustCall(function (err) {
-      _server4.close();
-
-      client.close();
-    }));
-    var cnt = 10;
-    req.on('data', function (data) {
-      cnt--;
-      if (cnt === 0) rs.destroy();
     });
   });
 }

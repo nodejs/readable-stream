@@ -146,6 +146,7 @@ pump(
             file !== 'test-stream-base-prototype-accessors.js' &&
             file !== 'test-stream-base-prototype-accessors-enumerability.js'  &&
             file !== 'test-stream-wrap-drain.js' &&
+            file !== 'test-stream-pipeline-http2.js' &&
             file !== 'test-stream-base-typechecking.js') {
           processTestFile(file)
         }

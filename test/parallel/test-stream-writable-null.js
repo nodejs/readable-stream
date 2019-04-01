@@ -18,8 +18,8 @@ var MyWritable =
 function (_stream$Writable) {
   _inheritsLoose(MyWritable, _stream$Writable);
 
-  function MyWritable(opt) {
-    return _stream$Writable.call(this, opt) || this;
+  function MyWritable() {
+    return _stream$Writable.apply(this, arguments) || this;
   }
 
   var _proto = MyWritable.prototype;

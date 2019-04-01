@@ -226,7 +226,7 @@ var _require2 = require('util'),
   var _expected4 = new Error('kaboom');
 
   _write9.destroy(_expected4, common.mustCall(function (err) {
-    assert.strictEqual(_expected4, err);
+    assert.strictEqual(err, _expected4);
   }));
 }
 {

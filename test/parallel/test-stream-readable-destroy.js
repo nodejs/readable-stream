@@ -195,7 +195,7 @@ var _require2 = require('util'),
   _read8.on('close', common.mustCall());
 
   _read8.destroy(_expected4, common.mustCall(function (err) {
-    assert.strictEqual(_expected4, err);
+    assert.strictEqual(err, _expected4);
   }));
 }
 {
