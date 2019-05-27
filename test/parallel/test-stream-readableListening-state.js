@@ -34,7 +34,11 @@ r2.on('data', common.mustCall(function (chunk) {
 r2.push(bufferShim.from('Testing readableListening state'));
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

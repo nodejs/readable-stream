@@ -287,7 +287,7 @@ if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
 if (global.__coverage__) knownGlobals.push(__coverage__);
-'console,clearImmediate,setImmediate,core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
+'console,clearImmediate,setImmediate,core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,queueMicrotask,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
   return typeof global[item] !== undefined;
 }).forEach(function (item) {
   knownGlobals.push(global[item]);
