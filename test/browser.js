@@ -33,6 +33,8 @@ test('streams', function (t) {
   require('./browser/test-stream-duplex')(t);
   require('./browser/test-stream-end-paused')(t);
   require('./browser/test-stream-ispaused')(t);
+  require('./browser/test-stream-finished')(t);
+  require('./browser/test-stream-pipeline')(t);
   require('./browser/test-stream-pipe-after-end')(t);
   require('./browser/test-stream-pipe-cleanup')(t);
   require('./browser/test-stream-pipe-cleanup-pause')(t);
