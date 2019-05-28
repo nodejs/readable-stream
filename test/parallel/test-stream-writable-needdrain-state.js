@@ -28,7 +28,11 @@ transform.write('asdasd', common.mustCall(function () {
 assert.strictEqual(transform._writableState.needDrain, true);
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

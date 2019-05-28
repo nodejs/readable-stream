@@ -49,7 +49,11 @@ r.pipe(w); // This might sound unrealistic, but it happens in net.js. When
 w.end();
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

@@ -77,7 +77,11 @@ process.on('exit', function (code) {
 });
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

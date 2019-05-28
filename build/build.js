@@ -107,7 +107,7 @@ function processTestFile (file) {
   if (testReplace[file])
     replacements = replacements.concat(testReplace[file])
 
-  processFile(url, out, replacements, ';require(\'tap\').pass(\'sync run\');var _list = process.listeners(\'uncaughtException\'); process.removeAllListeners(\'uncaughtException\'); _list.pop(); _list.forEach((e) => process.on(\'uncaughtException\', e));')
+  processFile(url, out, replacements, ';(function () { var t = require(\'tap\'); t.pass(\'sync run\'); })();var _list = process.listeners(\'uncaughtException\'); process.removeAllListeners(\'uncaughtException\'); _list.pop(); _list.forEach((e) => process.on(\'uncaughtException\', e));')
 }
 
 //--------------------------------------------------------------------

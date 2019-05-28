@@ -27,7 +27,11 @@ r.on('end', common.mustCall());
 r.on('data', common.mustCall(5));
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

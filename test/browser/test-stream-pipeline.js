@@ -54,14 +54,14 @@ module.exports = function (t) {
     t.throws(function () {
       pipeline(_read, function () {
       });
-    }, /ERR_MISSING_ARGS/);
+    });
     t.throws(function () {
       pipeline(function () {
       });
-    }, /ERR_MISSING_ARGS/);
+    });
     t.throws(function () {
       pipeline();
-    }, /ERR_MISSING_ARGS/);
+    });
     t.end();
   });
   t.test('pipeline error', function (t) {

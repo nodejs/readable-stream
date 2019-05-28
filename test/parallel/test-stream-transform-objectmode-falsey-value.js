@@ -60,7 +60,11 @@ var int = setInterval(common.mustCall(function () {
 }, expect.length + 1), 1);
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

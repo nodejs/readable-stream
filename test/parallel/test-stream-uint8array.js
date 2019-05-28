@@ -114,7 +114,11 @@ var GHI = new Uint8Array([0x47, 0x48, 0x49]);
 }
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

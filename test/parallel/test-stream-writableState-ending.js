@@ -40,7 +40,11 @@ assert.strictEqual(result, writable); // ending, ended = true.
 testStates(true, false, true);
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 

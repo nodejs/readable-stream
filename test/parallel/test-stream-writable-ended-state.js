@@ -25,7 +25,11 @@ writable.end('testing ended state', common.mustCall(function () {
 assert.strictEqual(writable._writableState.ended, true);
 ;
 
-require('tap').pass('sync run');
+(function () {
+  var t = require('tap');
+
+  t.pass('sync run');
+})();
 
 var _list = process.listeners('uncaughtException');
 
