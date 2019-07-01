@@ -143,7 +143,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
       , `$1
 
 /*<replacement>*/
-  var asyncWrite = !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
+  var asyncWrite = typeof process !== 'undefined' && !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
 /*</replacement>*/
 `
       ]
@@ -230,6 +230,17 @@ function CorkedRequest(state) {
       /Buffer\.prototype\.copy\.call\(src, target, offset\);/
     , 'src.copy(target, offset);'
   ]
+  , isStdStreamCheck = [
+      /dest !== process\.(stdout|stderr)/g
+    , `!isStdStream(dest, '$1')`
+  ]
+  , isStdStreamDeclaration = [
+      /$/
+    , `
+function isStdStream(stream, type) {
+  return typeof process === 'undefined' ? false : stream === process[type];
+}`
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -272,6 +283,8 @@ module.exports['_stream_readable.js'] = [
   , safeBufferFix
   , fixUintStuff
   , addUintStuff
+  , isStdStreamCheck
+  , isStdStreamDeclaration
 ]
 
 module.exports['_stream_transform.js'] = [
