@@ -47,8 +47,8 @@ readable.once('pause', common.mustCall(function () {
 
     isCurrentlyBufferingWrites = false;
 
-    for (var _i = 0; _i < queue.length; _i++) {
-      var queued = queue[_i];
+    for (var _i = 0, _queue = queue; _i < _queue.length; _i++) {
+      var queued = _queue[_i];
       queued.cb();
     }
   }));

@@ -212,6 +212,25 @@ function CorkedRequest(state) {
           /const \{ once \} = require\('internal\/util'\);/
       ,  'function once(callback) { let called = false; return function(...args) { if (called) return; called = true; callback(...args); }; }'
   ]
+  , nextTickUsage = [
+          /process\.nextTick\((.+?)\)/g
+      ,   'nextTick($1)'
+  ]
+  , nextTickDeclaration = depth => [
+          /^('use strict';)$/m
+      ,   `$1\n\nvar nextTick = require('${'../'.repeat(depth)}next-tick.js')`
+  ]
+  , isStdStreamCheck = [
+          /dest !== process\.(stdout|stderr)/g
+      ,   `!isStdStream(dest, '$1')`
+  ]
+  , isStdStreamDeclaration = [
+          /$/
+      ,   `
+function isStdStream(stream, type) {
+  return typeof process === 'undefined' ? false : stream === process[type];
+}`
+  ]
 
 module.exports['_stream_duplex.js'] = [
     requireReplacement
@@ -222,6 +241,8 @@ module.exports['_stream_duplex.js'] = [
   , objectKeysReplacement
   , objectKeysDefine
   , errorsOneLevel
+  , nextTickDeclaration(1)
+  , nextTickUsage
 ]
 
 module.exports['_stream_passthrough.js'] = [
@@ -257,6 +278,10 @@ module.exports['_stream_readable.js'] = [
   , numberIE11
   , noAsyncIterators1
   , noAsyncIterators2
+  , nextTickDeclaration(1)
+  , nextTickUsage
+  , isStdStreamCheck
+  , isStdStreamDeclaration
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -295,6 +320,8 @@ module.exports['_stream_writable.js'] = [
   , useCorkedRequest
   , addConstructors
   , errorsOneLevel
+  , nextTickDeclaration(1)
+  , nextTickUsage
 ]
 
 module.exports['internal/streams/buffer_list.js'] = [
@@ -312,6 +339,8 @@ const custom = inspect && inspect.custom || 'inspect'
 ]
 module.exports['internal/streams/destroy.js'] = [
     errorsTwoLevel
+  , nextTickDeclaration(3)
+  , nextTickUsage
 ]
 
 module.exports['internal/streams/state.js'] = [
@@ -333,6 +362,8 @@ module.exports['internal/streams/async_iterator.js'] = [
       /  return\(\)/,
       '[Symbol.asyncIterator]() { return this },\n  return\(\)'
     ]
+  , nextTickDeclaration(3)
+  , nextTickUsage
 ]
 
 module.exports['internal/streams/end-of-stream.js'] = [

@@ -55,6 +55,7 @@
     "worker_threads": false,
     "./errors": "./errors-browser.js",
     "./readable.js": "./readable-browser.js",
+    "./next-tick.js": "./next-tick-browser.js",
     "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
   },
   "nyc": {

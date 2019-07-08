@@ -701,8 +701,8 @@ function getArrayBufferViews(buf) {
   var out = [];
   var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
 
-  for (var _i = 0; _i < arrayBufferViews.length; _i++) {
-    var type = arrayBufferViews[_i];
+  for (var _i = 0, _arrayBufferViews = arrayBufferViews; _i < _arrayBufferViews.length; _i++) {
+    var type = _arrayBufferViews[_i];
     var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
         BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === void 0 ? 1 : _type$BYTES_PER_ELEME;
 

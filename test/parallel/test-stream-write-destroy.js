@@ -14,11 +14,8 @@ var _require = require('../../'),
 // writes.
 
 
-var _arr = [false, true];
-
-for (var _i = 0; _i < _arr.length; _i++) {
+for (var _i = 0, _arr = [false, true]; _i < _arr.length; _i++) {
   var withPendingData = _arr[_i];
-  var _arr2 = [false, true];
 
   var _loop = function _loop() {
     var useEnd = _arr2[_i2];
@@ -80,7 +77,7 @@ for (var _i = 0; _i < _arr.length; _i++) {
     assert.strictEqual(finished, !withPendingData && useEnd);
   };
 
-  for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+  for (var _i2 = 0, _arr2 = [false, true]; _i2 < _arr2.length; _i2++) {
     _loop();
   }
 }

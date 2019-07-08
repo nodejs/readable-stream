@@ -38,8 +38,8 @@ readable.push(input); // The pipe() calls will postpone emission of the 'resume'
 // so no data will be available to the writable streams until then.
 
 process.nextTick(common.mustCall(function () {
-  for (var _i = 0; _i < writables.length; _i++) {
-    var target = writables[_i];
+  for (var _i = 0, _writables = writables; _i < _writables.length; _i++) {
+    var target = _writables[_i];
     assert.deepStrictEqual(target.output, [input]);
     target.on('unpipe', common.mustCall());
     readable.unpipe(target);
@@ -51,8 +51,8 @@ process.nextTick(common.mustCall(function () {
   readable.resume(); // Make sure the 'end' event gets emitted.
 }));
 readable.on('end', common.mustCall(function () {
-  for (var _i2 = 0; _i2 < writables.length; _i2++) {
-    var target = writables[_i2];
+  for (var _i2 = 0, _writables2 = writables; _i2 < _writables2.length; _i2++) {
+    var target = _writables2[_i2];
     assert.deepStrictEqual(target.output, [input]);
   }
 }));
