@@ -214,11 +214,11 @@ function CorkedRequest(state) {
   ]
   , nextTickUsage = [
           /process\.nextTick\((.+?)\)/g
-      ,   'nextTick($1)'
+      ,   'fakeProcess.nextTick($1)'
   ]
-  , nextTickDeclaration = depth => [
+  , fakeProcessDeclaration = depth => [
           /^('use strict';)$/m
-      ,   `$1\n\nvar nextTick = require('${'../'.repeat(depth)}next-tick.js')`
+      ,   `$1\n\nvar fakeProcess = require('${'../'.repeat(depth)}fake-process.js');`
   ]
   , isStdStreamCheck = [
           /dest !== process\.(stdout|stderr)/g
@@ -241,7 +241,7 @@ module.exports['_stream_duplex.js'] = [
   , objectKeysReplacement
   , objectKeysDefine
   , errorsOneLevel
-  , nextTickDeclaration(1)
+  , fakeProcessDeclaration(1)
   , nextTickUsage
 ]
 
@@ -278,7 +278,7 @@ module.exports['_stream_readable.js'] = [
   , numberIE11
   , noAsyncIterators1
   , noAsyncIterators2
-  , nextTickDeclaration(1)
+  , fakeProcessDeclaration(1)
   , nextTickUsage
   , isStdStreamCheck
   , isStdStreamDeclaration
@@ -320,7 +320,7 @@ module.exports['_stream_writable.js'] = [
   , useCorkedRequest
   , addConstructors
   , errorsOneLevel
-  , nextTickDeclaration(1)
+  , fakeProcessDeclaration(1)
   , nextTickUsage
 ]
 
@@ -339,7 +339,7 @@ const custom = inspect && inspect.custom || 'inspect'
 ]
 module.exports['internal/streams/destroy.js'] = [
     errorsTwoLevel
-  , nextTickDeclaration(3)
+  , fakeProcessDeclaration(3)
   , nextTickUsage
 ]
 
@@ -362,7 +362,7 @@ module.exports['internal/streams/async_iterator.js'] = [
       /  return\(\)/,
       '[Symbol.asyncIterator]() { return this },\n  return\(\)'
     ]
-  , nextTickDeclaration(3)
+  , fakeProcessDeclaration(3)
   , nextTickUsage
 ]
 
