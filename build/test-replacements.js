@@ -59,6 +59,10 @@ module.exports.all = [
         /require\(['"]assert['"]\)/g
       , 'require(\'assert/\')'
     ]
+  , [
+        /.*--expose.internals.*/
+      , ''
+    ]
 ]
 
 module.exports['test-stream2-basic.js'] = [
