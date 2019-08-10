@@ -441,7 +441,7 @@ module.exports['test-stream-finished.js'] = [
 module.exports['test-stream-readable-async-iterators.js'] = [
   [
     /assert.rejects\(/g,
-    '(function(f, e) { let success = false; f().then(function() { success = true; throw new Error(\'should not succeeed\') }).catch(function(e2) { if (success) { throw e2; } assert.strictEqual(e.message, e2.message); })})('
+    '(function(f, e) { let success = false; f().then(function() { success = true; throw new Error(\'should not succeed\') }).catch(function(e2) { if (success) { throw e2; } assert.strictEqual(e.message, e2.message); })})('
   ],
   [
     /tests\(\).then\(common\.mustCall\(\)\)/,
