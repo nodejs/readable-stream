@@ -98,8 +98,8 @@ function parseDNSPacket(buffer) {
   var counts = [['questions', buffer.readUInt16BE(4)], ['answers', buffer.readUInt16BE(6)], ['authorityAnswers', buffer.readUInt16BE(8)], ['additionalRecords', buffer.readUInt16BE(10)]];
   var offset = 12;
 
-  for (var _i = 0; _i < counts.length; _i++) {
-    var _counts$_i = _slicedToArray(counts[_i], 2),
+  for (var _i = 0, _counts = counts; _i < _counts.length; _i++) {
+    var _counts$_i = _slicedToArray(_counts[_i], 2),
         sectionName = _counts$_i[0],
         count = _counts$_i[1];
 

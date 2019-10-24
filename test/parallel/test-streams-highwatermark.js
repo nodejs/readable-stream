@@ -26,11 +26,9 @@ var stream = require('../../');
     highWaterMark: ovfl
   });
   assert.strictEqual(writable._writableState.highWaterMark, ovfl);
-  var _arr = [true, false, '5', {}, -5, NaN];
 
   var _loop = function _loop() {
     var invalidHwm = _arr[_i];
-    var _arr2 = [stream.Readable, stream.Writable];
 
     var _loop2 = function _loop2() {
       var type = _arr2[_i2];
@@ -45,12 +43,12 @@ var stream = require('../../');
       });
     };
 
-    for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+    for (var _i2 = 0, _arr2 = [stream.Readable, stream.Writable]; _i2 < _arr2.length; _i2++) {
       _loop2();
     }
   };
 
-  for (var _i = 0; _i < _arr.length; _i++) {
+  for (var _i = 0, _arr = [true, false, '5', {}, -5, NaN]; _i < _arr.length; _i++) {
     _loop();
   }
 }

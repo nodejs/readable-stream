@@ -12,9 +12,6 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 
-var _require2 = require('util'),
-    inherits = _require2.inherits;
-
 {
   var duplex = new Duplex({
     write: function write(chunk, enc, cb) {
@@ -234,7 +231,8 @@ var _require2 = require('util'),
     Duplex.call(this);
   };
 
-  inherits(MyDuplex, Duplex);
+  Object.setPrototypeOf(MyDuplex.prototype, Duplex.prototype);
+  Object.setPrototypeOf(MyDuplex, Duplex);
   new MyDuplex();
 }
 ;

@@ -32,15 +32,14 @@ var stream = require('../../');
 
 var assert = require('assert/');
 
-var util = require('util');
-
 function Writable() {
   this.writable = true;
 
   require('stream').Stream.call(this);
 }
 
-util.inherits(Writable, require('stream').Stream);
+Object.setPrototypeOf(Writable.prototype, require('stream').Stream.prototype);
+Object.setPrototypeOf(Writable, require('stream').Stream);
 
 function Readable() {
   this.readable = true;
@@ -48,7 +47,8 @@ function Readable() {
   require('stream').Stream.call(this);
 }
 
-util.inherits(Readable, require('stream').Stream);
+Object.setPrototypeOf(Readable.prototype, require('stream').Stream.prototype);
+Object.setPrototypeOf(Readable, require('stream').Stream);
 var passed = false;
 var w = new Writable();
 w.on('pipe', function (src) {

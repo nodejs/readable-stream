@@ -55,9 +55,13 @@ module.exports.all = [
     ]
   , bufferShimFix
   , bufferStaticMethods
-  ,   [
+  , [
         /require\(['"]assert['"]\)/g
       , 'require(\'assert/\')'
+    ]
+  , [
+        /\/\/ Flags: .*/
+      , ''
     ]
 ]
 

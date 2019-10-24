@@ -93,14 +93,72 @@ var _process$binding = process.binding('config'),
 
 var noop = function noop() {};
 
+var hasCrypto = true;
+
 var isMainThread = function () {
-  try {
+  if (require('module').builtinModules.includes('worker_threads')) {
     return require('worker_threads').isMainThread;
-  } catch (_e) {
-    // Worker module not enabled → only a single main thread exists.
-    return true;
+  } // Worker module not enabled → only a single main thread exists.
+
+
+  return true;
+}(); // Check for flags. Skip this for workers (both, the `cluster` module and
+// `worker_threads`) and child processes.
+
+
+if (process.argv.length === 2 && isMainThread && module.parent && require('cluster').isMaster) {
+  // The copyright notice is relatively big and the flags could come afterwards.
+  var bytesToRead = 1500;
+  var buffer = Buffer.allocUnsafe(bytesToRead);
+  var fd = fs.openSync(module.parent.filename, 'r');
+  var bytesRead = fs.readSync(fd, buffer, 0, bytesToRead);
+  fs.closeSync(fd);
+  var source = buffer.toString('utf8', 0, bytesRead);
+  var flagStart = source.indexOf('// Flags: --') + 10;
+
+  if (flagStart !== 9) {
+    var flagEnd = source.indexOf('\n', flagStart); // Normalize different EOL.
+
+    if (source[flagEnd - 1] === '\r') {
+      flagEnd--;
+    }
+
+    var flags = source.substring(flagStart, flagEnd).replace(/_/g, '-').split(' ');
+    var args = process.execArgv.map(function (arg) {
+      return arg.replace(/_/g, '-');
+    });
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = flags[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var flag = _step.value;
+
+        if (!args.includes(flag) && // If the binary was built without-ssl then the crypto flags are
+        // invalid (bad option). The test itself should handle this case.
+        hasCrypto && ( // If the binary is build without `intl` the inspect option is
+        // invalid. The test itself should handle this case.
+        process.config.variables.v8_enable_inspector !== 0 || !flag.startsWith('--inspect'))) {
+          throw new Error("Test has to be started with the flag: '".concat(flag, "'"));
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
   }
-}();
+}
 
 var isWindows = process.platform === 'win32';
 var isAIX = process.platform === 'aix';
@@ -110,7 +168,6 @@ var isFreeBSD = process.platform === 'freebsd';
 var isOpenBSD = process.platform === 'openbsd';
 var isLinux = process.platform === 'linux';
 var isOSX = process.platform === 'darwin';
-var isOSXMojave = isOSX && os.release().startsWith('18');
 var enoughTestMem = os.totalmem() > 0x70000000;
 /* 1.75 Gb */
 
@@ -119,8 +176,7 @@ var cpus = os.cpus().length === 0 ? [{
 }] : os.cpus();
 var enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
 var rootDir = isWindows ? 'c:\\' : '/';
-var buildType = 'readable-stream';
-var hasCrypto = true; // If env var is set then enable async_hook hooks for all tests.
+var buildType = 'readable-stream'; // If env var is set then enable async_hook hooks for all tests.
 
 if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
   var destroydIdsList = {};
@@ -404,7 +460,7 @@ function canCreateSymLink() {
         timout: 1000
       });
       return output.includes('SeCreateSymbolicLinkPrivilege');
-    } catch (_unused) {
+    } catch (_e) {
       return false;
     }
   } // On non-Windows platforms, this always returns `true`
@@ -488,7 +544,7 @@ function isAlive(pid) {
   try {
     process.kill(pid, 'SIGCONT');
     return true;
-  } catch (_unused2) {
+  } catch (_unused) {
     return false;
   }
 }
@@ -550,26 +606,26 @@ function expectWarning(nameOrMap, expected, code) {
 }
 
 var Comparison = function Comparison(obj, keys) {
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
 
   try {
-    for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var key = _step.value;
+    for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var key = _step2.value;
       if (key in obj) this[key] = obj[key];
     }
   } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion && _iterator.return != null) {
-        _iterator.return();
+      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+        _iterator2.return();
       }
     } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
+      if (_didIteratorError2) {
+        throw _iteratorError2;
       }
     }
   }
@@ -621,13 +677,13 @@ function expectsError(fn, settings, exact) {
 
 
     var keys = objectKeys(settings);
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
+    var _iteratorNormalCompletion3 = true;
+    var _didIteratorError3 = false;
+    var _iteratorError3 = undefined;
 
     try {
-      for (var _iterator2 = keys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        var key = _step2.value;
+      for (var _iterator3 = keys[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+        var key = _step3.value;
 
         if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
           // Create placeholder objects to create a nice output.
@@ -651,16 +707,16 @@ function expectsError(fn, settings, exact) {
         }
       }
     } catch (err) {
-      _didIteratorError2 = true;
-      _iteratorError2 = err;
+      _didIteratorError3 = true;
+      _iteratorError3 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-          _iterator2.return();
+        if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+          _iterator3.return();
         }
       } finally {
-        if (_didIteratorError2) {
-          throw _iteratorError2;
+        if (_didIteratorError3) {
+          throw _iteratorError3;
         }
       }
     }
@@ -701,8 +757,8 @@ function getArrayBufferViews(buf) {
   var out = [];
   var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
 
-  for (var _i = 0; _i < arrayBufferViews.length; _i++) {
-    var type = arrayBufferViews[_i];
+  for (var _i = 0, _arrayBufferViews = arrayBufferViews; _i < _arrayBufferViews.length; _i++) {
+    var type = _arrayBufferViews[_i];
     var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
         BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === void 0 ? 1 : _type$BYTES_PER_ELEME;
 
@@ -740,7 +796,7 @@ function getTTYfd() {
   if (ttyFd === undefined) {
     try {
       return fs.openSync('/dev/tty');
-    } catch (_unused3) {
+    } catch (_unused2) {
       // There aren't any tty fd's available to use.
       return -1;
     }
@@ -757,7 +813,7 @@ function runWithInvalidFD(func) {
     while (fs.fstatSync(fd--) && fd > 0) {
       ;
     }
-  } catch (_unused4) {
+  } catch (_unused3) {
     return func(fd);
   }
 
@@ -792,7 +848,6 @@ module.exports = {
   isMainThread: isMainThread,
   isOpenBSD: isOpenBSD,
   isOSX: isOSX,
-  isOSXMojave: isOSXMojave,
   isSunOS: isSunOS,
   isWindows: isWindows,
   localIPv6Hosts: localIPv6Hosts,

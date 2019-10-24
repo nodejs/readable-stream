@@ -32,9 +32,6 @@ var objectKeys = objectKeys || function (obj) {
 var _require = require('../../'),
     Stream = _require.Stream;
 
-var _require2 = require('util'),
-    inherits = _require2.inherits;
-
 function noop() {} // A stream to push an array into a REPL
 
 
@@ -48,7 +45,8 @@ function ArrayStream() {
   };
 }
 
-inherits(ArrayStream, Stream);
+Object.setPrototypeOf(ArrayStream.prototype, Stream.prototype);
+Object.setPrototypeOf(ArrayStream, Stream);
 ArrayStream.prototype.readable = true;
 ArrayStream.prototype.writable = true;
 ArrayStream.prototype.pause = noop;
