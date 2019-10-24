@@ -208,6 +208,14 @@ function CorkedRequest(state) {
           /return createReadableStreamAsyncIterator\(this\);\n};/m
       ,   'return createReadableStreamAsyncIterator(this);\n};\n}'
   ]
+  , noAsyncIteratorsFrom1 = [
+          /Readable\.from = function *\(iterable, opts\) \{/g
+      ,   'if (typeof Symbol === \'function\' ) {\nReadable.from = function (iterable, opts) {'
+  ]
+  , noAsyncIteratorsFrom2 = [
+          /return readable;\n};/m
+      ,   'return readable;\n};\n}'
+  ]
   , once = [
           /const \{ once \} = require\('internal\/util'\);/
       ,  'function once(callback) { let called = false; return function(...args) { if (called) return; called = true; callback(...args); }; }'
@@ -257,6 +265,8 @@ module.exports['_stream_readable.js'] = [
   , numberIE11
   , noAsyncIterators1
   , noAsyncIterators2
+  , noAsyncIteratorsFrom1
+  , noAsyncIteratorsFrom2
 ]
 
 module.exports['_stream_transform.js'] = [
