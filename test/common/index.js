@@ -96,7 +96,7 @@ var noop = function noop() {};
 var hasCrypto = true;
 
 var isMainThread = function () {
-  if (require('module').builtinModules.includes('worker_threads')) {
+  if (false) {
     return require('worker_threads').isMainThread;
   } // Worker module not enabled → only a single main thread exists.
 
@@ -106,7 +106,7 @@ var isMainThread = function () {
 // `worker_threads`) and child processes.
 
 
-if (process.argv.length === 2 && isMainThread && module.parent && require('cluster').isMaster) {
+if (false && isMainThread && module.parent && require('cluster').isMaster) {
   // The copyright notice is relatively big and the flags could come afterwards.
   var bytesToRead = 1500;
   var buffer = Buffer.allocUnsafe(bytesToRead);

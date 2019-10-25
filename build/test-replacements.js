@@ -110,6 +110,14 @@ module.exports['common.js'] = [
   , catchES7
   , catchES7OpenClose
   , [
+        /require\('module'\)\.builtinModules\.includes\('worker_threads'\)/,
+        'false'
+    ]
+  , [
+        /process.argv.length === 2/,
+        'false'
+    ]
+  , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
         + '  if (typeof constructor == \'function\')\n'
