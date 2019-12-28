@@ -1,8 +1,7 @@
 sudo: false
 language: node_js
 before_install:
-  - npm install -g npm@2
-  - test $NPM_LEGACY && npm install -g npm@latest-3 || npm install npm -g
+  - (test $NPM_LEGACY && npm install -g npm@2 && npm install -g npm@3) || true
 notifications:
   email: false
 matrix:
