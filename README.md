@@ -48,7 +48,7 @@ v3.x.x of `readable-stream` is a cut from Node 10. This version supports Node 6,
    https://github.com/nodejs/node/pull/17979
 
 ## Version 2.x.x
-v2.x.x of `readable-stream` is a cut of the stream module from Node 8 (there has been no semver-major changes from Node 4 to 8). This version supports all Node.js version from 0.8, as well as evergreen browsers and IE 10 & 11.
+v2.x.x of `readable-stream` is a cut of the stream module from Node 8 (there have been no semver-major changes from Node 4 to 8). This version supports all Node.js versions from 0.8, as well as evergreen browsers and IE 10 & 11.
 
 ### Big Thanks
 
