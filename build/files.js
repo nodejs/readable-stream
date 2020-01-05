@@ -41,7 +41,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , utilReplacement = [
           /^const util = require\('util'\);/m
-        ,   '\n/*<replacement>*/\nconst util = require(\'core-util-is\');\n'
+        ,   '\n/*<replacement>*/\nconst util = Object.create(require(\'core-util-is\'));\n'
           + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
       ]
 
