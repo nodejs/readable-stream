@@ -368,3 +368,7 @@ module.exports['internal/streams/pipeline.js'] = [
       'require(\'.\/end-of-stream\')'
     ]
 ]
+
+module.exports['internal/streams/from.js'] = [
+    errorsTwoLevel
+]

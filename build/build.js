@@ -131,7 +131,7 @@ pump(
     //--------------------------------------------------------------------
     // Discover, grab and process all test-stream* files on the given release
 
-    glob(path.join(testsrcurl, 'test-stream*.js'), function (err, list) {
+    glob(path.join(testsrcurl, 'test-@(stream|readable)*.js'), function (err, list) {
       if (err) {
         throw err
       }
@@ -152,7 +152,6 @@ pump(
         }
       })
     })
-
 
     //--------------------------------------------------------------------
     // Grab the nodejs/node test/common.js
