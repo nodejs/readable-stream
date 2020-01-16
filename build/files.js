@@ -213,8 +213,8 @@ function CorkedRequest(state) {
       ,   'if (typeof Symbol === \'function\' ) {\nReadable.from = function (iterable, opts) {'
   ]
   , noAsyncIteratorsFrom2 = [
-          /return readable;\n};/m
-      ,   'return readable;\n};\n}'
+          /return from\(Readable, iterable, opts\);\n};/m
+      ,   'return from(Readable, iterable, opts);\n};\n}'
   ]
   , once = [
           /const \{ once \} = require\('internal\/util'\);/

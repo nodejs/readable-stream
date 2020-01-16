@@ -225,11 +225,11 @@ var assert = require('assert/');
   _duplex8.destroy();
 }
 {
-  var MyDuplex = function MyDuplex() {
+  function MyDuplex() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Duplex.call(this);
-  };
+  }
 
   Object.setPrototypeOf(MyDuplex.prototype, Duplex.prototype);
   Object.setPrototypeOf(MyDuplex, Duplex);

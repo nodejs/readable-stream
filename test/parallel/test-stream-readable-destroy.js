@@ -170,11 +170,11 @@ var assert = require('assert/');
   _read7.destroy();
 }
 {
-  var MyReadable = function MyReadable() {
+  function MyReadable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Readable.call(this);
-  };
+  }
 
   Object.setPrototypeOf(MyReadable.prototype, Readable.prototype);
   Object.setPrototypeOf(MyReadable, Readable);

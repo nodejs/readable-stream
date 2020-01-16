@@ -38,11 +38,30 @@ readable.push(input); // The pipe() calls will postpone emission of the 'resume'
 // so no data will be available to the writable streams until then.
 
 process.nextTick(common.mustCall(function () {
-  for (var _i = 0, _writables = writables; _i < _writables.length; _i++) {
-    var target = _writables[_i];
-    assert.deepStrictEqual(target.output, [input]);
-    target.on('unpipe', common.mustCall());
-    readable.unpipe(target);
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = writables[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var target = _step.value;
+      assert.deepStrictEqual(target.output, [input]);
+      target.on('unpipe', common.mustCall());
+      readable.unpipe(target);
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return != null) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
   }
 
   readable.push('something else'); // This does not get through.
@@ -51,9 +70,28 @@ process.nextTick(common.mustCall(function () {
   readable.resume(); // Make sure the 'end' event gets emitted.
 }));
 readable.on('end', common.mustCall(function () {
-  for (var _i2 = 0, _writables2 = writables; _i2 < _writables2.length; _i2++) {
-    var target = _writables2[_i2];
-    assert.deepStrictEqual(target.output, [input]);
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = writables[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var target = _step2.value;
+      assert.deepStrictEqual(target.output, [input]);
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
   }
 }));
 ;

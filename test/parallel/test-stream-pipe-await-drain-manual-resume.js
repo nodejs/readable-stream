@@ -46,10 +46,28 @@ readable.once('pause', common.mustCall(function () {
     // should be flushed.
 
     isCurrentlyBufferingWrites = false;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-    for (var _i = 0, _queue = queue; _i < _queue.length; _i++) {
-      var queued = _queue[_i];
-      queued.cb();
+    try {
+      for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var queued = _step.value;
+        queued.cb();
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
     }
   }));
 }));

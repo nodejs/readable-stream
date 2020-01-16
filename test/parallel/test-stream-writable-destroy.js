@@ -223,11 +223,11 @@ var assert = require('assert/');
   _write8.destroy();
 }
 {
-  var MyWritable = function MyWritable() {
+  function MyWritable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Writable.call(this);
-  };
+  }
 
   Object.setPrototypeOf(MyWritable.prototype, Writable.prototype);
   Object.setPrototypeOf(MyWritable, Writable);

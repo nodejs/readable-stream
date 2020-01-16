@@ -74,10 +74,14 @@ var promisify = require('util-promisify');
   finished(_rs, common.mustCall());
 }
 {
-  var run =
-  /*#__PURE__*/
-  function () {
-    var _ref = _asyncToGenerator(function* () {
+  var finishedPromise = promisify(finished);
+
+  function run() {
+    return _run.apply(this, arguments);
+  }
+
+  function _run() {
+    _run = _asyncToGenerator(function* () {
       var rs = fs.createReadStream(__filename);
       var done = common.mustCall();
       var ended = false;
@@ -89,13 +93,9 @@ var promisify = require('util-promisify');
       assert(ended);
       done();
     });
+    return _run.apply(this, arguments);
+  }
 
-    return function run() {
-      return _ref.apply(this, arguments);
-    };
-  }();
-
-  var finishedPromise = promisify(finished);
   run();
 }
 {

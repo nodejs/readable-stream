@@ -38,22 +38,6 @@ source.unpipe(dest2);
 source.unpipe(dest1);
 assert.strictEqual(source._readableState.pipes, null);
 {
-  var checkDestCleanup = function checkDestCleanup(dest) {
-    var currentDestId = ++destCount;
-
-    _source.pipe(dest);
-
-    var unpipeChecker = common.mustCall(function () {
-      assert.deepStrictEqual(dest.listeners('unpipe'), [unpipeChecker], "destination{".concat(currentDestId, "} should have a 'unpipe' event ") + 'listener which is `unpipeChecker`');
-      dest.removeListener('unpipe', unpipeChecker);
-      destCheckEventNames.forEach(function (eventName) {
-        assert.strictEqual(dest.listenerCount(eventName), 0, "destination{".concat(currentDestId, "}'s '").concat(eventName, "' event ") + 'listeners not removed');
-      });
-      if (--destCount === 0) checkSrcCleanup();
-    });
-    dest.on('unpipe', unpipeChecker);
-  };
-
   // test `cleanup()` if we unpipe all streams.
   var _source = Readable({
     read: function read() {}
@@ -78,6 +62,23 @@ assert.strictEqual(source._readableState.pipes, null);
       assert.strictEqual(_source.listenerCount(eventName), 0, "source's '".concat(eventName, "' event listeners not removed"));
     });
   });
+
+  function checkDestCleanup(dest) {
+    var currentDestId = ++destCount;
+
+    _source.pipe(dest);
+
+    var unpipeChecker = common.mustCall(function () {
+      assert.deepStrictEqual(dest.listeners('unpipe'), [unpipeChecker], "destination{".concat(currentDestId, "} should have a 'unpipe' event ") + 'listener which is `unpipeChecker`');
+      dest.removeListener('unpipe', unpipeChecker);
+      destCheckEventNames.forEach(function (eventName) {
+        assert.strictEqual(dest.listenerCount(eventName), 0, "destination{".concat(currentDestId, "}'s '").concat(eventName, "' event ") + 'listeners not removed');
+      });
+      if (--destCount === 0) checkSrcCleanup();
+    });
+    dest.on('unpipe', unpipeChecker);
+  }
+
   checkDestCleanup(_dest);
   checkDestCleanup(_dest2);
 
