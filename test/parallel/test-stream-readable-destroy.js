@@ -12,9 +12,6 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 
-var _require2 = require('util'),
-    inherits = _require2.inherits;
-
 {
   var read = new Readable({
     read: function read() {}
@@ -173,13 +170,14 @@ var _require2 = require('util'),
   _read7.destroy();
 }
 {
-  var MyReadable = function MyReadable() {
+  function MyReadable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Readable.call(this);
-  };
+  }
 
-  inherits(MyReadable, Readable);
+  Object.setPrototypeOf(MyReadable.prototype, Readable.prototype);
+  Object.setPrototypeOf(MyReadable, Readable);
   new MyReadable();
 }
 {

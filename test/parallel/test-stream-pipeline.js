@@ -401,10 +401,14 @@ var promisify = require('util-promisify');
   }));
 }
 {
-  var run =
-  /*#__PURE__*/
-  function () {
-    var _ref = _asyncToGenerator(function* () {
+  var pipelinePromise = promisify(pipeline);
+
+  function run() {
+    return _run.apply(this, arguments);
+  }
+
+  function _run() {
+    _run = _asyncToGenerator(function* () {
       var read = new Readable({
         read: function read() {}
       });
@@ -422,13 +426,9 @@ var promisify = require('util-promisify');
       yield pipelinePromise(read, write);
       assert(finished);
     });
+    return _run.apply(this, arguments);
+  }
 
-    return function run() {
-      return _ref.apply(this, arguments);
-    };
-  }();
-
-  var pipelinePromise = promisify(pipeline);
   run();
 }
 {

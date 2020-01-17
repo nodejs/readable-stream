@@ -208,6 +208,14 @@ function CorkedRequest(state) {
           /return createReadableStreamAsyncIterator\(this\);\n};/m
       ,   'return createReadableStreamAsyncIterator(this);\n};\n}'
   ]
+  , noAsyncIteratorsFrom1 = [
+          /Readable\.from = function *\(iterable, opts\) \{/g
+      ,   'if (typeof Symbol === \'function\' ) {\nReadable.from = function (iterable, opts) {'
+  ]
+  , noAsyncIteratorsFrom2 = [
+          /return from\(Readable, iterable, opts\);\n};/m
+      ,   'return from(Readable, iterable, opts);\n};\n}'
+  ]
   , once = [
           /const \{ once \} = require\('internal\/util'\);/
       ,  'function once(callback) { let called = false; return function(...args) { if (called) return; called = true; callback(...args); }; }'
@@ -257,6 +265,8 @@ module.exports['_stream_readable.js'] = [
   , numberIE11
   , noAsyncIterators1
   , noAsyncIterators2
+  , noAsyncIteratorsFrom1
+  , noAsyncIteratorsFrom2
 ]
 
 module.exports['_stream_transform.js'] = [
@@ -356,5 +366,16 @@ module.exports['internal/streams/pipeline.js'] = [
   , [
       /require\('internal\/streams\/end-of-stream'\)/,
       'require(\'.\/end-of-stream\')'
+    ]
+]
+
+module.exports['internal/streams/from.js'] = [
+    errorsTwoLevel
+  , [
+        /if \(iterable && iterable\[Symbol.asyncIterator\]\)/
+    , `if (iterable && typeof iterable.next === 'function') {
+      iterator = iterable
+    }
+else if (iterable && iterable[Symbol.asyncIterator])`
     ]
 ]

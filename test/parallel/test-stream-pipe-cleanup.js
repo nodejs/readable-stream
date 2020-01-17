@@ -34,8 +34,6 @@ var stream = require('../../');
 
 var assert = require('assert/');
 
-var util = require('util');
-
 (function () {
   if (/^v0\.8\./.test(process.version)) return;
 
@@ -46,7 +44,8 @@ var util = require('util');
     require('stream').Stream.call(this);
   }
 
-  util.inherits(Writable, require('stream').Stream);
+  Object.setPrototypeOf(Writable.prototype, require('stream').Stream.prototype);
+  Object.setPrototypeOf(Writable, require('stream').Stream);
 
   Writable.prototype.end = function () {
     this.endCalls++;
@@ -62,14 +61,16 @@ var util = require('util');
     require('stream').Stream.call(this);
   }
 
-  util.inherits(Readable, require('stream').Stream);
+  Object.setPrototypeOf(Readable.prototype, require('stream').Stream.prototype);
+  Object.setPrototypeOf(Readable, require('stream').Stream);
 
   function Duplex() {
     this.readable = true;
     Writable.call(this);
   }
 
-  util.inherits(Duplex, Writable);
+  Object.setPrototypeOf(Duplex.prototype, Writable.prototype);
+  Object.setPrototypeOf(Duplex, Writable);
   var i = 0;
   var limit = 100;
   var w = new Writable();

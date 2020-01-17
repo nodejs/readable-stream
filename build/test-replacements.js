@@ -55,9 +55,13 @@ module.exports.all = [
     ]
   , bufferShimFix
   , bufferStaticMethods
-  ,   [
+  , [
         /require\(['"]assert['"]\)/g
       , 'require(\'assert/\')'
+    ]
+  , [
+        /\/\/ Flags: .*/
+      , ''
     ]
 ]
 
@@ -105,6 +109,14 @@ module.exports['common.js'] = [
   , deepStrictEqual
   , catchES7
   , catchES7OpenClose
+  , [
+        /require\('module'\)\.builtinModules\.includes\('worker_threads'\)/,
+        'false'
+    ]
+  , [
+        /process.argv.length === 2/,
+        'false'
+    ]
   , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
@@ -450,5 +462,12 @@ module.exports['test-stream-readable-async-iterators.js'] = [
   [
     /const AsyncIteratorPrototype = Object\.getPrototypeOf\(\n.*Object\.getPrototypeOf\(async function\* \(\) \{\}\).prototype\);/m,
     'const AsyncIteratorPrototype = Object\.getPrototypeOf(function () {})'
+  ]
+]
+
+module.exports['test-readable-from.js'] = [
+  [
+      /const \{ once \} = require\('events'\);/
+    , 'const once = require(\'events.once\');'
   ]
 ]

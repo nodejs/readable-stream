@@ -12,9 +12,6 @@ var _require = require('../../'),
 
 var assert = require('assert/');
 
-var _require2 = require('util'),
-    inherits = _require2.inherits;
-
 {
   var write = new Writable({
     write: function write(chunk, enc, cb) {
@@ -190,6 +187,28 @@ var _require2 = require('util'),
   assert.strictEqual(_write7.destroyed, true);
 }
 {
+  var writable = new Writable({
+    destroy: common.mustCall(function (err, cb) {
+      process.nextTick(cb, new Error('kaboom 1'));
+    }),
+    write: function write(chunk, enc, cb) {
+      cb();
+    }
+  });
+  writable.on('close', common.mustCall());
+  writable.on('error', common.expectsError({
+    type: Error,
+    message: 'kaboom 2'
+  }));
+  writable.destroy();
+  assert.strictEqual(writable.destroyed, true);
+  assert.strictEqual(writable._writableState.errorEmitted, false); // Test case where `writable.destroy()` is called again with an error before
+  // the `_destroy()` callback is called.
+
+  writable.destroy(new Error('kaboom 2'));
+  assert.strictEqual(writable._writableState.errorEmitted, true);
+}
+{
   var _write8 = new Writable({
     write: function write(chunk, enc, cb) {
       cb();
@@ -204,13 +223,14 @@ var _require2 = require('util'),
   _write8.destroy();
 }
 {
-  var MyWritable = function MyWritable() {
+  function MyWritable() {
     assert.strictEqual(this.destroyed, false);
     this.destroyed = false;
     Writable.call(this);
-  };
+  }
 
-  inherits(MyWritable, Writable);
+  Object.setPrototypeOf(MyWritable.prototype, Writable.prototype);
+  Object.setPrototypeOf(MyWritable, Writable);
   new MyWritable();
 }
 {
