@@ -464,3 +464,10 @@ module.exports['test-stream-readable-async-iterators.js'] = [
     'const AsyncIteratorPrototype = Object\.getPrototypeOf(function () {})'
   ]
 ]
+
+module.exports['test-readable-from.js'] = [
+  [
+      /const \{ once \} = require\('events'\);/
+    , 'const once = require(\'events.once\');'
+  ]
+]

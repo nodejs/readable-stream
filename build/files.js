@@ -371,4 +371,11 @@ module.exports['internal/streams/pipeline.js'] = [
 
 module.exports['internal/streams/from.js'] = [
     errorsTwoLevel
+  , [
+        /if \(iterable && iterable\[Symbol.asyncIterator\]\)/
+    , `if (iterable && typeof iterable.next === 'function') {
+      iterator = iterable
+    }
+else if (iterable && iterable[Symbol.asyncIterator])`
+    ]
 ]

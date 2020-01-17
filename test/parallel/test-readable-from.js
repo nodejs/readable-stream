@@ -30,14 +30,13 @@ var bufferShim = require('safe-buffer').Buffer;
 var _require = require('../common'),
     mustCall = _require.mustCall;
 
-var _require2 = require('events'),
-    once = _require2.once;
+var once = require('events.once');
 
-var _require3 = require('../../'),
-    Readable = _require3.Readable;
+var _require2 = require('../../'),
+    Readable = _require2.Readable;
 
-var _require4 = require('assert/'),
-    strictEqual = _require4.strictEqual;
+var _require3 = require('assert/'),
+    strictEqual = _require3.strictEqual;
 
 function toReadableBasicSupport() {
   return _toReadableBasicSupport.apply(this, arguments);
