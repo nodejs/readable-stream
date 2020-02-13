@@ -1,6 +1,20 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -39,17 +53,20 @@ var chunk = bufferShim.from('hallo');
 var TestWriter =
 /*#__PURE__*/
 function (_stream$Writable) {
-  _inheritsLoose(TestWriter, _stream$Writable);
+  _inherits(TestWriter, _stream$Writable);
 
   function TestWriter() {
-    return _stream$Writable.apply(this, arguments) || this;
+    _classCallCheck(this, TestWriter);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(TestWriter).apply(this, arguments));
   }
 
-  var _proto = TestWriter.prototype;
-
-  _proto._write = function _write(buffer, encoding, callback) {
-    callback(null);
-  };
+  _createClass(TestWriter, [{
+    key: "_write",
+    value: function _write(buffer, encoding, callback) {
+      callback(null);
+    }
+  }]);
 
   return TestWriter;
 }(stream.Writable);
@@ -60,19 +77,22 @@ var dest = new TestWriter(); // Set this high so that we'd trigger a nextTick wa
 var TestReader =
 /*#__PURE__*/
 function (_stream$Readable) {
-  _inheritsLoose(TestReader, _stream$Readable);
+  _inherits(TestReader, _stream$Readable);
 
   function TestReader() {
-    return _stream$Readable.call(this, {
+    _classCallCheck(this, TestReader);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(TestReader).call(this, {
       highWaterMark: 0x10000
-    }) || this;
+    }));
   }
 
-  var _proto2 = TestReader.prototype;
-
-  _proto2._read = function _read(size) {
-    this.push(chunk);
-  };
+  _createClass(TestReader, [{
+    key: "_read",
+    value: function _read(size) {
+      this.push(chunk);
+    }
+  }]);
 
   return TestReader;
 }(stream.Readable);

@@ -1,6 +1,20 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 if (process.version.indexOf('v0.8') === 0) {
   process.exit(0);
@@ -23,17 +37,20 @@ var _require = require('../../'),
 var NullWriteable =
 /*#__PURE__*/
 function (_Writable) {
-  _inheritsLoose(NullWriteable, _Writable);
+  _inherits(NullWriteable, _Writable);
 
   function NullWriteable() {
-    return _Writable.apply(this, arguments) || this;
+    _classCallCheck(this, NullWriteable);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(NullWriteable).apply(this, arguments));
   }
 
-  var _proto = NullWriteable.prototype;
-
-  _proto._write = function _write(chunk, encoding, callback) {
-    return callback();
-  };
+  _createClass(NullWriteable, [{
+    key: "_write",
+    value: function _write(chunk, encoding, callback) {
+      return callback();
+    }
+  }]);
 
   return NullWriteable;
 }(Writable);
@@ -41,17 +58,20 @@ function (_Writable) {
 var QuickEndReadable =
 /*#__PURE__*/
 function (_Readable) {
-  _inheritsLoose(QuickEndReadable, _Readable);
+  _inherits(QuickEndReadable, _Readable);
 
   function QuickEndReadable() {
-    return _Readable.apply(this, arguments) || this;
+    _classCallCheck(this, QuickEndReadable);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(QuickEndReadable).apply(this, arguments));
   }
 
-  var _proto2 = QuickEndReadable.prototype;
-
-  _proto2._read = function _read() {
-    this.push(null);
-  };
+  _createClass(QuickEndReadable, [{
+    key: "_read",
+    value: function _read() {
+      this.push(null);
+    }
+  }]);
 
   return QuickEndReadable;
 }(Readable);
@@ -59,15 +79,18 @@ function (_Readable) {
 var NeverEndReadable =
 /*#__PURE__*/
 function (_Readable2) {
-  _inheritsLoose(NeverEndReadable, _Readable2);
+  _inherits(NeverEndReadable, _Readable2);
 
   function NeverEndReadable() {
-    return _Readable2.apply(this, arguments) || this;
+    _classCallCheck(this, NeverEndReadable);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(NeverEndReadable).apply(this, arguments));
   }
 
-  var _proto3 = NeverEndReadable.prototype;
-
-  _proto3._read = function _read() {};
+  _createClass(NeverEndReadable, [{
+    key: "_read",
+    value: function _read() {}
+  }]);
 
   return NeverEndReadable;
 }(Readable);

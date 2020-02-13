@@ -1,6 +1,20 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /*<replacement>*/
 require('@babel/polyfill');
@@ -42,39 +56,44 @@ var kOtherSide = Symbol('Other');
 var DuplexSocket =
 /*#__PURE__*/
 function (_Duplex) {
-  _inheritsLoose(DuplexSocket, _Duplex);
+  _inherits(DuplexSocket, _Duplex);
 
   function DuplexSocket() {
     var _this;
 
-    _this = _Duplex.call(this) || this;
+    _classCallCheck(this, DuplexSocket);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DuplexSocket).call(this));
     _this[kCallback] = null;
     _this[kOtherSide] = null;
     return _this;
   }
 
-  var _proto = DuplexSocket.prototype;
+  _createClass(DuplexSocket, [{
+    key: "_read",
+    value: function _read() {
+      var callback = this[kCallback];
 
-  _proto._read = function _read() {
-    var callback = this[kCallback];
-
-    if (callback) {
-      this[kCallback] = null;
-      callback();
+      if (callback) {
+        this[kCallback] = null;
+        callback();
+      }
     }
-  };
-
-  _proto._write = function _write(chunk, encoding, callback) {
-    assert.notStrictEqual(this[kOtherSide], null);
-    assert.strictEqual(this[kOtherSide][kCallback], null);
-    this[kOtherSide][kCallback] = callback;
-    this[kOtherSide].push(chunk);
-  };
-
-  _proto._final = function _final(callback) {
-    this[kOtherSide].on('end', callback);
-    this[kOtherSide].push(null);
-  };
+  }, {
+    key: "_write",
+    value: function _write(chunk, encoding, callback) {
+      assert.notStrictEqual(this[kOtherSide], null);
+      assert.strictEqual(this[kOtherSide][kCallback], null);
+      this[kOtherSide][kCallback] = callback;
+      this[kOtherSide].push(chunk);
+    }
+  }, {
+    key: "_final",
+    value: function _final(callback) {
+      this[kOtherSide].on('end', callback);
+      this[kOtherSide].push(null);
+    }
+  }]);
 
   return DuplexSocket;
 }(Duplex);

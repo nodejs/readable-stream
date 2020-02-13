@@ -1,5 +1,7 @@
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
@@ -44,21 +46,22 @@ var Countdown =
 /*#__PURE__*/
 function () {
   function Countdown(limit, cb) {
+    _classCallCheck(this, Countdown);
+
     assert.strictEqual(typeof limit, 'number');
     assert.strictEqual(typeof cb, 'function');
     this[kLimit] = limit;
     this[kCallback] = common.mustCall(cb);
   }
 
-  var _proto = Countdown.prototype;
-
-  _proto.dec = function dec() {
-    assert(this[kLimit] > 0, 'Countdown expired');
-    if (--this[kLimit] === 0) this[kCallback]();
-    return this[kLimit];
-  };
-
   _createClass(Countdown, [{
+    key: "dec",
+    value: function dec() {
+      assert(this[kLimit] > 0, 'Countdown expired');
+      if (--this[kLimit] === 0) this[kCallback]();
+      return this[kLimit];
+    }
+  }, {
     key: "remaining",
     get: function get() {
       return this[kLimit];

@@ -1,5 +1,11 @@
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /*<replacement>*/
 require('@babel/polyfill');
 
@@ -83,187 +89,192 @@ var State =
 /*#__PURE__*/
 function () {
   function State() {
+    _classCallCheck(this, State);
+
     this.snapshot = createJSHeapDump();
     this.embedderGraph = buildEmbedderGraph();
   } // Validate the v8 heap snapshot
 
 
-  var _proto = State.prototype;
+  _createClass(State, [{
+    key: "validateSnapshot",
+    value: function validateSnapshot(rootName, expected) {
+      var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+          _ref2$loose = _ref2.loose,
+          loose = _ref2$loose === void 0 ? false : _ref2$loose;
 
-  _proto.validateSnapshot = function validateSnapshot(rootName, expected) {
-    var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-        _ref2$loose = _ref2.loose,
-        loose = _ref2$loose === void 0 ? false : _ref2$loose;
+      var rootNodes = this.snapshot.filter(function (node) {
+        return node.name === rootName && node.type !== 'string';
+      });
 
-    var rootNodes = this.snapshot.filter(function (node) {
-      return node.name === rootName && node.type !== 'string';
-    });
+      if (loose) {
+        assert(rootNodes.length >= expected.length, "Expect to find at least ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
+      } else {
+        assert.strictEqual(rootNodes.length, expected.length, "Expect to find ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
+      }
 
-    if (loose) {
-      assert(rootNodes.length >= expected.length, "Expect to find at least ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
-    } else {
-      assert.strictEqual(rootNodes.length, expected.length, "Expect to find ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
-    }
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+      try {
+        for (var _iterator = expected[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var expectation = _step.value;
 
-    try {
-      for (var _iterator = expected[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var expectation = _step.value;
+          if (expectation.children) {
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
-        if (expectation.children) {
-          var _iteratorNormalCompletion2 = true;
-          var _didIteratorError2 = false;
-          var _iteratorError2 = undefined;
+            try {
+              var _loop = function _loop() {
+                var expectedEdge = _step2.value;
+                var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
+                  return isEdge(edge, expectedEdge);
+                };
+                var hasChild = rootNodes.some(function (node) {
+                  return node.outgoingEdges.some(check);
+                }); // Don't use assert with a custom message here. Otherwise the
+                // inspection in the message is done eagerly and wastes a lot of CPU
+                // time.
 
-          try {
-            var _loop = function _loop() {
-              var expectedEdge = _step2.value;
-              var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
-                return isEdge(edge, expectedEdge);
+                if (!hasChild) {
+                  throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
+                }
               };
-              var hasChild = rootNodes.some(function (node) {
-                return node.outgoingEdges.some(check);
-              }); // Don't use assert with a custom message here. Otherwise the
-              // inspection in the message is done eagerly and wastes a lot of CPU
-              // time.
 
-              if (!hasChild) {
-                throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
+              for (var _iterator2 = expectation.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                _loop();
               }
-            };
-
-            for (var _iterator2 = expectation.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              _loop();
-            }
-          } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
             } finally {
-              if (_didIteratorError2) {
-                throw _iteratorError2;
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
               }
             }
           }
         }
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return != null) {
-          _iterator.return();
-        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
       } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
         }
       }
-    }
-  } // Validate our internal embedded graph representation
-  ;
+    } // Validate our internal embedded graph representation
 
-  _proto.validateGraph = function validateGraph(rootName, expected) {
-    var _ref3 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-        _ref3$loose = _ref3.loose,
-        loose = _ref3$loose === void 0 ? false : _ref3$loose;
+  }, {
+    key: "validateGraph",
+    value: function validateGraph(rootName, expected) {
+      var _ref3 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+          _ref3$loose = _ref3.loose,
+          loose = _ref3$loose === void 0 ? false : _ref3$loose;
 
-    var rootNodes = this.embedderGraph.filter(function (node) {
-      return node.name === rootName;
-    });
+      var rootNodes = this.embedderGraph.filter(function (node) {
+        return node.name === rootName;
+      });
 
-    if (loose) {
-      assert(rootNodes.length >= expected.length, "Expect to find at least ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
-    } else {
-      assert.strictEqual(rootNodes.length, expected.length, "Expect to find ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
-    }
+      if (loose) {
+        assert(rootNodes.length >= expected.length, "Expect to find at least ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
+      } else {
+        assert.strictEqual(rootNodes.length, expected.length, "Expect to find ".concat(expected.length, " '").concat(rootName, "', ") + "found ".concat(rootNodes.length));
+      }
 
-    var _iteratorNormalCompletion3 = true;
-    var _didIteratorError3 = false;
-    var _iteratorError3 = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
-    try {
-      for (var _iterator3 = expected[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-        var expectation = _step3.value;
+      try {
+        for (var _iterator3 = expected[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var expectation = _step3.value;
 
-        if (expectation.children) {
-          var _iteratorNormalCompletion4 = true;
-          var _didIteratorError4 = false;
-          var _iteratorError4 = undefined;
+          if (expectation.children) {
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
-          try {
-            var _loop2 = function _loop2() {
-              var expectedEdge = _step4.value;
-              var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
-                return isEdge(edge, expectedEdge);
-              }; // Don't use assert with a custom message here. Otherwise the
-              // inspection in the message is done eagerly and wastes a lot of CPU
-              // time.
-
-              var hasChild = rootNodes.some(function (node) {
-                return node.edges.some(check);
-              });
-
-              if (!hasChild) {
-                throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
-              }
-            };
-
-            for (var _iterator4 = expectation.children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-              _loop2();
-            }
-          } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
-          } finally {
             try {
-              if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                _iterator4.return();
+              var _loop2 = function _loop2() {
+                var expectedEdge = _step4.value;
+                var check = typeof expectedEdge === 'function' ? expectedEdge : function (edge) {
+                  return isEdge(edge, expectedEdge);
+                }; // Don't use assert with a custom message here. Otherwise the
+                // inspection in the message is done eagerly and wastes a lot of CPU
+                // time.
+
+                var hasChild = rootNodes.some(function (node) {
+                  return node.edges.some(check);
+                });
+
+                if (!hasChild) {
+                  throw new Error('expected to find child ' + "".concat(util.inspect(expectedEdge), " in ").concat(inspectNode(rootNodes)));
+                }
+              };
+
+              for (var _iterator4 = expectation.children[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                _loop2();
               }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
             } finally {
-              if (_didIteratorError4) {
-                throw _iteratorError4;
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
               }
             }
           }
         }
-      }
-    } catch (err) {
-      _didIteratorError3 = true;
-      _iteratorError3 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-          _iterator3.return();
-        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
-        if (_didIteratorError3) {
-          throw _iteratorError3;
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
         }
       }
     }
-  };
+  }, {
+    key: "validateSnapshotNodes",
+    value: function validateSnapshotNodes(rootName, expected) {
+      var _ref4 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+          _ref4$loose = _ref4.loose,
+          loose = _ref4$loose === void 0 ? false : _ref4$loose;
 
-  _proto.validateSnapshotNodes = function validateSnapshotNodes(rootName, expected) {
-    var _ref4 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-        _ref4$loose = _ref4.loose,
-        loose = _ref4$loose === void 0 ? false : _ref4$loose;
-
-    this.validateSnapshot(rootName, expected, {
-      loose: loose
-    });
-    this.validateGraph(rootName, expected, {
-      loose: loose
-    });
-  };
+      this.validateSnapshot(rootName, expected, {
+        loose: loose
+      });
+      this.validateGraph(rootName, expected, {
+        loose: loose
+      });
+    }
+  }]);
 
   return State;
 }();

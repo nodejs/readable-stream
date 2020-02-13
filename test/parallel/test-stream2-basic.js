@@ -1,6 +1,20 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -39,52 +53,55 @@ var EE = require('events').EventEmitter;
 var TestReader =
 /*#__PURE__*/
 function (_R) {
-  _inheritsLoose(TestReader, _R);
+  _inherits(TestReader, _R);
 
   function TestReader(n) {
     var _this;
 
-    _this = _R.call(this) || this;
+    _classCallCheck(this, TestReader);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TestReader).call(this));
     _this._buffer = bufferShim.alloc(n || 100, 'x');
     _this._pos = 0;
     _this._bufs = 10;
     return _this;
   }
 
-  var _proto = TestReader.prototype;
+  _createClass(TestReader, [{
+    key: "_read",
+    value: function _read(n) {
+      var _this2 = this;
 
-  _proto._read = function _read(n) {
-    var _this2 = this;
+      var max = this._buffer.length - this._pos;
+      n = Math.max(n, 0);
+      var toRead = Math.min(n, max);
 
-    var max = this._buffer.length - this._pos;
-    n = Math.max(n, 0);
-    var toRead = Math.min(n, max);
+      if (toRead === 0) {
+        // simulate the read buffer filling up with some more bytes some time
+        // in the future.
+        setTimeout(function () {
+          _this2._pos = 0;
+          _this2._bufs -= 1;
 
-    if (toRead === 0) {
-      // simulate the read buffer filling up with some more bytes some time
-      // in the future.
-      setTimeout(function () {
-        _this2._pos = 0;
-        _this2._bufs -= 1;
+          if (_this2._bufs <= 0) {
+            // read them all!
+            if (!_this2.ended) _this2.push(null);
+          } else {
+            // now we have more.
+            // kinda cheating by calling _read, but whatever,
+            // it's just fake anyway.
+            _this2._read(n);
+          }
+        }, 10);
+        return;
+      }
 
-        if (_this2._bufs <= 0) {
-          // read them all!
-          if (!_this2.ended) _this2.push(null);
-        } else {
-          // now we have more.
-          // kinda cheating by calling _read, but whatever,
-          // it's just fake anyway.
-          _this2._read(n);
-        }
-      }, 10);
-      return;
+      var ret = this._buffer.slice(this._pos, this._pos + toRead);
+
+      this._pos += toRead;
+      this.push(ret);
     }
-
-    var ret = this._buffer.slice(this._pos, this._pos + toRead);
-
-    this._pos += toRead;
-    this.push(ret);
-  };
+  }]);
 
   return TestReader;
 }(R);
@@ -92,29 +109,33 @@ function (_R) {
 var TestWriter =
 /*#__PURE__*/
 function (_EE) {
-  _inheritsLoose(TestWriter, _EE);
+  _inherits(TestWriter, _EE);
 
   function TestWriter() {
     var _this3;
 
-    _this3 = _EE.call(this) || this;
+    _classCallCheck(this, TestWriter);
+
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(TestWriter).call(this));
     _this3.received = [];
     _this3.flush = false;
     return _this3;
   }
 
-  var _proto2 = TestWriter.prototype;
-
-  _proto2.write = function write(c) {
-    this.received.push(c.toString());
-    this.emit('write', c);
-    return true;
-  };
-
-  _proto2.end = function end(c) {
-    if (c) this.write(c);
-    this.emit('end', this.received);
-  };
+  _createClass(TestWriter, [{
+    key: "write",
+    value: function write(c) {
+      this.received.push(c.toString());
+      this.emit('write', c);
+      return true;
+    }
+  }, {
+    key: "end",
+    value: function end(c) {
+      if (c) this.write(c);
+      this.emit('end', this.received);
+    }
+  }]);
 
   return TestWriter;
 }(EE);

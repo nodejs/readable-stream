@@ -215,7 +215,7 @@ function _tests() {
         var success = false;
         f().then(function () {
           success = true;
-          throw new Error('should not succeeed');
+          throw new Error('should not succeed');
         }).catch(function (e2) {
           if (success) {
             throw e2;

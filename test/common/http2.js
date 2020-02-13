@@ -1,6 +1,16 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
@@ -83,6 +93,8 @@ var Frame =
 /*#__PURE__*/
 function () {
   function Frame(length, type, flags, id) {
+    _classCallCheck(this, Frame);
+
     this[kFrameData] = Buffer.alloc(9);
     write24BE(this[kFrameData], 0, length);
     write8(this[kFrameData], 3, type);
@@ -103,13 +115,16 @@ function () {
 var SettingsFrame =
 /*#__PURE__*/
 function (_Frame) {
-  _inheritsLoose(SettingsFrame, _Frame);
+  _inherits(SettingsFrame, _Frame);
 
   function SettingsFrame() {
     var ack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    _classCallCheck(this, SettingsFrame);
+
     var flags = 0;
     if (ack) flags |= FLAG_ACK;
-    return _Frame.call(this, 0, 4, flags, 0) || this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(SettingsFrame).call(this, 0, 4, flags, 0));
   }
 
   return SettingsFrame;
@@ -118,13 +133,16 @@ function (_Frame) {
 var DataFrame =
 /*#__PURE__*/
 function (_Frame2) {
-  _inheritsLoose(DataFrame, _Frame2);
+  _inherits(DataFrame, _Frame2);
 
   function DataFrame(id, payload) {
     var _this;
 
     var padlen = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var final = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+    _classCallCheck(this, DataFrame);
+
     var len = payload.length;
     var flags = 0;
     if (final) flags |= FLAG_EOS;
@@ -137,7 +155,7 @@ function (_Frame2) {
       flags |= FLAG_PADDED;
     }
 
-    _this = _Frame2.call(this, len, 0, flags, id) || this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DataFrame).call(this, len, 0, flags, id));
     buffers.unshift(_this[kFrameData]);
     _this[kFrameData] = Buffer.concat(buffers);
     return _this;
@@ -149,13 +167,16 @@ function (_Frame2) {
 var HeadersFrame =
 /*#__PURE__*/
 function (_Frame3) {
-  _inheritsLoose(HeadersFrame, _Frame3);
+  _inherits(HeadersFrame, _Frame3);
 
   function HeadersFrame(id, payload) {
     var _this2;
 
     var padlen = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var final = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+    _classCallCheck(this, HeadersFrame);
+
     var len = payload.length;
     var flags = FLAG_EOH;
     if (final) flags |= FLAG_EOS;
@@ -168,7 +189,7 @@ function (_Frame3) {
       flags |= FLAG_PADDED;
     }
 
-    _this2 = _Frame3.call(this, len, 1, flags, id) || this;
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(HeadersFrame).call(this, len, 1, flags, id));
     buffers.unshift(_this2[kFrameData]);
     _this2[kFrameData] = Buffer.concat(buffers);
     return _this2;
@@ -180,14 +201,17 @@ function (_Frame3) {
 var PingFrame =
 /*#__PURE__*/
 function (_Frame4) {
-  _inheritsLoose(PingFrame, _Frame4);
+  _inherits(PingFrame, _Frame4);
 
   function PingFrame() {
     var _this3;
 
     var ack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    _classCallCheck(this, PingFrame);
+
     var buffers = [Buffer.alloc(8)];
-    _this3 = _Frame4.call(this, 8, 6, ack ? 1 : 0, 0) || this;
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(PingFrame).call(this, 8, 6, ack ? 1 : 0, 0));
     buffers.unshift(_this3[kFrameData]);
     _this3[kFrameData] = Buffer.concat(buffers);
     return _this3;
@@ -199,13 +223,15 @@ function (_Frame4) {
 var AltSvcFrame =
 /*#__PURE__*/
 function (_Frame5) {
-  _inheritsLoose(AltSvcFrame, _Frame5);
+  _inherits(AltSvcFrame, _Frame5);
 
   function AltSvcFrame(size) {
     var _this4;
 
+    _classCallCheck(this, AltSvcFrame);
+
     var buffers = [Buffer.alloc(size)];
-    _this4 = _Frame5.call(this, size, 10, 0, 0) || this;
+    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(AltSvcFrame).call(this, size, 10, 0, 0));
     buffers.unshift(_this4[kFrameData]);
     _this4[kFrameData] = Buffer.concat(buffers);
     return _this4;
