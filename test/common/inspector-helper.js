@@ -1,10 +1,24 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /*<replacement>*/
 require('@babel/polyfill');
@@ -208,6 +222,8 @@ function () {
   function InspectorSession(socket, instance) {
     var _this = this;
 
+    _classCallCheck(this, InspectorSession);
+
     this._instance = instance;
     this._socket = socket;
     this._nextId = 1;
@@ -240,240 +256,249 @@ function () {
     });
   }
 
-  var _proto = InspectorSession.prototype;
-
-  _proto.waitForServerDisconnect = function waitForServerDisconnect() {
-    return this._terminationPromise;
-  };
-
-  _proto.disconnect =
-  /*#__PURE__*/
-  function () {
-    var _disconnect = _asyncToGenerator(function* () {
-      this._socket.destroy();
-
-      return this.waitForServerDisconnect();
-    });
-
-    function disconnect() {
-      return _disconnect.apply(this, arguments);
+  _createClass(InspectorSession, [{
+    key: "waitForServerDisconnect",
+    value: function waitForServerDisconnect() {
+      return this._terminationPromise;
     }
+  }, {
+    key: "disconnect",
+    value: function () {
+      var _disconnect = _asyncToGenerator(function* () {
+        this._socket.destroy();
 
-    return disconnect;
-  }();
+        return this.waitForServerDisconnect();
+      });
 
-  _proto._onMessage = function _onMessage(message) {
-    if (message.id) {
-      var _this$_commandRespons = this._commandResponsePromises.get(message.id),
-          resolve = _this$_commandRespons.resolve,
-          reject = _this$_commandRespons.reject;
-
-      this._commandResponsePromises.delete(message.id);
-
-      if (message.result) resolve(message.result);else reject(message.error);
-    } else {
-      if (message.method === 'Debugger.scriptParsed') {
-        var _message$params = message.params,
-            scriptId = _message$params.scriptId,
-            url = _message$params.url;
-
-        this._scriptsIdsByUrl.set(scriptId, url);
-
-        var fileUrl = url.startsWith('file:') ? url : pathToFileURL(url).toString();
-
-        if (fileUrl === this.scriptURL().toString()) {
-          this.mainScriptId = scriptId;
-        }
+      function disconnect() {
+        return _disconnect.apply(this, arguments);
       }
 
-      if (this._notificationCallback) {
-        // In case callback needs to install another
-        var callback = this._notificationCallback;
-        this._notificationCallback = null;
-        callback(message);
+      return disconnect;
+    }()
+  }, {
+    key: "_onMessage",
+    value: function _onMessage(message) {
+      if (message.id) {
+        var _this$_commandRespons = this._commandResponsePromises.get(message.id),
+            resolve = _this$_commandRespons.resolve,
+            reject = _this$_commandRespons.reject;
+
+        this._commandResponsePromises.delete(message.id);
+
+        if (message.result) resolve(message.result);else reject(message.error);
       } else {
-        this._unprocessedNotifications.push(message);
-      }
-    }
-  };
+        if (message.method === 'Debugger.scriptParsed') {
+          var _message$params = message.params,
+              scriptId = _message$params.scriptId,
+              url = _message$params.url;
 
-  _proto._sendMessage = function _sendMessage(message) {
-    var _this2 = this;
+          this._scriptsIdsByUrl.set(scriptId, url);
 
-    var msg = JSON.parse(JSON.stringify(message)); // Clone!
+          var fileUrl = url.startsWith('file:') ? url : pathToFileURL(url).toString();
 
-    msg.id = this._nextId++;
-    if (DEBUG) console.log('[sent]', JSON.stringify(msg));
-    var responsePromise = new Promise(function (resolve, reject) {
-      _this2._commandResponsePromises.set(msg.id, {
-        resolve: resolve,
-        reject: reject
-      });
-    });
-    return new Promise(function (resolve) {
-      return _this2._socket.write(formatWSFrame(msg), resolve);
-    }).then(function () {
-      return responsePromise;
-    });
-  };
+          if (fileUrl === this.scriptURL().toString()) {
+            this.mainScriptId = scriptId;
+          }
+        }
 
-  _proto.send = function send(commands) {
-    var _this3 = this;
-
-    if (Array.isArray(commands)) {
-      // Multiple commands means the response does not matter. There might even
-      // never be a response.
-      return Promise.all(commands.map(function (command) {
-        return _this3._sendMessage(command);
-      })).then(function () {});
-    } else {
-      return this._sendMessage(commands);
-    }
-  };
-
-  _proto.waitForNotification = function waitForNotification(methodOrPredicate, description) {
-    var desc = description || methodOrPredicate;
-    var message = "Timed out waiting for matching notification (".concat(desc, "))");
-    return fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
-  };
-
-  _proto._asyncWaitForNotification =
-  /*#__PURE__*/
-  function () {
-    var _asyncWaitForNotification2 = _asyncToGenerator(function* (methodOrPredicate) {
-      var _this4 = this;
-
-      function matchMethod(notification) {
-        return notification.method === methodOrPredicate;
-      }
-
-      var predicate = typeof methodOrPredicate === 'string' ? matchMethod : methodOrPredicate;
-      var notification = null;
-
-      do {
-        if (this._unprocessedNotifications.length) {
-          notification = this._unprocessedNotifications.shift();
+        if (this._notificationCallback) {
+          // In case callback needs to install another
+          var callback = this._notificationCallback;
+          this._notificationCallback = null;
+          callback(message);
         } else {
-          notification = yield new Promise(function (resolve) {
-            return _this4._notificationCallback = resolve;
-          });
+          this._unprocessedNotifications.push(message);
         }
-      } while (!predicate(notification));
-
-      return notification;
-    });
-
-    function _asyncWaitForNotification(_x) {
-      return _asyncWaitForNotification2.apply(this, arguments);
+      }
     }
+  }, {
+    key: "_sendMessage",
+    value: function _sendMessage(message) {
+      var _this2 = this;
 
-    return _asyncWaitForNotification;
-  }();
+      var msg = JSON.parse(JSON.stringify(message)); // Clone!
 
-  _proto._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
-    if (message.method === 'Debugger.paused') {
-      var callFrame = message.params.callFrames[0];
-      var location = callFrame.location;
-
-      var scriptPath = this._scriptsIdsByUrl.get(location.scriptId);
-
-      assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), "".concat(scriptPath, " !== ").concat(expectedScriptPath));
-      assert.strictEqual(location.lineNumber, line);
-      return true;
+      msg.id = this._nextId++;
+      if (DEBUG) console.log('[sent]', JSON.stringify(msg));
+      var responsePromise = new Promise(function (resolve, reject) {
+        _this2._commandResponsePromises.set(msg.id, {
+          resolve: resolve,
+          reject: reject
+        });
+      });
+      return new Promise(function (resolve) {
+        return _this2._socket.write(formatWSFrame(msg), resolve);
+      }).then(function () {
+        return responsePromise;
+      });
     }
-  };
+  }, {
+    key: "send",
+    value: function send(commands) {
+      var _this3 = this;
 
-  _proto.waitForBreakOnLine = function waitForBreakOnLine(line, url) {
-    var _this5 = this;
+      if (Array.isArray(commands)) {
+        // Multiple commands means the response does not matter. There might even
+        // never be a response.
+        return Promise.all(commands.map(function (command) {
+          return _this3._sendMessage(command);
+        })).then(function () {});
+      } else {
+        return this._sendMessage(commands);
+      }
+    }
+  }, {
+    key: "waitForNotification",
+    value: function waitForNotification(methodOrPredicate, description) {
+      var desc = description || methodOrPredicate;
+      var message = "Timed out waiting for matching notification (".concat(desc, "))");
+      return fires(this._asyncWaitForNotification(methodOrPredicate), message, TIMEOUT);
+    }
+  }, {
+    key: "_asyncWaitForNotification",
+    value: function () {
+      var _asyncWaitForNotification2 = _asyncToGenerator(function* (methodOrPredicate) {
+        var _this4 = this;
 
-    return this.waitForNotification(function (notification) {
-      return _this5._isBreakOnLineNotification(notification, line, url);
-    }, "break on ".concat(url, ":").concat(line));
-  };
+        function matchMethod(notification) {
+          return notification.method === methodOrPredicate;
+        }
 
-  _proto._matchesConsoleOutputNotification = function _matchesConsoleOutputNotification(notification, type, values) {
-    if (!Array.isArray(values)) values = [values];
+        var predicate = typeof methodOrPredicate === 'string' ? matchMethod : methodOrPredicate;
+        var notification = null;
 
-    if (notification.method === 'Runtime.consoleAPICalled') {
-      var params = notification.params;
-
-      if (params.type === type) {
-        var _i2 = 0;
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var value = _step2.value;
-            if (value.value !== values[_i2++]) return false;
+        do {
+          if (this._unprocessedNotifications.length) {
+            notification = this._unprocessedNotifications.shift();
+          } else {
+            notification = yield new Promise(function (resolve) {
+              return _this4._notificationCallback = resolve;
+            });
           }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
+        } while (!predicate(notification));
+
+        return notification;
+      });
+
+      function _asyncWaitForNotification(_x) {
+        return _asyncWaitForNotification2.apply(this, arguments);
+      }
+
+      return _asyncWaitForNotification;
+    }()
+  }, {
+    key: "_isBreakOnLineNotification",
+    value: function _isBreakOnLineNotification(message, line, expectedScriptPath) {
+      if (message.method === 'Debugger.paused') {
+        var callFrame = message.params.callFrames[0];
+        var location = callFrame.location;
+
+        var scriptPath = this._scriptsIdsByUrl.get(location.scriptId);
+
+        assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), "".concat(scriptPath, " !== ").concat(expectedScriptPath));
+        assert.strictEqual(location.lineNumber, line);
+        return true;
+      }
+    }
+  }, {
+    key: "waitForBreakOnLine",
+    value: function waitForBreakOnLine(line, url) {
+      var _this5 = this;
+
+      return this.waitForNotification(function (notification) {
+        return _this5._isBreakOnLineNotification(notification, line, url);
+      }, "break on ".concat(url, ":").concat(line));
+    }
+  }, {
+    key: "_matchesConsoleOutputNotification",
+    value: function _matchesConsoleOutputNotification(notification, type, values) {
+      if (!Array.isArray(values)) values = [values];
+
+      if (notification.method === 'Runtime.consoleAPICalled') {
+        var params = notification.params;
+
+        if (params.type === type) {
+          var _i2 = 0;
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
           try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-              _iterator2.return();
+            for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var value = _step2.value;
+              if (value.value !== values[_i2++]) return false;
             }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
           } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
             }
           }
+
+          return _i2 === values.length;
+        }
+      }
+    }
+  }, {
+    key: "waitForConsoleOutput",
+    value: function waitForConsoleOutput(type, values) {
+      var _this6 = this;
+
+      var desc = "Console output matching ".concat(JSON.stringify(values));
+      return this.waitForNotification(function (notification) {
+        return _this6._matchesConsoleOutputNotification(notification, type, values);
+      }, desc);
+    }
+  }, {
+    key: "runToCompletion",
+    value: function () {
+      var _runToCompletion = _asyncToGenerator(function* () {
+        console.log('[test]', 'Verify node waits for the frontend to disconnect');
+        yield this.send({
+          'method': 'Debugger.resume'
+        });
+        yield this.waitForNotification(function (notification) {
+          return notification.method === 'Runtime.executionContextDestroyed' && notification.params.executionContextId === 1;
+        });
+
+        while ((yield this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {
+          ;
         }
 
-        return _i2 === values.length;
-      }
-    }
-  };
-
-  _proto.waitForConsoleOutput = function waitForConsoleOutput(type, values) {
-    var _this6 = this;
-
-    var desc = "Console output matching ".concat(JSON.stringify(values));
-    return this.waitForNotification(function (notification) {
-      return _this6._matchesConsoleOutputNotification(notification, type, values);
-    }, desc);
-  };
-
-  _proto.runToCompletion =
-  /*#__PURE__*/
-  function () {
-    var _runToCompletion = _asyncToGenerator(function* () {
-      console.log('[test]', 'Verify node waits for the frontend to disconnect');
-      yield this.send({
-        'method': 'Debugger.resume'
-      });
-      yield this.waitForNotification(function (notification) {
-        return notification.method === 'Runtime.executionContextDestroyed' && notification.params.executionContextId === 1;
+        yield this.disconnect();
       });
 
-      while ((yield this._instance.nextStderrString()) !== 'Waiting for the debugger to disconnect...') {
-        ;
+      function runToCompletion() {
+        return _runToCompletion.apply(this, arguments);
       }
 
-      yield this.disconnect();
-    });
-
-    function runToCompletion() {
-      return _runToCompletion.apply(this, arguments);
+      return runToCompletion;
+    }()
+  }, {
+    key: "scriptPath",
+    value: function scriptPath() {
+      return this._instance.scriptPath();
     }
-
-    return runToCompletion;
-  }();
-
-  _proto.scriptPath = function scriptPath() {
-    return this._instance.scriptPath();
-  };
-
-  _proto.script = function script() {
-    return this._instance.script();
-  };
-
-  _proto.scriptURL = function scriptURL() {
-    return pathToFileURL(this.scriptPath());
-  };
+  }, {
+    key: "script",
+    value: function script() {
+      return this._instance.script();
+    }
+  }, {
+    key: "scriptURL",
+    value: function scriptURL() {
+      return pathToFileURL(this.scriptPath());
+    }
+  }]);
 
   return InspectorSession;
 }();
@@ -481,7 +506,7 @@ function () {
 var NodeInstance =
 /*#__PURE__*/
 function (_EventEmitter) {
-  _inheritsLoose(NodeInstance, _EventEmitter);
+  _inherits(NodeInstance, _EventEmitter);
 
   function NodeInstance() {
     var _this7;
@@ -489,7 +514,10 @@ function (_EventEmitter) {
     var inspectorFlags = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ['--inspect-brk=0'];
     var scriptContents = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var scriptFile = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _MAINSCRIPT;
-    _this7 = _EventEmitter.call(this) || this;
+
+    _classCallCheck(this, NodeInstance);
+
+    _this7 = _possibleConstructorReturn(this, _getPrototypeOf(NodeInstance).call(this));
     _this7._scriptPath = scriptFile;
     _this7._script = scriptFile ? null : scriptContents;
     _this7._portCallback = null;
@@ -523,185 +551,189 @@ function (_EventEmitter) {
     return _this7;
   }
 
-  NodeInstance.startViaSignal =
-  /*#__PURE__*/
-  function () {
-    var _startViaSignal = _asyncToGenerator(function* (scriptContents) {
-      var instance = new NodeInstance([], "".concat(scriptContents, "\nprocess._rawDebug('started');"), undefined);
-      var msg = 'Timed out waiting for process to start';
+  _createClass(NodeInstance, [{
+    key: "onStderrLine",
+    value: function onStderrLine(line) {
+      console.log('[err]', line);
 
-      while ((yield fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
+      if (this._portCallback) {
+        var matches = line.match(/Debugger listening on ws:\/\/.+:(\d+)\/.+/);
 
-      process._debugProcess(instance._process.pid);
+        if (matches) {
+          this._portCallback(matches[1]);
 
-      return instance;
-    });
+          this._portCallback = null;
+        }
+      }
 
-    function startViaSignal(_x2) {
-      return _startViaSignal.apply(this, arguments);
-    }
+      if (this._stderrLineCallback) {
+        this._stderrLineCallback(line);
 
-    return startViaSignal;
-  }();
-
-  var _proto2 = NodeInstance.prototype;
-
-  _proto2.onStderrLine = function onStderrLine(line) {
-    console.log('[err]', line);
-
-    if (this._portCallback) {
-      var matches = line.match(/Debugger listening on ws:\/\/.+:(\d+)\/.+/);
-
-      if (matches) {
-        this._portCallback(matches[1]);
-
-        this._portCallback = null;
+        this._stderrLineCallback = null;
+      } else {
+        this._unprocessedStderrLines.push(line);
       }
     }
-
-    if (this._stderrLineCallback) {
-      this._stderrLineCallback(line);
-
-      this._stderrLineCallback = null;
-    } else {
-      this._unprocessedStderrLines.push(line);
-    }
-  };
-
-  _proto2.httpGet = function httpGet(host, path, hostHeaderValue) {
-    console.log('[test]', "Testing ".concat(path));
-    var headers = hostHeaderValue ? {
-      'Host': hostHeaderValue
-    } : null;
-    return this.portPromise.then(function (port) {
-      return new Promise(function (resolve, reject) {
-        var req = http.get({
-          host: host,
-          port: port,
-          path: path,
-          headers: headers
-        }, function (res) {
-          var response = '';
-          res.setEncoding('utf8');
-          res.on('data', function (data) {
-            return response += data.toString();
-          }).on('end', function () {
-            resolve(response);
+  }, {
+    key: "httpGet",
+    value: function httpGet(host, path, hostHeaderValue) {
+      console.log('[test]', "Testing ".concat(path));
+      var headers = hostHeaderValue ? {
+        'Host': hostHeaderValue
+      } : null;
+      return this.portPromise.then(function (port) {
+        return new Promise(function (resolve, reject) {
+          var req = http.get({
+            host: host,
+            port: port,
+            path: path,
+            headers: headers
+          }, function (res) {
+            var response = '';
+            res.setEncoding('utf8');
+            res.on('data', function (data) {
+              return response += data.toString();
+            }).on('end', function () {
+              resolve(response);
+            });
           });
+          req.on('error', reject);
         });
-        req.on('error', reject);
-      });
-    }).then(function (response) {
-      try {
-        return JSON.parse(response);
-      } catch (e) {
-        e.body = response;
-        throw e;
-      }
-    });
-  };
-
-  _proto2.sendUpgradeRequest =
-  /*#__PURE__*/
-  function () {
-    var _sendUpgradeRequest = _asyncToGenerator(function* () {
-      var response = yield this.httpGet(null, '/json/list');
-      var devtoolsUrl = response[0].webSocketDebuggerUrl;
-      var port = yield this.portPromise;
-      return http.get({
-        port: port,
-        path: parseURL(devtoolsUrl).path,
-        headers: {
-          'Connection': 'Upgrade',
-          'Upgrade': 'websocket',
-          'Sec-WebSocket-Version': 13,
-          'Sec-WebSocket-Key': 'key=='
+      }).then(function (response) {
+        try {
+          return JSON.parse(response);
+        } catch (e) {
+          e.body = response;
+          throw e;
         }
       });
-    });
-
-    function sendUpgradeRequest() {
-      return _sendUpgradeRequest.apply(this, arguments);
     }
-
-    return sendUpgradeRequest;
-  }();
-
-  _proto2.connectInspectorSession =
-  /*#__PURE__*/
-  function () {
-    var _connectInspectorSession = _asyncToGenerator(function* () {
-      var _this8 = this;
-
-      console.log('[test]', 'Connecting to a child Node process');
-      var upgradeRequest = yield this.sendUpgradeRequest();
-      return new Promise(function (resolve) {
-        upgradeRequest.on('upgrade', function (message, socket) {
-          return resolve(new InspectorSession(socket, _this8));
-        }).on('response', common.mustNotCall('Upgrade was not received'));
+  }, {
+    key: "sendUpgradeRequest",
+    value: function () {
+      var _sendUpgradeRequest = _asyncToGenerator(function* () {
+        var response = yield this.httpGet(null, '/json/list');
+        var devtoolsUrl = response[0].webSocketDebuggerUrl;
+        var port = yield this.portPromise;
+        return http.get({
+          port: port,
+          path: parseURL(devtoolsUrl).path,
+          headers: {
+            'Connection': 'Upgrade',
+            'Upgrade': 'websocket',
+            'Sec-WebSocket-Version': 13,
+            'Sec-WebSocket-Key': 'key=='
+          }
+        });
       });
-    });
 
-    function connectInspectorSession() {
-      return _connectInspectorSession.apply(this, arguments);
-    }
+      function sendUpgradeRequest() {
+        return _sendUpgradeRequest.apply(this, arguments);
+      }
 
-    return connectInspectorSession;
-  }();
+      return sendUpgradeRequest;
+    }()
+  }, {
+    key: "connectInspectorSession",
+    value: function () {
+      var _connectInspectorSession = _asyncToGenerator(function* () {
+        var _this8 = this;
 
-  _proto2.expectConnectionDeclined =
-  /*#__PURE__*/
-  function () {
-    var _expectConnectionDeclined = _asyncToGenerator(function* () {
-      console.log('[test]', 'Checking upgrade is not possible');
-      var upgradeRequest = yield this.sendUpgradeRequest();
-      return new Promise(function (resolve) {
-        upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
-          return response.on('data', function () {}).on('end', function () {
-            return resolve(response.statusCode);
+        console.log('[test]', 'Connecting to a child Node process');
+        var upgradeRequest = yield this.sendUpgradeRequest();
+        return new Promise(function (resolve) {
+          upgradeRequest.on('upgrade', function (message, socket) {
+            return resolve(new InspectorSession(socket, _this8));
+          }).on('response', common.mustNotCall('Upgrade was not received'));
+        });
+      });
+
+      function connectInspectorSession() {
+        return _connectInspectorSession.apply(this, arguments);
+      }
+
+      return connectInspectorSession;
+    }()
+  }, {
+    key: "expectConnectionDeclined",
+    value: function () {
+      var _expectConnectionDeclined = _asyncToGenerator(function* () {
+        console.log('[test]', 'Checking upgrade is not possible');
+        var upgradeRequest = yield this.sendUpgradeRequest();
+        return new Promise(function (resolve) {
+          upgradeRequest.on('upgrade', common.mustNotCall('Upgrade was received')).on('response', function (response) {
+            return response.on('data', function () {}).on('end', function () {
+              return resolve(response.statusCode);
+            });
           });
         });
       });
-    });
 
-    function expectConnectionDeclined() {
-      return _expectConnectionDeclined.apply(this, arguments);
+      function expectConnectionDeclined() {
+        return _expectConnectionDeclined.apply(this, arguments);
+      }
+
+      return expectConnectionDeclined;
+    }()
+  }, {
+    key: "expectShutdown",
+    value: function expectShutdown() {
+      return this._shutdownPromise;
     }
+  }, {
+    key: "nextStderrString",
+    value: function nextStderrString() {
+      var _this9 = this;
 
-    return expectConnectionDeclined;
-  }();
+      if (this._unprocessedStderrLines.length) return Promise.resolve(this._unprocessedStderrLines.shift());
+      return new Promise(function (resolve) {
+        return _this9._stderrLineCallback = resolve;
+      });
+    }
+  }, {
+    key: "write",
+    value: function write(message) {
+      this._process.stdin.write(message);
+    }
+  }, {
+    key: "kill",
+    value: function kill() {
+      this._process.kill();
 
-  _proto2.expectShutdown = function expectShutdown() {
-    return this._shutdownPromise;
-  };
+      return this.expectShutdown();
+    }
+  }, {
+    key: "scriptPath",
+    value: function scriptPath() {
+      return this._scriptPath;
+    }
+  }, {
+    key: "script",
+    value: function script() {
+      if (this._script === null) this._script = fs.readFileSync(this.scriptPath(), 'utf8');
+      return this._script;
+    }
+  }], [{
+    key: "startViaSignal",
+    value: function () {
+      var _startViaSignal = _asyncToGenerator(function* (scriptContents) {
+        var instance = new NodeInstance([], "".concat(scriptContents, "\nprocess._rawDebug('started');"), undefined);
+        var msg = 'Timed out waiting for process to start';
 
-  _proto2.nextStderrString = function nextStderrString() {
-    var _this9 = this;
+        while ((yield fires(instance.nextStderrString(), msg, TIMEOUT)) !== 'started') {}
 
-    if (this._unprocessedStderrLines.length) return Promise.resolve(this._unprocessedStderrLines.shift());
-    return new Promise(function (resolve) {
-      return _this9._stderrLineCallback = resolve;
-    });
-  };
+        process._debugProcess(instance._process.pid);
 
-  _proto2.write = function write(message) {
-    this._process.stdin.write(message);
-  };
+        return instance;
+      });
 
-  _proto2.kill = function kill() {
-    this._process.kill();
+      function startViaSignal(_x2) {
+        return _startViaSignal.apply(this, arguments);
+      }
 
-    return this.expectShutdown();
-  };
-
-  _proto2.scriptPath = function scriptPath() {
-    return this._scriptPath;
-  };
-
-  _proto2.script = function script() {
-    if (this._script === null) this._script = fs.readFileSync(this.scriptPath(), 'utf8');
-    return this._script;
-  };
+      return startViaSignal;
+    }()
+  }]);
 
   return NodeInstance;
 }(EventEmitter);

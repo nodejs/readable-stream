@@ -1,6 +1,20 @@
 "use strict";
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -35,18 +49,21 @@ var stream = require('../../');
 var Read =
 /*#__PURE__*/
 function (_stream$Readable) {
-  _inheritsLoose(Read, _stream$Readable);
+  _inherits(Read, _stream$Readable);
 
   function Read() {
-    return _stream$Readable.apply(this, arguments) || this;
+    _classCallCheck(this, Read);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Read).apply(this, arguments));
   }
 
-  var _proto = Read.prototype;
-
-  _proto._read = function _read(size) {
-    this.push('x');
-    this.push(null);
-  };
+  _createClass(Read, [{
+    key: "_read",
+    value: function _read(size) {
+      this.push('x');
+      this.push(null);
+    }
+  }]);
 
   return Read;
 }(stream.Readable);
@@ -54,18 +71,21 @@ function (_stream$Readable) {
 var Write =
 /*#__PURE__*/
 function (_stream$Writable) {
-  _inheritsLoose(Write, _stream$Writable);
+  _inherits(Write, _stream$Writable);
 
   function Write() {
-    return _stream$Writable.apply(this, arguments) || this;
+    _classCallCheck(this, Write);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Write).apply(this, arguments));
   }
 
-  var _proto2 = Write.prototype;
-
-  _proto2._write = function _write(buffer, encoding, cb) {
-    this.emit('error', new Error('boom'));
-    this.emit('alldone');
-  };
+  _createClass(Write, [{
+    key: "_write",
+    value: function _write(buffer, encoding, cb) {
+      this.emit('error', new Error('boom'));
+      this.emit('alldone');
+    }
+  }]);
 
   return Write;
 }(stream.Writable);

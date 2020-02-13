@@ -13,11 +13,5 @@
       ],
       "debug": true
     }]
-  ],
-  "plugins": [
-    // Included in the preset, but we can't specify per-plugin options there
-    ["@babel/plugin-transform-classes", {
-      "loose": true
-    }]
   ]
 }
