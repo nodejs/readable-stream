@@ -95,8 +95,6 @@ Node.js. The responsibilities of the Streams Working Group include:
 <a name="members"></a>
 ## Team Members
 
-* **Calvin Metcalf** ([@calvinmetcalf](https://github.com/calvinmetcalf)) &lt;calvin.metcalf@gmail.com&gt;
-  - Release GPG key: F3EF5F62A87FC27A22E643F714CE4FF5015AA242
 * **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
 * **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
