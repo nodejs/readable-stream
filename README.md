@@ -98,8 +98,6 @@ Node.js. The responsibilities of the Streams Working Group include:
 * **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
 * **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
-* **Irina Shestak** ([@lrlna](https://github.com/lrlna)) &lt;shestak.irina@gmail.com&gt;
 * **Robert Nagy** ([@ronag](https://github.com/ronag)) &lt;ronagy@icloud.com&gt;
-* **Yoshua Wyuts** ([@yoshuawuyts](https://github.com/yoshuawuyts)) &lt;yoshuawuyts@gmail.com&gt;
 
 [sauce]: https://saucelabs.com
