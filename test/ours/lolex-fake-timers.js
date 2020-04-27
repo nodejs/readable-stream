@@ -3,6 +3,7 @@ var tap = require('tap');
 var util = require('util');
 var assert = require('assert');
 var lolex = require('lolex');
+var clock = lolex.install({toFake: [ 'setImmediate', 'nextTick' ]});
 var stream = require('../../');
 var Transform = stream.Transform;
 
@@ -12,7 +13,6 @@ function MyTransform() {
 
 util.inherits(MyTransform, Transform);
 
-var clock = lolex.install({toFake: [ 'setImmediate', 'nextTick' ]});
 var stream2DataCalled = false;
 
 var stream = new MyTransform();
