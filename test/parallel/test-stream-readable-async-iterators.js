@@ -207,7 +207,7 @@ function _tests() {
 
       var iterator = _readable4[Symbol.asyncIterator]();
 
-      var err = new Error('kaboom');
+      var _err = new Error('kaboom');
 
       _readable4.destroy(new Error('kaboom'));
 
@@ -223,7 +223,7 @@ function _tests() {
 
           assert.strictEqual(e.message, e2.message);
         });
-      }(iterator.next.bind(iterator), err);
+      }(iterator.next.bind(iterator), _err);
     }
     {
       console.log('read object mode');
@@ -280,7 +280,7 @@ function _tests() {
         }
       });
 
-      var _err;
+      var _err2;
 
       try {
         // eslint-disable-next-line no-unused-vars
@@ -308,10 +308,10 @@ function _tests() {
           }
         }
       } catch (e) {
-        _err = e;
+        _err2 = e;
       }
 
-      assert.strictEqual(_err.message, 'kaboom from read');
+      assert.strictEqual(_err2.message, 'kaboom from read');
     }
     {
       console.log('destroy async');
@@ -332,7 +332,7 @@ function _tests() {
       });
 
       var _received = 0;
-      var _err2 = null;
+      var _err3 = null;
 
       try {
         // eslint-disable-next-line no-unused-vars
@@ -361,10 +361,10 @@ function _tests() {
           }
         }
       } catch (e) {
-        _err2 = e;
+        _err3 = e;
       }
 
-      assert.strictEqual(_err2.message, 'kaboom');
+      assert.strictEqual(_err3.message, 'kaboom');
       assert.strictEqual(_received, 1);
     }
     {
@@ -377,7 +377,7 @@ function _tests() {
         }
       });
 
-      var _err3 = null;
+      var _err4 = null;
 
       try {
         var _iteratorNormalCompletion5 = true;
@@ -406,10 +406,10 @@ function _tests() {
           }
         }
       } catch (e) {
-        _err3 = e;
+        _err4 = e;
       }
 
-      assert.strictEqual(_err3.message, 'kaboom');
+      assert.strictEqual(_err4.message, 'kaboom');
       assert.strictEqual(_readable8.destroyed, true);
     }
     {
@@ -424,7 +424,7 @@ function _tests() {
       });
 
       var _received2 = 0;
-      var _err4 = null;
+      var _err5 = null;
 
       try {
         var _iteratorNormalCompletion6 = true;
@@ -453,10 +453,10 @@ function _tests() {
           }
         }
       } catch (e) {
-        _err4 = e;
+        _err5 = e;
       }
 
-      assert.strictEqual(_err4.message, 'kaboom');
+      assert.strictEqual(_err5.message, 'kaboom');
       assert.strictEqual(_received2, 1);
     }
     {
@@ -575,8 +575,8 @@ function _tests() {
 
       _readable12.destroy();
 
-      var _ref = yield _readable12[Symbol.asyncIterator]().next(),
-          done = _ref.done;
+      var _yield$_readable12$Sy = yield _readable12[Symbol.asyncIterator]().next(),
+          done = _yield$_readable12$Sy.done;
 
       assert.strictEqual(done, true);
     }
@@ -590,18 +590,18 @@ function _tests() {
 
       var passthrough = new PassThrough();
 
-      var _err5 = new Error('kaboom');
+      var _err6 = new Error('kaboom');
 
       pipeline(_readable13, passthrough, common.mustCall(function (e) {
-        assert.strictEqual(e, _err5);
+        assert.strictEqual(e, _err6);
       }));
 
-      _readable13.destroy(_err5);
+      _readable13.destroy(_err6);
 
       try {
         yield _readable13[Symbol.asyncIterator]().next();
       } catch (e) {
-        assert.strictEqual(e, _err5);
+        assert.strictEqual(e, _err6);
       }
     }
     {
@@ -766,9 +766,9 @@ function _tests() {
 
       var _d3 = _b3.next();
 
-      var _err6 = new Error('kaboom');
+      var _err7 = new Error('kaboom');
 
-      _r4.destroy(_err6);
+      _r4.destroy(_err7);
 
       yield Promise.all([_asyncToGenerator(function* () {
         var e;
@@ -779,7 +779,7 @@ function _tests() {
           e = _e;
         }
 
-        assert.strictEqual(e, _err6);
+        assert.strictEqual(e, _err7);
       })(), _asyncToGenerator(function* () {
         var e;
 
@@ -789,7 +789,7 @@ function _tests() {
           e = _e;
         }
 
-        assert.strictEqual(e, _err6);
+        assert.strictEqual(e, _err7);
       })()]);
     }
   });
