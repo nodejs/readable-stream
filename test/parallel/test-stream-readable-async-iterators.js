@@ -718,11 +718,11 @@ function _tests() {
 
       _r2.push(null);
 
-      assert.deepStrictEqual((yield c), {
+      assert.deepStrictEqual(yield c, {
         done: true,
         value: undefined
       });
-      assert.deepStrictEqual((yield _d), {
+      assert.deepStrictEqual(yield _d, {
         done: true,
         value: undefined
       });
@@ -743,11 +743,11 @@ function _tests() {
 
       _r3.destroy();
 
-      assert.deepStrictEqual((yield _c), {
+      assert.deepStrictEqual(yield _c, {
         done: true,
         value: undefined
       });
-      assert.deepStrictEqual((yield _d2), {
+      assert.deepStrictEqual(yield _d2, {
         done: true,
         value: undefined
       });

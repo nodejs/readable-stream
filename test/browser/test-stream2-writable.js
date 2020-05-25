@@ -1,5 +1,6 @@
 'use strict';
 var common = require('../common');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var W = require('../../lib/_stream_writable');
 var D = require('../../lib/_stream_duplex');
 
@@ -196,7 +197,7 @@ module.exports = function (t) {
     });
 
     tw.on('finish', function() {
-      process.nextTick(function() {
+      nextTick(function() {
         t.same(tw.buffer, chunks, 'got chunks in the right order');
         t.same(callbacks._called, chunks, 'called all callbacks');
         t.end();
@@ -296,7 +297,7 @@ module.exports = function (t) {
     });
     w.end('this is the end');
     w.end('and so is this');
-    process.nextTick(function() {
+    nextTick(function() {
       t.ok(gotError);
       t.end();
     });
@@ -358,7 +359,7 @@ module.exports = function (t) {
   test('finish is emitted if last chunk is empty', function(t) {
     var w = new W();
     w._write = function(chunk, e, cb) {
-      process.nextTick(cb);
+      nextTick(cb);
     };
     w.on('finish', function() {
       t.end();

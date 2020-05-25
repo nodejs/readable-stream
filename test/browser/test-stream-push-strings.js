@@ -1,6 +1,6 @@
 'use strict';
 var common = require('../common');
-
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var Readable = require('../../').Readable;
 var inherits = require('inherits');
 
@@ -24,7 +24,7 @@ module.exports = function (t) {
         case 2:
           return this.push('second to last chunk');
         case 3:
-          return process.nextTick(function() {
+          return nextTick(function() {
             this.push('first chunk');
           }.bind(this));
         default:

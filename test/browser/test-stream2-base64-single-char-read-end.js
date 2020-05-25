@@ -1,5 +1,6 @@
 'use strict';
 var common = require('../common');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var R = require('../../lib/_stream_readable');
 var W = require('../../lib/_stream_writable');
 module.exports = function (t) {
@@ -14,7 +15,7 @@ module.exports = function (t) {
   src._read = function(n) {
     if(!hasRead) {
       hasRead = true;
-      process.nextTick(function() {
+      nextTick(function() {
         src.push(Buffer.from('1'));
         src.push(null);
       });

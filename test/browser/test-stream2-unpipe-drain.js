@@ -1,7 +1,7 @@
 'use strict';
 var common = require('../common');
 var stream = require('../../');
-
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var crypto = require('crypto');
 
 var inherits = require('inherits');
@@ -42,12 +42,12 @@ module.exports = function (t) {
     src1.pipe(dest);
 
     src1.once('readable', function() {
-      process.nextTick(function() {
+      nextTick(function() {
 
         src2.pipe(dest);
 
         src2.once('readable', function() {
-          process.nextTick(function() {
+          nextTick(function() {
 
             src1.unpipe(dest);
           });
