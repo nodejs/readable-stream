@@ -1,5 +1,6 @@
 'use strict';
 var common = require('../common');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var PassThrough = require('../../lib/_stream_passthrough');
 var Transform = require('../../lib/_stream_transform');
 
@@ -248,7 +249,7 @@ module.exports = function (t) {
     };
 
     pt.once('readable', function() {
-      process.nextTick(function() {
+      nextTick(function() {
         pt.write(Buffer.from('d'));
         pt.write(Buffer.from('ef'), function() {
           pt.end();
@@ -417,7 +418,7 @@ module.exports = function (t) {
     // read one more time to get the 'end' event
     jp.read();
 
-    process.nextTick(function() {
+    nextTick(function() {
       t.ok(ended);
       t.end();
     });
@@ -459,7 +460,7 @@ module.exports = function (t) {
     // read one more time to get the 'end' event
     js.read();
 
-    process.nextTick(function() {
+    nextTick(function() {
       t.ok(ended);
       t.end();
     });

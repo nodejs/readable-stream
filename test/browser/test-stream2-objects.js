@@ -1,5 +1,6 @@
 'use strict';
 var common = require('../common');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
 
@@ -94,7 +95,7 @@ module.exports = function (t) {
     var list = [{ one: '1'}, { two: '2' }];
     r._read = function(n) {
       var item = list.shift();
-      process.nextTick(function() {
+      nextTick(function() {
         r.push(item || null);
       });
     };
@@ -256,7 +257,7 @@ module.exports = function (t) {
 
     w._write = function(chunk, encoding, cb) {
       list.push(chunk);
-      process.nextTick(cb);
+      nextTick(cb);
     };
 
     w.on('finish', function() {
@@ -282,7 +283,7 @@ module.exports = function (t) {
     w._write = function(chunk, encoding, cb) {
       t.equal(chunk, 'foo');
 
-      process.nextTick(function() {
+      nextTick(function() {
         called = true;
         cb();
       });

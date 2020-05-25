@@ -1,5 +1,6 @@
 'use strict';
 var common = require('../common');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var stream = require('../../');
 var Readable = stream.Readable;
 var Writable = stream.Writable;
@@ -49,7 +50,7 @@ module.exports = function (t) {
     function readStop() {
       //console.error('readStop');
       reading = false;
-      process.nextTick(function() {
+      nextTick(function() {
         var r = stream.read();
         if (r !== null)
           writer.write(r);
@@ -73,7 +74,7 @@ module.exports = function (t) {
     writer._write = function(chunk, encoding, cb) {
       //console.error('WRITE %s', chunk);
       written.push(chunk);
-      process.nextTick(cb);
+      nextTick(cb);
     };
 
     writer.on('finish', finish);

@@ -2,6 +2,7 @@
 var common = require('../common');
 
 var stream = require('../../');
+var nextTick = require('../../lib/internal/streams/next-tick') 
 var Readable = stream.Readable;
 var Writable = stream.Writable;
 
@@ -18,7 +19,7 @@ module.exports = function (t){
       if (!(chunks % 2))
         setImmediate(push);
       else if (!(chunks % 3))
-        process.nextTick(push);
+        nextTick(push);
       else
         push();
     };

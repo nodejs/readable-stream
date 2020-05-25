@@ -7,10 +7,10 @@
     "node": ">= 6"
   },
   "dependencies": {
+    "browser-util-inspect": "^0.2.0",
     "buffer": "^5.6.0",
     "events": "^3.1.0",
     "inherits": "^2.0.3",
-    "next-tick": "^1.1.0",
     "string_decoder": "^1.1.1",
     "util-deprecate": "^1.0.1"
   },
@@ -60,7 +60,8 @@
     "./errors": "./errors-browser.js",
     "./readable.js": "./readable-browser.js",
     "./lib/internal/streams/from.js": "./lib/internal/streams/from-browser.js",
-    "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
+    "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js",
+    "./lib/internal/streams/next-tick.js": "./lib/internal/streams/next-tick-browser.js"
   },
   "nyc": {
     "include": [
