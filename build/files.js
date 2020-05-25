@@ -342,7 +342,7 @@ module.exports['internal/streams/buffer_list.js'] = [
     [
       /const \{ inspect \} = require\('util'\);/,
       `
-const inspect = require('browser-util-inspect')
+const inspect = require('./inspect')
 const custom = inspect && inspect.custom || 'inspect'
       `
     ]
