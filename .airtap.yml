@@ -1,17 +1,18 @@
-sauce_connect: true
+providers:
+  - airtap-sauce
+
 browsers:
   - name: chrome
-    version: latest
-    platform: Windows 10
-  - name: internet explorer
-    version: latest
-    platform: Windows 10
+  - name: ie
   - name: firefox
-    version: latest
-    platform: Windows 10
   - name: safari
-    version: latest
-    platform: Mac 10.13
-  - name: microsoftedge
-    version: latest
-    platform: Windows 10
+  - name: edge
+
+presets:
+  local:
+    providers:
+      - airtap-playwright
+    browsers:
+      - name: chromium
+      - name: firefox
+      - name: webkit

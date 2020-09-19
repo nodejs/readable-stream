@@ -8,5 +8,6 @@ zlib.js
 .babelrc
 .travis.yml
 .nyc_output
+.github
 coverage
 doc/
