@@ -1,23 +1,22 @@
 language: node_js
+
 notifications:
   email: false
-matrix:
+
+import:
+  - nodejs/ci-config-travis:lts/gte-6.yml
+
+env:
+  - CMD=test
+
+jobs:
   fast_finish: true
   include:
-  - node_js: 6
-    env: CMD=test
-  - node_js: 8
-    env: CMD=test
-  - node_js: 9
-    env: CMD=test
-  - node_js: 10
-    env: CMD=test
-  - node_js: 12
-    env: CMD=test
-  - node_js: 12
-    env: CMD=test-browsers
-    addons:
-      sauce_connect: true
-      hosts:
-      - airtap.local
+    - node_js: lts/*
+      env: CMD=test-browsers
+      addons:
+        sauce_connect: true
+        hosts:
+        - airtap.local
+
 script: npm run $CMD
