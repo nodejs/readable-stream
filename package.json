@@ -18,7 +18,7 @@
     "@babel/preset-env": "^7.2.0",
     "airtap": "^4.0.1",
     "airtap-playwright": "^1.0.1",
-    "airtap-sauce": "^1.0.0",
+    "airtap-sauce": "^1.1.0",
     "assert": "^1.4.0",
     "bl": "^2.0.0",
     "deep-strict-equal": "^0.2.0",
