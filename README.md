@@ -1,11 +1,11 @@
 # readable-stream
 
-***Node.js core streams for userland*** [![Build Status](https://travis-ci.com/nodejs/readable-stream.svg?branch=master)](https://travis-ci.com/nodejs/readable-stream)
+***Node.js core streams for userland***
 
-
-[![NPM](https://nodei.co/npm/readable-stream.png?downloads=true&downloadRank=true)](https://nodei.co/npm/readable-stream/)
-[![NPM](https://nodei.co/npm-dl/readable-stream.png?&months=6&height=3)](https://nodei.co/npm/readable-stream/)
-
+[![npm status](http://img.shields.io/npm/v/readable-stream.svg)](https://www.npmjs.org/package/readable-stream)
+[![node](https://img.shields.io/node/v/readable-stream.svg)](https://www.npmjs.org/package/readable-stream)
+![Node.js](https://github.com/nodejs/readable-stream/workflows/Node.js/badge.svg?branch=master)
+![Sauce Labs](https://github.com/nodejs/readable-stream/workflows/Sauce%20Labs/badge.svg?branch=master)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/readabe-stream.svg)](https://saucelabs.com/u/readabe-stream)
 

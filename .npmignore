@@ -6,7 +6,6 @@ zlib.js
 .airtap.yml
 .airtaprc
 .babelrc
-.travis.yml
 .nyc_output
 .github
 coverage
