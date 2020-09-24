@@ -5,18 +5,3 @@ notifications:
 
 import:
   - nodejs/ci-config-travis:lts/gte-6.yml
-
-env:
-  - CMD=test
-
-jobs:
-  fast_finish: true
-  include:
-    - node_js: lts/*
-      env: CMD=test-browsers
-      addons:
-        sauce_connect: true
-        hosts:
-        - airtap.local
-
-script: npm run $CMD

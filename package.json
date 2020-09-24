@@ -16,7 +16,9 @@
     "@babel/core": "^7.2.0",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.2.0",
-    "airtap": "0.0.9",
+    "airtap": "^4.0.1",
+    "airtap-playwright": "^1.0.1",
+    "airtap-sauce": "^1.1.0",
     "assert": "^1.4.0",
     "bl": "^2.0.0",
     "deep-strict-equal": "^0.2.0",
@@ -36,8 +38,8 @@
   "scripts": {
     "test": "tap -J --no-esm test/parallel/*.js test/ours/*.js",
     "ci": "TAP=1 tap --no-esm test/parallel/*.js test/ours/*.js | tee test.tap",
-    "test-browsers": "airtap --sauce-connect --loopback airtap.local -- test/browser.js",
-    "test-browser-local": "airtap --open --local -- test/browser.js",
+    "test-browsers": "airtap test/browser.js",
+    "test-browsers-local": "airtap -p local test/browser.js",
     "cover": "nyc npm test",
     "report": "nyc report --reporter=lcov",
     "update-browser-errors": "babel -o errors-browser.js errors.js"
