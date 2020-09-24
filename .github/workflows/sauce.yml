@@ -17,15 +17,8 @@ jobs:
           SAUCE_CONNECT_DOWNLOAD_ON_INSTALL: true
       - name: Add host
         run: echo "127.0.0.1 airtap.local" | sudo tee -a /etc/hosts
-      - name: Verify Sauce Connect
-        run: ./node_modules/sauce-connect-launcher/sc/sc-4.6.2-linux/bin/sc --doctor || echo Bad
-        env:
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       - name: Test
         run: npm run test-browsers
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          DEBUG: airtap*
-          DEBUG_COLORS: true
