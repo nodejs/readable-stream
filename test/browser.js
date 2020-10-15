@@ -1,20 +1,20 @@
-if (!global.console) {
-  global.console = {};
+if (!globalThis.console) {
+  globalThis.console = {};
 }
-if (!global.console.log) {
-  global.console.log = function () {};
+if (!globalThis.console.log) {
+  globalThis.console.log = function () {};
 }
-if (!global.console.error) {
-  global.console.error = global.console.log;
+if (!globalThis.console.error) {
+  globalThis.console.error = globalThis.console.log;
 }
-if (!global.console.info) {
-  global.console.info = global.console.log;
+if (!globalThis.console.info) {
+  globalThis.console.info = globalThis.console.log;
 }
 var test = require('tape');
 var util = require('util');
 
 // TODO: add replacements instead
-global.process = {
+globalThis.process = {
   env: {},
   on: function () {},
   cwd: function () {

@@ -742,7 +742,7 @@ Installs a GC listener for the collection of `target`.
 
 This uses `async_hooks` for GC tracking. This means that it enables
 `async_hooks` tracking, which may affect the test functionality. It also
-means that between a `global.gc()` call and the listener being invoked
+means that between a `globalThis.gc()` call and the listener being invoked
 a full `setImmediate()` invocation passes.
 
 `listener` is an object to make it easier to use a closure; the target object

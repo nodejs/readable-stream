@@ -61,7 +61,7 @@ var objectKeys = objectKeys || function (obj) {
 /*</replacement>*/
 
 
-var process = global.process; // Some tests tamper with the process global.
+var process = globalThis.process; // Some tests tamper with the process globalThis.
 
 var path = require('path');
 
@@ -290,7 +290,7 @@ var pwdCommand = isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
 
 function platformTimeout(ms) {
   if (process.features.debug) ms = 2 * ms;
-  if (global.__coverage__) ms = 4 * ms;
+  if (globalThis.__coverage__) ms = 4 * ms;
   if (isAIX) return 2 * ms; // default localhost speed is slower on AIX
 
   if (process.arch !== 'arm') return ms;
@@ -304,11 +304,11 @@ function platformTimeout(ms) {
 
 var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
 
-if (global.gc) {
-  knownGlobals.push(global.gc);
+if (globalThis.gc) {
+  knownGlobals.push(globalThis.gc);
 }
 
-if (global.DTRACE_HTTP_SERVER_RESPONSE) {
+if (globalThis.DTRACE_HTTP_SERVER_RESPONSE) {
   knownGlobals.push(DTRACE_HTTP_SERVER_RESPONSE);
   knownGlobals.push(DTRACE_HTTP_SERVER_REQUEST);
   knownGlobals.push(DTRACE_HTTP_CLIENT_RESPONSE);
@@ -317,7 +317,7 @@ if (global.DTRACE_HTTP_SERVER_RESPONSE) {
   knownGlobals.push(DTRACE_NET_SERVER_CONNECTION);
 }
 
-if (global.COUNTER_NET_SERVER_CONNECTION) {
+if (globalThis.COUNTER_NET_SERVER_CONNECTION) {
   knownGlobals.push(COUNTER_NET_SERVER_CONNECTION);
   knownGlobals.push(COUNTER_NET_SERVER_CONNECTION_CLOSE);
   knownGlobals.push(COUNTER_HTTP_SERVER_REQUEST);
@@ -344,7 +344,7 @@ function allowGlobals() {
 if (typeof constructor == 'function') knownGlobals.push(constructor);
 if (typeof DTRACE_NET_SOCKET_READ == 'function') knownGlobals.push(DTRACE_NET_SOCKET_READ);
 if (typeof DTRACE_NET_SOCKET_WRITE == 'function') knownGlobals.push(DTRACE_NET_SOCKET_WRITE);
-if (global.__coverage__) knownGlobals.push(__coverage__);
+if (globalThis.__coverage__) knownGlobals.push(__coverage__);
 'console,clearImmediate,setImmediate,core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,queueMicrotask,asap,Observable,regeneratorRuntime,_babelPolyfill'.split(',').filter(function (item) {
   return typeof global[item] !== undefined;
 }).forEach(function (item) {
@@ -361,7 +361,7 @@ function leakedGlobals() {
     }
   }
 
-  if (global.__coverage__) {
+  if (globalThis.__coverage__) {
     return leaked.filter(function (varname) {
       return !/^(?:cov_|__cov)/.test(varname);
     });
