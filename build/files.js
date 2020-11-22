@@ -98,6 +98,27 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
 
+    , crossplatformEventEmitterRequire = [
+      /const EE = require\(['"]events['"]\);/g,
+      `
+      let CrossplatformEventEmitter;
+      if(typeof DenoEventEmitter === "undefined"){
+        CrossplatformEventEmitter = require('events');
+      }else{
+        CrossplatformEventEmitter = DenoEventEmitter;
+      }
+      `
+    ]
+    , crossplatformEventEmitter = [
+      /EE/g,
+      `CrossplatformEventEmitter`
+    ]
+    //This one is tricky, you need to watch out what the name of the options passed
+    //to the stream function is (opts) in this case
+    , extendCrossplatformEventEmitter = [
+      /CrossplatformEventEmitter\.call\(this\);/g,
+      `Object.assign(this, new CrossplatformEventEmitter());`
+    ]
     , eventEmittterReplacement = [
         /^(const EE = require\('events'\));$/m
       ,   '/*<replacement>*/\n$1.EventEmitter;\n\n'
@@ -124,7 +145,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , requireStreamReplacement = [
       /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
-      + 'var Stream = require(\'./internal/streams/stream\')'
+      + 'var Stream = require(\'./internal/streams/legacy\')'
       + '\n/*</replacement>*/\n'
     ]
     , isBufferReplacement = [
@@ -434,3 +455,11 @@ module.exports['internal/streams/from.js'] = [
 else if (iterable && iterable[Symbol.asyncIterator])`
     ]
 ]
+
+module.exports['internal/streams/legacy.js'] = [
+  , utilReplacement
+  , inherits
+  , crossplatformEventEmitterRequire
+  , crossplatformEventEmitter
+  , extendCrossplatformEventEmitter
+];
