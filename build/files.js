@@ -99,19 +99,30 @@ const headRegexp = /(^module.exports = \w+;?)/m
       + '\'ucs2\', \'ucs-2\',\'utf16le\', \'utf-16le\', \'raw\']\n'
       + '.indexOf(($1 + \'\').toLowerCase()) > -1)'
     ]
-
+    , bufferReplacement = [
+      /Buffer\./g,
+      'CrossplatformBuffer.'
+    ]
     , requireStreamReplacement = [
       /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
       + 'var Stream = require(\'./internal/streams/stream\')'
       + '\n/*</replacement>*/\n'
     ]
-
     , isBufferReplacement = [
       /(\w+) instanceof Buffer/g
-    , 'Buffer.isBuffer($1)'
+    , 'CrossplatformBuffer.isBuffer($1)'
     ]
-
+    , requireBufferReplacement = [
+      /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/g
+    ,  `
+    let CrossplatformBuffer;
+    if(typeof Buffer === "undefined"){
+      CrossplatformBuffer = require('buffer').Buffer;
+    }else{
+      CrossplatformBuffer = Buffer;
+    }`
+    ]
     , internalUtilReplacement = [
           /^const internalUtil = require\('internal\/util'\);/m
         ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
@@ -132,13 +143,18 @@ const headRegexp = /(^module.exports = \w+;?)/m
   , addUintStuff = [
     /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/g
     , `
-  const Buffer = require('buffer').Buffer
+  let CrossplatformBuffer;
+  if(typeof Buffer === "undefined"){
+    CrossplatformBuffer = require('buffer').Buffer;
+  }else{
+    CrossplatformBuffer = Buffer;
+  }
   const OurUint8Array = global.Uint8Array || function () {}
 function _uint8ArrayToBuffer(chunk) {
-   return Buffer.from(chunk);
+   return CrossplatformBuffer.from(chunk);
 }
 function _isUint8Array(obj) {
-  return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
+  return CrossplatformBuffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
   `
   ]
@@ -178,7 +194,7 @@ function CorkedRequest(state) {
   ]
   , fixBufferCheck = [
       /Object\.getPrototypeOf\((chunk)\) !== Buffer\.prototype/g
-    , '!Buffer.isBuffer($1)'
+    , '!CrossplatformBuffer.isBuffer($1)'
   ]
   , errorsOneLevel = [
         /internal\/errors/
@@ -255,6 +271,7 @@ module.exports['_stream_readable.js'] = [
   , stringDecoderReplacement
   , eventEmittterReplacement
   , requireStreamReplacement
+  , bufferReplacement
   , isBufferReplacement
   , eventEmittterListenerCountReplacement
   , internalDirectory
@@ -291,6 +308,7 @@ module.exports['_stream_writable.js'] = [
   , objectDefinePropertyReplacement
   , objectDefinePropertySingReplacement
   , bufferIsEncodingReplacement
+  , bufferReplacement
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement
   , isBufferReplacement
@@ -319,6 +337,8 @@ const { inspect } = require('util')
 const custom = inspect && inspect.custom || 'inspect'
       `
     ]
+    , requireBufferReplacement
+    , bufferReplacement
 ]
 module.exports['internal/streams/destroy.js'] = [
     errorsTwoLevel

@@ -6,15 +6,19 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 if (process.version.indexOf('v0.8') === 0) {
   process.exit(0);
@@ -34,15 +38,15 @@ var _require = require('../../'),
     Writable = _require.Writable,
     Readable = _require.Readable;
 
-var NullWriteable =
-/*#__PURE__*/
-function (_Writable) {
+var NullWriteable = /*#__PURE__*/function (_Writable) {
   _inherits(NullWriteable, _Writable);
+
+  var _super = _createSuper(NullWriteable);
 
   function NullWriteable() {
     _classCallCheck(this, NullWriteable);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(NullWriteable).apply(this, arguments));
+    return _super.apply(this, arguments);
   }
 
   _createClass(NullWriteable, [{
@@ -55,15 +59,15 @@ function (_Writable) {
   return NullWriteable;
 }(Writable);
 
-var QuickEndReadable =
-/*#__PURE__*/
-function (_Readable) {
+var QuickEndReadable = /*#__PURE__*/function (_Readable) {
   _inherits(QuickEndReadable, _Readable);
+
+  var _super2 = _createSuper(QuickEndReadable);
 
   function QuickEndReadable() {
     _classCallCheck(this, QuickEndReadable);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(QuickEndReadable).apply(this, arguments));
+    return _super2.apply(this, arguments);
   }
 
   _createClass(QuickEndReadable, [{
@@ -76,15 +80,15 @@ function (_Readable) {
   return QuickEndReadable;
 }(Readable);
 
-var NeverEndReadable =
-/*#__PURE__*/
-function (_Readable2) {
+var NeverEndReadable = /*#__PURE__*/function (_Readable2) {
   _inherits(NeverEndReadable, _Readable2);
+
+  var _super3 = _createSuper(NeverEndReadable);
 
   function NeverEndReadable() {
     _classCallCheck(this, NeverEndReadable);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(NeverEndReadable).apply(this, arguments));
+    return _super3.apply(this, arguments);
   }
 
   _createClass(NeverEndReadable, [{

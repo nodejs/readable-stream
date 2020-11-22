@@ -42,9 +42,7 @@ var kCallback = Symbol('callback');
 
 var common = require('./');
 
-var Countdown =
-/*#__PURE__*/
-function () {
+var Countdown = /*#__PURE__*/function () {
   function Countdown(limit, cb) {
     _classCallCheck(this, Countdown);
 
