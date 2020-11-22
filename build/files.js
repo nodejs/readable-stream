@@ -51,13 +51,21 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , debugLogReplacement = [
           /const debug = util.debuglog\('stream'\);/
-      ,   '\n\n/*<replacement>*/\nconst debugUtil = require(\'util\');\n'
-        + 'let debug;\n'
-        + 'if (debugUtil && debugUtil.debuglog) {\n'
-        + '  debug = debugUtil.debuglog(\'stream\');\n'
-        + '} else {\n'
-        + '  debug = function () {};\n'
-        + '}\n/*</replacement>*/\n'
+      , `
+      /*<replacement>*/
+      let CrossplatformUtil;
+      if(typeof DenoUtil === "undefined"){
+        CrossplatformUtil = require('util');
+      }else{
+        CrossplatformUtil = DenoUtil;
+      }
+      /*</replacement>*/
+      let debug;
+      if (CrossplatformUtil && CrossplatformUtil.debuglog) {
+        debug = CrossplatformUtil.debuglog('stream');
+      } else {
+        debug = function () {};
+      }`
       ]
 
     , deprecateReplacement = [
@@ -125,8 +133,18 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
     , internalUtilReplacement = [
           /^const internalUtil = require\('internal\/util'\);/m
-        ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
-          + '/*</replacement>*/\n'
+        ,
+        `
+        /*<replacement>*/
+        let deprecate;
+        if(typeof DenoUtil === "undefined"){
+          deprecate = require('util-deprecate');
+        }else{
+          deprecate = DenoUtil.deprecate;
+        }
+        const internalUtil = { deprecate };
+        /*</replacement>*/
+        `
       ]
   , internalDirectory = [
     /require\('internal\/streams\/([a-zA-z]+)'\)/g,
@@ -333,8 +351,16 @@ module.exports['internal/streams/buffer_list.js'] = [
     [
       /const \{ inspect \} = require\('util'\);/,
       `
-const { inspect } = require('util')
-const custom = inspect && inspect.custom || 'inspect'
+      /*<replacement>*/
+      let CrossplatformUtil;
+      if(typeof DenoUtil === "undefined"){
+        CrossplatformUtil = require('util');
+      }else{
+        CrossplatformUtil = DenoUtil;
+      }
+      /*</replacement>*/
+      const { inspect } = CrossplatformUtil;
+      const custom = inspect && inspect.custom || 'inspect'
       `
     ]
     , requireBufferReplacement
