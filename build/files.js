@@ -24,6 +24,16 @@ const headRegexp = /(^module.exports = \w+;?)/m
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
       ]
+    , lazyStringDecoderReplacement = [
+      /if \(\!StringDecoder\)\s*StringDecoder = require\(['"]string_decoder['"]\)\.StringDecoder;/g
+      , `
+      if (typeof DenoStringDecoder === "undefined") {
+        StringDecoder = require('string_decoder/').StringDecoder
+      }else{
+        StringDecoder = DenoStringDecoder;
+      }
+      `
+    ]
 
       // The browser build ends up with a circular dependency, so the require is
       // done lazily, but cached.
@@ -282,11 +292,10 @@ module.exports['_stream_readable.js'] = [
   , instanceofReplacement
   , altIndexOfImplReplacement
   , altIndexOfUseReplacement
-  , stringDecoderReplacement
+  , lazyStringDecoderReplacement
   , debugLogReplacement
   , utilReplacement
   , inherits
-  , stringDecoderReplacement
   , eventEmittterReplacement
   , requireStreamReplacement
   , bufferReplacement
