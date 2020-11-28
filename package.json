@@ -59,7 +59,7 @@
     "./errors": "./errors-browser.js",
     "./readable.js": "./readable-browser.js",
     "./lib/internal/streams/from.js": "./lib/internal/streams/from-browser.js",
-    "./lib/internal/streams/stream.js": "./lib/internal/streams/stream-browser.js"
+    "./lib/internal/streams/legacy.js": "./lib/internal/streams/stream-browser.js"
   },
   "nyc": {
     "include": [
