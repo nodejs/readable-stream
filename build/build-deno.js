@@ -3,6 +3,6 @@ require("esbuild").buildSync({
   entryPoints: ['./readable.js'],
   format: "esm",
   inject: ['./build/node-shim.js'],
-  outfile: './readable-deno.js',
+  outfile: './_readable-deno.js',
   platform: "node",
 });
