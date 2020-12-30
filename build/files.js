@@ -309,6 +309,8 @@ module.exports['_stream_passthrough.js'] = [
 module.exports['_stream_readable.js'] = [
     addDuplexRequire
   , addDuplexDec
+  , crossplatformEventEmitterRequire
+  , crossplatformEventEmitter
   , requireReplacement
   , instanceofReplacement
   , altIndexOfImplReplacement

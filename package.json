@@ -22,6 +22,7 @@
     "assert": "^1.4.0",
     "bl": "^2.0.0",
     "deep-strict-equal": "^0.2.0",
+    "esbuild": "^0.8.8",
     "events.once": "^2.0.2",
     "glob": "^7.1.2",
     "gunzip-maybe": "^1.4.1",
