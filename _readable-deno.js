@@ -190,10 +190,10 @@ var require_buffer_list = __commonJS((exports, module) => {
     CrossplatformBuffer = Buffer;
   }
   var CrossplatformUtil;
-  if (typeof default4 === "undefined") {
+  if (typeof default3 === "undefined") {
     CrossplatformUtil = require("util");
   } else {
-    CrossplatformUtil = default4;
+    CrossplatformUtil = default3;
   }
   var _CrossplatformUtil = CrossplatformUtil;
   var inspect = _CrossplatformUtil.inspect;
@@ -608,10 +608,10 @@ var require_stream_writable = __commonJS((exports, module) => {
   var Duplex;
   Writable.WritableState = WritableState;
   var deprecate;
-  if (typeof default4 === "undefined") {
+  if (typeof default3 === "undefined") {
     deprecate = require_node();
   } else {
-    deprecate = default4.deprecate;
+    deprecate = default3.deprecate;
   }
   var internalUtil = {
     deprecate
@@ -1581,10 +1581,10 @@ var require_stream_readable = __commonJS((exports, module) => {
     return CrossplatformBuffer.isBuffer(obj) || obj instanceof OurUint8Array;
   }
   var CrossplatformUtil;
-  if (typeof default4 === "undefined") {
+  if (typeof default3 === "undefined") {
     CrossplatformUtil = require("util");
   } else {
-    CrossplatformUtil = default4;
+    CrossplatformUtil = default3;
   }
   var debug;
   if (CrossplatformUtil && CrossplatformUtil.debuglog) {
@@ -1602,7 +1602,7 @@ var require_stream_readable = __commonJS((exports, module) => {
   var ERR_STREAM_PUSH_AFTER_EOF = _require$codes.ERR_STREAM_PUSH_AFTER_EOF;
   var ERR_METHOD_NOT_IMPLEMENTED = _require$codes.ERR_METHOD_NOT_IMPLEMENTED;
   var ERR_STREAM_UNSHIFT_AFTER_END_EVENT = _require$codes.ERR_STREAM_UNSHIFT_AFTER_END_EVENT;
-  var StringDecoder;
+  var StringDecoder2;
   var createReadableStreamAsyncIterator;
   var from;
   require_inherits()(Readable, Stream);
@@ -1650,12 +1650,12 @@ var require_stream_readable = __commonJS((exports, module) => {
     this.decoder = null;
     this.encoding = null;
     if (options.encoding) {
-      if (typeof default3 === "undefined") {
-        StringDecoder = require("string_decoder/").StringDecoder;
+      if (typeof StringDecoder === "undefined") {
+        StringDecoder2 = require("string_decoder/").StringDecoder;
       } else {
-        StringDecoder = default3;
+        StringDecoder2 = StringDecoder;
       }
-      this.decoder = new StringDecoder(options.encoding);
+      this.decoder = new StringDecoder2(options.encoding);
       this.encoding = options.encoding;
     }
   }
@@ -1784,12 +1784,12 @@ var require_stream_readable = __commonJS((exports, module) => {
     return this._readableState.flowing === false;
   };
   Readable.prototype.setEncoding = function(enc) {
-    if (typeof default3 === "undefined") {
-      StringDecoder = require("string_decoder/").StringDecoder;
+    if (typeof StringDecoder === "undefined") {
+      StringDecoder2 = require("string_decoder/").StringDecoder;
     } else {
-      StringDecoder = default3;
+      StringDecoder2 = StringDecoder;
     }
-    var decoder = new StringDecoder(enc);
+    var decoder = new StringDecoder2(enc);
     this._readableState.decoder = decoder;
     this._readableState.encoding = this._readableState.decoder.encoding;
     var p = this._readableState.buffer.head;
@@ -2598,6 +2598,6 @@ var require_readable = __commonJS((exports, module) => {
 // build/node-shim.js
 import "https://deno.land/std@0.83.0/node/global.ts";
 import {default as default2} from "https://deno.land/std@0.83.0/node/events.ts";
-import {default as default3} from "https://deno.land/std@0.83.0/node/string_decoder.ts";
-import {default as default4} from "https://deno.land/std@0.83.0/node/util.ts";
+import {StringDecoder} from "https://deno.land/std@0.83.0/node/string_decoder.ts";
+import {default as default3} from "https://deno.land/std@0.83.0/node/util.ts";
 export default require_readable();
