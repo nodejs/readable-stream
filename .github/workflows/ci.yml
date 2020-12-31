@@ -16,7 +16,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Install Deno
+      uses: denolib/setup-deno@v2
+      with:
+        deno-version: v1.6.3
     - name: npm install
       run: npm install
     - name: npm run test
       run: npm run test
+    - name: Test Deno build
+      run: deno run -A --unstable --import-map=import-map.json test/deno.js

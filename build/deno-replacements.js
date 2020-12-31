@@ -8,7 +8,3 @@ module.exports.all = [
     '$1../common-deno.js',
   ],
 ];
-
-module.exports['test-stream3-pause-then-read.js'] = [
-  
-]
