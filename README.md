@@ -76,6 +76,30 @@ Note that `require('stream')` will return `Stream`, while
 whatever is exported directly, but rather use one of the properties as
 shown in the example above.
 
+## Usage In Browsers
+
+You will need a bundler like [`browserify`](https://github.com/browserify/browserify#readme), [`webpack`](https://webpack.js.org/), [`parcel`](https://github.com/parcel-bundler/parcel#readme) or similar. With Webpack 5 (which unlike other bundlers does not polyfill Node.js core modules and globals like `process`) you will also need to:
+
+1. Install polyfills by running `npm install buffer process --save-dev`
+2. Create a [`webpack.config.js`](https://webpack.js.org/guides/getting-started/#using-a-configuration) file containing:
+
+```js
+const webpack = require('webpack')
+
+module.exports = {
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    })
+  ],
+  resolve: {
+    fallback: {
+      buffer: require.resolve('buffer/')
+    }
+  }
+}
+```
+
 # Streams Working Group
 
 `readable-stream` is maintained by the Streams Working Group, which
