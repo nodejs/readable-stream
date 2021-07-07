@@ -1,7 +1,9 @@
 var Stream = require('stream');
 if (process.env.READABLE_STREAM === 'disable' && Stream) {
   module.exports = Stream.Readable;
-  Object.assign(module.exports, Stream);
+  Object.entries(Object.getOwnPropertyDescriptors(Stream))
+    .filter((entry) => entry[1].writable && entry[0] !== 'prototype')
+    .forEach((entry) => module.exports[entry[0]] = Stream[entry[0]])
   module.exports.Stream = Stream;
 } else {
   exports = module.exports = require('./lib/_stream_readable.js');
