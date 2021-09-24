@@ -4,8 +4,8 @@
 
 [![npm status](http://img.shields.io/npm/v/readable-stream.svg)](https://www.npmjs.org/package/readable-stream)
 [![node](https://img.shields.io/node/v/readable-stream.svg)](https://www.npmjs.org/package/readable-stream)
-![Node.js](https://github.com/nodejs/readable-stream/workflows/Node.js/badge.svg?branch=master)
-![Sauce Labs](https://github.com/nodejs/readable-stream/workflows/Sauce%20Labs/badge.svg?branch=master)
+![Node.js](https://github.com/nodejs/readable-stream/workflows/Node.js/badge.svg?branch=main)
+![Sauce Labs](https://github.com/nodejs/readable-stream/workflows/Sauce%20Labs/badge.svg?branch=main)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/readabe-stream.svg)](https://saucelabs.com/u/readabe-stream)
 
