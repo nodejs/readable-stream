@@ -4,7 +4,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _asyncIterator(iterable) { var method; if (typeof Symbol !== "undefined") { if (Symbol.asyncIterator) { method = iterable[Symbol.asyncIterator]; if (method != null) return method.call(iterable); } if (Symbol.iterator) { method = iterable[Symbol.iterator]; if (method != null) return method.call(iterable); } } throw new TypeError("Object is not async iterable"); }
+function _asyncIterator(iterable) { var method, async, sync, retry = 2; for ("undefined" != typeof Symbol && (async = Symbol.asyncIterator, sync = Symbol.iterator); retry--;) { if (async && null != (method = iterable[async])) return method.call(iterable); if (sync && null != (method = iterable[sync])) return new AsyncFromSyncIterator(method.call(iterable)); async = "@@asyncIterator", sync = "@@iterator"; } throw new TypeError("Object is not async iterable"); }
+
+function AsyncFromSyncIterator(s) { function AsyncFromSyncIteratorContinuation(r) { if (Object(r) !== r) return Promise.reject(new TypeError(r + " is not an object.")); var done = r.done; return Promise.resolve(r.value).then(function (value) { return { value: value, done: done }; }); } return AsyncFromSyncIterator = function AsyncFromSyncIterator(s) { this.s = s, this.n = s.next; }, AsyncFromSyncIterator.prototype = { s: null, n: null, next: function next() { return AsyncFromSyncIteratorContinuation(this.n.apply(this.s, arguments)); }, return: function _return(value) { var ret = this.s.return; return void 0 === ret ? Promise.resolve({ value: value, done: !0 }) : AsyncFromSyncIteratorContinuation(ret.apply(this.s, arguments)); }, throw: function _throw(value) { var thr = this.s.return; return void 0 === thr ? Promise.reject(value) : AsyncFromSyncIteratorContinuation(thr.apply(this.s, arguments)); } }, new AsyncFromSyncIterator(s); }
 
 /*<replacement>*/
 var bufferShim = require('safe-buffer').Buffer;
@@ -42,14 +44,14 @@ function _tests() {
       readable.push(null);
       var iter = readable[Symbol.asyncIterator]();
       assert.strictEqual((yield iter.next()).value, 0);
-      var _iteratorNormalCompletion = true;
+      var _iteratorAbruptCompletion = false;
       var _didIteratorError = false;
 
       var _iteratorError;
 
       try {
-        for (var _iterator = _asyncIterator(iter), _step, _value; _step = yield _iterator.next(), _iteratorNormalCompletion = _step.done, _value = yield _step.value, !_iteratorNormalCompletion; _iteratorNormalCompletion = true) {
-          var d = _value;
+        for (var _iterator = _asyncIterator(iter), _step; _iteratorAbruptCompletion = !(_step = yield _iterator.next()).done; _iteratorAbruptCompletion = false) {
+          var d = _step.value;
           assert.strictEqual(d, 1);
         }
       } catch (err) {
@@ -57,7 +59,7 @@ function _tests() {
         _iteratorError = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
+          if (_iteratorAbruptCompletion && _iterator.return != null) {
             yield _iterator.return();
           }
         } finally {
@@ -242,14 +244,14 @@ function _tests() {
         }
       });
 
-      var _iteratorNormalCompletion2 = true;
+      var _iteratorAbruptCompletion2 = false;
       var _didIteratorError2 = false;
 
       var _iteratorError2;
 
       try {
-        for (var _iterator2 = _asyncIterator(_readable5), _step2, _value2; _step2 = yield _iterator2.next(), _iteratorNormalCompletion2 = _step2.done, _value2 = yield _step2.value, !_iteratorNormalCompletion2; _iteratorNormalCompletion2 = true) {
-          var _k = _value2;
+        for (var _iterator2 = _asyncIterator(_readable5), _step2; _iteratorAbruptCompletion2 = !(_step2 = yield _iterator2.next()).done; _iteratorAbruptCompletion2 = false) {
+          var _k = _step2.value;
           received++;
           assert.strictEqual(_k, 'hello');
         }
@@ -258,7 +260,7 @@ function _tests() {
         _iteratorError2 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+          if (_iteratorAbruptCompletion2 && _iterator2.return != null) {
             yield _iterator2.return();
           }
         } finally {
@@ -284,21 +286,21 @@ function _tests() {
 
       try {
         // eslint-disable-next-line no-unused-vars
-        var _iteratorNormalCompletion3 = true;
+        var _iteratorAbruptCompletion3 = false;
         var _didIteratorError3 = false;
 
         var _iteratorError3;
 
         try {
-          for (var _iterator3 = _asyncIterator(_readable6), _step3, _value3; _step3 = yield _iterator3.next(), _iteratorNormalCompletion3 = _step3.done, _value3 = yield _step3.value, !_iteratorNormalCompletion3; _iteratorNormalCompletion3 = true) {
-            var _k2 = _value3;
+          for (var _iterator3 = _asyncIterator(_readable6), _step3; _iteratorAbruptCompletion3 = !(_step3 = yield _iterator3.next()).done; _iteratorAbruptCompletion3 = false) {
+            var _k2 = _step3.value;
           }
         } catch (err) {
           _didIteratorError3 = true;
           _iteratorError3 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            if (_iteratorAbruptCompletion3 && _iterator3.return != null) {
               yield _iterator3.return();
             }
           } finally {
@@ -336,14 +338,14 @@ function _tests() {
 
       try {
         // eslint-disable-next-line no-unused-vars
-        var _iteratorNormalCompletion4 = true;
+        var _iteratorAbruptCompletion4 = false;
         var _didIteratorError4 = false;
 
         var _iteratorError4;
 
         try {
-          for (var _iterator4 = _asyncIterator(_readable7), _step4, _value4; _step4 = yield _iterator4.next(), _iteratorNormalCompletion4 = _step4.done, _value4 = yield _step4.value, !_iteratorNormalCompletion4; _iteratorNormalCompletion4 = true) {
-            var _k3 = _value4;
+          for (var _iterator4 = _asyncIterator(_readable7), _step4; _iteratorAbruptCompletion4 = !(_step4 = yield _iterator4.next()).done; _iteratorAbruptCompletion4 = false) {
+            var _k3 = _step4.value;
             _received++;
           }
         } catch (err) {
@@ -351,7 +353,7 @@ function _tests() {
           _iteratorError4 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            if (_iteratorAbruptCompletion4 && _iterator4.return != null) {
               yield _iterator4.return();
             }
           } finally {
@@ -380,14 +382,14 @@ function _tests() {
       var _err3 = null;
 
       try {
-        var _iteratorNormalCompletion5 = true;
+        var _iteratorAbruptCompletion5 = false;
         var _didIteratorError5 = false;
 
         var _iteratorError5;
 
         try {
-          for (var _iterator5 = _asyncIterator(_readable8), _step5, _value5; _step5 = yield _iterator5.next(), _iteratorNormalCompletion5 = _step5.done, _value5 = yield _step5.value, !_iteratorNormalCompletion5; _iteratorNormalCompletion5 = true) {
-            var _k4 = _value5;
+          for (var _iterator5 = _asyncIterator(_readable8), _step5; _iteratorAbruptCompletion5 = !(_step5 = yield _iterator5.next()).done; _iteratorAbruptCompletion5 = false) {
+            var _k4 = _step5.value;
             assert.strictEqual(_k4, 'hello');
             throw new Error('kaboom');
           }
@@ -396,7 +398,7 @@ function _tests() {
           _iteratorError5 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+            if (_iteratorAbruptCompletion5 && _iterator5.return != null) {
               yield _iterator5.return();
             }
           } finally {
@@ -427,14 +429,14 @@ function _tests() {
       var _err4 = null;
 
       try {
-        var _iteratorNormalCompletion6 = true;
+        var _iteratorAbruptCompletion6 = false;
         var _didIteratorError6 = false;
 
         var _iteratorError6;
 
         try {
-          for (var _iterator6 = _asyncIterator(_readable9), _step6, _value6; _step6 = yield _iterator6.next(), _iteratorNormalCompletion6 = _step6.done, _value6 = yield _step6.value, !_iteratorNormalCompletion6; _iteratorNormalCompletion6 = true) {
-            var _k5 = _value6;
+          for (var _iterator6 = _asyncIterator(_readable9), _step6; _iteratorAbruptCompletion6 = !(_step6 = yield _iterator6.next()).done; _iteratorAbruptCompletion6 = false) {
+            var _k5 = _step6.value;
             assert.strictEqual(_k5, 'hello');
             _received2++;
           }
@@ -443,7 +445,7 @@ function _tests() {
           _iteratorError6 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+            if (_iteratorAbruptCompletion6 && _iterator6.return != null) {
               yield _iterator6.return();
             }
           } finally {
@@ -480,14 +482,14 @@ function _tests() {
         }
       });
 
-      var _iteratorNormalCompletion7 = true;
+      var _iteratorAbruptCompletion7 = false;
       var _didIteratorError7 = false;
 
       var _iteratorError7;
 
       try {
-        for (var _iterator7 = _asyncIterator(_readable10), _step7, _value7; _step7 = yield _iterator7.next(), _iteratorNormalCompletion7 = _step7.done, _value7 = yield _step7.value, !_iteratorNormalCompletion7; _iteratorNormalCompletion7 = true) {
-          var _k6 = _value7;
+        for (var _iterator7 = _asyncIterator(_readable10), _step7; _iteratorAbruptCompletion7 = !(_step7 = yield _iterator7.next()).done; _iteratorAbruptCompletion7 = false) {
+          var _k6 = _step7.value;
           _received3++;
           assert.strictEqual(_k6, 'hello');
         }
@@ -496,7 +498,7 @@ function _tests() {
         _iteratorError7 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+          if (_iteratorAbruptCompletion7 && _iterator7.return != null) {
             yield _iterator7.return();
           }
         } finally {
@@ -538,14 +540,14 @@ function _tests() {
       });
 
       var data = '';
-      var _iteratorNormalCompletion8 = true;
+      var _iteratorAbruptCompletion8 = false;
       var _didIteratorError8 = false;
 
       var _iteratorError8;
 
       try {
-        for (var _iterator8 = _asyncIterator(_readable11), _step8, _value8; _step8 = yield _iterator8.next(), _iteratorNormalCompletion8 = _step8.done, _value8 = yield _step8.value, !_iteratorNormalCompletion8; _iteratorNormalCompletion8 = true) {
-          var _k7 = _value8;
+        for (var _iterator8 = _asyncIterator(_readable11), _step8; _iteratorAbruptCompletion8 = !(_step8 = yield _iterator8.next()).done; _iteratorAbruptCompletion8 = false) {
+          var _k7 = _step8.value;
           data += _k7;
         }
       } catch (err) {
@@ -553,7 +555,7 @@ function _tests() {
         _iteratorError8 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+          if (_iteratorAbruptCompletion8 && _iterator8.return != null) {
             yield _iterator8.return();
           }
         } finally {
@@ -575,8 +577,8 @@ function _tests() {
 
       _readable12.destroy();
 
-      var _ref = yield _readable12[Symbol.asyncIterator]().next(),
-          done = _ref.done;
+      var _yield$_readable12$Sy = yield _readable12[Symbol.asyncIterator]().next(),
+          done = _yield$_readable12$Sy.done;
 
       assert.strictEqual(done, true);
     }
@@ -615,14 +617,14 @@ function _tests() {
         }
       }); // eslint-disable-next-line no-unused-vars
 
-      var _iteratorNormalCompletion9 = true;
+      var _iteratorAbruptCompletion9 = false;
       var _didIteratorError9 = false;
 
       var _iteratorError9;
 
       try {
-        for (var _iterator9 = _asyncIterator(r), _step9, _value9; _step9 = yield _iterator9.next(), _iteratorNormalCompletion9 = _step9.done, _value9 = yield _step9.value, !_iteratorNormalCompletion9; _iteratorNormalCompletion9 = true) {
-          var a = _value9;
+        for (var _iterator9 = _asyncIterator(r), _step9; _iteratorAbruptCompletion9 = !(_step9 = yield _iterator9.next()).done; _iteratorAbruptCompletion9 = false) {
+          var a = _step9.value;
         } // eslint-disable-next-line no-unused-vars
 
       } catch (err) {
@@ -630,7 +632,7 @@ function _tests() {
         _iteratorError9 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
+          if (_iteratorAbruptCompletion9 && _iterator9.return != null) {
             yield _iterator9.return();
           }
         } finally {
@@ -640,21 +642,21 @@ function _tests() {
         }
       }
 
-      var _iteratorNormalCompletion10 = true;
+      var _iteratorAbruptCompletion10 = false;
       var _didIteratorError10 = false;
 
       var _iteratorError10;
 
       try {
-        for (var _iterator10 = _asyncIterator(r), _step10, _value10; _step10 = yield _iterator10.next(), _iteratorNormalCompletion10 = _step10.done, _value10 = yield _step10.value, !_iteratorNormalCompletion10; _iteratorNormalCompletion10 = true) {
-          var b = _value10;
+        for (var _iterator10 = _asyncIterator(r), _step10; _iteratorAbruptCompletion10 = !(_step10 = yield _iterator10.next()).done; _iteratorAbruptCompletion10 = false) {
+          var b = _step10.value;
         }
       } catch (err) {
         _didIteratorError10 = true;
         _iteratorError10 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
+          if (_iteratorAbruptCompletion10 && _iterator10.return != null) {
             yield _iterator10.return();
           }
         } finally {
@@ -676,14 +678,14 @@ function _tests() {
       }); // eslint-disable-next-line no-unused-vars
 
 
-      var _iteratorNormalCompletion11 = true;
+      var _iteratorAbruptCompletion11 = false;
       var _didIteratorError11 = false;
 
       var _iteratorError11;
 
       try {
-        for (var _iterator11 = _asyncIterator(_r), _step11, _value11; _step11 = yield _iterator11.next(), _iteratorNormalCompletion11 = _step11.done, _value11 = yield _step11.value, !_iteratorNormalCompletion11; _iteratorNormalCompletion11 = true) {
-          var _a = _value11;
+        for (var _iterator11 = _asyncIterator(_r), _step11; _iteratorAbruptCompletion11 = !(_step11 = yield _iterator11.next()).done; _iteratorAbruptCompletion11 = false) {
+          var _a = _step11.value;
 
           _r.destroy(null);
         }
@@ -692,7 +694,7 @@ function _tests() {
         _iteratorError11 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
+          if (_iteratorAbruptCompletion11 && _iterator11.return != null) {
             yield _iterator11.return();
           }
         } finally {
@@ -718,11 +720,11 @@ function _tests() {
 
       _r2.push(null);
 
-      assert.deepStrictEqual((yield c), {
+      assert.deepStrictEqual(yield c, {
         done: true,
         value: undefined
       });
-      assert.deepStrictEqual((yield _d), {
+      assert.deepStrictEqual(yield _d, {
         done: true,
         value: undefined
       });
@@ -743,11 +745,11 @@ function _tests() {
 
       _r3.destroy();
 
-      assert.deepStrictEqual((yield _c), {
+      assert.deepStrictEqual(yield _c, {
         done: true,
         value: undefined
       });
-      assert.deepStrictEqual((yield _d2), {
+      assert.deepStrictEqual(yield _d2, {
         done: true,
         value: undefined
       });
