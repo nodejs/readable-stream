@@ -1,3 +1,5 @@
+'use strict'
+
 const { Transform } = require('../lib')
 
 class MyStream extends Transform {

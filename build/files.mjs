@@ -1,26 +1,32 @@
 export const sources = [
   'lib/_stream_.+',
   'lib/internal/errors.js',
+  'lib/internal/per_context/primordials.js',
   'lib/internal/streams/.+',
-  'lib/internal/wrap_js_stream.js',
-  'test/parallel/test-stream.+',
-  'test/parallel/test-readable.+',
+  'lib/internal/util/inspect.js',
+  'lib/internal/validators.js',
+  'lib/internal/js_stream_socket.js',
+  'lib/stream.js',
+  'lib/stream/promises.js',
+  'test/common/fixtures.js',
+  'test/common/fixtures.mjs',
   'test/common/index.js',
-  'test/common/tmpdir.js'
+  'test/common/index.mjs',
+  'test/common/tmpdir.js',
+  'test/fixtures/[^/]+.txt',
+  'test/parallel/test-readable.+',
+  'test/parallel/test-stream.+'
 ]
 
 export const skippedSources = [
-  'test/parallel/test-stream2-httpclient-response-end.js',
-  'test/parallel/test-stream-base-no-abort.js',
-  'test/parallel/test-stream-preprocess.js',
-  'test/parallel/test-stream-inheritance.js',
-  'test/parallel/test-stream-base-prototype-accessors.js',
-  'test/parallel/test-stream-base-prototype-accessors-enumerability.js',
-  'test/parallel/test-stream-wrap-drain.js',
-  'test/parallel/test-stream-pipeline-http2.js',
-  'test/parallel/test-stream-base-typechecking.js'
+  'test/parallel/test-stream-consumers.js',
+  'test/parallel/test-stream-destroy.js',
+  'test/parallel/test-stream-map.js',
+  'test/parallel/test-stream-pipeline.js',
+  'test/parallel/test-stream-readable-async-iterators.js'
 ]
 
 export const aliases = {
-  'lib/internal/errors.js': ['lib/internal/errors-browser.js']
+  'lib/internal/per_context/primordials.js': ['lib/internal/primordials.js'],
+  'lib/internal/util/inspect.js': ['lib/internal/inspect.js', 'lib/internal/inspect-browser.js']
 }

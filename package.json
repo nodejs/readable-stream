@@ -2,7 +2,6 @@
   "name": "readable-stream",
   "version": "3.6.0",
   "description": "Streams3, a user-land copy of the stream library from Node.js",
-  "author": "NearForm Ltd",
   "homepage": "https://github.com/nodejs/readable-stream",
   "license": "MIT",
   "licenses": [
@@ -33,28 +32,29 @@
     "util": false,
     "worker_threads": false,
     "./lib/index.js": "./lib/browser.js",
-    "./lib/internal/errors.js": "./lib/internal/errors-browser.js"
+    "./lib/internal/inspect.js": "./lib/internal/inspect-browser.js"
   },
   "scripts": {
     "build": "node build/build.mjs",
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
-    "test-browsers": "airtap test/browser/test-*.js",
-    "test-browsers-local": "airtap -p local test/browser/test-*.js",
+    "test:browsers": "airtap test/browser/test-*.js",
+    "test:browsers:local": "airtap -p local test/browser/test-*.js",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src",
     "lint": "eslint src"
   },
   "dependencies": {
-    "inherits": "^2.0.4",
-    "util-deprecate": "^1.0.2"
+    "aggregate-error": "^3.1.0",
+    "abort-controller": "^3.0.0"
   },
   "devDependencies": {
+    "@sinonjs/fake-timers": "^9.1.1",
     "airtap": "^4.0.4",
     "airtap-playwright": "^1.0.1",
+    "airtap-sauce": "^1.1.2",
     "c8": "^7.11.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
-    "lolex": "^6.0.0",
     "prettier": "^2.6.2",
     "tap": "^16.0.1",
     "tape": "^5.5.2",

@@ -1,4 +1,5 @@
 import { createReadStream } from 'node:fs'
+import process from 'node:process'
 import { Readable } from '../lib/index.js'
 
 const fst = createReadStream(new URL(import.meta.url).pathname)
@@ -13,7 +14,7 @@ rst.on('end', function () {
 console.log("Every time you press a key, you will see more contents of the source file. Let's begin!\n\n")
 process.stdin.setRawMode(true)
 process.stdin.on('data', function () {
-  const c = rst.read(25)
+  const c = rst.read(100)
   if (!c) {
     return setTimeout(process.exit, 500)
   }

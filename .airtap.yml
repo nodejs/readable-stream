@@ -1,6 +1,6 @@
 providers:
   - airtap-sauce
-
+sauce_connect: true
 browsers:
   - name: chrome
   - name: firefox
@@ -15,3 +15,7 @@ presets:
       - name: chromium
       - name: firefox
       - name: webkit
+      - name: chromium
+        options:
+          launch:
+            channel: msedge

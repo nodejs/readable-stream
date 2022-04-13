@@ -3,7 +3,7 @@
 require('../common')
 const t = require('tap')
 const util = require('util')
-const lolex = require('lolex')
+const fakeTimers = require('@sinonjs/fake-timers')
 const Transform = require('../../lib').Transform
 
 t.plan(1)
@@ -14,7 +14,7 @@ function MyTransform() {
 
 util.inherits(MyTransform, Transform)
 
-const clock = lolex.install({ toFake: ['setImmediate', 'nextTick'] })
+const clock = fakeTimers.install({ toFake: ['setImmediate', 'nextTick'] })
 let stream2DataCalled = false
 
 const stream = new MyTransform()

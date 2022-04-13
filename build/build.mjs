@@ -1,6 +1,7 @@
 import { createReadStream } from 'node:fs'
-import { copyFile, cp, mkdir, rm, writeFile } from 'node:fs/promises'
+import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
+import process from 'node:process'
 import { finished } from 'node:stream/promises'
 import { Parse } from 'tar'
 import { request } from 'undici'
@@ -8,7 +9,7 @@ import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
 import { replacements } from './replacements.mjs'
 
-const baseMatcher = /^lib|test/
+const baseMatcher = /^(?:lib|test)/
 
 function highlightFile(file, color) {
   return `\x1b[${color}m${file.replace(process.cwd() + '/', '')}\x1b[0m`
@@ -82,7 +83,7 @@ async function processFiles(contents) {
     }
 
     // Append trailers
-    if (matchingReplacements.length) {
+    if (matchingFooters.length) {
       modifications.push(highlightFile('footers', 33))
 
       for (const footerKey of matchingFooters) {
@@ -144,13 +145,25 @@ async function main() {
     tarFile = await downloadNode(nodeVersion)
   }
 
-  // Extract and process contents
+  // Extract contents
   const contents = await extract(nodeVersion, tarFile)
 
-  await mkdir('lib/internal/streams', { recursive: true, force: true })
-  await mkdir('test/common', { recursive: true, force: true })
-  await mkdir('test/parallel', { recursive: true, force: true })
+  // Update Node version in README.md
+  replacements['README.md'][0][1] = replacements['README.md'][0][1].replace('$2', nodeVersion)
+  replacements['README.md'][1][1] = replacements['README.md'][1][1].replace('$2', nodeVersion)
 
+  contents.push(['README.md', await readFile('./README.md', 'utf-8')])
+
+  // Create paths
+  const paths = new Set(contents.map((c) => dirname(c[0])))
+  paths.delete('.')
+
+  for (const path of paths.values()) {
+    console.log(`Creating directory ${highlightFile(path, 32)} ...`)
+    await mkdir(path, { recursive: true, force: true })
+  }
+
+  // Perform replacements
   await processFiles(contents)
 
   // Copy template files
@@ -163,9 +176,6 @@ async function main() {
   console.log(`Copying template to file ${highlightFile('lib/util.js', 32)} ...`)
   await copyFile('src/util.js', 'lib/util.js')
 
-  console.log(`Copying template to file ${highlightFile('lib/internal/uv-browser.js', 32)} ...`)
-  await copyFile('src/uv-browser.js', 'lib/internal/uv-browser.js')
-
   console.log(`Copying template to file ${highlightFile('test/test-browser.js', 32)} ...`)
   await copyFile('src/test/test-browser.js', 'test/test-browser.js')
 
@@ -175,11 +185,9 @@ async function main() {
   console.log(`Copying template to file ${highlightFile('test/ours', 32)} ...`)
   await cp('src/test/ours', 'test/ours', { recursive: true })
 
-  // TODO@PI
-  // // Update Node version in README
-  // // processFile(readmePath, readmePath, [
-  // //   [readmeVersionRegex, "$1" + nodeVersion]
-  // // ])
+  // Remove some unwanted directories
+  await rm('lib/internal/per_context', { recursive: true, force: true })
+  await rm('lib/internal/util', { recursive: true, force: true })
 }
 
 await main()

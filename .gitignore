@@ -1,5 +1,4 @@
-./lib/
+coverage/
 node_modules/
 node-*.tar.gz
-./test/
 package-lock.json
