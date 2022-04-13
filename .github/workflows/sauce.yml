@@ -1,4 +1,4 @@
-name: Sauce Labs
+name: Sauce Labs Build
 on: push
 jobs:
   test:

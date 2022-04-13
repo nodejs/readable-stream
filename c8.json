@@ -1,0 +1,9 @@
+{
+  "include": ["dist/lib"],
+  "reporter": ["text", "html"],
+  "check-coverage": true,
+  "branches": 75,
+  "functions": 75,
+  "lines": 75,
+  "statements": 75
+}

@@ -1,0 +1,5 @@
+---
+bail: true
+coverage: false
+node-arg:
+  - --expose-internals

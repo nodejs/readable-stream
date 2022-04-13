@@ -1,8 +1,5 @@
+./lib/
 node_modules/
-.zuul.yml
-.nyc_output
-coverage
+node-*.tar.gz
+./test/
 package-lock.json
-*.tap
-.airtaprc
-yarn.lock

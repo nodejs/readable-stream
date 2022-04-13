@@ -1,4 +1,4 @@
-name: Node.js
+name: Node.js Build
 
 on: [push, pull_request]
 
@@ -11,12 +11,12 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         node-version: [6.x, 8.x, 10.x, 12.x, 14.x]
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install
-      run: npm install
-    - name: npm run test
-      run: npm run test
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install
+        run: npm install
+      - name: npm run test
+        run: npm run test
