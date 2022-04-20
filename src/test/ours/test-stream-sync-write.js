@@ -3,7 +3,7 @@
 require('../common')
 const t = require('tap')
 const util = require('util')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 const WritableStream = stream.Writable
 
 t.plan(1)

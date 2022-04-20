@@ -157,6 +157,7 @@ async function main() {
   // Create paths
   const paths = new Set(contents.map((c) => dirname(c[0])))
   paths.delete('.')
+  paths.add('lib/ours')
 
   for (const path of paths.values()) {
     console.log(`Creating directory ${highlightFile(path, 32)} ...`)
@@ -167,14 +168,20 @@ async function main() {
   await processFiles(contents)
 
   // Copy template files
-  console.log(`Copying template to file ${highlightFile('lib/browser.js', 32)} ...`)
-  await copyFile('src/browser.js', 'lib/browser.js')
+  console.log(`Copying template to file ${highlightFile('lib/ours/browser.js', 32)} ...`)
+  await copyFile('src/browser.js', 'lib/ours/browser.js')
 
-  console.log(`Copying template to file ${highlightFile('lib/index.js', 32)} ...`)
-  await copyFile('src/index.js', 'lib/index.js')
+  console.log(`Copying template to file ${highlightFile('lib/ours/index.js', 32)} ...`)
+  await copyFile('src/index.js', 'lib/ours/index.js')
 
-  console.log(`Copying template to file ${highlightFile('lib/util.js', 32)} ...`)
-  await copyFile('src/util.js', 'lib/util.js')
+  console.log(`Copying template to file ${highlightFile('lib/ours/errors.js', 32)} ...`)
+  await copyFile('src/errors.js', 'lib/ours/errors.js')
+
+  console.log(`Copying template to file ${highlightFile('lib/ours/primordials.js', 32)} ...`)
+  await copyFile('src/primordials.js', 'lib/ours/primordials.js')
+
+  console.log(`Copying template to file ${highlightFile('lib/ours/util.js', 32)} ...`)
+  await copyFile('src/util.js', 'lib/ours/util.js')
 
   console.log(`Copying template to file ${highlightFile('test/test-browser.js', 32)} ...`)
   await copyFile('src/test/test-browser.js', 'test/test-browser.js')
@@ -184,10 +191,6 @@ async function main() {
 
   console.log(`Copying template to file ${highlightFile('test/ours', 32)} ...`)
   await cp('src/test/ours', 'test/ours', { recursive: true })
-
-  // Remove some unwanted directories
-  await rm('lib/internal/per_context', { recursive: true, force: true })
-  await rm('lib/internal/util', { recursive: true, force: true })
 }
 
 await main()

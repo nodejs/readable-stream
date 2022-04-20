@@ -7,7 +7,7 @@
 const common = require('../common');
 
 const assert = require('assert');
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 const bufferBlerg = Buffer.from('blerg');
 const w = new Writable();

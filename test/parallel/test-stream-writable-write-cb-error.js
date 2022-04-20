@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 const assert = require('assert');
 
 // Ensure callback is always invoked before

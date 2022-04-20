@@ -1,7 +1,7 @@
 'use strict'
 
 const t = require('tap')
-const { codes: errors } = require('../../lib/internal/errors')
+const { codes: errors } = require('../../lib/ours/errors')
 
 function checkError(err, Base, name, code, message) {
   t.ok(err instanceof Base)

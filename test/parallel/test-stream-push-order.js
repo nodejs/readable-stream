@@ -26,7 +26,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 require('../common');
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 const assert = require('assert');
 
 const s = new Readable({

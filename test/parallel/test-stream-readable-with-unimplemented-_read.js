@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 const readable = new Readable();
 

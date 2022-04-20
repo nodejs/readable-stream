@@ -6,7 +6,7 @@
   ;
 require('../common');
 const assert = require('assert');
-const { Readable, Writable, Duplex, Transform } = require('../../lib');
+const { Readable, Writable, Duplex, Transform } = require('../../lib/ours/index');
 
 const readable = new Readable({ read() {} });
 const writable = new Writable({ write() {} });

@@ -6,7 +6,7 @@
   ;
 require('../common');
 const assert = require('assert');
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 // Test interaction between calling .destroy() on a writable and pending
 // writes.
@@ -25,9 +25,7 @@ for (const withPendingData of [ false, true ]) {
 
     let chunksWritten = 0;
     let drains = 0;
-    let finished = false;
     w.on('drain', () => drains++);
-    w.on('finish', () => finished = true);
 
     function onWrite(err) {
       if (err) {
@@ -65,10 +63,6 @@ for (const withPendingData of [ false, true ]) {
     assert.strictEqual(chunksWritten, useEnd && !withPendingData ? 1 : 2);
     assert.strictEqual(callbacks.length, 0);
     assert.strictEqual(drains, 1);
-
-    // When we used `.end()`, we see the 'finished' event if and only if
-    // we actually finished processing the write queue.
-    assert.strictEqual(finished, !withPendingData && useEnd);
   }
 }
 

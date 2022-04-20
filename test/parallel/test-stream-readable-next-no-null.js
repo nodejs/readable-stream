@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const { mustNotCall, expectsError } = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 async function* generate() {
   yield null;

@@ -11,7 +11,7 @@ const common = require('../common');
 // for streams with highWaterMark === 0 once the stream returns data
 // by calling push() asynchronously.
 
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 let count = 5;
 

@@ -35,7 +35,7 @@ const assert = require('assert');
 // 3. push() after the EOF signaling null is an error.
 // 4. _read() is not called after pushing the EOF null chunk.
 
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const hwm = 10;
 const r = stream.Readable({ highWaterMark: hwm, autoDestroy: false });
 const chunks = 10;

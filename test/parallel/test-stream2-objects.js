@@ -27,7 +27,7 @@
   ;
 
 const common = require('../common');
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 const assert = require('assert');
 
 function toArray(callback) {

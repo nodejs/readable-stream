@@ -6,7 +6,7 @@
   ;
 require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const Writable = stream.Writable;
 
 // Test the buffering behavior of Writable streams.

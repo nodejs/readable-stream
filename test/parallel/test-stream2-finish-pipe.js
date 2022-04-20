@@ -26,7 +26,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 const r = new stream.Readable();
 r._read = function(size) {

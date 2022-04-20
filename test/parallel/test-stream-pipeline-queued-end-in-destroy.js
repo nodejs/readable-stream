@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Duplex, pipeline } = require('../../lib');
+const { Readable, Duplex, pipeline } = require('../../lib/ours/index');
 
 // Test that the callback for pipeline() is called even when the ._destroy()
 // method of the stream places an .end() request to itself that does not

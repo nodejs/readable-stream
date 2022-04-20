@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 // This test ensures that if have 'readable' listener
 // on Readable instance it will not disrupt the pipe.

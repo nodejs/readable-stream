@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 // This is very similar to test-stream-pipe-cleanup-pause.js.

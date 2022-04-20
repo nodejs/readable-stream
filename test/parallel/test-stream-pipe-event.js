@@ -26,7 +26,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 function Writable() {

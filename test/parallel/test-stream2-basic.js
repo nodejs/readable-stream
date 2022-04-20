@@ -27,7 +27,7 @@
   ;
 
 const common = require('../common');
-const { Readable: R, Writable: W } = require('../../lib');
+const { Readable: R, Writable: W } = require('../../lib/ours/index');
 const assert = require('assert');
 
 const EE = require('events').EventEmitter;

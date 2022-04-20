@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 const reader = new stream.Readable();
 const writer1 = new stream.Writable();

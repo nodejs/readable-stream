@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 const MAX = 42;
 const BATCH = 10;

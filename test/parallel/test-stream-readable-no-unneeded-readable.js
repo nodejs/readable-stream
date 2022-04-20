@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Readable, PassThrough } = require('../../lib');
+const { Readable, PassThrough } = require('../../lib/ours/index');
 
 function test(r) {
   const wrapper = new Readable({

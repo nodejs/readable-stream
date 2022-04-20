@@ -28,7 +28,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 
 {
   // First test, not reading when the readable is added.

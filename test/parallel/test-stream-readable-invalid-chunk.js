@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 function testPushArg(val) {
   const readable = new stream.Readable({

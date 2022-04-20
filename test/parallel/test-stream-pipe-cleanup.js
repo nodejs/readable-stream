@@ -28,7 +28,7 @@
 // This test asserts that Stream.prototype.pipe does not leave listeners
 // hanging on the source or dest.
 require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 function Writable() {

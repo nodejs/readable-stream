@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 let pushes = 0;
 const total = 65500 + 40 * 1024;

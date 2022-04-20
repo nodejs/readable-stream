@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 // Verify that .push() and .unshift() can be called from 'data' listeners.
 

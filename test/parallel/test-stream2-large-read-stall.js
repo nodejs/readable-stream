@@ -36,7 +36,7 @@ const PUSHSIZE = 20;
 const PUSHCOUNT = 1000;
 const HWM = 50;
 
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 const r = new Readable({
   highWaterMark: HWM
 });

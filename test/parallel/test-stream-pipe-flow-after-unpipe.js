@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 // Tests that calling .unpipe() un-blocks a stream that is paused because
 // it is waiting on the writable side to finish a write().

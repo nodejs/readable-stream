@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Readable, addAbortSignal } = require('../../lib');
+const { Readable, addAbortSignal } = require('../../lib/ours/index');
 const assert = require('assert');
 
 {
@@ -18,6 +18,7 @@ const assert = require('assert');
   read.on('close', common.mustCall());
 
   read.destroy();
+  assert.strictEqual(read.errored, null);
   assert.strictEqual(read.destroyed, true);
 }
 
@@ -36,6 +37,7 @@ const assert = require('assert');
   }));
 
   read.destroy(expected);
+  assert.strictEqual(read.errored, expected);
   assert.strictEqual(read.destroyed, true);
 }
 

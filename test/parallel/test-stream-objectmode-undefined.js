@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Writable, Transform } = require('../../lib');
+const { Readable, Writable, Transform } = require('../../lib/ours/index');
 
 {
   const stream = new Readable({

@@ -27,7 +27,7 @@
   ;
 
 const common = require('../common');
-const { Writable: W, Duplex: D } = require('../../lib');
+const { Writable: W, Duplex: D } = require('../../lib/ours/index');
 const assert = require('assert');
 
 class TestWriter extends W {

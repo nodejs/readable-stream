@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 {
   const w = new Writable({

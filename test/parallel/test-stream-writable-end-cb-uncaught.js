@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 process.on('uncaughtException', common.mustCall((err) => {
   assert.strictEqual(err.message, 'kaboom');

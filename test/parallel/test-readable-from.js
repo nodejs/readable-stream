@@ -7,7 +7,7 @@
 
 const { mustCall } = require('../common');
 const { once } = require('events');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 const { strictEqual, throws } = require('assert');
 const common = require('../common');
 

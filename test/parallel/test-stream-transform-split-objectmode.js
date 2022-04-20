@@ -28,7 +28,7 @@
 require('../common');
 const assert = require('assert');
 
-const Transform = require('../../lib').Transform;
+const Transform = require('../../lib/ours/index').Transform;
 
 const parser = new Transform({ readableObjectMode: true });
 

@@ -22,30 +22,30 @@
   "bugs": {
     "url": "https://github.com/nodejs/readable-stream/issues"
   },
-  "main": "lib/index.js",
+  "main": "lib/ours/index.js",
   "files": [
     "lib",
     "LICENSE",
     "README.md"
   ],
   "browser": {
-    "util": false,
-    "worker_threads": false,
-    "./lib/index.js": "./lib/browser.js",
-    "./lib/internal/inspect.js": "./lib/internal/inspect-browser.js"
+    "util": "./lib/ours/util.js",
+    "./lib/index.js": "./lib/ours/browser.js"
   },
   "scripts": {
     "build": "node build/build.mjs",
+    "postbuild": "prettier -w lib test",
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
-    "test:browsers": "airtap test/browser/test-*.js",
+    "test:browsers": "airtap -p sauce test/browser/test-*.js",
     "test:browsers:local": "airtap -p local test/browser/test-*.js",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src",
     "lint": "eslint src"
   },
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "aggregate-error": "^3.1.0",
-    "abort-controller": "^3.0.0"
+    "object-inspect": "^1.12.0"
   },
   "devDependencies": {
     "@sinonjs/fake-timers": "^9.1.1",

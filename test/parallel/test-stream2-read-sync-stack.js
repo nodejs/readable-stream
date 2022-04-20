@@ -26,7 +26,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 
 // This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error

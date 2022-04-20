@@ -28,7 +28,7 @@
 require('../common');
 const assert = require('assert');
 
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 
 class MyStream extends Readable {
   constructor(options) {

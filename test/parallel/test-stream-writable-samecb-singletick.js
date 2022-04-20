@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const { Console } = require('console');
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 const async_hooks = require('async_hooks');
 
 // Make sure that repeated calls to silentConsole.log(), and by extension

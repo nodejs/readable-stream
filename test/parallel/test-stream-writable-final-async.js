@@ -8,7 +8,7 @@
 const common = require('../common');
 const {
   Duplex,
-} = require('../../lib');
+} = require('../../lib/ours/index');
 
     const st = require('timers').setTimeout;
 

@@ -14,7 +14,7 @@ const common = require('../common');
 // specifically catch any regressions that might occur with these streams.
 
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 const streamData = [ 'a', null ];
 

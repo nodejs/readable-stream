@@ -8,7 +8,7 @@
 const common = require('../common');
 if (!common.hasCrypto)
   common.skip('missing crypto');
-const { Readable, pipeline } = require('../../lib');
+const { Readable, pipeline } = require('../../lib/ours/index');
 const http2 = require('http2');
 
 {

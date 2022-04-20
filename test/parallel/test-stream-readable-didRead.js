@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { isDisturbed, isErrored, Readable } = require('../../lib');
+const { isDisturbed, isErrored, Readable } = require('../../lib/ours/index');
 
 function noop() {}
 

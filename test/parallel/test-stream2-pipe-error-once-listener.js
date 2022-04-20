@@ -27,7 +27,7 @@
   ;
 
 require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 class Read extends stream.Readable {
   _read(size) {

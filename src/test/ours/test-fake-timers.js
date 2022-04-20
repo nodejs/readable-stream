@@ -4,7 +4,7 @@ require('../common')
 const t = require('tap')
 const util = require('util')
 const fakeTimers = require('@sinonjs/fake-timers')
-const Transform = require('../../lib').Transform
+const Transform = require('../../lib/ours/index').Transform
 
 t.plan(1)
 

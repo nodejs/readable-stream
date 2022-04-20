@@ -30,7 +30,7 @@ const assert = require('assert');
 
 // This test verifies that stream.unshift(Buffer.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 
 const r = new Readable();
 let nChunks = 10;

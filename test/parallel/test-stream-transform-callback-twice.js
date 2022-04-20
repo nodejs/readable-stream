@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Transform } = require('../../lib');
+const { Transform } = require('../../lib/ours/index');
 const stream = new Transform({
   transform(chunk, enc, cb) { cb(); cb(); }
 });

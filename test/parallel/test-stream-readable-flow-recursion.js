@@ -33,7 +33,7 @@ const assert = require('assert');
 // more data continuously, but without triggering a nextTick
 // warning or RangeError.
 
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 
 // Throw an error if we trigger a nextTick warning.
 process.throwDeprecation = true;

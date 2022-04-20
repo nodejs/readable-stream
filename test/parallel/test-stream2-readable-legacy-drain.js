@@ -28,7 +28,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const Stream = require('../../lib');
+const Stream = require('../../lib/ours/index');
 const Readable = Stream.Readable;
 
 const r = new Readable();

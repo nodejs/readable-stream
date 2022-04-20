@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 // Don't emit 'drain' if ended
 

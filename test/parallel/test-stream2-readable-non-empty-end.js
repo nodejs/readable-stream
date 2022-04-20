@@ -27,7 +27,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 let len = 0;
 const chunks = new Array(10);

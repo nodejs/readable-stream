@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Duplex } = require('../../lib');
+const { Duplex } = require('../../lib/ours/index');
 const assert = require('assert');
 
 {
@@ -130,7 +130,7 @@ const assert = require('assert');
   duplex.removeListener('end', fail);
   duplex.removeListener('finish', fail);
   duplex.on('end', common.mustNotCall());
-  duplex.on('finish', common.mustCall());
+  duplex.on('finish', common.mustNotCall());
   assert.strictEqual(duplex.destroyed, true);
 }
 

@@ -9,7 +9,7 @@ const common = require('../common');
 // Testing Readable Stream resumeScheduled state
 
 const assert = require('assert');
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 {
   // pipe() test case

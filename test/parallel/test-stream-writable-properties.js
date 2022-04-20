@@ -7,7 +7,7 @@
 require('../common');
 const assert = require('assert');
 
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 {
   const w = new Writable();

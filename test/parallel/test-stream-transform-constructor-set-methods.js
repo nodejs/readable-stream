@@ -7,7 +7,7 @@
 const common = require('../common');
 
 const assert = require('assert');
-const { Transform } = require('../../lib');
+const { Transform } = require('../../lib/ours/index');
 
 const t = new Transform();
 

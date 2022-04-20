@@ -28,7 +28,7 @@
   ;
 require('../common');
 const assert = require('assert');
-const fromList = require('../../lib').Readable._fromList;
+const fromList = require('../../lib/ours/index').Readable._fromList;
 const BufferList = require('../../lib/internal/streams/buffer_list');
 const util = require('util');
 

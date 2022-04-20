@@ -14,7 +14,7 @@ const {
   Duplex,
   PassThrough,
   Stream,
-} = require('../../lib');
+} = require('../../lib/ours/index');
 const assert = require('assert');
 const EE = require('events');
 const fs = require('fs');
@@ -265,7 +265,12 @@ const http = require('http');
   const streamLike = new EE();
   streamLike.readableEnded = true;
   streamLike.readable = true;
-  finished(streamLike, common.mustCall());
+  assert.throws(
+    () => {
+      finished(streamLike, () => {});
+    },
+    { code: 'ERR_INVALID_ARG_TYPE' }
+  );
   streamLike.emit('close');
 }
 
@@ -618,8 +623,10 @@ testClosed((opts) => new Writable({ write() {}, ...opts }));
   const w = new Writable();
   const _err = new Error();
   w.destroy(_err);
+  assert.strictEqual(w.errored, _err);
   finished(w, common.mustCall((err) => {
     assert.strictEqual(_err, err);
+    assert.strictEqual(w.closed, true);
     finished(w, common.mustCall((err) => {
       assert.strictEqual(_err, err);
     }));
@@ -629,7 +636,9 @@ testClosed((opts) => new Writable({ write() {}, ...opts }));
 {
   const w = new Writable();
   w.destroy();
+  assert.strictEqual(w.errored, null);
   finished(w, common.mustCall((err) => {
+    assert.strictEqual(w.closed, true);
     assert.strictEqual(err.code, 'ERR_STREAM_PREMATURE_CLOSE');
     finished(w, common.mustCall((err) => {
       assert.strictEqual(err.code, 'ERR_STREAM_PREMATURE_CLOSE');

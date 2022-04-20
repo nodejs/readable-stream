@@ -27,7 +27,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable: R } = require('../../lib');
+const { Readable: R } = require('../../lib/ours/index');
 
 class TestReader extends R {
   constructor(n, opts) {

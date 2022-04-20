@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const { Duplex, Readable, Writable, pipeline } = require('../../lib');
+const { Duplex, Readable, Writable, pipeline } = require('../../lib/ours/index');
 const { Blob } = require('buffer');
 
 {

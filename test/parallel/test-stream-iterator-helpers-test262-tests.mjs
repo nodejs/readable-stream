@@ -1,5 +1,5 @@
 import { mustCall } from '../common/index.mjs';
-import { Readable }from '../../lib/index.js';
+import { Readable }from '../../lib/ours/index.js';
 import assert from 'assert';
 import tap from 'tap';
 
@@ -69,7 +69,7 @@ import tap from 'tap';
   );
   assert.strictEqual(descriptor.enumerable, false);
   assert.strictEqual(descriptor.configurable, true);
-  // assert.strictEqual(descriptor.writable, true);
+  assert.strictEqual(descriptor.writable, true);
 }
 {
   // drop/length
@@ -80,7 +80,7 @@ import tap from 'tap';
   );
   assert.strictEqual(descriptor.enumerable, false);
   assert.strictEqual(descriptor.configurable, true);
-  // assert.strictEqual(descriptor.writable, true);
+  assert.strictEqual(descriptor.writable, true);
   // drop/limit-equals-total
   const iterator = Readable.from([1, 2]).drop(2);
   const result = await iterator[Symbol.asyncIterator]().next();

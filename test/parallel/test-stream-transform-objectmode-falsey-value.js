@@ -28,7 +28,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const PassThrough = stream.PassThrough;
 
 const src = new PassThrough({ objectMode: true });

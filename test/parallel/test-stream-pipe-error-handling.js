@@ -27,7 +27,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Stream, PassThrough } = require('../../lib');
+const { Stream, PassThrough } = require('../../lib/ours/index');
 
 {
   const source = new Stream();

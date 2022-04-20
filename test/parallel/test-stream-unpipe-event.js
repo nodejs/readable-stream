@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Writable, Readable } = require('../../lib');
+const { Writable, Readable } = require('../../lib/ours/index');
 class NullWriteable extends Writable {
   _write(chunk, encoding, callback) {
     return callback();

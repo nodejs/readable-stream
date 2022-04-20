@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 process.on('uncaughtException', common.mustCall((err) => {
   assert.strictEqual(err.message, 'asd');

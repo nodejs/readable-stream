@@ -30,7 +30,7 @@ const assert = require('assert');
 
 // Make sure we don't miss the end event for paused 0-length streams
 
-const Readable = require('../../lib').Readable;
+const Readable = require('../../lib/ours/index').Readable;
 const stream = new Readable();
 let calledRead = false;
 stream._read = function() {

@@ -7,7 +7,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const { Writable } = require('../../lib');
+const { Writable } = require('../../lib/ours/index');
 
 function expectError(w, args, code, sync) {
   if (sync) {

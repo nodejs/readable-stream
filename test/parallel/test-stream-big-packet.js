@@ -27,7 +27,7 @@
   ;
 require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 let passed = false;
 

@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Writable, PassThrough } = require('../../lib');
+const { Readable, Writable, PassThrough } = require('../../lib/ours/index');
 
 {
   let ticks = 17;

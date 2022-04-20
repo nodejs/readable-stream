@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 // Ensure consistency between the finish event when using cork()
 // and writev and when not using them

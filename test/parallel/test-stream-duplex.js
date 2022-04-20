@@ -27,7 +27,7 @@
 
 require('../common');
 const assert = require('assert');
-const Duplex = require('../../lib').Duplex;
+const Duplex = require('../../lib/ours/index').Duplex;
 
 const stream = new Duplex({ objectMode: true });
 

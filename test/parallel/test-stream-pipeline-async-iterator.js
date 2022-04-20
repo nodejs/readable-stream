@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Readable, PassThrough, pipeline } = require('../../lib');
+const { Readable, PassThrough, pipeline } = require('../../lib/ours/index');
 const assert = require('assert');
 
 const _err = new Error('kaboom');

@@ -9,7 +9,7 @@ const common = require('../common');
 const fixtures = require('../common/fixtures');
 const {
   Readable,
-} = require('../../lib');
+} = require('../../lib/ours/index');
 const assert = require('assert');
 
     const st = require('timers').setTimeout;

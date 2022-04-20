@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 let ticks = 18;
 let expectedData = 19;
@@ -63,7 +63,7 @@ function readAndPause() {
 }
 
 {
-  const { PassThrough } = require('../../lib');
+  const { PassThrough } = require('../../lib/ours/index');
 
   const source3 = new PassThrough();
   const target3 = new PassThrough();

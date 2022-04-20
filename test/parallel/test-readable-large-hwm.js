@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 // Make sure that readable completes
 // even when reading larger buffer.

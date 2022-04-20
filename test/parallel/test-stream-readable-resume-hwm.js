@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 // readable.resume() should not lead to a ._read() call being scheduled
 // when we exceed the high water mark already.

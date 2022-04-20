@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Transform } = require('../../lib');
+const { Transform } = require('../../lib/ours/index');
 const assert = require('assert');
 
 {
@@ -122,7 +122,7 @@ const assert = require('assert');
   transform.removeListener('end', fail);
   transform.removeListener('finish', fail);
   transform.on('end', common.mustCall());
-  transform.on('finish', common.mustCall());
+  transform.on('finish', common.mustNotCall());
 }
 
 {

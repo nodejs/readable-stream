@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Writable, addAbortSignal } = require('../../lib');
+const { Writable, addAbortSignal } = require('../../lib/ours/index');
 const assert = require('assert');
 
 {
@@ -129,8 +129,6 @@ const assert = require('assert');
 
   write.destroy();
 
-  write.removeListener('finish', fail);
-  write.on('finish', common.mustCall());
   assert.strictEqual(write.destroyed, true);
 }
 

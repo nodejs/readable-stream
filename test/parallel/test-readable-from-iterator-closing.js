@@ -6,7 +6,7 @@
   ;
 
 const { mustCall, mustNotCall } = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 const { strictEqual } = require('assert');
 
 async function asyncSupport() {

@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 const assert = require('assert');
 
 // This test verifies that a stream could be resumed after

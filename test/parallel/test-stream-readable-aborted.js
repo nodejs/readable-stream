@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const { Readable, Duplex } = require('../../lib');
+const { Readable, Duplex } = require('../../lib/ours/index');
 
 {
   const readable = new Readable({

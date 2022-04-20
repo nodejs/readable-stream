@@ -14,7 +14,7 @@ const {
   Writable,
   finished,
   PassThrough
-} = require('../../lib');
+} = require('../../lib/ours/index');
 const compose = require('../../lib/internal/streams/compose');
 const assert = require('assert');
 

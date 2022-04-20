@@ -9,7 +9,7 @@ const common = require('../common');
 const {
   pipeline,
   PassThrough
-} = require('../../lib');
+} = require('../../lib/ours/index');
 
 
 async function runTest() {

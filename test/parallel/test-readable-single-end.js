@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 // This test ensures that there will not be an additional empty 'readable'
 // event when stream has ended (only 1 event signalling about end)

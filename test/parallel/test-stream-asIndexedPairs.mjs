@@ -1,5 +1,5 @@
 import '../common/index.mjs';
-import { Readable }from '../../lib/index.js';
+import { Readable }from '../../lib/ours/index.js';
 import { deepStrictEqual, rejects, throws } from 'assert';
 import tap from 'tap';
 

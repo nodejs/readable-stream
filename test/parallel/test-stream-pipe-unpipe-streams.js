@@ -7,7 +7,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 const source = Readable({ read: () => {} });
 const dest1 = Writable({ write: () => {} });

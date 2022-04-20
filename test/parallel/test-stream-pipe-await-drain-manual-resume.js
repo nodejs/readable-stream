@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 // A consumer stream with a very low highWaterMark, which starts in a state

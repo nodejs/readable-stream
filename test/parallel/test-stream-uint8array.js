@@ -7,7 +7,7 @@
 const common = require('../common');
 const assert = require('assert');
 
-const { Readable, Writable } = require('../../lib');
+const { Readable, Writable } = require('../../lib/ours/index');
 
 const ABC = new Uint8Array([0x41, 0x42, 0x43]);
 const DEF = new Uint8Array([0x44, 0x45, 0x46]);

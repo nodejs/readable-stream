@@ -2,33 +2,6 @@
 
 const test = require('tape')
 
-// if (!global.console) {
-//   global.console = {}
-// }
-// if (!global.console.log) {
-//   global.console.log = function () {}
-// }
-// if (!global.console.error) {
-//   global.console.error = global.console.log
-// }
-// if (!global.console.info) {
-//   global.console.info = global.console.log
-// }
-
-// // TODO: add replacements instead
-// global.process = {
-//   env: {},
-//   on: function () {},
-//   cwd: function () {
-//     return '/'
-//   },
-//   binding: function () {
-//     return {
-//       hasTracing: false
-//     }
-//   }
-// }
-
 test('streams', function (t) {
   require('./browser/test-stream-big-packet')(t)
   require('./browser/test-stream-big-push')(t)
@@ -68,8 +41,8 @@ test('streams 2', function (t) {
   require('./browser/test-stream2-pipe-error-once-listener')(t)
   require('./browser/test-stream2-push')(t)
   require('./browser/test-stream2-readable-empty-buffer-no-eof')(t)
-  // require('./browser/test-stream2-readable-from-list')(t);
-  // require('./browser/test-stream2-transform')(t);
+  require('./browser/test-stream2-readable-from-list')(t)
+  require('./browser/test-stream2-transform')(t)
   require('./browser/test-stream2-set-encoding')(t)
   require('./browser/test-stream2-readable-legacy-drain')(t)
   require('./browser/test-stream2-readable-wrap-empty')(t)

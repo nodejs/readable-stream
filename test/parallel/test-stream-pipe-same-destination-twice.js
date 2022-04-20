@@ -10,7 +10,7 @@ const common = require('../common');
 // Tests that piping a source stream twice to the same destination stream
 // works, and that a subsequent unpipe() call only removes the pipe *once*.
 const assert = require('assert');
-const { PassThrough, Writable } = require('../../lib');
+const { PassThrough, Writable } = require('../../lib/ours/index');
 
 {
   const passThrough = new PassThrough();

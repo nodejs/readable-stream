@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 const r = new stream.Stream();
 r.listenerCount = undefined;

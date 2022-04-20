@@ -7,7 +7,7 @@
 require('../common');
 const assert = require('assert');
 
-const { Transform, Readable, Writable } = require('../../lib');
+const { Transform, Readable, Writable } = require('../../lib/ours/index');
 
 const DEFAULT = 16 * 1024;
 

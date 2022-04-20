@@ -1,6 +1,6 @@
 import * as common from '../common/index.mjs';
 import { setTimeout } from 'timers/promises';
-import { Readable }from '../../lib/index.js';
+import { Readable }from '../../lib/ours/index.js';
 import assert from 'assert';
 import tap from 'tap';
 

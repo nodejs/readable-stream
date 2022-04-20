@@ -27,7 +27,7 @@
   ;
 const common = require('../common');
 const assert = require('assert');
-const { PassThrough, Transform } = require('../../lib');
+const { PassThrough, Transform } = require('../../lib/ours/index');
 
 {
   // Verify writable side consumption

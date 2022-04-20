@@ -7,7 +7,7 @@
 
 const common = require('../common');
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 {
   // Invoke end callback on failure.

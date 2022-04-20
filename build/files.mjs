@@ -1,11 +1,7 @@
 export const sources = [
   'lib/_stream_.+',
-  'lib/internal/errors.js',
-  'lib/internal/per_context/primordials.js',
   'lib/internal/streams/.+',
-  'lib/internal/util/inspect.js',
   'lib/internal/validators.js',
-  'lib/internal/js_stream_socket.js',
   'lib/stream.js',
   'lib/stream/promises.js',
   'test/common/fixtures.js',
@@ -19,14 +15,15 @@ export const sources = [
 ]
 
 export const skippedSources = [
+  'lib/_stream_wrap.js',
   'test/parallel/test-stream-consumers.js',
   'test/parallel/test-stream-destroy.js',
   'test/parallel/test-stream-map.js',
   'test/parallel/test-stream-pipeline.js',
-  'test/parallel/test-stream-readable-async-iterators.js'
+  'test/parallel/test-stream-readable-async-iterators.js',
+  'test/parallel/test-stream-wrap-drain.js',
+  'test/parallel/test-stream-wrap-encoding.js',
+  'test/parallel/test-stream-wrap.js'
 ]
 
-export const aliases = {
-  'lib/internal/per_context/primordials.js': ['lib/internal/primordials.js'],
-  'lib/internal/util/inspect.js': ['lib/internal/inspect.js', 'lib/internal/inspect-browser.js']
-}
+export const aliases = {}

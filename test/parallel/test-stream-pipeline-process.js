@@ -10,7 +10,7 @@ const assert = require('assert');
 const os = require('os');
 
 if (process.argv[2] === 'child') {
-  const { pipeline } = require('../../lib');
+  const { pipeline } = require('../../lib/ours/index');
   pipeline(
     process.stdin,
     process.stdout,

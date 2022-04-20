@@ -28,7 +28,7 @@
 require('../common');
 const assert = require('assert');
 
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 class MyWritable extends stream.Writable {
   constructor(fn, options) {

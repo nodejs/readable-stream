@@ -6,7 +6,7 @@
   ;
 
 const common = require('../common');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 const transform = new stream.Transform({

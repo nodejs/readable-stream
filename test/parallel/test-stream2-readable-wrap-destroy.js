@@ -6,7 +6,7 @@
   ;
 const common = require('../common');
 
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 const EE = require('events').EventEmitter;
 
 const oldStream = new EE();

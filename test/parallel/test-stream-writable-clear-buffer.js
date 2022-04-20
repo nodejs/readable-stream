@@ -9,7 +9,7 @@
 // the actual buffered request count are the same.
 
 const common = require('../common');
-const Stream = require('../../lib');
+const Stream = require('../../lib/ours/index');
 const assert = require('assert');
 
 class StreamWritable extends Stream.Writable {

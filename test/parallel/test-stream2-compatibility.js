@@ -26,7 +26,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 require('../common');
-const { Readable: R, Writable: W } = require('../../lib');
+const { Readable: R, Writable: W } = require('../../lib/ours/index');
 const assert = require('assert');
 
 let ondataCalled = 0;

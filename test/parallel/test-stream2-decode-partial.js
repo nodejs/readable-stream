@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 require('../common');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 const assert = require('assert');
 
 let buf = '';

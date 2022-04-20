@@ -5,7 +5,7 @@
     const silentConsole = { log() {}, error() {} };
   ;
 const common = require('../common');
-const { PassThrough } = require('../../lib');
+const { PassThrough } = require('../../lib/ours/index');
 
 const pt = new PassThrough({ highWaterMark: 0 });
 pt.on('drain', common.mustCall());

@@ -8,7 +8,7 @@
 
 require('../common');
 const assert = require('assert');
-const { addAbortSignal, Readable } = require('../../lib');
+const { addAbortSignal, Readable } = require('../../lib/ours/index');
 const {
   addAbortSignalNoValidate,
 } = require('../../lib/internal/streams/add-abort-signal');

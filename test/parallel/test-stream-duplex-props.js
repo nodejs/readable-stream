@@ -7,7 +7,7 @@
 
 require('../common');
 const assert = require('assert');
-const { Duplex } = require('../../lib');
+const { Duplex } = require('../../lib/ours/index');
 
 {
   const d = new Duplex({

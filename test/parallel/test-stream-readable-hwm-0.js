@@ -12,7 +12,7 @@ const common = require('../common');
 // emit 'readable' event.
 
 const assert = require('assert');
-const { Readable } = require('../../lib');
+const { Readable } = require('../../lib/ours/index');
 
 const r = new Readable({
   // Must be called only once upon setting 'readable' listener

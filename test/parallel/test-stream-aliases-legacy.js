@@ -8,7 +8,7 @@
 require('../common');
 
 const assert = require('assert');
-const stream = require('../../lib');
+const stream = require('../../lib/ours/index');
 
 // Verify that all individual aliases are left in place.
 
