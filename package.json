@@ -59,7 +59,7 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-promise": "^5.0.0",
     "prettier": "^2.6.2",
     "tap": "^16.0.1",
     "tape": "^5.5.2",
@@ -67,6 +67,6 @@
     "undici": "^5.0.0"
   },
   "engines": {
-    "node": ">= 12.22.0"
+    "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
   }
 }
