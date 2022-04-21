@@ -1,28 +1,34 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const { Readable } = require('../../lib/ours/index');
+const silentConsole = {
+  log() {},
 
-const readable = new Readable();
+  error() {}
+}
+const common = require('../common')
 
-readable.read();
-readable.on('error', common.expectsError({
-  code: 'ERR_METHOD_NOT_IMPLEMENTED',
-  name: 'Error',
-  message: 'The _read() method is not implemented'
-}));
-readable.on('close', common.mustCall());
+const { Readable } = require('../../lib/ours/index')
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+const readable = new Readable()
+readable.read()
+readable.on(
+  'error',
+  common.expectsError({
+    code: 'ERR_METHOD_NOT_IMPLEMENTED',
+    name: 'Error',
+    message: 'The _read() method is not implemented'
+  })
+)
+readable.on('close', common.mustCall())
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

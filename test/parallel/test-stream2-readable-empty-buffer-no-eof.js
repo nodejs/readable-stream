@@ -18,25 +18,26 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-const Readable = require('../../lib/ours/index').Readable;
+const assert = require('assert')
 
-test1();
-test2();
+const Readable = require('../../lib/ours/index').Readable
+
+test1()
+test2()
 
 function test1() {
-  const r = new Readable();
-
-  // Should not end when we get a Buffer.alloc(0) or '' as the _read
+  const r = new Readable() // Should not end when we get a Buffer.alloc(0) or '' as the _read
   // result that just means that there is *temporarily* no data, but to
   // go ahead and try again later.
   //
@@ -46,87 +47,101 @@ function test1() {
   // r.read(0) again later, otherwise there is no more work being done
   // and the process just exits.
 
-  const buf = Buffer.alloc(5, 'x');
-  let reads = 5;
-  r._read = function(n) {
+  const buf = Buffer.alloc(5, 'x')
+  let reads = 5
+
+  r._read = function (n) {
     switch (reads--) {
       case 5:
         return setImmediate(() => {
-          return r.push(buf);
-        });
+          return r.push(buf)
+        })
+
       case 4:
         setImmediate(() => {
-          return r.push(Buffer.alloc(0));
-        });
-        return setImmediate(r.read.bind(r, 0));
+          return r.push(Buffer.alloc(0))
+        })
+        return setImmediate(r.read.bind(r, 0))
+
       case 3:
-        setImmediate(r.read.bind(r, 0));
+        setImmediate(r.read.bind(r, 0))
         return process.nextTick(() => {
-          return r.push(Buffer.alloc(0));
-        });
+          return r.push(Buffer.alloc(0))
+        })
+
       case 2:
-        setImmediate(r.read.bind(r, 0));
-        return r.push(Buffer.alloc(0)); // Not-EOF!
+        setImmediate(r.read.bind(r, 0))
+        return r.push(Buffer.alloc(0))
+      // Not-EOF!
+
       case 1:
-        return r.push(buf);
+        return r.push(buf)
+
       case 0:
-        return r.push(null); // EOF
+        return r.push(null)
+      // EOF
+
       default:
-        throw new Error('unreachable');
+        throw new Error('unreachable')
     }
-  };
-
-  const results = [];
-  function flow() {
-    let chunk;
-    while (null !== (chunk = r.read()))
-      results.push(String(chunk));
   }
-  r.on('readable', flow);
-  r.on('end', () => {
-    results.push('EOF');
-  });
-  flow();
 
+  const results = []
+
+  function flow() {
+    let chunk
+
+    while (null !== (chunk = r.read())) results.push(String(chunk))
+  }
+
+  r.on('readable', flow)
+  r.on('end', () => {
+    results.push('EOF')
+  })
+  flow()
   process.on('exit', () => {
-    assert.deepStrictEqual(results, [ 'xxxxx', 'xxxxx', 'EOF' ]);
-    silentConsole.log('ok');
-  });
+    assert.deepStrictEqual(results, ['xxxxx', 'xxxxx', 'EOF'])
+    silentConsole.log('ok')
+  })
 }
 
 function test2() {
-  const r = new Readable({ encoding: 'base64' });
-  let reads = 5;
-  r._read = function(n) {
-    if (!reads--)
-      return r.push(null); // EOF
-    return r.push(Buffer.from('x'));
-  };
+  const r = new Readable({
+    encoding: 'base64'
+  })
+  let reads = 5
 
-  const results = [];
-  function flow() {
-    let chunk;
-    while (null !== (chunk = r.read()))
-      results.push(String(chunk));
+  r._read = function (n) {
+    if (!reads--) return r.push(null) // EOF
+
+    return r.push(Buffer.from('x'))
   }
-  r.on('readable', flow);
+
+  const results = []
+
+  function flow() {
+    let chunk
+
+    while (null !== (chunk = r.read())) results.push(String(chunk))
+  }
+
+  r.on('readable', flow)
   r.on('end', () => {
-    results.push('EOF');
-  });
-  flow();
-
+    results.push('EOF')
+  })
+  flow()
   process.on('exit', () => {
-    assert.deepStrictEqual(results, [ 'eHh4', 'eHg=', 'EOF' ]);
-    silentConsole.log('ok');
-  });
+    assert.deepStrictEqual(results, ['eHh4', 'eHg=', 'EOF'])
+    silentConsole.log('ok')
+  })
 }
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,17 +1,17 @@
 'use strict'
 
 const test = require('tape')
+
 const { EventEmitter: EE } = require('events')
+
 const { Readable, Writable } = require('../../lib/ours/index')
 
 test('push', function (t) {
   t.plan(33)
-
   const stream = new Readable({
     highWaterMark: 16,
     encoding: 'utf8'
   })
-
   const source = new EE()
 
   stream._read = function () {
@@ -23,19 +23,16 @@ test('push', function (t) {
   stream.on('end', function () {
     ended = true
   })
-
   source.on('data', function (chunk) {
-    const ret = stream.push(chunk)
-    // console.error('data', stream._readableState.length);
+    const ret = stream.push(chunk) // console.error('data', stream._readableState.length);
+
     if (!ret) {
       readStop()
     }
   })
-
   source.on('end', function () {
     stream.push(null)
   })
-
   let reading = false
 
   function readStart() {
@@ -48,6 +45,7 @@ test('push', function (t) {
     reading = false
     process.nextTick(function () {
       const r = stream.read()
+
       if (r !== null) {
         writer.write(r)
       }
@@ -57,9 +55,7 @@ test('push', function (t) {
   const writer = new Writable({
     decodeStrings: false
   })
-
   const written = []
-
   const expectWritten = [
     'asdfgasdfgasdfgasdfg',
     'asdfgasdfgasdfgasdfg',
@@ -75,15 +71,13 @@ test('push', function (t) {
     process.nextTick(cb)
   }
 
-  writer.on('finish', finish)
-
-  // now emit some chunks.
+  writer.on('finish', finish) // now emit some chunks.
 
   const chunk = 'asdfg'
-
   let set = 0
   readStart()
   data()
+
   function data() {
     t.ok(reading)
     source.emit('data', chunk)
@@ -94,6 +88,7 @@ test('push', function (t) {
     t.ok(reading)
     source.emit('data', chunk)
     t.notOk(reading)
+
     if (set++ < 5) {
       setTimeout(data, 10)
     } else {

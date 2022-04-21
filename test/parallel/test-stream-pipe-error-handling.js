@@ -18,122 +18,123 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
-const { Stream, PassThrough } = require('../../lib/ours/index');
-
-{
-  const source = new Stream();
-  const dest = new Stream();
-
-  source.pipe(dest);
-
-  let gotErr = null;
-  source.on('error', function(err) {
-    gotErr = err;
-  });
-
-  const err = new Error('This stream turned into bacon.');
-  source.emit('error', err);
-  assert.strictEqual(gotErr, err);
+  error() {}
 }
+const common = require('../common')
+
+const assert = require('assert')
+
+const { Stream, PassThrough } = require('../../lib/ours/index')
 
 {
-  const source = new Stream();
-  const dest = new Stream();
+  const source = new Stream()
+  const dest = new Stream()
+  source.pipe(dest)
+  let gotErr = null
+  source.on('error', function (err) {
+    gotErr = err
+  })
+  const err = new Error('This stream turned into bacon.')
+  source.emit('error', err)
+  assert.strictEqual(gotErr, err)
+}
+{
+  const source = new Stream()
+  const dest = new Stream()
+  source.pipe(dest)
+  const err = new Error('This stream turned into bacon.')
+  let gotErr = null
 
-  source.pipe(dest);
-
-  const err = new Error('This stream turned into bacon.');
-
-  let gotErr = null;
   try {
-    source.emit('error', err);
+    source.emit('error', err)
   } catch (e) {
-    gotErr = e;
+    gotErr = e
   }
 
-  assert.strictEqual(gotErr, err);
+  assert.strictEqual(gotErr, err)
 }
-
 {
-  const R = Stream.Readable;
-  const W = Stream.Writable;
-
-  const r = new R({ autoDestroy: false });
-  const w = new W({ autoDestroy: false });
-  let removed = false;
-
-  r._read = common.mustCall(function() {
-    setTimeout(common.mustCall(function() {
-      assert(removed);
-      assert.throws(function() {
-        w.emit('error', new Error('fail'));
-      }, /^Error: fail$/);
-    }), 1);
-  });
-
-  w.on('error', myOnError);
-  r.pipe(w);
-  w.removeListener('error', myOnError);
-  removed = true;
+  const R = Stream.Readable
+  const W = Stream.Writable
+  const r = new R({
+    autoDestroy: false
+  })
+  const w = new W({
+    autoDestroy: false
+  })
+  let removed = false
+  r._read = common.mustCall(function () {
+    setTimeout(
+      common.mustCall(function () {
+        assert(removed)
+        assert.throws(function () {
+          w.emit('error', new Error('fail'))
+        }, /^Error: fail$/)
+      }),
+      1
+    )
+  })
+  w.on('error', myOnError)
+  r.pipe(w)
+  w.removeListener('error', myOnError)
+  removed = true
 
   function myOnError() {
-    throw new Error('this should not happen');
+    throw new Error('this should not happen')
   }
 }
-
 {
-  const R = Stream.Readable;
-  const W = Stream.Writable;
+  const R = Stream.Readable
+  const W = Stream.Writable
+  const r = new R()
+  const w = new W()
+  let removed = false
+  r._read = common.mustCall(function () {
+    setTimeout(
+      common.mustCall(function () {
+        assert(removed)
+        w.emit('error', new Error('fail'))
+      }),
+      1
+    )
+  })
+  w.on('error', common.mustCall())
 
-  const r = new R();
-  const w = new W();
-  let removed = false;
+  w._write = () => {}
 
-  r._read = common.mustCall(function() {
-    setTimeout(common.mustCall(function() {
-      assert(removed);
-      w.emit('error', new Error('fail'));
-    }), 1);
-  });
+  r.pipe(w) // Removing some OTHER random listener should not do anything
 
-  w.on('error', common.mustCall());
-  w._write = () => {};
-
-  r.pipe(w);
-  // Removing some OTHER random listener should not do anything
-  w.removeListener('error', () => {});
-  removed = true;
+  w.removeListener('error', () => {})
+  removed = true
 }
-
 {
-  const _err = new Error('this should be handled');
-  const destination = new PassThrough();
-  destination.once('error', common.mustCall((err) => {
-    assert.strictEqual(err, _err);
-  }));
+  const _err = new Error('this should be handled')
 
-  const stream = new Stream();
-  stream
-    .pipe(destination);
-
-  destination.destroy(_err);
+  const destination = new PassThrough()
+  destination.once(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  const stream = new Stream()
+  stream.pipe(destination)
+  destination.destroy(_err)
 }
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

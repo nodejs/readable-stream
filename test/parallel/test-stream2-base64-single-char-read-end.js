@@ -18,54 +18,58 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const { Readable: R, Writable: W } = require('../../lib/ours/index');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-const src = new R({ encoding: 'base64' });
-const dst = new W();
-let hasRead = false;
-const accum = [];
+const { Readable: R, Writable: W } = require('../../lib/ours/index')
 
-src._read = function(n) {
+const assert = require('assert')
+
+const src = new R({
+  encoding: 'base64'
+})
+const dst = new W()
+let hasRead = false
+const accum = []
+
+src._read = function (n) {
   if (!hasRead) {
-    hasRead = true;
-    process.nextTick(function() {
-      src.push(Buffer.from('1'));
-      src.push(null);
-    });
+    hasRead = true
+    process.nextTick(function () {
+      src.push(Buffer.from('1'))
+      src.push(null)
+    })
   }
-};
+}
 
-dst._write = function(chunk, enc, cb) {
-  accum.push(chunk);
-  cb();
-};
+dst._write = function (chunk, enc, cb) {
+  accum.push(chunk)
+  cb()
+}
 
-src.on('end', function() {
-  assert.strictEqual(String(Buffer.concat(accum)), 'MQ==');
-  clearTimeout(timeout);
-});
+src.on('end', function () {
+  assert.strictEqual(String(Buffer.concat(accum)), 'MQ==')
+  clearTimeout(timeout)
+})
+src.pipe(dst)
+const timeout = setTimeout(function () {
+  assert.fail('timed out waiting for _write')
+}, 100)
+/* replacement start */
 
-src.pipe(dst);
-
-const timeout = setTimeout(function() {
-  assert.fail('timed out waiting for _write');
-}, 100);
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

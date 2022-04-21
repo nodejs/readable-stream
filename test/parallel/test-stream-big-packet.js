@@ -18,63 +18,66 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
-const stream = require('../../lib/ours/index');
+  error() {}
+}
+require('../common')
 
-let passed = false;
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
+
+let passed = false
 
 class TestStream extends stream.Transform {
   _transform(chunk, encoding, done) {
     if (!passed) {
       // Char 'a' only exists in the last write
-      passed = chunk.toString().includes('a');
+      passed = chunk.toString().includes('a')
     }
-    done();
+
+    done()
   }
 }
 
 const s1 = new stream.Transform({
   transform(chunk, encoding, cb) {
-    process.nextTick(cb, null, chunk);
+    process.nextTick(cb, null, chunk)
   }
-});
-const s2 = new stream.PassThrough();
-const s3 = new TestStream();
-s1.pipe(s3);
-// Don't let s2 auto close which may close s3
-s2.pipe(s3, { end: false });
+})
+const s2 = new stream.PassThrough()
+const s3 = new TestStream()
+s1.pipe(s3) // Don't let s2 auto close which may close s3
 
-// We must write a buffer larger than highWaterMark
-const big = Buffer.alloc(s1.writableHighWaterMark + 1, 'x');
+s2.pipe(s3, {
+  end: false
+}) // We must write a buffer larger than highWaterMark
 
-// Since big is larger than highWaterMark, it will be buffered internally.
-assert(!s1.write(big));
-// 'tiny' is small enough to pass through internal buffer.
-assert(s2.write('tiny'));
+const big = Buffer.alloc(s1.writableHighWaterMark + 1, 'x') // Since big is larger than highWaterMark, it will be buffered internally.
 
-// Write some small data in next IO loop, which will never be written to s3
+assert(!s1.write(big)) // 'tiny' is small enough to pass through internal buffer.
+
+assert(s2.write('tiny')) // Write some small data in next IO loop, which will never be written to s3
 // Because 'drain' event is not emitted from s1 and s1 is still paused
-setImmediate(s1.write.bind(s1), 'later');
 
-// Assert after two IO loops when all operations have been done.
-process.on('exit', function() {
-  assert(passed, 'Large buffer is not handled properly by Writable Stream');
-});
+setImmediate(s1.write.bind(s1), 'later') // Assert after two IO loops when all operations have been done.
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('exit', function () {
+  assert(passed, 'Large buffer is not handled properly by Writable Stream')
+})
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

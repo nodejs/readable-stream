@@ -18,79 +18,76 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-const Transform = require('../../lib/ours/index').Transform;
+const assert = require('assert')
 
-const parser = new Transform({ readableObjectMode: true });
+const Transform = require('../../lib/ours/index').Transform
 
-assert(parser._readableState.objectMode);
-assert(!parser._writableState.objectMode);
-assert.strictEqual(parser.readableHighWaterMark, 16);
-assert.strictEqual(parser.writableHighWaterMark, 16 * 1024);
-assert.strictEqual(parser.readableHighWaterMark,
-                   parser._readableState.highWaterMark);
-assert.strictEqual(parser.writableHighWaterMark,
-                   parser._writableState.highWaterMark);
+const parser = new Transform({
+  readableObjectMode: true
+})
+assert(parser._readableState.objectMode)
+assert(!parser._writableState.objectMode)
+assert.strictEqual(parser.readableHighWaterMark, 16)
+assert.strictEqual(parser.writableHighWaterMark, 16 * 1024)
+assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
+assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
 
-parser._transform = function(chunk, enc, callback) {
-  callback(null, { val: chunk[0] });
-};
+parser._transform = function (chunk, enc, callback) {
+  callback(null, {
+    val: chunk[0]
+  })
+}
 
-let parsed;
+let parsed
+parser.on('data', function (obj) {
+  parsed = obj
+})
+parser.end(Buffer.from([42]))
+process.on('exit', function () {
+  assert.strictEqual(parsed.val, 42)
+})
+const serializer = new Transform({
+  writableObjectMode: true
+})
+assert(!serializer._readableState.objectMode)
+assert(serializer._writableState.objectMode)
+assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024)
+assert.strictEqual(serializer.writableHighWaterMark, 16)
+assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
+assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
 
-parser.on('data', function(obj) {
-  parsed = obj;
-});
+serializer._transform = function (obj, _, callback) {
+  callback(null, Buffer.from([obj.val]))
+}
 
-parser.end(Buffer.from([42]));
+let serialized
+serializer.on('data', function (chunk) {
+  serialized = chunk
+})
+serializer.write({
+  val: 42
+})
+process.on('exit', function () {
+  assert.strictEqual(serialized[0], 42)
+})
+/* replacement start */
 
-process.on('exit', function() {
-  assert.strictEqual(parsed.val, 42);
-});
-
-
-const serializer = new Transform({ writableObjectMode: true });
-
-assert(!serializer._readableState.objectMode);
-assert(serializer._writableState.objectMode);
-assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024);
-assert.strictEqual(serializer.writableHighWaterMark, 16);
-assert.strictEqual(parser.readableHighWaterMark,
-                   parser._readableState.highWaterMark);
-assert.strictEqual(parser.writableHighWaterMark,
-                   parser._writableState.highWaterMark);
-
-serializer._transform = function(obj, _, callback) {
-  callback(null, Buffer.from([obj.val]));
-};
-
-let serialized;
-
-serializer.on('data', function(chunk) {
-  serialized = chunk;
-});
-
-serializer.write({ val: 42 });
-
-process.on('exit', function() {
-  assert.strictEqual(serialized[0], 42);
-});
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

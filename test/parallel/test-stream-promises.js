@@ -1,118 +1,109 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
+const silentConsole = {
+  log() {},
 
-const common = require('../common');
-const stream = require('../../lib/ours/index');
-const {
-  Readable,
-  Writable,
-  promises,
-} = stream;
-const {
-  finished,
-  pipeline,
-} = require('../../lib/stream/promises');
-const fs = require('fs');
-const assert = require('assert');
-const { promisify } = require('util');
+  error() {}
+}
+const common = require('../common')
 
-assert.strictEqual(promises.pipeline, pipeline);
-assert.strictEqual(promises.finished, finished);
-assert.strictEqual(pipeline, promisify(stream.pipeline));
-assert.strictEqual(finished, promisify(stream.finished));
+const stream = require('../../lib/ours/index')
 
-// pipeline success
+const { Readable, Writable, promises } = stream
+
+const { finished, pipeline } = require('../../lib/stream/promises')
+
+const fs = require('fs')
+
+const assert = require('assert')
+
+const { promisify } = require('util')
+
+assert.strictEqual(promises.pipeline, pipeline)
+assert.strictEqual(promises.finished, finished)
+assert.strictEqual(pipeline, promisify(stream.pipeline))
+assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
+
 {
-  let finished = false;
-  const processed = [];
-  const expected = [
-    Buffer.from('a'),
-    Buffer.from('b'),
-    Buffer.from('c'),
-  ];
-
+  let finished = false
+  const processed = []
+  const expected = [Buffer.from('a'), Buffer.from('b'), Buffer.from('c')]
   const read = new Readable({
-    read() { }
-  });
-
+    read() {}
+  })
   const write = new Writable({
     write(data, enc, cb) {
-      processed.push(data);
-      cb();
+      processed.push(data)
+      cb()
     }
-  });
-
+  })
   write.on('finish', () => {
-    finished = true;
-  });
+    finished = true
+  })
 
   for (let i = 0; i < expected.length; i++) {
-    read.push(expected[i]);
+    read.push(expected[i])
   }
-  read.push(null);
 
-  pipeline(read, write).then(common.mustCall((value) => {
-    assert.ok(finished);
-    assert.deepStrictEqual(processed, expected);
-  }));
-}
+  read.push(null)
+  pipeline(read, write).then(
+    common.mustCall((value) => {
+      assert.ok(finished)
+      assert.deepStrictEqual(processed, expected)
+    })
+  )
+} // pipeline error
 
-// pipeline error
 {
   const read = new Readable({
-    read() { }
-  });
-
+    read() {}
+  })
   const write = new Writable({
     write(data, enc, cb) {
-      cb();
+      cb()
     }
-  });
+  })
+  read.push('data')
+  setImmediate(() => read.destroy())
+  pipeline(read, write).catch(
+    common.mustCall((err) => {
+      assert.ok(err, 'should have an error')
+    })
+  )
+} // finished success
 
-  read.push('data');
-  setImmediate(() => read.destroy());
-
-  pipeline(read, write).catch(common.mustCall((err) => {
-    assert.ok(err, 'should have an error');
-  }));
-}
-
-// finished success
 {
   async function run() {
-    const rs = fs.createReadStream(__filename);
-
-    let ended = false;
-    rs.resume();
+    const rs = fs.createReadStream(__filename)
+    let ended = false
+    rs.resume()
     rs.on('end', () => {
-      ended = true;
-    });
-    await finished(rs);
-    assert(ended);
+      ended = true
+    })
+    await finished(rs)
+    assert(ended)
   }
 
-  run().then(common.mustCall());
-}
+  run().then(common.mustCall())
+} // finished error
 
-// finished error
 {
-  const rs = fs.createReadStream('file-does-not-exist');
-
-  assert.rejects(finished(rs), {
-    code: 'ENOENT'
-  }).then(common.mustCall());
+  const rs = fs.createReadStream('file-does-not-exist')
+  assert
+    .rejects(finished(rs), {
+      code: 'ENOENT'
+    })
+    .then(common.mustCall())
 }
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,26 +1,31 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
+const silentConsole = {
+  log() {},
 
-const Readable = require('../../lib/ours/index').Readable;
+  error() {}
+}
+const common = require('../common')
+
+const Readable = require('../../lib/ours/index').Readable
 
 const _read = common.mustCall(function _read(n) {
-  this.push(null);
-});
+  this.push(null)
+})
 
-const r = new Readable({ read: _read });
-r.resume();
+const r = new Readable({
+  read: _read
+})
+r.resume()
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

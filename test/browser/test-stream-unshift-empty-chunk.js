@@ -1,11 +1,11 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('unshift empty chunk', function (t) {
   t.plan(1)
-
   const r = new Readable()
   let nChunks = 10
   const chunk = Buffer.alloc(10)
@@ -21,20 +21,20 @@ test('unshift empty chunk', function (t) {
   const seen = []
   r.on('readable', function () {
     let chunk
+
     while ((chunk = r.read())) {
-      seen.push(chunk.toString())
-      // simulate only reading a certain amount of the data,
+      seen.push(chunk.toString()) // simulate only reading a certain amount of the data,
       // and then putting the rest of the chunk back into the
       // stream, like a parser might do.  We just fill it with
       // 'y' so that it's easy to see which bits were touched,
       // and which were not.
+
       const putBack = Buffer.alloc(readAll ? 0 : 5)
       putBack.fill('y')
       readAll = !readAll
       r.unshift(putBack)
     }
   })
-
   const expect = [
     'xxxxxxxxxx',
     'yyyyy',
@@ -55,7 +55,6 @@ test('unshift empty chunk', function (t) {
     'xxxxxxxxxx',
     'yyyyy'
   ]
-
   r.on('end', function () {
     t.deepEqual(seen, expect)
   })

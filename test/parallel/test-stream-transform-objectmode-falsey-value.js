@@ -18,49 +18,60 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
+  error() {}
+}
+const common = require('../common')
 
-const stream = require('../../lib/ours/index');
-const PassThrough = stream.PassThrough;
+const assert = require('assert')
 
-const src = new PassThrough({ objectMode: true });
-const tx = new PassThrough({ objectMode: true });
-const dest = new PassThrough({ objectMode: true });
+const stream = require('../../lib/ours/index')
 
-const expect = [ -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-const results = [];
-
-dest.on('data', common.mustCall(function(x) {
-  results.push(x);
-}, expect.length));
-
-src.pipe(tx).pipe(dest);
-
-let i = -1;
-const int = setInterval(common.mustCall(function() {
-  if (results.length === expect.length) {
-    src.end();
-    clearInterval(int);
-    assert.deepStrictEqual(results, expect);
-  } else {
-    src.write(i++);
-  }
-}, expect.length + 1), 1);
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
+const PassThrough = stream.PassThrough
+const src = new PassThrough({
+  objectMode: true
+})
+const tx = new PassThrough({
+  objectMode: true
+})
+const dest = new PassThrough({
+  objectMode: true
+})
+const expect = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const results = []
+dest.on(
+  'data',
+  common.mustCall(function (x) {
+    results.push(x)
+  }, expect.length)
+)
+src.pipe(tx).pipe(dest)
+let i = -1
+const int = setInterval(
+  common.mustCall(function () {
+    if (results.length === expect.length) {
+      src.end()
+      clearInterval(int)
+      assert.deepStrictEqual(results, expect)
     } else {
-      tap.fail(`test failed - exited code ${code}`);
+      src.write(i++)
     }
-  });
-  /* replacement end */
+  }, expect.length + 1),
+  1
+)
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

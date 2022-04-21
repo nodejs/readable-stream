@@ -18,98 +18,131 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
-const { Readable, Writable } = require('../../lib/ours/index');
-const EE = require('events').EventEmitter;
+  error() {}
+}
+const common = require('../common')
+
+const assert = require('assert')
+
+const { Readable, Writable } = require('../../lib/ours/index')
+
+const EE = require('events').EventEmitter
 
 function runTest(highWaterMark, objectMode, produce) {
+  const old = new EE()
+  const r = new Readable({
+    highWaterMark,
+    objectMode
+  })
+  assert.strictEqual(r, r.wrap(old))
+  r.on('end', common.mustCall())
 
-  const old = new EE();
-  const r = new Readable({ highWaterMark, objectMode });
-  assert.strictEqual(r, r.wrap(old));
+  old.pause = function () {
+    old.emit('pause')
+    flowing = false
+  }
 
-  r.on('end', common.mustCall());
+  old.resume = function () {
+    old.emit('resume')
+    flow()
+  } // Make sure pause is only emitted once.
 
-  old.pause = function() {
-    old.emit('pause');
-    flowing = false;
-  };
-
-  old.resume = function() {
-    old.emit('resume');
-    flow();
-  };
-
-  // Make sure pause is only emitted once.
-  let pausing = false;
+  let pausing = false
   r.on('pause', () => {
-    assert.strictEqual(pausing, false);
-    pausing = true;
+    assert.strictEqual(pausing, false)
+    pausing = true
     process.nextTick(() => {
-      pausing = false;
-    });
-  });
+      pausing = false
+    })
+  })
+  let flowing
+  let chunks = 10
+  let oldEnded = false
+  const expected = []
 
-  let flowing;
-  let chunks = 10;
-  let oldEnded = false;
-  const expected = [];
   function flow() {
-    flowing = true;
+    flowing = true
+
     while (flowing && chunks-- > 0) {
-      const item = produce();
-      expected.push(item);
-      old.emit('data', item);
+      const item = produce()
+      expected.push(item)
+      old.emit('data', item)
     }
+
     if (chunks <= 0) {
-      oldEnded = true;
-      old.emit('end');
+      oldEnded = true
+      old.emit('end')
     }
   }
 
-  const w = new Writable({ highWaterMark: highWaterMark * 2,
-                           objectMode });
-  const written = [];
-  w._write = function(chunk, encoding, cb) {
-    written.push(chunk);
-    setTimeout(cb, 1);
-  };
+  const w = new Writable({
+    highWaterMark: highWaterMark * 2,
+    objectMode
+  })
+  const written = []
 
-  w.on('finish', common.mustCall(function() {
-    performAsserts();
-  }));
+  w._write = function (chunk, encoding, cb) {
+    written.push(chunk)
+    setTimeout(cb, 1)
+  }
 
-  r.pipe(w);
-
-  flow();
+  w.on(
+    'finish',
+    common.mustCall(function () {
+      performAsserts()
+    })
+  )
+  r.pipe(w)
+  flow()
 
   function performAsserts() {
-    assert(oldEnded);
-    assert.deepStrictEqual(written, expected);
+    assert(oldEnded)
+    assert.deepStrictEqual(written, expected)
   }
 }
 
-runTest(100, false, function() { return Buffer.allocUnsafe(100); });
-runTest(10, false, function() { return Buffer.from('xxxxxxxxxx'); });
-runTest(1, true, function() { return { foo: 'bar' }; });
+runTest(100, false, function () {
+  return Buffer.allocUnsafe(100)
+})
+runTest(10, false, function () {
+  return Buffer.from('xxxxxxxxxx')
+})
+runTest(1, true, function () {
+  return {
+    foo: 'bar'
+  }
+})
+const objectChunks = [
+  5,
+  'a',
+  false,
+  0,
+  '',
+  'xyz',
+  {
+    x: 4
+  },
+  7,
+  [],
+  555
+]
+runTest(1, true, function () {
+  return objectChunks.shift()
+})
+/* replacement start */
 
-const objectChunks = [ 5, 'a', false, 0, '', 'xyz', { x: 4 }, 7, [], 555 ];
-runTest(1, true, function() { return objectChunks.shift(); });
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

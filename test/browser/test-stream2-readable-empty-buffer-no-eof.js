@@ -1,14 +1,12 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('readable empty buffer no eof 1', function (t) {
   t.plan(1)
-
-  const r = new Readable()
-
-  // should not end when we get a Buffer(0) or '' as the _read result
+  const r = new Readable() // should not end when we get a Buffer(0) or '' as the _read result
   // that just means that there is *temporarily* no data, but to go
   // ahead and try again later.
   //
@@ -21,41 +19,53 @@ test('readable empty buffer no eof 1', function (t) {
   const buf = Buffer.alloc(5)
   buf.fill('x')
   let reads = 5
+
   r._read = function (n) {
     switch (reads--) {
       case 0:
-        return r.push(null) // EOF
+        return r.push(null)
+      // EOF
+
       case 1:
         return r.push(buf)
+
       case 2:
         setTimeout(r.read.bind(r, 0), 50)
-        return r.push(Buffer.alloc(0)) // Not-EOF!
+        return r.push(Buffer.alloc(0))
+      // Not-EOF!
+
       case 3:
         setTimeout(r.read.bind(r, 0), 50)
         return process.nextTick(function () {
           return r.push(Buffer.alloc(0))
         })
+
       case 4:
         setTimeout(r.read.bind(r, 0), 50)
         return setTimeout(function () {
           return r.push(Buffer.alloc(0))
         })
+
       case 5:
         return setTimeout(function () {
           return r.push(buf)
         })
+
       default:
         throw new Error('unreachable')
     }
   }
 
   const results = []
+
   function flow() {
     let chunk
+
     while ((chunk = r.read()) !== null) {
       results.push(chunk + '')
     }
   }
+
   r.on('readable', flow)
   r.on('end', function () {
     results.push('EOF')
@@ -63,12 +73,13 @@ test('readable empty buffer no eof 1', function (t) {
   })
   flow()
 })
-
 test('readable empty buffer no eof 2', function (t) {
   t.plan(1)
-
-  const r = new Readable({ encoding: 'base64' })
+  const r = new Readable({
+    encoding: 'base64'
+  })
   let reads = 5
+
   r._read = function (n) {
     if (!reads--) {
       return r.push(null) // EOF
@@ -78,12 +89,15 @@ test('readable empty buffer no eof 2', function (t) {
   }
 
   const results = []
+
   function flow() {
     let chunk
+
     while ((chunk = r.read()) !== null) {
       results.push(chunk + '')
     }
   }
+
   r.on('readable', flow)
   r.on('end', function () {
     results.push('EOF')

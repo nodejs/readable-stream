@@ -1,54 +1,53 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
+const silentConsole = {
+  log() {},
 
-const common = require('../common');
-const assert = require('assert');
-const stream = require('../../lib/ours/index');
+  error() {}
+}
+const common = require('../common')
 
-let pushes = 0;
-const total = 65500 + 40 * 1024;
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
+
+let pushes = 0
+const total = 65500 + 40 * 1024
 const rs = new stream.Readable({
-  read: common.mustCall(function() {
+  read: common.mustCall(function () {
     if (pushes++ === 10) {
-      this.push(null);
-      return;
+      this.push(null)
+      return
     }
 
-    const length = this._readableState.length;
-
-    // We are at most doing two full runs of _reads
+    const length = this._readableState.length // We are at most doing two full runs of _reads
     // before stopping, because Readable is greedy
     // to keep its buffer full
-    assert(length <= total);
 
-    this.push(Buffer.alloc(65500));
+    assert(length <= total)
+    this.push(Buffer.alloc(65500))
+
     for (let i = 0; i < 40; i++) {
-      this.push(Buffer.alloc(1024));
-    }
-
-    // We will be over highWaterMark at this point
+      this.push(Buffer.alloc(1024))
+    } // We will be over highWaterMark at this point
     // but a new call to _read is scheduled anyway.
   }, 11)
-});
-
+})
 const ws = stream.Writable({
-  write: common.mustCall(function(data, enc, cb) {
-    setImmediate(cb);
+  write: common.mustCall(function (data, enc, cb) {
+    setImmediate(cb)
   }, 41 * 10)
-});
+})
+rs.pipe(ws)
+/* replacement start */
 
-rs.pipe(ws);
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

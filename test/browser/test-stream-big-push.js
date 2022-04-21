@@ -1,18 +1,16 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('big push', function (t) {
   t.plan(10)
-
   const str = 'asdfasdfasdfasdfasdf'
-
   const r = new Readable({
     highWaterMark: 5,
     encoding: 'utf8'
   })
-
   let reads = 0
   let eofed = false
   let ended = false
@@ -36,20 +34,16 @@ test('big push', function (t) {
 
   r.on('end', function () {
     ended = true
-  })
-
-  // push some data in to start.
+  }) // push some data in to start.
   // we've never gotten any read event at this point.
-  const ret = r.push(str)
 
-  // should be false.  > hwm
+  const ret = r.push(str) // should be false.  > hwm
+
   t.notOk(ret)
   let chunk = r.read()
   t.equal(chunk, str)
-
   chunk = r.read()
   t.equal(chunk, null)
-
   r.once('readable', function () {
     // this time, we'll get *all* the remaining data, because
     // it's been added synchronously, as the read WOULD take
@@ -57,11 +51,9 @@ test('big push', function (t) {
     // which synchronously added more, which we then return.
     chunk = r.read()
     t.equal(chunk, str + str)
-
     chunk = r.read()
     t.equal(chunk, null)
   })
-
   r.on('end', function () {
     t.ok(eofed)
     t.ok(ended)

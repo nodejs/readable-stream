@@ -18,50 +18,52 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const Readable = require('../../lib/ours/index').Readable;
-const assert = require('assert');
+  error() {}
+}
+require('../common')
+
+const Readable = require('../../lib/ours/index').Readable
+
+const assert = require('assert')
 
 const s = new Readable({
   highWaterMark: 20,
   encoding: 'ascii'
-});
+})
+const list = ['1', '2', '3', '4', '5', '6']
 
-const list = ['1', '2', '3', '4', '5', '6'];
+s._read = function (n) {
+  const one = list.shift()
 
-s._read = function(n) {
-  const one = list.shift();
   if (!one) {
-    s.push(null);
+    s.push(null)
   } else {
-    const two = list.shift();
-    s.push(one);
-    s.push(two);
+    const two = list.shift()
+    s.push(one)
+    s.push(two)
   }
-};
+}
 
-s.read(0);
+s.read(0) // ACTUALLY [1, 3, 5, 6, 4, 2]
 
-// ACTUALLY [1, 3, 5, 6, 4, 2]
+process.on('exit', function () {
+  assert.strictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6')
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-process.on('exit', function() {
-  assert.strictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6');
-  silentConsole.log('ok');
-});
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

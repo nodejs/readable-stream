@@ -1,18 +1,20 @@
 'use strict'
 
 const test = require('tape')
+
 const inherits = require('inherits')
+
 const { Writable } = require('../../lib/ours/index')
 
 test('should bea ble to write sync', function (t) {
   t.plan(2)
-
   let internalCalls = 0
   let externalCalls = 0
 
   const InternalStream = function () {
     Writable.call(this)
   }
+
   inherits(InternalStream, Writable)
 
   InternalStream.prototype._write = function (chunk, encoding, callback) {
@@ -26,10 +28,12 @@ test('should bea ble to write sync', function (t) {
     this._writable = writable
     Writable.call(this)
   }
+
   inherits(ExternalStream, Writable)
 
   ExternalStream.prototype._write = function (chunk, encoding, callback) {
     externalCalls++
+
     this._writable.write(chunk, encoding, callback)
   }
 

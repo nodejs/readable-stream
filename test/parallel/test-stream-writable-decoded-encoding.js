@@ -18,56 +18,68 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-const stream = require('../../lib/ours/index');
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
 
 class MyWritable extends stream.Writable {
   constructor(fn, options) {
-    super(options);
-    this.fn = fn;
+    super(options)
+    this.fn = fn
   }
 
   _write(chunk, encoding, callback) {
-    this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
-    callback();
+    this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding)
+    callback()
   }
 }
 
 {
-  const m = new MyWritable(function(isBuffer, type, enc) {
-    assert(isBuffer);
-    assert.strictEqual(type, 'object');
-    assert.strictEqual(enc, 'buffer');
-  }, { decodeStrings: true });
-  m.write('some-text', 'utf8');
-  m.end();
-}
-
-{
-  const m = new MyWritable(function(isBuffer, type, enc) {
-    assert(!isBuffer);
-    assert.strictEqual(type, 'string');
-    assert.strictEqual(enc, 'utf8');
-  }, { decodeStrings: false });
-  m.write('some-text', 'utf8');
-  m.end();
-}
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
+  const m = new MyWritable(
+    function (isBuffer, type, enc) {
+      assert(isBuffer)
+      assert.strictEqual(type, 'object')
+      assert.strictEqual(enc, 'buffer')
+    },
+    {
+      decodeStrings: true
     }
-  });
-  /* replacement end */
+  )
+  m.write('some-text', 'utf8')
+  m.end()
+}
+{
+  const m = new MyWritable(
+    function (isBuffer, type, enc) {
+      assert(!isBuffer)
+      assert.strictEqual(type, 'string')
+      assert.strictEqual(enc, 'utf8')
+    },
+    {
+      decodeStrings: false
+    }
+  )
+  m.write('some-text', 'utf8')
+  m.end()
+}
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

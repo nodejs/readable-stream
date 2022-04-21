@@ -1,7 +1,9 @@
 'use strict'
 
 const test = require('tape')
+
 const inherits = require('inherits')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('push strings', function (t) {
@@ -18,6 +20,7 @@ test('push strings', function (t) {
     switch (this._chunks--) {
       case 0:
         return this.push(null)
+
       case 1:
         return setTimeout(
           function () {
@@ -25,29 +28,32 @@ test('push strings', function (t) {
           }.bind(this),
           100
         )
+
       case 2:
         return this.push('second to last chunk')
+
       case 3:
         return process.nextTick(
           function () {
             this.push('first chunk')
           }.bind(this)
         )
+
       default:
         throw new Error('?')
     }
   }
-  const expect = ['first chunksecond to last chunk', 'last chunk']
 
+  const expect = ['first chunksecond to last chunk', 'last chunk']
   const ms = new MyStream()
   const results = []
   ms.on('readable', function () {
     let chunk
+
     while ((chunk = ms.read()) !== null) {
       results.push(chunk + '')
     }
   })
-
   ms.on('end', function () {
     t.equal(ms._chunks, -1)
     t.deepEqual(results, expect)

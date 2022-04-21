@@ -1,78 +1,76 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
-const { Readable, Writable, Duplex, Transform } = require('../../lib/ours/index');
+const silentConsole = {
+  log() {},
 
-const readable = new Readable({ read() {} });
-const writable = new Writable({ write() {} });
-const duplex = new Duplex({ read() {}, write() {} });
-const transform = new Transform({ transform() {} });
+  error() {}
+}
+require('../common')
 
-assert.ok(readable instanceof Readable);
-assert.ok(!(writable instanceof Readable));
-assert.ok(duplex instanceof Readable);
-assert.ok(transform instanceof Readable);
+const assert = require('assert')
 
-assert.ok(!(readable instanceof Writable));
-assert.ok(writable instanceof Writable);
-assert.ok(duplex instanceof Writable);
-assert.ok(transform instanceof Writable);
+const { Readable, Writable, Duplex, Transform } = require('../../lib/ours/index')
 
-assert.ok(!(readable instanceof Duplex));
-assert.ok(!(writable instanceof Duplex));
-assert.ok(duplex instanceof Duplex);
-assert.ok(transform instanceof Duplex);
+const readable = new Readable({
+  read() {}
+})
+const writable = new Writable({
+  write() {}
+})
+const duplex = new Duplex({
+  read() {},
 
-assert.ok(!(readable instanceof Transform));
-assert.ok(!(writable instanceof Transform));
-assert.ok(!(duplex instanceof Transform));
-assert.ok(transform instanceof Transform);
+  write() {}
+})
+const transform = new Transform({
+  transform() {}
+})
+assert.ok(readable instanceof Readable)
+assert.ok(!(writable instanceof Readable))
+assert.ok(duplex instanceof Readable)
+assert.ok(transform instanceof Readable)
+assert.ok(!(readable instanceof Writable))
+assert.ok(writable instanceof Writable)
+assert.ok(duplex instanceof Writable)
+assert.ok(transform instanceof Writable)
+assert.ok(!(readable instanceof Duplex))
+assert.ok(!(writable instanceof Duplex))
+assert.ok(duplex instanceof Duplex)
+assert.ok(transform instanceof Duplex)
+assert.ok(!(readable instanceof Transform))
+assert.ok(!(writable instanceof Transform))
+assert.ok(!(duplex instanceof Transform))
+assert.ok(transform instanceof Transform)
+assert.ok(!(null instanceof Writable))
+assert.ok(!(undefined instanceof Writable)) // Simple inheritance check for `Writable` works fine in a subclass constructor.
 
-assert.ok(!(null instanceof Writable));
-assert.ok(!(undefined instanceof Writable));
-
-// Simple inheritance check for `Writable` works fine in a subclass constructor.
 function CustomWritable() {
-  assert.ok(
-    this instanceof CustomWritable,
-    `${this} does not inherit from CustomWritable`
-  );
-  assert.ok(
-    this instanceof Writable,
-    `${this} does not inherit from Writable`
-  );
+  assert.ok(this instanceof CustomWritable, `${this} does not inherit from CustomWritable`)
+  assert.ok(this instanceof Writable, `${this} does not inherit from Writable`)
 }
 
-Object.setPrototypeOf(CustomWritable, Writable);
-Object.setPrototypeOf(CustomWritable.prototype, Writable.prototype);
-
-new CustomWritable();
-
-assert.throws(
-  CustomWritable,
-  {
-    code: 'ERR_ASSERTION',
-    constructor: assert.AssertionError,
-    message: 'undefined does not inherit from CustomWritable'
-  }
-);
+Object.setPrototypeOf(CustomWritable, Writable)
+Object.setPrototypeOf(CustomWritable.prototype, Writable.prototype)
+new CustomWritable()
+assert.throws(CustomWritable, {
+  code: 'ERR_ASSERTION',
+  constructor: assert.AssertionError,
+  message: 'undefined does not inherit from CustomWritable'
+})
 
 class OtherCustomWritable extends Writable {}
 
-assert(!(new OtherCustomWritable() instanceof CustomWritable));
-assert(!(new CustomWritable() instanceof OtherCustomWritable));
+assert(!(new OtherCustomWritable() instanceof CustomWritable))
+assert(!(new CustomWritable() instanceof OtherCustomWritable))
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

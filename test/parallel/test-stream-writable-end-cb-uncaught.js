@@ -1,39 +1,49 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
+const silentConsole = {
+  log() {},
 
-const common = require('../common');
-const assert = require('assert');
-const stream = require('../../lib/ours/index');
+  error() {}
+}
+const common = require('../common')
 
-process.on('uncaughtException', common.mustCall((err) => {
-  assert.strictEqual(err.message, 'kaboom');
-}));
+const assert = require('assert')
 
-const writable = new stream.Writable();
-const _err = new Error('kaboom');
+const stream = require('../../lib/ours/index')
+
+process.on(
+  'uncaughtException',
+  common.mustCall((err) => {
+    assert.strictEqual(err.message, 'kaboom')
+  })
+)
+const writable = new stream.Writable()
+
+const _err = new Error('kaboom')
 
 writable._write = (chunk, encoding, cb) => {
-  cb();
-};
+  cb()
+}
+
 writable._final = (cb) => {
-  cb(_err);
-};
+  cb(_err)
+}
 
-writable.write('asd');
-writable.end(common.mustCall((err) => {
-  assert.strictEqual(err, _err);
-}));
+writable.write('asd')
+writable.end(
+  common.mustCall((err) => {
+    assert.strictEqual(err, _err)
+  })
+)
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

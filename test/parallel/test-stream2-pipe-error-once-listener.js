@@ -18,51 +18,50 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
+  error() {}
+}
+require('../common')
 
-require('../common');
-const stream = require('../../lib/ours/index');
+const stream = require('../../lib/ours/index')
 
 class Read extends stream.Readable {
   _read(size) {
-    this.push('x');
-    this.push(null);
+    this.push('x')
+    this.push(null)
   }
 }
 
 class Write extends stream.Writable {
   _write(buffer, encoding, cb) {
-    this.emit('error', new Error('boom'));
-    this.emit('alldone');
+    this.emit('error', new Error('boom'))
+    this.emit('alldone')
   }
 }
 
-const read = new Read();
-const write = new Write();
+const read = new Read()
+const write = new Write()
+write.once('error', () => {})
+write.once('alldone', function (err) {
+  silentConsole.log('ok')
+})
+process.on('exit', function (c) {
+  silentConsole.error('error thrown even with listener')
+})
+read.pipe(write)
+/* replacement start */
 
-write.once('error', () => {});
-write.once('alldone', function(err) {
-  silentConsole.log('ok');
-});
-
-process.on('exit', function(c) {
-  silentConsole.error('error thrown even with listener');
-});
-
-read.pipe(write);
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

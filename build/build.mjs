@@ -1,10 +1,13 @@
+import { transform } from '@babel/core'
 import { createReadStream } from 'node:fs'
-import { copyFile, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { finished } from 'node:stream/promises'
+import prettier from 'prettier'
 import { Parse } from 'tar'
 import { request } from 'undici'
+import prettierConfig from '../prettier.config.cjs'
 import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
 import { replacements } from './replacements.mjs'
@@ -66,6 +69,8 @@ async function processFiles(contents) {
   const replacementsKeys = Object.keys(replacements)
   const footersKeys = Object.keys(footers)
 
+  prettierConfig.parser = 'babel'
+
   for (let [path, content] of contents) {
     const modifications = []
     const matchingReplacements = replacementsKeys.filter((k) => new RegExp(k).test(path))
@@ -91,6 +96,13 @@ async function processFiles(contents) {
           content += footer
         }
       }
+    }
+
+    // Process the file through babel and prettier
+    if (path.endsWith('.js')) {
+      modifications.push(highlightFile('babel', 33), highlightFile('prettier', 33))
+      console.log(prettierConfig)
+      content = prettier.format(await transform(content).code.replaceAll('void 0', 'undefined'), prettierConfig)
     }
 
     if (!modifications.length) {
@@ -152,12 +164,26 @@ async function main() {
   replacements['README.md'][0][1] = replacements['README.md'][0][1].replace('$2', nodeVersion)
   replacements['README.md'][1][1] = replacements['README.md'][1][1].replace('$2', nodeVersion)
 
+  // Add custom files
+  contents.push(['lib/ours/browser.js', await readFile('src/browser.js', 'utf-8')])
+  contents.push(['lib/ours/index.js', await readFile('src/index.js', 'utf-8')])
+  contents.push(['lib/ours/errors.js', await readFile('src/errors.js', 'utf-8')])
+  contents.push(['lib/ours/primordials.js', await readFile('src/primordials.js', 'utf-8')])
+  contents.push(['lib/ours/util.js', await readFile('src/util.js', 'utf-8')])
+
+  for (const file of await readdir('src/test/ours')) {
+    contents.push([`test/ours/${file}`, await readFile(`src/test/ours/${file}`, 'utf-8')])
+  }
+
+  for (const file of await readdir('src/test/browser')) {
+    contents.push([`test/browser/${file}`, await readFile(`src/test/browser/${file}`, 'utf-8')])
+  }
+
   contents.push(['README.md', await readFile('./README.md', 'utf-8')])
 
   // Create paths
   const paths = new Set(contents.map((c) => dirname(c[0])))
   paths.delete('.')
-  paths.add('lib/ours')
 
   for (const path of paths.values()) {
     console.log(`Creating directory ${highlightFile(path, 32)} ...`)
@@ -166,28 +192,6 @@ async function main() {
 
   // Perform replacements
   await processFiles(contents)
-
-  // Copy template files
-  console.log(`Copying template to file ${highlightFile('lib/ours/browser.js', 32)} ...`)
-  await copyFile('src/browser.js', 'lib/ours/browser.js')
-
-  console.log(`Copying template to file ${highlightFile('lib/ours/index.js', 32)} ...`)
-  await copyFile('src/index.js', 'lib/ours/index.js')
-
-  console.log(`Copying template to file ${highlightFile('lib/ours/errors.js', 32)} ...`)
-  await copyFile('src/errors.js', 'lib/ours/errors.js')
-
-  console.log(`Copying template to file ${highlightFile('lib/ours/primordials.js', 32)} ...`)
-  await copyFile('src/primordials.js', 'lib/ours/primordials.js')
-
-  console.log(`Copying template to file ${highlightFile('lib/ours/util.js', 32)} ...`)
-  await copyFile('src/util.js', 'lib/ours/util.js')
-
-  console.log(`Copying folder ${highlightFile('test/browser', 32)} ...`)
-  await cp('src/test/browser', 'test/browser', { recursive: true })
-
-  console.log(`Copying folder ${highlightFile('test/ours', 32)} ...`)
-  await cp('src/test/ours', 'test/ours', { recursive: true })
 }
 
 await main()

@@ -2,6 +2,16 @@
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 
+if (typeof Blob === 'undefined') {
+  let { Blob } = require('buffer')
+
+  if (typeof Blob === 'undefined') {
+    Blob = require('blob-polyfill').Blob
+  }
+
+  globalThis.Blob = Blob
+}
+
 module.exports = {
   once(callback) {
     let called = false
@@ -59,6 +69,10 @@ module.exports = {
     isArrayBufferView(arr) {
       return ArrayBuffer.isView(arr)
     }
+  },
+  isBlob(blob) {
+    // eslint-disable-next-line no-undef
+    return blob instanceof Blob
   }
 }
 

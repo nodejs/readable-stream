@@ -18,67 +18,70 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
-const { Readable, Writable } = require('../../lib/ours/index');
+  error() {}
+}
+const common = require('../common')
+
+const assert = require('assert')
+
+const { Readable, Writable } = require('../../lib/ours/index')
 
 class TestReadable extends Readable {
   constructor(opt) {
-    super(opt);
-    this._ended = false;
+    super(opt)
+    this._ended = false
   }
 
   _read() {
-    if (this._ended)
-      this.emit('error', new Error('_read called twice'));
-    this._ended = true;
-    this.push(null);
+    if (this._ended) this.emit('error', new Error('_read called twice'))
+    this._ended = true
+    this.push(null)
   }
 }
 
 class TestWritable extends Writable {
   constructor(opt) {
-    super(opt);
-    this._written = [];
+    super(opt)
+    this._written = []
   }
 
   _write(chunk, encoding, cb) {
-    this._written.push(chunk);
-    cb();
+    this._written.push(chunk)
+
+    cb()
   }
-}
+} // This one should not emit 'end' until we read() from it later.
 
-// This one should not emit 'end' until we read() from it later.
-const ender = new TestReadable();
+const ender = new TestReadable() // What happens when you pipe() a Readable that's already ended?
 
-// What happens when you pipe() a Readable that's already ended?
-const piper = new TestReadable();
-// pushes EOF null, and length=0, so this will trigger 'end'
-piper.read();
+const piper = new TestReadable() // pushes EOF null, and length=0, so this will trigger 'end'
 
-setTimeout(common.mustCall(function() {
-  ender.on('end', common.mustCall());
-  const c = ender.read();
-  assert.strictEqual(c, null);
+piper.read()
+setTimeout(
+  common.mustCall(function () {
+    ender.on('end', common.mustCall())
+    const c = ender.read()
+    assert.strictEqual(c, null)
+    const w = new TestWritable()
+    w.on('finish', common.mustCall())
+    piper.pipe(w)
+  }),
+  1
+)
+/* replacement start */
 
-  const w = new TestWritable();
-  w.on('finish', common.mustCall());
-  piper.pipe(w);
-}), 1);
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

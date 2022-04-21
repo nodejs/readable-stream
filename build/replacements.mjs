@@ -8,8 +8,6 @@ const internalStreamsBlob = [
         return b instanceof Blob
       }
     }
-
-    const { Blob } = require('buffer');
   `
 ]
 
@@ -137,6 +135,17 @@ const testParallelImportStreamInMjs = [" from 'stream';", "from '../../lib/ours/
 
 const testParallelImportTapInMjs = ["(from 'assert';)", "$1\nimport tap from 'tap';"]
 
+const testParallelDuplexFromBlob = [
+  "const \\{ Blob \\} = require\\('buffer'\\)",
+  `
+    let {Blob} = require('buffer');
+
+    if (typeof Blob === 'undefined') {
+      Blob = require('blob-polyfill').Blob;
+    }
+  `
+]
+
 const testParallelFinishedEvent = ["res.on\\('close", "res.on('finish"]
 
 const testParallelFlatMapWinLineSeparator = [
@@ -247,6 +256,7 @@ export const replacements = {
     testParallelSilentConsole,
     testParallelTimersPromises
   ],
+  'test/parallel/test-stream-duplex-from.js': [testParallelDuplexFromBlob],
   'test/parallel/test-stream-finished.js': [testParallelFinishedEvent],
   'test/parallel/test-stream-flatMap.js': [testParallelFlatMapWinLineSeparator],
   'test/parallel/test-stream-preprocess.js': [testParallelPreprocessWinLineSeparator],

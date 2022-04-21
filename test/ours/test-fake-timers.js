@@ -1,9 +1,13 @@
 'use strict'
 
 require('../common')
+
 const t = require('tap')
+
 const util = require('util')
+
 const fakeTimers = require('@sinonjs/fake-timers')
+
 const Transform = require('../../lib/ours/index').Transform
 
 t.plan(1)
@@ -13,10 +17,10 @@ function MyTransform() {
 }
 
 util.inherits(MyTransform, Transform)
-
-const clock = fakeTimers.install({ toFake: ['setImmediate', 'nextTick'] })
+const clock = fakeTimers.install({
+  toFake: ['setImmediate', 'nextTick']
+})
 let stream2DataCalled = false
-
 const stream = new MyTransform()
 stream.on('data', function () {
   stream.on('end', function () {
@@ -34,7 +38,6 @@ stream.on('data', function () {
   stream.end()
 })
 stream.emit('data')
-
 clock.runAll()
 clock.uninstall()
 t.ok(stream2DataCalled)

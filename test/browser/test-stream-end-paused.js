@@ -1,11 +1,11 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('end pause', function (t) {
   t.plan(2)
-
   const stream = new Readable()
   let calledRead = false
 
@@ -18,9 +18,7 @@ test('end pause', function (t) {
   stream.on('data', function () {
     throw new Error('should not ever get data')
   })
-
   stream.pause()
-
   setTimeout(function () {
     stream.on('end', function () {
       t.ok(calledRead)

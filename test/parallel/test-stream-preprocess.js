@@ -1,75 +1,89 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
+const silentConsole = {
+  log() {},
 
-const fs = require('fs');
-const rl = require('readline');
-const fixtures = require('../common/fixtures');
+  error() {}
+}
+const common = require('../common')
 
-const BOM = '\uFEFF';
+const assert = require('assert')
 
-// Get the data using a non-stream way to compare with the streamed data.
-const modelData = fixtures.readSync('file-to-read-without-bom.txt', 'utf8');
-const modelDataFirstCharacter = modelData[0];
+const fs = require('fs')
 
-// Detect the number of forthcoming 'line' events for mustCall() 'expected' arg.
-const lineCount = modelData.match(/\n/g).length;
+const rl = require('readline')
 
-// Ensure both without-bom and with-bom test files are textwise equal.
-assert.strictEqual(fixtures.readSync('file-to-read-with-bom.txt', 'utf8'),
-                   `${BOM}${modelData}`
-);
+const fixtures = require('../common/fixtures')
 
-// An unjustified BOM stripping with a non-BOM character unshifted to a stream.
-const inputWithoutBOM =
-  fs.createReadStream(fixtures.path('file-to-read-without-bom.txt'), 'utf8');
+const BOM = '\uFEFF' // Get the data using a non-stream way to compare with the streamed data.
 
-inputWithoutBOM.once('readable', common.mustCall(() => {
-  const maybeBOM = inputWithoutBOM.read(1);
-  assert.strictEqual(maybeBOM, modelDataFirstCharacter);
-  assert.notStrictEqual(maybeBOM, BOM);
+const modelData = fixtures.readSync('file-to-read-without-bom.txt', 'utf8')
+const modelDataFirstCharacter = modelData[0] // Detect the number of forthcoming 'line' events for mustCall() 'expected' arg.
 
-  inputWithoutBOM.unshift(maybeBOM);
+const lineCount = modelData.match(/\n/g).length // Ensure both without-bom and with-bom test files are textwise equal.
 
-  let streamedData = '';
-  rl.createInterface({
-    input: inputWithoutBOM,
-  }).on('line', common.mustCall((line) => {
-    streamedData += `${line}\n`;
-  }, lineCount)).on('close', common.mustCall(() => {
-    assert.strictEqual(streamedData, process.platform === 'win32' ? modelData.replace(/\r\n/g, '\n') : modelData);
-  }));
-}));
+assert.strictEqual(fixtures.readSync('file-to-read-with-bom.txt', 'utf8'), `${BOM}${modelData}`) // An unjustified BOM stripping with a non-BOM character unshifted to a stream.
 
-// A justified BOM stripping.
-const inputWithBOM =
-  fs.createReadStream(fixtures.path('file-to-read-with-bom.txt'), 'utf8');
+const inputWithoutBOM = fs.createReadStream(fixtures.path('file-to-read-without-bom.txt'), 'utf8')
+inputWithoutBOM.once(
+  'readable',
+  common.mustCall(() => {
+    const maybeBOM = inputWithoutBOM.read(1)
+    assert.strictEqual(maybeBOM, modelDataFirstCharacter)
+    assert.notStrictEqual(maybeBOM, BOM)
+    inputWithoutBOM.unshift(maybeBOM)
+    let streamedData = ''
+    rl.createInterface({
+      input: inputWithoutBOM
+    })
+      .on(
+        'line',
+        common.mustCall((line) => {
+          streamedData += `${line}\n`
+        }, lineCount)
+      )
+      .on(
+        'close',
+        common.mustCall(() => {
+          assert.strictEqual(streamedData, process.platform === 'win32' ? modelData.replace(/\r\n/g, '\n') : modelData)
+        })
+      )
+  })
+) // A justified BOM stripping.
 
-inputWithBOM.once('readable', common.mustCall(() => {
-  const maybeBOM = inputWithBOM.read(1);
-  assert.strictEqual(maybeBOM, BOM);
+const inputWithBOM = fs.createReadStream(fixtures.path('file-to-read-with-bom.txt'), 'utf8')
+inputWithBOM.once(
+  'readable',
+  common.mustCall(() => {
+    const maybeBOM = inputWithBOM.read(1)
+    assert.strictEqual(maybeBOM, BOM)
+    let streamedData = ''
+    rl.createInterface({
+      input: inputWithBOM
+    })
+      .on(
+        'line',
+        common.mustCall((line) => {
+          streamedData += `${line}\n`
+        }, lineCount)
+      )
+      .on(
+        'close',
+        common.mustCall(() => {
+          assert.strictEqual(streamedData, process.platform === 'win32' ? modelData.replace(/\r\n/g, '\n') : modelData)
+        })
+      )
+  })
+)
+/* replacement start */
 
-  let streamedData = '';
-  rl.createInterface({
-    input: inputWithBOM,
-  }).on('line', common.mustCall((line) => {
-    streamedData += `${line}\n`;
-  }, lineCount)).on('close', common.mustCall(() => {
-    assert.strictEqual(streamedData, process.platform === 'win32' ? modelData.replace(/\r\n/g, '\n') : modelData);
-  }));
-}));
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

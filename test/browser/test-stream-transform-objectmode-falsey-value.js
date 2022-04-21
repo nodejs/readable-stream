@@ -1,27 +1,29 @@
 'use strict'
 
 const test = require('tape')
+
 const { PassThrough } = require('../../lib/ours/index')
 
 test('transform objectmode falsey value', function (t) {
   t.plan(13)
-
-  const src = new PassThrough({ objectMode: true })
-  const tx = new PassThrough({ objectMode: true })
-  const dest = new PassThrough({ objectMode: true })
-
+  const src = new PassThrough({
+    objectMode: true
+  })
+  const tx = new PassThrough({
+    objectMode: true
+  })
+  const dest = new PassThrough({
+    objectMode: true
+  })
   const expect = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   const results = []
   dest.on('end', function () {
     t.deepEqual(results, expect)
   })
-
   dest.on('data', function (x) {
     results.push(x)
   })
-
   src.pipe(tx).pipe(dest)
-
   let i = -1
   const int = setInterval(function () {
     if (i > 10) {

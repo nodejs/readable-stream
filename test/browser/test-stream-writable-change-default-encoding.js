@@ -1,7 +1,9 @@
 'use strict'
 
 const test = require('tape')
+
 const inherits = require('inherits')
+
 const stream = require('../../lib/ours/index')
 
 inherits(MyWritable, stream.Writable)
@@ -18,50 +20,51 @@ function MyWritable(fn, options) {
 
 test('defaultCondingIsUtf8', (t) => {
   t.plan(1)
-
   const m = new MyWritable(
     function (isBuffer, type, enc) {
       t.equal(enc, 'utf8')
     },
-    { decodeStrings: false }
+    {
+      decodeStrings: false
+    }
   )
   m.write('foo')
   m.end()
 })
-
 test('changeDefaultEncodingToAscii', (t) => {
   t.plan(1)
-
   const m = new MyWritable(
     function (isBuffer, type, enc) {
       t.equal(enc, 'ascii')
     },
-    { decodeStrings: false }
+    {
+      decodeStrings: false
+    }
   )
   m.setDefaultEncoding('ascii')
   m.write('bar')
   m.end()
 })
-
 test('changeDefaultEncodingToInvalidValue', (t) => {
   t.plan(1)
-
   t.throws(function () {
-    const m = new MyWritable(function (isBuffer, type, enc) {}, { decodeStrings: false })
+    const m = new MyWritable(function (isBuffer, type, enc) {}, {
+      decodeStrings: false
+    })
     m.setDefaultEncoding({})
     m.write('bar')
     m.end()
   }, TypeError)
 })
-
 test('checkVairableCaseEncoding', (t) => {
   t.plan(1)
-
   const m = new MyWritable(
     function (isBuffer, type, enc) {
       t.equal(enc, 'ascii')
     },
-    { decodeStrings: false }
+    {
+      decodeStrings: false
+    }
   )
   m.setDefaultEncoding('AsCii')
   m.write('bar')

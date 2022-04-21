@@ -1,32 +1,34 @@
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const stream = require('../../lib/ours/index');
+const silentConsole = {
+  log() {},
 
-const r = new stream.Stream();
-r.listenerCount = undefined;
+  error() {}
+}
+const common = require('../common')
 
-const w = new stream.Stream();
-w.listenerCount = undefined;
+const stream = require('../../lib/ours/index')
 
-w.on('pipe', function() {
-  r.emit('error', new Error('Readable Error'));
-  w.emit('error', new Error('Writable Error'));
-});
-r.on('error', common.mustCall());
-w.on('error', common.mustCall());
-r.pipe(w);
+const r = new stream.Stream()
+r.listenerCount = undefined
+const w = new stream.Stream()
+w.listenerCount = undefined
+w.on('pipe', function () {
+  r.emit('error', new Error('Readable Error'))
+  w.emit('error', new Error('Writable Error'))
+})
+r.on('error', common.mustCall())
+w.on('error', common.mustCall())
+r.pipe(w)
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

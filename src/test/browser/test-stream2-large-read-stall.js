@@ -23,9 +23,10 @@ test('large object read stall', function (t) {
 
   r.on('readable', function () {
     false && console.error('>> readable')
+    let ret
     do {
       false && console.error('  > read(%d)', READSIZE)
-      var ret = r.read(READSIZE)
+      ret = r.read(READSIZE)
       false && console.error('  < %j (%d remain)', ret && ret.length, rs.length)
     } while (ret && ret.length === READSIZE)
 

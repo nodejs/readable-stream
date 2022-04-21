@@ -18,68 +18,70 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const { Readable: R, Writable: W } = require('../../lib/ours/index');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-let ondataCalled = 0;
+const { Readable: R, Writable: W } = require('../../lib/ours/index')
+
+const assert = require('assert')
+
+let ondataCalled = 0
 
 class TestReader extends R {
   constructor() {
-    super();
-    this._buffer = Buffer.alloc(100, 'x');
-
+    super()
+    this._buffer = Buffer.alloc(100, 'x')
     this.on('data', () => {
-      ondataCalled++;
-    });
+      ondataCalled++
+    })
   }
 
   _read(n) {
-    this.push(this._buffer);
-    this._buffer = Buffer.alloc(0);
+    this.push(this._buffer)
+    this._buffer = Buffer.alloc(0)
   }
 }
 
-const reader = new TestReader();
-setImmediate(function() {
-  assert.strictEqual(ondataCalled, 1);
-  silentConsole.log('ok');
-  reader.push(null);
-});
+const reader = new TestReader()
+setImmediate(function () {
+  assert.strictEqual(ondataCalled, 1)
+  silentConsole.log('ok')
+  reader.push(null)
+})
 
 class TestWriter extends W {
   constructor() {
-    super();
-    this.write('foo');
-    this.end();
+    super()
+    this.write('foo')
+    this.end()
   }
 
   _write(chunk, enc, cb) {
-    cb();
+    cb()
   }
 }
 
-const writer = new TestWriter();
+const writer = new TestWriter()
+process.on('exit', function () {
+  assert.strictEqual(reader.readable, false)
+  assert.strictEqual(writer.writable, false)
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-process.on('exit', function() {
-  assert.strictEqual(reader.readable, false);
-  assert.strictEqual(writer.writable, false);
-  silentConsole.log('ok');
-});
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

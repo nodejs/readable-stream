@@ -18,78 +18,80 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-// This test verifies that stream.unshift(Buffer.alloc(0)) or
+const assert = require('assert') // This test verifies that stream.unshift(Buffer.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
-const Readable = require('../../lib/ours/index').Readable;
 
-const r = new Readable();
-let nChunks = 10;
-const chunk = Buffer.alloc(10, 'x');
+const Readable = require('../../lib/ours/index').Readable
 
-r._read = function(n) {
+const r = new Readable()
+let nChunks = 10
+const chunk = Buffer.alloc(10, 'x')
+
+r._read = function (n) {
   setImmediate(() => {
-    r.push(--nChunks === 0 ? null : chunk);
-  });
-};
+    r.push(--nChunks === 0 ? null : chunk)
+  })
+}
 
-let readAll = false;
-const seen = [];
+let readAll = false
+const seen = []
 r.on('readable', () => {
-  let chunk;
+  let chunk
+
   while ((chunk = r.read()) !== null) {
-    seen.push(chunk.toString());
-    // Simulate only reading a certain amount of the data,
+    seen.push(chunk.toString()) // Simulate only reading a certain amount of the data,
     // and then putting the rest of the chunk back into the
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
-    const putBack = Buffer.alloc(readAll ? 0 : 5, 'y');
-    readAll = !readAll;
-    r.unshift(putBack);
+
+    const putBack = Buffer.alloc(readAll ? 0 : 5, 'y')
+    readAll = !readAll
+    r.unshift(putBack)
   }
-});
-
-const expect =
-  [ 'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy',
-    'xxxxxxxxxx',
-    'yyyyy' ];
-
+})
+const expect = [
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy'
+]
 r.on('end', () => {
-  assert.deepStrictEqual(seen, expect);
-  silentConsole.log('ok');
-});
+  assert.deepStrictEqual(seen, expect)
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,13 +1,14 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('non empty end', function (t) {
   t.plan(4)
-
   let len = 0
   const chunks = new Array(10)
+
   for (let i = 1; i <= 10; i++) {
     chunks[i - 1] = Buffer.alloc(i)
     len += i
@@ -15,6 +16,7 @@ test('non empty end', function (t) {
 
   const test = new Readable()
   let n = 0
+
   test._read = function (size) {
     const chunk = chunks[n++]
     setTimeout(function () {
@@ -23,6 +25,7 @@ test('non empty end', function (t) {
   }
 
   test.on('end', thrower)
+
   function thrower() {
     throw new Error('this should not happen!')
   }
@@ -31,11 +34,13 @@ test('non empty end', function (t) {
   test.on('readable', function () {
     const b = len - bytesread - 1
     const res = test.read(b)
+
     if (res) {
-      bytesread += res.length
-      // console.error('br=%d len=%d', bytesread, len);
+      bytesread += res.length // console.error('br=%d len=%d', bytesread, len);
+
       setTimeout(next)
     }
+
     test.read(0)
   })
   test.read(0)
@@ -43,12 +48,10 @@ test('non empty end', function (t) {
   function next() {
     // now let's make 'end' happen
     test.removeListener('end', thrower)
-
     test.on('end', function () {
       t.ok(true, 'end emitted')
-    })
+    }) // one to get the last byte
 
-    // one to get the last byte
     let r = test.read()
     t.ok(r)
     t.equal(r.length, 1)

@@ -18,72 +18,71 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-const common = require('../common');
-const assert = require('assert');
-const stream = require('../../lib/ours/index');
-const str = 'asdfasdfasdfasdfasdf';
+  error() {}
+}
+const common = require('../common')
 
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
+
+const str = 'asdfasdfasdfasdfasdf'
 const r = new stream.Readable({
   highWaterMark: 5,
   encoding: 'utf8'
-});
-
-let reads = 0;
+})
+let reads = 0
 
 function _read() {
   if (reads === 0) {
     setTimeout(() => {
-      r.push(str);
-    }, 1);
-    reads++;
+      r.push(str)
+    }, 1)
+    reads++
   } else if (reads === 1) {
-    const ret = r.push(str);
-    assert.strictEqual(ret, false);
-    reads++;
+    const ret = r.push(str)
+    assert.strictEqual(ret, false)
+    reads++
   } else {
-    r.push(null);
+    r.push(null)
   }
 }
 
-r._read = common.mustCall(_read, 3);
-
-r.on('end', common.mustCall());
-
-// Push some data in to start.
+r._read = common.mustCall(_read, 3)
+r.on('end', common.mustCall()) // Push some data in to start.
 // We've never gotten any read event at this point.
-const ret = r.push(str);
-// Should be false.  > hwm
-assert(!ret);
-let chunk = r.read();
-assert.strictEqual(chunk, str);
-chunk = r.read();
-assert.strictEqual(chunk, null);
 
+const ret = r.push(str) // Should be false.  > hwm
+
+assert(!ret)
+let chunk = r.read()
+assert.strictEqual(chunk, str)
+chunk = r.read()
+assert.strictEqual(chunk, null)
 r.once('readable', () => {
   // This time, we'll get *all* the remaining data, because
   // it's been added synchronously, as the read WOULD take
   // us below the hwm, and so it triggered a _read() again,
   // which synchronously added more, which we then return.
-  chunk = r.read();
-  assert.strictEqual(chunk, str + str);
+  chunk = r.read()
+  assert.strictEqual(chunk, str + str)
+  chunk = r.read()
+  assert.strictEqual(chunk, null)
+})
+/* replacement start */
 
-  chunk = r.read();
-  assert.strictEqual(chunk, null);
-});
-
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

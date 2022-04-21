@@ -1,7 +1,9 @@
 'use strict'
 
 const test = require('tape')
+
 const { EventEmitter: EE } = require('events')
+
 const { Readable, Writable } = require('../../lib/ours/index')
 
 let run = 0
@@ -9,11 +11,12 @@ let run = 0
 function runTest(highWaterMark, objectMode, produce) {
   test('run #' + ++run, (t) => {
     t.plan(4)
-
     const old = new EE()
-    const r = new Readable({ highWaterMark: highWaterMark, objectMode: objectMode })
+    const r = new Readable({
+      highWaterMark: highWaterMark,
+      objectMode: objectMode
+    })
     t.equal(r, r.wrap(old))
-
     let ended = false
     r.on('end', function () {
       ended = true
@@ -35,25 +38,30 @@ function runTest(highWaterMark, objectMode, produce) {
     let chunks = 10
     let oldEnded = false
     const expected = []
+
     function flow() {
-      flowing = true
-      // eslint-disable-next-line no-unmodified-loop-condition
+      flowing = true // eslint-disable-next-line no-unmodified-loop-condition
+
       while (flowing && chunks-- > 0) {
         const item = produce()
-        expected.push(item)
-        // console.log('old.emit', chunks, flowing);
-        old.emit('data', item)
-        // console.log('after emit', chunks, flowing);
+        expected.push(item) // console.log('old.emit', chunks, flowing);
+
+        old.emit('data', item) // console.log('after emit', chunks, flowing);
       }
+
       if (chunks <= 0) {
-        oldEnded = true
-        // console.log('old end', chunks, flowing);
+        oldEnded = true // console.log('old end', chunks, flowing);
+
         old.emit('end')
       }
     }
 
-    const w = new Writable({ highWaterMark: highWaterMark * 2, objectMode: objectMode })
+    const w = new Writable({
+      highWaterMark: highWaterMark * 2,
+      objectMode: objectMode
+    })
     const written = []
+
     w._write = function (chunk, encoding, cb) {
       // console.log('_write', chunk);
       written.push(chunk)
@@ -63,9 +71,7 @@ function runTest(highWaterMark, objectMode, produce) {
     w.on('finish', function () {
       performAsserts()
     })
-
     r.pipe(w)
-
     flow()
 
     function performAsserts() {
@@ -79,16 +85,28 @@ function runTest(highWaterMark, objectMode, produce) {
 runTest(100, false, function () {
   return Buffer.alloc(100)
 })
-
 runTest(10, false, function () {
   return Buffer.from('xxxxxxxxxx')
 })
-
 runTest(1, true, function () {
-  return { foo: 'bar' }
+  return {
+    foo: 'bar'
+  }
 })
-
-const objectChunks = [5, 'a', false, 0, '', 'xyz', { x: 4 }, 7, [], 555]
+const objectChunks = [
+  5,
+  'a',
+  false,
+  0,
+  '',
+  'xyz',
+  {
+    x: 4
+  },
+  7,
+  [],
+  555
+]
 runTest(1, true, function () {
   return objectChunks.shift()
 })

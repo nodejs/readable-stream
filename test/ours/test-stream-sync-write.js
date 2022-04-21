@@ -1,19 +1,23 @@
 'use strict'
 
 require('../common')
-const t = require('tap')
-const util = require('util')
-const stream = require('../../lib/ours/index')
-const WritableStream = stream.Writable
 
+const t = require('tap')
+
+const util = require('util')
+
+const stream = require('../../lib/ours/index')
+
+const WritableStream = stream.Writable
 t.plan(1)
 
 const InternalStream = function () {
   WritableStream.call(this)
 }
-util.inherits(InternalStream, WritableStream)
 
+util.inherits(InternalStream, WritableStream)
 let invocations = 0
+
 InternalStream.prototype._write = function (chunk, encoding, callback) {
   callback()
 }
@@ -24,6 +28,7 @@ const ExternalStream = function (writable) {
   this._writable = writable
   WritableStream.call(this)
 }
+
 util.inherits(ExternalStream, WritableStream)
 
 ExternalStream.prototype._write = function (chunk, encoding, callback) {

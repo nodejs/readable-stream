@@ -1,5 +1,16 @@
 const testPolyfills = `
   /* replacement start */
+  if (typeof Blob === 'undefined') {
+    let { Blob } = require('buffer')
+
+    if (typeof Blob === 'undefined') {
+      Blob = require('blob-polyfill').Blob
+    }
+  
+    globalThis.Blob = Blob
+    allowGlobals(Blob)
+  }
+
   if (typeof EventTarget === 'undefined') {
     globalThis.EventTarget = require('event-target-shim').EventTarget;
   }

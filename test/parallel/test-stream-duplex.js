@@ -18,53 +18,59 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-    'use strict'
+const tap = require('tap')
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
+const silentConsole = {
+  log() {},
 
-require('../common');
-const assert = require('assert');
-const Duplex = require('../../lib/ours/index').Duplex;
+  error() {}
+}
+require('../common')
 
-const stream = new Duplex({ objectMode: true });
+const assert = require('assert')
 
-assert(Duplex() instanceof Duplex);
-assert(stream._readableState.objectMode);
-assert(stream._writableState.objectMode);
-assert(stream.allowHalfOpen);
-assert.strictEqual(stream.listenerCount('end'), 0);
+const Duplex = require('../../lib/ours/index').Duplex
 
-let written;
-let read;
+const stream = new Duplex({
+  objectMode: true
+})
+assert(Duplex() instanceof Duplex)
+assert(stream._readableState.objectMode)
+assert(stream._writableState.objectMode)
+assert(stream.allowHalfOpen)
+assert.strictEqual(stream.listenerCount('end'), 0)
+let written
+let read
 
 stream._write = (obj, _, cb) => {
-  written = obj;
-  cb();
-};
+  written = obj
+  cb()
+}
 
-stream._read = () => {};
+stream._read = () => {}
 
 stream.on('data', (obj) => {
-  read = obj;
-});
-
-stream.push({ val: 1 });
-stream.end({ val: 2 });
-
+  read = obj
+})
+stream.push({
+  val: 1
+})
+stream.end({
+  val: 2
+})
 process.on('exit', () => {
-  assert.strictEqual(read.val, 1);
-  assert.strictEqual(written.val, 2);
-});
+  assert.strictEqual(read.val, 1)
+  assert.strictEqual(written.val, 2)
+})
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

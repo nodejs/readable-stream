@@ -1,8 +1,11 @@
 'use strict'
 
 const test = require('tape')
+
 const crypto = require('crypto')
+
 const inherits = require('inherits')
+
 const stream = require('../../lib/ours/index')
 
 test('unpipe drain', function (t) {
@@ -19,6 +22,7 @@ test('unpipe drain', function (t) {
   function TestWriter() {
     stream.Writable.call(this)
   }
+
   inherits(TestWriter, stream.Writable)
 
   TestWriter.prototype._write = function (buffer, encoding, callback) {
@@ -32,6 +36,7 @@ test('unpipe drain', function (t) {
     stream.Readable.call(this)
     this.reads = 0
   }
+
   inherits(TestReader, stream.Readable)
 
   TestReader.prototype._read = function (size) {
@@ -41,13 +46,10 @@ test('unpipe drain', function (t) {
 
   const src1 = new TestReader()
   const src2 = new TestReader()
-
   src1.pipe(dest)
-
   src1.once('readable', function () {
     process.nextTick(function () {
       src2.pipe(dest)
-
       src2.once('readable', function () {
         process.nextTick(function () {
           src1.unpipe(dest)
@@ -55,7 +57,6 @@ test('unpipe drain', function (t) {
       })
     })
   })
-
   dest.on('unpipe', function () {
     t.equal(src1.reads, 2)
     t.equal(src2.reads, 1)

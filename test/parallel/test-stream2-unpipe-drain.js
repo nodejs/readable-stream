@@ -18,70 +18,65 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
+  error() {}
+}
+require('../common')
 
-const stream = require('../../lib/ours/index');
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
 
 class TestWriter extends stream.Writable {
   _write(buffer, encoding, callback) {
-    silentConsole.log('write called');
-    // Super slow write stream (callback never called)
+    silentConsole.log('write called') // Super slow write stream (callback never called)
   }
 }
 
-const dest = new TestWriter();
+const dest = new TestWriter()
 
 class TestReader extends stream.Readable {
   constructor() {
-    super();
-    this.reads = 0;
+    super()
+    this.reads = 0
   }
 
   _read(size) {
-    this.reads += 1;
-    this.push(Buffer.alloc(size));
+    this.reads += 1
+    this.push(Buffer.alloc(size))
   }
 }
 
-const src1 = new TestReader();
-const src2 = new TestReader();
-
-src1.pipe(dest);
-
+const src1 = new TestReader()
+const src2 = new TestReader()
+src1.pipe(dest)
 src1.once('readable', () => {
   process.nextTick(() => {
-
-    src2.pipe(dest);
-
+    src2.pipe(dest)
     src2.once('readable', () => {
       process.nextTick(() => {
-
-        src1.unpipe(dest);
-      });
-    });
-  });
-});
-
-
+        src1.unpipe(dest)
+      })
+    })
+  })
+})
 process.on('exit', () => {
-  assert.strictEqual(src1.reads, 2);
-  assert.strictEqual(src2.reads, 2);
-});
+  assert.strictEqual(src1.reads, 2)
+  assert.strictEqual(src2.reads, 2)
+})
+/* replacement start */
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

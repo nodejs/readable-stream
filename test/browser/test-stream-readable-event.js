@@ -1,25 +1,23 @@
 'use strict'
 
 const test = require('tape')
+
 const { Readable } = require('../../lib/ours/index')
 
 test('readable events - first', (t) => {
-  t.plan(3)
-
-  // First test, not reading when the readable is added.
+  t.plan(3) // First test, not reading when the readable is added.
   // make sure that on('readable', ...) triggers a readable event.
+
   const r = new Readable({
     highWaterMark: 3
   })
-
   let _readCalled = false
+
   r._read = function (n) {
     _readCalled = true
-  }
+  } // This triggers a 'readable' event, which is lost.
 
-  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('blerg'))
-
   let caughtReadable = false
   setTimeout(function () {
     // we're testing what we think we are
@@ -29,31 +27,25 @@ test('readable events - first', (t) => {
       setTimeout(function () {
         // we're testing what we think we are
         t.notOk(_readCalled)
-
         t.ok(caughtReadable)
       })
     })
   })
 })
-
 test('readable events - second', (t) => {
-  t.plan(3)
-
-  // second test, make sure that readable is re-emitted if there's
+  t.plan(3) // second test, make sure that readable is re-emitted if there's
   // already a length, while it IS reading.
 
   const r = new Readable({
     highWaterMark: 3
   })
-
   let _readCalled = false
+
   r._read = function (n) {
     _readCalled = true
-  }
+  } // This triggers a 'readable' event, which is lost.
 
-  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('bl'))
-
   let caughtReadable = false
   setTimeout(function () {
     // assert we're testing what we think we are
@@ -63,31 +55,26 @@ test('readable events - second', (t) => {
       setTimeout(function () {
         // we're testing what we think we are
         t.ok(_readCalled)
-
         t.ok(caughtReadable)
       })
     })
   })
 })
-
 test('readable events - third', (t) => {
-  t.plan(3)
-
-  // Third test, not reading when the stream has not passed
+  t.plan(3) // Third test, not reading when the stream has not passed
   // the highWaterMark but *has* reached EOF.
+
   const r = new Readable({
     highWaterMark: 30
   })
-
   let _readCalled = false
+
   r._read = function (n) {
     _readCalled = true
-  }
+  } // This triggers a 'readable' event, which is lost.
 
-  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('blerg'))
   r.push(null)
-
   let caughtReadable = false
   setTimeout(function () {
     // assert we're testing what we think we are
@@ -97,7 +84,6 @@ test('readable events - third', (t) => {
       setTimeout(function () {
         // we're testing what we think we are
         t.notOk(_readCalled)
-
         t.ok(caughtReadable)
       })
     })

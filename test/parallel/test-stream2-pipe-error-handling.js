@@ -18,104 +18,109 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
+const tap = require('tap')
 
-    'use strict'
+const silentConsole = {
+  log() {},
 
-    const tap = require('tap');
-    const silentConsole = { log() {}, error() {} };
-  ;
-require('../common');
-const assert = require('assert');
-const stream = require('../../lib/ours/index');
-
-{
-  let count = 1000;
-
-  const source = new stream.Readable();
-  source._read = function(n) {
-    n = Math.min(count, n);
-    count -= n;
-    source.push(Buffer.allocUnsafe(n));
-  };
-
-  let unpipedDest;
-  source.unpipe = function(dest) {
-    unpipedDest = dest;
-    stream.Readable.prototype.unpipe.call(this, dest);
-  };
-
-  const dest = new stream.Writable();
-  dest._write = function(chunk, encoding, cb) {
-    cb();
-  };
-
-  source.pipe(dest);
-
-  let gotErr = null;
-  dest.on('error', function(err) {
-    gotErr = err;
-  });
-
-  let unpipedSource;
-  dest.on('unpipe', function(src) {
-    unpipedSource = src;
-  });
-
-  const err = new Error('This stream turned into bacon.');
-  dest.emit('error', err);
-  assert.strictEqual(gotErr, err);
-  assert.strictEqual(unpipedSource, source);
-  assert.strictEqual(unpipedDest, dest);
+  error() {}
 }
+require('../common')
+
+const assert = require('assert')
+
+const stream = require('../../lib/ours/index')
 
 {
-  let count = 1000;
+  let count = 1000
+  const source = new stream.Readable()
 
-  const source = new stream.Readable();
-  source._read = function(n) {
-    n = Math.min(count, n);
-    count -= n;
-    source.push(Buffer.allocUnsafe(n));
-  };
-
-  let unpipedDest;
-  source.unpipe = function(dest) {
-    unpipedDest = dest;
-    stream.Readable.prototype.unpipe.call(this, dest);
-  };
-
-  const dest = new stream.Writable({ autoDestroy: false });
-  dest._write = function(chunk, encoding, cb) {
-    cb();
-  };
-
-  source.pipe(dest);
-
-  let unpipedSource;
-  dest.on('unpipe', function(src) {
-    unpipedSource = src;
-  });
-
-  const err = new Error('This stream turned into bacon.');
-
-  let gotErr = null;
-  try {
-    dest.emit('error', err);
-  } catch (e) {
-    gotErr = e;
+  source._read = function (n) {
+    n = Math.min(count, n)
+    count -= n
+    source.push(Buffer.allocUnsafe(n))
   }
-  assert.strictEqual(gotErr, err);
-  assert.strictEqual(unpipedSource, source);
-  assert.strictEqual(unpipedDest, dest);
-}
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+  let unpipedDest
+
+  source.unpipe = function (dest) {
+    unpipedDest = dest
+    stream.Readable.prototype.unpipe.call(this, dest)
+  }
+
+  const dest = new stream.Writable()
+
+  dest._write = function (chunk, encoding, cb) {
+    cb()
+  }
+
+  source.pipe(dest)
+  let gotErr = null
+  dest.on('error', function (err) {
+    gotErr = err
+  })
+  let unpipedSource
+  dest.on('unpipe', function (src) {
+    unpipedSource = src
+  })
+  const err = new Error('This stream turned into bacon.')
+  dest.emit('error', err)
+  assert.strictEqual(gotErr, err)
+  assert.strictEqual(unpipedSource, source)
+  assert.strictEqual(unpipedDest, dest)
+}
+{
+  let count = 1000
+  const source = new stream.Readable()
+
+  source._read = function (n) {
+    n = Math.min(count, n)
+    count -= n
+    source.push(Buffer.allocUnsafe(n))
+  }
+
+  let unpipedDest
+
+  source.unpipe = function (dest) {
+    unpipedDest = dest
+    stream.Readable.prototype.unpipe.call(this, dest)
+  }
+
+  const dest = new stream.Writable({
+    autoDestroy: false
+  })
+
+  dest._write = function (chunk, encoding, cb) {
+    cb()
+  }
+
+  source.pipe(dest)
+  let unpipedSource
+  dest.on('unpipe', function (src) {
+    unpipedSource = src
+  })
+  const err = new Error('This stream turned into bacon.')
+  let gotErr = null
+
+  try {
+    dest.emit('error', err)
+  } catch (e) {
+    gotErr = e
+  }
+
+  assert.strictEqual(gotErr, err)
+  assert.strictEqual(unpipedSource, source)
+  assert.strictEqual(unpipedDest, dest)
+}
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */
