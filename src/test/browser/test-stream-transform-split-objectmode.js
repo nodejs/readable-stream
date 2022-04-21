@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Transform } = require('../../lib')
+const { Transform } = require('../../lib/ours/index')
 
 test('transform split objectmode', function (t) {
   t.plan(10)

@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable, Writable, Stream } = require('../../lib')
+const { Readable, Writable, Stream } = require('../../lib/ours/index')
 
 test('Error Listener Catches', function (t) {
   t.plan(1)

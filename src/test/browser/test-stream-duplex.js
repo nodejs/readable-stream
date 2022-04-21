@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Duplex } = require('../../lib')
+const { Duplex } = require('../../lib/ours/index')
 
 test('duplex', function (t) {
   t.plan(4)

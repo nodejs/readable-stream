@@ -8,7 +8,7 @@
 // 4. _read() is not called after pushing the EOF null chunk.
 
 const test = require('tape')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 test('unshift read race', function (t) {
   t.plan(139)

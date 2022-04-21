@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable, Writable } = require('../../lib')
+const { Readable, Writable } = require('../../lib/ours/index')
 
 function toArray(callback) {
   const stream = new Writable({ objectMode: true })

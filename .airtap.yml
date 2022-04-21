@@ -1,42 +1,5 @@
-sauce_connect: true
-
 presets:
-  sauce:
-    providers:
-      - airtap-sauce
-    browsers:
-      - name: chrome
-      - name: firefox
-      # Testing on Safari disabled due to https://github.com/airtap/sauce/issues/11
-      # - name: safari
-      - name: edge
-
-  sauce-chrome:
-    providers:
-      - airtap-sauce
-    browsers:
-      - name: chrome
-
-  sauce-firefox:
-    providers:
-      - airtap-sauce
-    browsers:
-      - name: firefox
-
-  # Testing on Safari disabled due to https://github.com/airtap/sauce/issues/11
-  # sauce-safari:
-  #   providers:
-  #     - airtap-sauce
-  #   browsers:
-  #     - name: safari
-
-  sauce-edge:
-    providers:
-      - airtap-sauce
-    browsers:
-      - name: edge
-
-  local:
+  all:
     providers:
       - airtap-playwright
     browsers:
@@ -48,25 +11,25 @@ presets:
           launch:
             channel: msedge
 
-  local-chrome:
+  chrome:
     providers:
       - airtap-playwright
     browsers:
-      - name: chrome
+      - name: chromium
 
-  local-firefox:
+  firefox:
     providers:
       - airtap-playwright
     browsers:
       - name: firefox
 
-  local-safari:
+  safari:
     providers:
       - airtap-playwright
     browsers:
       - name: webkit
 
-  local-edge:
+  edge:
     providers:
       - airtap-playwright
     browsers:

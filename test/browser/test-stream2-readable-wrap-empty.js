@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const { EventEmitter: EE } = require('events')
-const Readable = require('../../lib')
+const Readable = require('../../lib/ours/index')
 
 test('wrap empty', function (t) {
   t.plan(1)

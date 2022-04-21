@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable } = require('../../lib')
+const { Readable } = require('../../lib/ours/index')
 
 test('non empty end', function (t) {
   t.plan(4)

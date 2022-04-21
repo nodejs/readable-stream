@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 function MyWritable(fn, options) {
   stream.Writable.call(this, options)

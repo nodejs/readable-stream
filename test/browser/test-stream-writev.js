@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 const queue = []
 for (let decode = 0; decode < 2; decode++) {

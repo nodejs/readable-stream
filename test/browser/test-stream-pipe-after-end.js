@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Readable, Writable } = require('../../lib')
+const { Readable, Writable } = require('../../lib/ours/index')
 
 test('pipe after end', function (t) {
   t.plan(4)

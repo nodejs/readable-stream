@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { PassThrough, Transform } = require('../../lib')
+const { PassThrough, Transform } = require('../../lib/ours/index')
 
 test('writable side consumption', function (t) {
   t.plan(3)

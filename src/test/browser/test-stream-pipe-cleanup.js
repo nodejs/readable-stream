@@ -4,7 +4,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Stream } = require('../../lib')
+const { Stream } = require('../../lib/ours/index')
 
 test('pipe cleanup', function (t) {
   t.plan(27)

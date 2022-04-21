@@ -1,10 +1,10 @@
-name: Node.js Build
+name: Node.js
 
 on: [push, pull_request]
 
 jobs:
   build:
-    name: Node.js Build
+    name: Node.js
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -26,4 +26,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run Tests
-        run: npm run test
+        run: npm run coverage

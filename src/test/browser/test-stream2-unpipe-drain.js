@@ -3,7 +3,7 @@
 const test = require('tape')
 const crypto = require('crypto')
 const inherits = require('inherits')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 test('unpipe drain', function (t) {
   try {

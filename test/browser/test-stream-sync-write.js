@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Writable } = require('../../lib')
+const { Writable } = require('../../lib/ours/index')
 
 test('should bea ble to write sync', function (t) {
   t.plan(2)

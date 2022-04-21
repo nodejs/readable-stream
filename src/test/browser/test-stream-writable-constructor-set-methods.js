@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Writable } = require('../../lib')
+const { Writable } = require('../../lib/ours/index')
 
 test('writable constructor set methods', function (t) {
   t.plan(5)

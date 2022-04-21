@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable } = require('../../lib')
+const { Readable } = require('../../lib/ours/index')
 
 test('readable events - first', (t) => {
   t.plan(3)

@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Stream } = require('../../lib')
+const { Stream } = require('../../lib/ours/index')
 
 test('pipe without listenerCount on read', function (t) {
   t.plan(1)

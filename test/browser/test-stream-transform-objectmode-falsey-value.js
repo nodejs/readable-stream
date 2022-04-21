@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { PassThrough } = require('../../lib')
+const { PassThrough } = require('../../lib/ours/index')
 
 test('transform objectmode falsey value', function (t) {
   t.plan(13)

@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const { EventEmitter: EE } = require('events')
-const { Readable, Writable } = require('../../lib')
+const { Readable, Writable } = require('../../lib/ours/index')
 
 let run = 0
 

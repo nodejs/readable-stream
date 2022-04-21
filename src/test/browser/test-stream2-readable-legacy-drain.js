@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Stream, Readable } = require('../../lib')
+const { Stream, Readable } = require('../../lib/ours/index')
 
 test('readable legacy drain', function (t) {
   t.plan(3)

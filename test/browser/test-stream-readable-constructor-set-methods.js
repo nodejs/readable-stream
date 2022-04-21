@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable } = require('../../lib')
+const { Readable } = require('../../lib/ours/index')
 
 test('readable constructor set methods', function (t) {
   t.plan(2)

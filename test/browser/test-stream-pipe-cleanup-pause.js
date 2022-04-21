@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 test('pipe cleanup pause', function (t) {
   t.plan(3)

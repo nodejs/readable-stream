@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Transform } = require('../../lib')
+const { Transform } = require('../../lib/ours/index')
 
 test('big packet', function (t) {
   t.plan(3)

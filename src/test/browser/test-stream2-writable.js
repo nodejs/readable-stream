@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Duplex, Writable } = require('../../lib')
+const { Duplex, Writable } = require('../../lib/ours/index')
 
 inherits(TestWriter, Writable)
 

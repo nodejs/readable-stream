@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const stream = require('../../lib')
+const stream = require('../../lib/ours/index')
 
 test('pipe error once listener', function (t) {
   t.plan(1)

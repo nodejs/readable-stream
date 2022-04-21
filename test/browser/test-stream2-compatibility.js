@@ -2,7 +2,7 @@
 
 const test = require('tape')
 const inherits = require('inherits')
-const { Readable } = require('../../lib')
+const { Readable } = require('../../lib/ours/index')
 
 test('compatibility', function (t) {
   t.plan(1)

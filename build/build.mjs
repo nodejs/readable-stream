@@ -183,13 +183,10 @@ async function main() {
   console.log(`Copying template to file ${highlightFile('lib/ours/util.js', 32)} ...`)
   await copyFile('src/util.js', 'lib/ours/util.js')
 
-  console.log(`Copying template to file ${highlightFile('test/test-browser.js', 32)} ...`)
-  await copyFile('src/test/test-browser.js', 'test/test-browser.js')
-
-  console.log(`Copying template to file ${highlightFile('test/browser', 32)} ...`)
+  console.log(`Copying folder ${highlightFile('test/browser', 32)} ...`)
   await cp('src/test/browser', 'test/browser', { recursive: true })
 
-  console.log(`Copying template to file ${highlightFile('test/ours', 32)} ...`)
+  console.log(`Copying folder ${highlightFile('test/ours', 32)} ...`)
   await cp('src/test/ours', 'test/ours', { recursive: true })
 }
 

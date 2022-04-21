@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable, Writable } = require('../../lib')
+const { Readable, Writable } = require('../../lib/ours/index')
 
 test('base64 single char read end', function (t) {
   t.plan(1)

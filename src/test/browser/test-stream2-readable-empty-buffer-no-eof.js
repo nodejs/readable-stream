@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const { Readable } = require('../../lib')
+const { Readable } = require('../../lib/ours/index')
 
 test('readable empty buffer no eof 1', function (t) {
   t.plan(1)

@@ -4,10 +4,8 @@
 
 [![npm status](https://img.shields.io/npm/v/readable-stream.svg)](https://npm.im/readable-stream)
 [![node](https://img.shields.io/node/v/readable-stream.svg)](https://www.npmjs.org/package/readable-stream)
-[![Node.js Build](https://github.com/nodejs/readable-stream/workflows/Node.js%20Build/badge.svg)](https://github.com/nodejs/readable-stream/actions?query=workflow%3ANode.js%20Build)
-[![Sauce Labs Build](https://github.com/nodejs/readable-stream/workflows/Sauce%20Labs%20Build/badge.svg)](https://github.com/nodejs/readable-stream/actions?query=workflow%3ASauce%20Labs%20Build)
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/readabe-stream.svg)](https://saucelabs.com/u/readabe-stream)
+[![Node.js Build](https://github.com/nodejs/readable-stream/workflows/Node.js/badge.svg)](https://github.com/nodejs/readable-stream/actions?query=workflow%3ANode.js)
+[![Browsers Build](https://github.com/nodejs/readable-stream/workflows/Browsers/badge.svg)](https://github.com/nodejs/readable-stream/actions?query=workflow%3ABrowsers)
 
 ```bash
 npm install --save readable-stream
@@ -50,10 +48,6 @@ v3.x.x of `readable-stream` is a cut from Node 10. This version supports Node 6,
 ## Version 2.x.x
 
 v2.x.x of `readable-stream` is a cut of the stream module from Node 8 (there have been no semver-major changes from Node 4 to 8). This version supports all Node.js versions from 0.8, as well as evergreen browsers and IE 10 & 11.
-
-### Big Thanks
-
-Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs][sauce]
 
 # Usage
 
@@ -119,5 +113,3 @@ Node.js. The responsibilities of the Streams Working Group include:
   - Release GPG key: 3ABC01543F22DD2239285CDD818674489FBC127E
 - **Robert Nagy** ([@ronag](https://github.com/ronag)) &lt;ronagy@icloud.com&gt;
 - **Vincent Weevers** ([@vweevers](https://github.com/vweevers)) &lt;mail@vincentweevers.nl&gt;
-
-[sauce]: https://saucelabs.com
