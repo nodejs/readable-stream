@@ -1,9 +1,9 @@
 import { resolve } from 'node:path'
 import { Readable } from 'node:stream'
+import { fileURLToPath } from 'node:url'
 import { chromium, firefox, webkit } from 'playwright'
 import reporter from 'tap-mocha-reporter'
 import Parser from 'tap-parser'
-import { fileURLToPath } from 'url'
 
 const validBrowsers = ['chrome', 'firefox', 'safari', 'edge']
 const validBundlers = ['browserify', 'webpack', 'rollup']

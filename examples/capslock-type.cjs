@@ -1,6 +1,6 @@
 'use strict'
 
-const { Transform } = require('../lib')
+const { Transform } = require('../lib/ours/index')
 
 class MyStream extends Transform {
   _transform(chunk, encoding, callback) {

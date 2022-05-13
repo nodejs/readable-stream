@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { finished } from 'node:stream/promises'
+import { fileURLToPath } from 'node:url'
 import prettier from 'prettier'
 import { Parse } from 'tar'
 import { request } from 'undici'
@@ -143,7 +144,8 @@ async function downloadNode(nodeVersion) {
 }
 
 async function main() {
-  const rootDir = resolve(dirname(new URL(import.meta.url).pathname), '..')
+  const __dirname = fileURLToPath(new URL('.', import.meta.url))
+  const rootDir = resolve(__dirname, '..')
 
   if (process.cwd() !== rootDir) {
     console.error('Please run this from the root directory of readable-stream repository.')

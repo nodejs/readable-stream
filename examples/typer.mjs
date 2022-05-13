@@ -1,8 +1,9 @@
 import { createReadStream } from 'node:fs'
 import process from 'node:process'
-import { Readable } from '../lib/index.js'
+import { fileURLToPath } from 'node:url'
+import { Readable } from '../lib/ours/index.js'
 
-const fst = createReadStream(new URL(import.meta.url).pathname)
+const fst = createReadStream(fileURLToPath(new URL(import.meta.url)))
 const rst = new Readable()
 
 rst.wrap(fst)
