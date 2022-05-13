@@ -7,7 +7,7 @@ export default {
   input: ['test/browser/test-browser.js'],
   output: {
     intro: 'function setImmediate(fn, ...args) { setTimeout(() => fn(...args), 1) }',
-    file: 'tmp/rollup/suite.js',
+    file: 'tmp/rollup/suite.browser.js',
     format: 'iife',
     name: 'readableStreamTestSuite'
   },

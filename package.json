@@ -36,8 +36,10 @@
     "build": "node build/build.mjs",
     "postbuild": "prettier -w lib test",
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
-    "test:browsers": "node test/browser/runner.mjs",
+    "test:browsers": "node test/browser/runner-browser.mjs",
     "test:browsers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.browser.config.js && cp test/browser/fixtures/index.html tmp/rollup",
+    "test:bundlers": "node test/browser/runner-node.mjs",
+    "test:bundlers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.node.config.js",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src lib test",
     "lint": "eslint src"

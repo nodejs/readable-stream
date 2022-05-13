@@ -23,7 +23,7 @@ function parseEnviroment() {
   }
 
   if (!validBrowsers.includes(browser) || !validBundlers.includes(bundler)) {
-    console.error('Usage: node runner.mjs [chrome|firefox|safari|edge] [browserify|webpack|rollup]')
+    console.error('Usage: node runner-browser.mjs [chrome|firefox|safari|edge] [browserify|webpack|rollup]')
     console.error('\nYou can also use the BROWSER and BUNDLER environment variables')
     process.exit(1)
   }

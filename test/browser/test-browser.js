@@ -1,5 +1,7 @@
 'use strict'
 
+const logger = globalThis.logger || console.log
+
 const tape = require('tape')
 
 const { createDeferredPromise } = require('../../lib/ours/util')
@@ -39,7 +41,7 @@ async function test(rootName, fn) {
     harness.onFinish(() => {
       const success = harness._exitCode === 0
       messages.push(`${success ? 'ok' : 'not ok'} ${currentIndex} - ${name}`)
-      console.log(messages.join('\n'))
+      logger(messages.join('\n'))
       completed++
 
       if (!success) {
@@ -61,13 +63,13 @@ async function runTests(suites) {
     }
 
     clearInterval(interval)
-    console.log(`1..${totalTests}`)
-    console.log(`# tests ${totalTests}`)
-    console.log(`# pass  ${completed - failed}`)
-    console.log(`# fail  ${failed}`)
-    console.log(`# ${failed === 0 ? 'ok' : 'not ok'}`) // This line is used by the playwright script to detect we're done
+    logger(`1..${totalTests}`)
+    logger(`# tests ${totalTests}`)
+    logger(`# pass  ${completed - failed}`)
+    logger(`# fail  ${failed}`)
+    logger(`# ${failed === 0 ? 'ok' : 'not ok'}`) // This line is used by the playwright script to detect we're done
 
-    console.log('# readable-stream-finished')
+    logger('# readable-stream-finished')
   }, 100) // Execute each test serially, to avoid side-effects errors when dealing with global error handling
 
   for (const suite of suites) {
