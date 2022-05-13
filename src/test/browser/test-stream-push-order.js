@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('push order', function (t) {
+module.exports = function (t) {
   t.plan(1)
 
   const s = new Readable({
@@ -29,4 +29,6 @@ test('push order', function (t) {
   setTimeout(function () {
     t.equals(s._readableState.buffer.join(','), '1,2,3,4,5,6')
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-push-order'

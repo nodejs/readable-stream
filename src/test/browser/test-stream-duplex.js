@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Duplex } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('duplex', function (t) {
+module.exports = function (t) {
   t.plan(4)
 
   const stream = new Duplex({ objectMode: true })
@@ -33,4 +33,6 @@ test('duplex', function (t) {
   stream.push({ val: 1 })
   stream.end({ val: 2 })
   stream.push(null)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-duplex'

@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
 const inherits = require('inherits')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('push strings', function (t) {
+module.exports = function (t) {
   t.plan(2)
 
   function MyStream(options) {
@@ -52,4 +52,6 @@ test('push strings', function (t) {
     t.equal(ms._chunks, -1)
     t.deepEqual(results, expect)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-push-strings'

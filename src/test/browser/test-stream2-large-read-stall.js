@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('large object read stall', function (t) {
+module.exports = function (t) {
   t.plan(1)
 
   // If everything aligns so that you do a read(n) of exactly the
@@ -58,4 +58,6 @@ test('large object read stall', function (t) {
 
   // start the flow
   r.read(0)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-large-read-stall'

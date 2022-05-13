@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('non empty end', function (t) {
+module.exports = function (t) {
   t.plan(4)
 
   let len = 0
@@ -55,4 +55,6 @@ test('non empty end', function (t) {
     r = test.read()
     t.equal(r, null)
   }
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-readable-non-empty-end'

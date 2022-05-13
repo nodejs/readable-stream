@@ -7,10 +7,10 @@
 // 3. push() after the EOF signaling null is an error.
 // 4. _read() is not called after pushing the EOF null chunk.
 
-const test = require('tape')
 const stream = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('unshift read race', function (t) {
+module.exports = function (t) {
   t.plan(139)
 
   const hwm = 10
@@ -58,9 +58,10 @@ test('unshift read race', function (t) {
     w.end()
 
     const onerror = global.onerror
-    global.onerror = (_u1, _u2, _u3, _u4, gotErr) => {
+    global.onerror = () => {
       t.ok(true)
       global.onerror = onerror
+      return true
     }
 
     r.push(Buffer.allocUnsafe(1))
@@ -118,4 +119,6 @@ test('unshift read race', function (t) {
 
     t.equal(written.length, 18)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-unshift-read-race'

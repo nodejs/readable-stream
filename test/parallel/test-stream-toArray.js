@@ -1,4 +1,20 @@
-'use strict'
+/* replacement start */
+const AbortController = globalThis.AbortController || require('abort-controller').AbortController
+
+const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
+
+const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
+
+if (typeof AbortSignal.abort !== 'function') {
+  AbortSignal.abort = function () {
+    const controller = new AbortController()
+    controller.abort()
+    return controller.signal
+  }
+}
+/* replacement end */
+
+;('use strict')
 
 const tap = require('tap')
 

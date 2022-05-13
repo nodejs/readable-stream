@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Stream } = require('../../lib/ours/index')
 
-test('pipe without listenerCount on read', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(1)
   const r = new Stream({
     read: function () {}
@@ -15,4 +15,6 @@ test('pipe without listenerCount on read', function (t) {
     r.emit('error', new Error('Readable Error'))
   })
   t.throws(() => r.pipe(w), 'TypeError: this.listenerCount is not a function')
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-without-listenerCount'

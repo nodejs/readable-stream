@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Writable } = require('../../lib/ours/index')
 
-test('writable constructor set methods', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(5)
   let _writeCalled = false
 
@@ -38,4 +38,6 @@ test('writable constructor set methods', function (t) {
     t.equal(dLength, 2)
     t.ok(_writevCalled)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-writable-constructor-set-methods'

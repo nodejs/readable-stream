@@ -66,6 +66,7 @@ testTransform(0, 0, {
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
 }) // Test undefined, null
+
 ;[undefined, null].forEach((v) => {
   testTransform(DEFAULT, DEFAULT, {
     readableHighWaterMark: v

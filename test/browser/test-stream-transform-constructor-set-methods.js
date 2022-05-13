@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Transform } = require('../../lib/ours/index')
 
-test('transform constructor set methods', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(4)
   let _transformCalled = false
 
@@ -32,4 +32,6 @@ test('transform constructor set methods', function (t) {
     t.ok(_transformCalled)
     t.ok(_flushCalled)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-transform-constructor-set-methods'

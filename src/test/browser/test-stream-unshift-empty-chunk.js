@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('unshift empty chunk', function (t) {
+module.exports = function (t) {
   t.plan(1)
 
   const r = new Readable()
@@ -59,4 +59,6 @@ test('unshift empty chunk', function (t) {
   r.on('end', function () {
     t.deepEqual(seen, expect)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-unshift-empty-chunk'

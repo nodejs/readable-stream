@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
 const inherits = require('inherits')
 const stream = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('pipe error once listener', function (t) {
+module.exports = function (t) {
   t.plan(1)
 
   const Read = function () {
@@ -36,4 +36,6 @@ test('pipe error once listener', function (t) {
   })
 
   read.pipe(write)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-pipe-error-once-listener'

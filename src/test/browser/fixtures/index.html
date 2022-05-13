@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #output {
+        margin: 30px;
+        white-space: pre;
+        font-family: monospace;
+      }
+
+      .error {
+        display: block;
+        width: calc(100% - 20px);
+        background-color: #bb0000;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="output"></div>
+
+    <script type="text/javascript">
+      let failed = false
+      const output = document.querySelector('#output')
+      const originalLog = console.log
+      const originalError = console.error
+
+      console.log = function (message, ...args) {
+        if (typeof message !== 'string') {
+          originalLog(message, ...args)
+          return
+        }
+
+        if (message.includes('not ok')) {
+          failed = true
+          document.body.style.backgroundColor = '#ff9d9d'
+        } else if (message.includes('# readable-stream-finished') && !failed) {
+          document.body.style.backgroundColor = '#9dff9d'
+        }
+
+        const span = document.createElement('span')
+        span.textContent = message + '\n'
+        output.appendChild(span)
+        window.scrollTo(0, document.body.scrollHeight)
+        originalLog(message, ...args)
+      }
+
+      console.error = function (message, ...args) {
+        if (typeof message !== 'string') {
+          originalError(message, ...args)
+          return
+        }
+
+        const span = document.createElement('span')
+        span.classList.add('error')
+        span.textContent = message + '\n'
+        output.appendChild(span)
+
+        originalError(message, ...args)
+      }
+    </script>
+    <script type="text/javascript" src="./suite.js"></script>
+  </body>
+</html>

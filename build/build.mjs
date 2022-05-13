@@ -10,6 +10,7 @@ import { request } from 'undici'
 import prettierConfig from '../prettier.config.cjs'
 import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
+import { headers } from './headers.mjs'
 import { replacements } from './replacements.mjs'
 
 const baseMatcher = /^(?:lib|test)/
@@ -67,6 +68,7 @@ async function extract(nodeVersion, tarFile) {
 
 async function processFiles(contents) {
   const replacementsKeys = Object.keys(replacements)
+  const headersKeys = Object.keys(headers)
   const footersKeys = Object.keys(footers)
 
   prettierConfig.parser = 'babel'
@@ -74,6 +76,7 @@ async function processFiles(contents) {
   for (let [path, content] of contents) {
     const modifications = []
     const matchingReplacements = replacementsKeys.filter((k) => new RegExp(k).test(path))
+    const matchingHeaders = headersKeys.filter((k) => new RegExp(k).test(path))
     const matchingFooters = footersKeys.filter((k) => new RegExp(k).test(path))
 
     // Perform replacements
@@ -87,7 +90,18 @@ async function processFiles(contents) {
       }
     }
 
-    // Append trailers
+    // Prepend headers
+    if (matchingHeaders.length) {
+      modifications.push(highlightFile('headers', 33))
+
+      for (const footerKey of matchingHeaders) {
+        for (const header of headers[footerKey]) {
+          content = header + content
+        }
+      }
+    }
+
+    // Append footers
     if (matchingFooters.length) {
       modifications.push(highlightFile('footers', 33))
 
@@ -101,7 +115,6 @@ async function processFiles(contents) {
     // Process the file through babel and prettier
     if (path.endsWith('.js')) {
       modifications.push(highlightFile('babel', 33), highlightFile('prettier', 33))
-      console.log(prettierConfig)
       content = prettier.format(await transform(content).code.replaceAll('void 0', 'undefined'), prettierConfig)
     }
 
@@ -176,7 +189,15 @@ async function main() {
   }
 
   for (const file of await readdir('src/test/browser')) {
+    if (file.endsWith('fixtures')) {
+      continue
+    }
+
     contents.push([`test/browser/${file}`, await readFile(`src/test/browser/${file}`, 'utf-8')])
+  }
+
+  for (const file of await readdir('src/test/browser/fixtures')) {
+    contents.push([`test/browser/fixtures/${file}`, await readFile(`src/test/browser/fixtures/${file}`, 'utf-8')])
   }
 
   contents.push(['README.md', await readFile('./README.md', 'utf-8')])

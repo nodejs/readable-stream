@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Readable } = require('../../lib/ours/index')
 
-test('readable constructor set methods', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(2)
   let _readCalled = false
 
@@ -21,4 +21,6 @@ test('readable constructor set methods', function (t) {
     t.equal(r._read, _read)
     t.ok(_readCalled)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-readable-constructor-set-methods'

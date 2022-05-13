@@ -1,12 +1,12 @@
 'use strict'
 
-const test = require('tape')
-
 const inherits = require('inherits')
 
 const { Writable } = require('../../lib/ours/index')
 
-test('should bea ble to write sync', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(2)
   let internalCalls = 0
   let externalCalls = 0
@@ -47,4 +47,6 @@ test('should bea ble to write sync', function (t) {
     t.equal(internalCalls, 2000)
     t.equal(externalCalls, 2000)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-sync-write'

@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
 const { EventEmitter: EE } = require('events')
 const { Readable, Writable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('push', function (t) {
+module.exports = function (t) {
   t.plan(33)
 
   const stream = new Readable({
@@ -114,4 +114,6 @@ test('push', function (t) {
       t.ok(ended)
     })
   }
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-push'

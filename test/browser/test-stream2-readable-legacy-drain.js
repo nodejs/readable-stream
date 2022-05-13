@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Stream, Readable } = require('../../lib/ours/index')
 
-test('readable legacy drain', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(3)
   const r = new Readable()
   const N = 256
@@ -44,4 +44,6 @@ test('readable legacy drain', function (t) {
   }
 
   r.pipe(w)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-readable-legacy-drain'

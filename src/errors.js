@@ -1,5 +1,7 @@
 'use strict'
 
+const { format, inspect, AggregateError: CustomAggregateError } = require('./util')
+
 /*
   This file is a reduced and adapted version of the main lib/internal/errors.js file defined at
 
@@ -9,12 +11,7 @@
   with the upstream file.
 */
 
-if (typeof AggregateError === 'undefined') {
-  globalThis.AggregateError = require('aggregate-error')
-}
-
-const assert = require('assert')
-const { inspect, format } = require('util')
+const AggregateError = globalThis.AggregateError || CustomAggregateError
 
 const kIsNodeError = Symbol('kIsNodeError')
 const kTypes = [
@@ -32,6 +29,12 @@ const kTypes = [
 const classRegExp = /^([A-Z][a-z0-9]*)+$/
 const nodeInternalPrefix = '__node_internal_'
 const codes = {}
+
+function assert(value, message) {
+  if (!value) {
+    throw new codes.ERR_INTERNAL_ASSERTION(message)
+  }
+}
 
 // Only use this for integers! Decimal numbers do not work with this function.
 function addNumericalSeparator(val) {
@@ -128,6 +131,8 @@ class AbortError extends Error {
     this.name = 'AbortError'
   }
 }
+
+E('ERR_ASSERTION', '%s', Error)
 
 E(
   'ERR_INVALID_ARG_TYPE',

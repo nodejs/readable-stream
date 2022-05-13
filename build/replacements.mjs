@@ -1,13 +1,28 @@
 const legacyStreamsRequireStream = ["require\\('stream'\\)", "require('./stream')"]
 
-const internalStreamsBlob = [
-  "require\\('../blob'\\);",
+const internalStreamsBufferPolyfill = [
+  "'use strict'",
   `
-    {
-      isBlob(b) {
-        return b instanceof Blob
-      }
-    }
+  'use strict'
+
+  const bufferModule = require('buffer');
+  `
+]
+
+const internalStreamsAbortControllerPolyfill = [
+  "'use strict'",
+  `
+  'use strict'
+
+  const abortControllerModule = require('abort-controller');
+  `
+]
+
+const internalStreamsNoRequireBlob = [
+  "const \\{\\n  isBlob,\\n\\} = require\\('internal/blob'\\);",
+  `
+    const Blob = globalThis.Blob || bufferModule.Blob;
+    const isBlob = typeof Blob !== 'undefined' ? function isBlob (b) { return b instanceof Blob } : function isBlob(b) { return false; }
   `
 ]
 
@@ -15,16 +30,16 @@ const internalStreamsInspectCustom = ['inspect.custom', "Symbol.for('nodejs.util
 
 const internalStreamsNoRequireAbortController = [
   'const \\{ AbortController \\} = .+',
-  `
-    if (typeof AbortController === 'undefined') {
-      globalThis.AbortController = require('abort-controller').AbortController;
-    }
-  `
+  'const AbortController = globalThis.AbortController || abortControllerModule.AbortController;'
 ]
 
 const internalStreamsRequireInternal = ["require\\('internal/([^']+)'\\)", "require('../$1')"]
 
+const internalStreamsNoRequireBuffer = ["const \\{ Buffer \\} = require\\('buffer'\\);", '']
+
 const internalStreamsRequireErrors = ["require\\('internal/errors'\\)", "require('../../ours/errors')"]
+
+const internalStreamsRequireEventEmitter = ['const EE =', 'const { EventEmitter: EE } =']
 
 const internalStreamsRequirePrimordials = ['= primordials', "= require('../../ours/primordials')"]
 
@@ -35,11 +50,16 @@ const internalStreamsRequireRelativeUtil = [
 
 const internalStreamsRequireRelativeDuplex = ['instanceof Stream.Duplex', "instanceof require('./duplex')"]
 
+const internalStreamsRequireStream = ["require\\('stream'\\)", "require('../../stream')"]
+
 const internalStreamsRequireStreams = ["require\\('internal/streams/([^']+)'\\)", "require('./$1')"]
 
-const internalStreamsRequireUtil = ["require\\('internal/util(?:/(?:debuglog|inspect))?'\\)", "require('util')"]
+const internalStreamsRequireUtil = [
+  "require\\('internal/util(?:/(?:debuglog|inspect))?'\\)",
+  "require('../../ours/util')"
+]
 
-const internalStreamsRequireUtilDebuglog = ["require\\('internal/util/debuglog'\\)", "require('util')"]
+const internalStreamsRequireUtilDebuglog = ["require\\('internal/util/debuglog'\\)", "require('../../ours/util')"]
 
 const internalStreamsRequireWebStream = ["require\\('internal/webstreams/adapters'\\)", '{}']
 
@@ -72,7 +92,7 @@ const internalValidatorsRequirePrimordials = ['= primordials', "= require('../ou
 
 const internalValidatorsRequireRelativeUtil = ["require\\('internal/util'\\)", "require('../ours/util')"]
 
-const internalValidatorsRequireUtilTypes = ["require\\('internal/util/types'\\)", "require('util').types"]
+const internalValidatorsRequireUtilTypes = ["require\\('internal/util/types'\\)", "require('../ours/util').types"]
 
 const streamIndexIsUint8Array = [
   "Stream._isUint8Array = require\\('internal/util/types'\\).isUint8Array;",
@@ -93,7 +113,7 @@ const streamIndexRequirePrimordials = ['= primordials', "= require('./ours/primo
 
 const streamIndexRequirePromises = ["require\\('stream/promises'\\);", "require('./stream/promises');"]
 
-const streamIndexRequireUtil = ["require\\('internal/util'\\)", "require('util')"]
+const streamIndexRequireUtil = ["require\\('internal/util'\\)", "require('./ours/util')"]
 
 const streamIndexUint8ArrayToBuffer = ['new internalBuffer.FastBuffer', 'Buffer.from']
 
@@ -107,7 +127,7 @@ const testCommonKnownGlobals = [
   'let knownGlobals = \\[(\\n\\s+)',
   `
     let knownGlobals = [\n
-      typeof AggregateError !== 'undefined' ? AggregateError : require('aggregate-error'),
+      typeof AggregateError !== 'undefined' ? AggregateError : require('../../lib/ours/util').AggregateError,
       typeof AbortController !== 'undefined' ? AbortController : require('abort-controller').AbortController,
       typeof AbortSignal !== 'undefined' ? AbortSignal : require('abort-controller').AbortSignal,
       typeof EventTarget !== 'undefined' ? EventTarget : require('event-target-shim').EventTarget,
@@ -136,14 +156,13 @@ const testParallelImportStreamInMjs = [" from 'stream';", "from '../../lib/ours/
 const testParallelImportTapInMjs = ["(from 'assert';)", "$1\nimport tap from 'tap';"]
 
 const testParallelDuplexFromBlob = [
-  "const \\{ Blob \\} = require\\('buffer'\\)",
-  `
-    let {Blob} = require('buffer');
+  "const \\{ Blob \\} = require\\('buffer'\\);",
+  "const Blob = globalThis.Blob || require('buffer').Blob"
+]
 
-    if (typeof Blob === 'undefined') {
-      Blob = require('blob-polyfill').Blob;
-    }
-  `
+const testParallelDuplexSkipWithoutBlob = [
+  "(\\{\n  const blob = new Blob\\(\\['blob'\\]\\))",
+  "if (typeof Blob !== 'undefined') $1"
 ]
 
 const testParallelFinishedEvent = ["res.on\\('close", "res.on('finish"]
@@ -204,19 +223,30 @@ const readmeLink = ['(\\[Node.js website\\]\\(https://nodejs.org/dist/v)(\\d+.\\
 
 export const replacements = {
   'lib/_stream.+': [legacyStreamsRequireStream],
+  'lib/internal/streams/duplexify.+': [
+    internalStreamsBufferPolyfill,
+    internalStreamsAbortControllerPolyfill,
+    internalStreamsNoRequireBlob,
+    internalStreamsNoRequireAbortController
+  ],
+  'lib/internal/streams/(operators|pipeline).+': [
+    internalStreamsAbortControllerPolyfill,
+    internalStreamsNoRequireAbortController
+  ],
   'lib/internal/streams/.+': [
-    internalStreamsNoRequireAbortController,
+    internalStreamsNoRequireBuffer,
     internalStreamsRequireErrors,
+    internalStreamsRequireEventEmitter,
     internalStreamsRequirePrimordials,
     internalStreamsRequireRelativeDuplex,
     internalStreamsRequireRelativeUtil,
+    internalStreamsRequireStream,
     internalStreamsRequireStreams,
     internalStreamsRequireUtil,
     internalStreamsRequireUtilDebuglog,
     internalStreamsRequireWebStream,
     internalStreamsRequireInternal,
     internalStreamsWeakHandler,
-    internalStreamsBlob,
     internalStreamsInspectCustom
   ],
   'lib/internal/validators.js': [
@@ -256,7 +286,7 @@ export const replacements = {
     testParallelSilentConsole,
     testParallelTimersPromises
   ],
-  'test/parallel/test-stream-duplex-from.js': [testParallelDuplexFromBlob],
+  'test/parallel/test-stream-duplex-from.js': [testParallelDuplexFromBlob, testParallelDuplexSkipWithoutBlob],
   'test/parallel/test-stream-finished.js': [testParallelFinishedEvent],
   'test/parallel/test-stream-flatMap.js': [testParallelFlatMapWinLineSeparator],
   'test/parallel/test-stream-preprocess.js': [testParallelPreprocessWinLineSeparator],

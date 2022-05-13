@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Readable } = require('../../lib/ours/index')
 
-test('large object read stall', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(1) // If everything aligns so that you do a read(n) of exactly the
   // remaining buffer, then make sure that 'end' still emits.
 
@@ -19,10 +19,11 @@ test('large object read stall', function (t) {
   r._read = push
   r.on('readable', function () {
     false && console.error('>> readable')
+    let ret
 
     do {
       false && console.error('  > read(%d)', READSIZE)
-      var ret = r.read(READSIZE)
+      ret = r.read(READSIZE)
       false && console.error('  < %j (%d remain)', ret && ret.length, rs.length)
     } while (ret && ret.length === READSIZE)
 
@@ -52,4 +53,6 @@ test('large object read stall', function (t) {
   } // start the flow
 
   r.read(0)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-large-read-stall'

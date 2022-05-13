@@ -1,14 +1,14 @@
 'use strict'
 
-const test = require('tape')
-
 const crypto = require('crypto')
 
 const inherits = require('inherits')
 
 const stream = require('../../lib/ours/index')
 
-test('unpipe drain', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   try {
     crypto.randomBytes(9)
   } catch (_) {
@@ -61,4 +61,6 @@ test('unpipe drain', function (t) {
     t.equal(src1.reads, 2)
     t.equal(src2.reads, 1)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-unpipe-drain'

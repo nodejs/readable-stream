@@ -11,6 +11,7 @@ jobs:
       matrix:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         browser: ['chrome', 'firefox', 'safari', 'edge']
+        bundler: ['rollup']
         exclude:
           - os: ubuntu-latest
             browser: safari
@@ -32,5 +33,7 @@ jobs:
         run: npm install
       - name: Install Browser
         run: ./node_modules/.bin/playwright install ${{ fromJSON('{"chrome":"chromium","edge":"msedge","firefox":"firefox","safari":"webkit"}')[matrix.browser] }}
+      - name: Bundle code
+        run: npm run test:browsers:prepare:${{ matrix.bundler }}
       - name: Run Tests on Browsers
-        run: ./node_modules/.bin/airtap -p ${{ matrix.browser }} test/browser/test-*.js
+        run: npm run test:browsers ${{ matrix.browser }} ${{ matrix.bundler }}

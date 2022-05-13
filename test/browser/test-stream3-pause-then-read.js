@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Readable, Writable } = require('../../lib/ours/index')
 
-test('pause then read', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(7)
   const totalChunks = 100
   const chunkSize = 99
@@ -47,6 +47,7 @@ test('pause then read', function (t) {
   function readn(n, then) {
     // console.error('read %d', n);
     expectEndingData -= n
+
     ;(function read() {
       const c = r.read(n)
 
@@ -152,4 +153,6 @@ test('pause then read', function (t) {
     })
     r.pipe(w)
   }
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream3-pause-then-read'

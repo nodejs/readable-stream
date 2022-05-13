@@ -1,4 +1,20 @@
-'use strict'
+/* replacement start */
+const AbortController = globalThis.AbortController || require('abort-controller').AbortController
+
+const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
+
+const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
+
+if (typeof AbortSignal.abort !== 'function') {
+  AbortSignal.abort = function () {
+    const controller = new AbortController()
+    controller.abort()
+    return controller.signal
+  }
+}
+/* replacement end */
+
+;('use strict')
 
 const tap = require('tap')
 
@@ -39,6 +55,7 @@ const naturals = () =>
     deepStrictEqual(await from([1, 2]).drop(0).toArray(), [1, 2])
     deepStrictEqual(await from([1, 2]).take(0).toArray(), [])
   })().then(common.mustCall()) // Asynchronous streams
+
   ;(async () => {
     deepStrictEqual(await fromAsync([1, 2, 3]).drop(2).toArray(), [3])
     deepStrictEqual(await fromAsync([1, 2, 3]).take(1).toArray(), [1])
@@ -49,6 +66,7 @@ const naturals = () =>
     deepStrictEqual(await fromAsync([1, 2]).take(0).toArray(), [])
   })().then(common.mustCall()) // Infinite streams
   // Asynchronous streams
+
   ;(async () => {
     deepStrictEqual(await naturals().take(1).toArray(), [1])
     deepStrictEqual(await naturals().drop(1).take(1).toArray(), [2])

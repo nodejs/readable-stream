@@ -1,12 +1,12 @@
 'use strict'
 
-const test = require('tape')
-
 const inherits = require('inherits')
 
 const { Readable } = require('../../lib/ours/index')
 
-test('compatibility', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(1)
   let ondataCalled = 0
 
@@ -32,4 +32,6 @@ test('compatibility', function (t) {
     t.equal(ondataCalled, 1)
   })
   new TestReader().read()
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-compatibility'

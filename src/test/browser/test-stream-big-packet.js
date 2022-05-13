@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
 const inherits = require('inherits')
 const { Transform } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('big packet', function (t) {
+module.exports = function (t) {
   t.plan(3)
 
   let passed = false
@@ -65,4 +65,6 @@ test('big packet', function (t) {
     }
     return -1
   }
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-big-packet'

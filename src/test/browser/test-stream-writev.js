@@ -1,7 +1,7 @@
 'use strict'
 
-const test = require('tape')
 const stream = require('../../lib/ours/index')
+const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
 
 const queue = []
 for (let decode = 0; decode < 2; decode++) {
@@ -94,8 +94,13 @@ function runTest(decode, uncork, multi) {
   }
 }
 
-for (let i = 0; i < queue.length; i++) {
-  const tr = queue[i]
+module.exports = function (test) {
+  for (let i = 0; i < queue.length; i++) {
+    const tr = queue[i]
 
-  test('round ' + i, runTest(tr[0], tr[1], tr[2]))
+    test('round ' + i, runTest(tr[0], tr[1], tr[2]))
+  }
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-writev'
+module.exports[kReadableStreamSuiteHasMultipleTests] = true

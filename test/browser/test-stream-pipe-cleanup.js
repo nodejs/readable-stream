@@ -1,13 +1,13 @@
 'use strict' // This test asserts that Stream.prototype.pipe does not leave listeners
 // hanging on the source or dest.
 
-const test = require('tape')
-
 const inherits = require('inherits')
 
 const { Stream } = require('../../lib/ours/index')
 
-test('pipe cleanup', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(27)
 
   if (/^v0\.8\./.test(process.version)) {
@@ -121,4 +121,6 @@ test('pipe cleanup', function (t) {
   t.equal(w.listeners('end').length, 0)
   t.equal(w.listeners('close').length, 0)
   d.end()
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-cleanup'

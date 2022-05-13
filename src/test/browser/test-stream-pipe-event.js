@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
 const inherits = require('inherits')
 const { Stream } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('pipe event', function (t) {
+module.exports = function (t) {
   t.plan(1)
 
   function Writable() {
@@ -31,4 +31,6 @@ test('pipe event', function (t) {
   r.pipe(w)
 
   t.ok(passed)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-event'

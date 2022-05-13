@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const stream = require('../../lib/ours/index')
 
-test('pipe cleanup pause', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(3)
   const reader = new stream.Readable()
   const writer1 = new stream.Writable()
@@ -40,4 +40,6 @@ test('pipe cleanup pause', function (t) {
 
   reader.pipe(writer1)
   reader.push(buffer)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-cleanup-pause'

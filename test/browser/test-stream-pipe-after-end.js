@@ -1,12 +1,12 @@
 'use strict'
 
-const test = require('tape')
-
 const inherits = require('inherits')
 
 const { Readable, Writable } = require('../../lib/ours/index')
 
-test('pipe after end', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(4)
 
   function TestReadable(opt) {
@@ -66,4 +66,6 @@ test('pipe after end', function (t) {
     })
     piper.pipe(w)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-after-end'

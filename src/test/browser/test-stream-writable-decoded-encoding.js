@@ -1,8 +1,8 @@
 'use strict'
 
-const test = require('tape')
 const inherits = require('inherits')
 const stream = require('../../lib/ours/index')
+const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
 
 function MyWritable(fn, options) {
   stream.Writable.call(this, options)
@@ -16,34 +16,39 @@ MyWritable.prototype._write = function (chunk, encoding, callback) {
   callback()
 }
 
-test('decodeStringsTrue', (t) => {
-  t.plan(3)
+module.exports = function (test) {
+  test('decodeStringsTrue', (t) => {
+    t.plan(3)
 
-  const m = new MyWritable(
-    function (isBuffer, type, enc) {
-      t.ok(isBuffer)
-      t.equal(type, 'object')
-      t.equal(enc, 'buffer')
-      // console.log('ok - decoded string is decoded');
-    },
-    { decodeStrings: true }
-  )
-  m.write('some-text', 'utf8')
-  m.end()
-})
+    const m = new MyWritable(
+      function (isBuffer, type, enc) {
+        t.ok(isBuffer)
+        t.equal(type, 'object')
+        t.equal(enc, 'buffer')
+        // console.log('ok - decoded string is decoded');
+      },
+      { decodeStrings: true }
+    )
+    m.write('some-text', 'utf8')
+    m.end()
+  })
 
-test('decodeStringsFalse', (t) => {
-  t.plan(3)
+  test('decodeStringsFalse', (t) => {
+    t.plan(3)
 
-  const m = new MyWritable(
-    function (isBuffer, type, enc) {
-      t.notOk(isBuffer)
-      t.equal(type, 'string')
-      t.equal(enc, 'utf8')
-      // console.log('ok - un-decoded string is not decoded');
-    },
-    { decodeStrings: false }
-  )
-  m.write('some-text', 'utf8')
-  m.end()
-})
+    const m = new MyWritable(
+      function (isBuffer, type, enc) {
+        t.notOk(isBuffer)
+        t.equal(type, 'string')
+        t.equal(enc, 'utf8')
+        // console.log('ok - un-decoded string is not decoded');
+      },
+      { decodeStrings: false }
+    )
+    m.write('some-text', 'utf8')
+    m.end()
+  })
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-writable-decoded-encoding'
+module.exports[kReadableStreamSuiteHasMultipleTests] = true

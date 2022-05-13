@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('big push', function (t) {
+module.exports = function (t) {
   t.plan(10)
 
   const str = 'asdfasdfasdfasdfasdf'
@@ -67,4 +67,6 @@ test('big push', function (t) {
     t.ok(ended)
     t.equal(reads, 2)
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-big-push'

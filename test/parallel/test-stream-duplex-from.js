@@ -13,11 +13,7 @@ const assert = require('assert')
 
 const { Duplex, Readable, Writable, pipeline } = require('../../lib/ours/index')
 
-let { Blob } = require('buffer')
-
-if (typeof Blob === 'undefined') {
-  Blob = require('blob-polyfill').Blob
-}
+const Blob = globalThis.Blob || require('buffer').Blob
 
 {
   const d = Duplex.from({
@@ -202,7 +198,7 @@ if (typeof Blob === 'undefined') {
   assert.strictEqual(Duplex.from(duplex), duplex)
 } // Ensure that Duplex.from works for blobs
 
-{
+if (typeof Blob !== 'undefined') {
   const blob = new Blob(['blob'])
   const expectedByteLength = blob.size
   const duplex = Duplex.from(blob)

@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('end pause', function (t) {
+module.exports = function (t) {
   t.plan(2)
 
   const stream = new Readable()
@@ -27,4 +27,6 @@ test('end pause', function (t) {
     })
     stream.resume()
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-end-paused'

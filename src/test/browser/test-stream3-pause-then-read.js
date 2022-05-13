@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Readable, Writable } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('pause then read', function (t) {
+module.exports = function (t) {
   t.plan(7)
 
   const totalChunks = 100
@@ -144,4 +144,6 @@ test('pause then read', function (t) {
     })
     r.pipe(w)
   }
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream3-pause-then-read'

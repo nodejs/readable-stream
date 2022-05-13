@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { Readable, Writable } = require('../../lib/ours/index')
 
-test('base64 single char read end', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(1)
   const src = new Readable({
     encoding: 'base64'
@@ -36,4 +36,6 @@ test('base64 single char read end', function (t) {
   const timeout = setTimeout(function () {
     t.fail('timed out waiting for _write')
   }, 100)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-base64-single-char-read-end'

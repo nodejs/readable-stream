@@ -1,4 +1,20 @@
-'use strict'
+/* replacement start */
+const AbortController = globalThis.AbortController || require('abort-controller').AbortController
+
+const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
+
+const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
+
+if (typeof AbortSignal.abort !== 'function') {
+  AbortSignal.abort = function () {
+    const controller = new AbortController()
+    controller.abort()
+    return controller.signal
+  }
+}
+/* replacement end */
+
+;('use strict')
 
 const tap = require('tap')
 
@@ -75,6 +91,7 @@ function oneTo5() {
       .toArray()
     assert.deepStrictEqual(result, [1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
   })().then(common.mustCall()) // flatMap works on an objectMode stream where mappign returns a stream
+
   ;(async () => {
     const result = await oneTo5()
       .flatMap(() => {

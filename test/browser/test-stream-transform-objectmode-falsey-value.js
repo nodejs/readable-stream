@@ -1,10 +1,10 @@
 'use strict'
 
-const test = require('tape')
-
 const { PassThrough } = require('../../lib/ours/index')
 
-test('transform objectmode falsey value', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(13)
   const src = new PassThrough({
     objectMode: true
@@ -34,4 +34,6 @@ test('transform objectmode falsey value', function (t) {
       src.write(i++)
     }
   }, 10)
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-transform-objectmode-falsey-value'

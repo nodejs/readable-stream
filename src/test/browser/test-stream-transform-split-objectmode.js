@@ -1,9 +1,9 @@
 'use strict'
 
-const test = require('tape')
 const { Transform } = require('../../lib/ours/index')
+const { kReadableStreamSuiteName } = require('./symbols')
 
-test('transform split objectmode', function (t) {
+module.exports = function (t) {
   t.plan(10)
 
   const parser = new Transform({ readableObjectMode: true })
@@ -54,4 +54,6 @@ test('transform split objectmode', function (t) {
   setImmediate(function () {
     serializer.end()
   })
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-transform-split-objectmode'

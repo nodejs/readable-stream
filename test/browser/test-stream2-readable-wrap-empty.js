@@ -1,12 +1,12 @@
 'use strict'
 
-const test = require('tape')
-
 const { EventEmitter: EE } = require('events')
 
 const Readable = require('../../lib/ours/index')
 
-test('wrap empty', function (t) {
+const { kReadableStreamSuiteName } = require('./symbols')
+
+module.exports = function (t) {
   t.plan(1)
   const oldStream = new EE()
 
@@ -21,4 +21,6 @@ test('wrap empty', function (t) {
       t.ok(true, 'ended')
     })
   oldStream.emit('end')
-})
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream2-readable-wrap-empty'
