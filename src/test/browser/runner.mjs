@@ -1,8 +1,9 @@
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { Readable } from 'node:stream'
 import { chromium, firefox, webkit } from 'playwright'
 import reporter from 'tap-mocha-reporter'
 import Parser from 'tap-parser'
+import { fileURLToPath } from 'url'
 
 const validBrowsers = ['chrome', 'firefox', 'safari', 'edge']
 const validBundlers = ['browserify', 'webpack', 'rollup']
@@ -104,6 +105,5 @@ const page = await browser.newPage()
 setupTape(page, configuration)
 
 // Execute the test suite
-await page.goto(
-  `file://${resolve(dirname(new URL(import.meta.url).pathname), `../../tmp/${configuration.bundler}/index.html`)}`
-)
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+await page.goto(`file://${resolve(__dirname, `../../tmp/${configuration.bundler}/index.html`)}`)
