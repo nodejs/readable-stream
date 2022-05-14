@@ -3,7 +3,7 @@
 const Stream = require('stream')
 
 if (Stream && process.env.READABLE_STREAM === 'disable') {
-  const promises = require('stream/promises')
+  const promises = Stream.promises
 
   // Explicit export naming is needed for ESM
   module.exports._uint8ArrayToBuffer = Stream._uint8ArrayToBuffer

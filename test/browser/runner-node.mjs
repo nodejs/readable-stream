@@ -62,9 +62,16 @@ function setupTape(configuration) {
   })
 }
 
-const configuration = parseEnviroment()
-setupTape(configuration)
+async function main() {
+  const configuration = parseEnviroment()
+  setupTape(configuration)
 
-// Execute the test suite
-const __dirname = fileURLToPath(new URL('.', import.meta.url))
-await import(`file://${resolve(__dirname, `../../tmp/${configuration.bundler}/suite.node.js`)}`)
+  // Execute the test suite
+  const __dirname = fileURLToPath(new URL('.', import.meta.url))
+  await import(`file://${resolve(__dirname, `../../tmp/${configuration.bundler}/suite.node.js`)}`)
+}
+
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})
