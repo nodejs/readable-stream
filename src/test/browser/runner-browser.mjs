@@ -6,7 +6,7 @@ import reporter from 'tap-mocha-reporter'
 import Parser from 'tap-parser'
 
 const validBrowsers = ['chrome', 'firefox', 'safari', 'edge']
-const validBundlers = ['browserify', 'webpack', 'rollup']
+const validBundlers = ['browserify', 'esbuild', 'rollup', 'webpack']
 
 function parseEnviroment() {
   const headless = process.env.HEADLESS !== 'false'
@@ -23,7 +23,7 @@ function parseEnviroment() {
   }
 
   if (!validBrowsers.includes(browser) || !validBundlers.includes(bundler)) {
-    console.error('Usage: node runner-browser.mjs [chrome|firefox|safari|edge] [browserify|webpack|rollup]')
+    console.error(`Usage: node runner-browser.mjs [${validBrowsers.join('|')}] [${validBundlers.join('|')}]`)
     console.error('\nYou can also use the BROWSER and BUNDLER environment variables')
     process.exit(1)
   }

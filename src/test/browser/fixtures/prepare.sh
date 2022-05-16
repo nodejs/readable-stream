@@ -16,21 +16,19 @@ case $BUNDLER in
     browserify test/browser/test-browser.js --node -o tmp/browserify/suite.node.js
     ;;
   esbuild)
+    node src/test/browser/fixtures/esbuild.browser.config.mjs
+    node src/test/browser/fixtures/esbuild.node.config.mjs
     ;;
   rollup)
     rollup -c test/browser/fixtures/rollup.browser.config.mjs
     rollup -c test/browser/fixtures/rollup.node.config.mjs
-    ;;
-  swc)
-    ;;
-  vite)
     ;;
   webpack)
     webpack -c test/browser/fixtures/webpack.browser.config.mjs
     webpack -c test/browser/fixtures/webpack.node.config.mjs
     ;;
   *)
-    echo "Please set the environment variable BUNDLER to browserify, esbuild, rollup, swc, vite or webpack."
+    echo "Please set the environment variable BUNDLER to browserify, esbuild, rollup or webpack."
     exit 1
     ;;
 esac

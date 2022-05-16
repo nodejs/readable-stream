@@ -4,14 +4,14 @@ import { fileURLToPath } from 'node:url'
 import reporter from 'tap-mocha-reporter'
 import Parser from 'tap-parser'
 
-const validBundlers = ['browserify', 'webpack', 'rollup']
+const validBundlers = ['browserify', 'esbuild', 'rollup', 'webpack']
 
 function parseEnviroment() {
   const reporter = process.env.SKIP_REPORTER !== 'true'
   const bundler = process.argv[2] || process.env.BUNDLER
 
   if (!validBundlers.includes(bundler)) {
-    console.error('Usage: node runner-node.mjs [browserify|webpack|rollup]')
+    console.error(`Usage: node runner-node.mjs [${validBundlers.join('|')}]`)
     console.error('\nYou can also use the BUNDLER environment variable')
     process.exit(1)
   }
