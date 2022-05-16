@@ -1,7 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs'
 import inject from '@rollup/plugin-inject'
 import nodeResolve from '@rollup/plugin-node-resolve'
-import { resolve } from 'node:path'
+import { resolve } from 'path'
 import nodePolyfill from 'rollup-plugin-polyfill-node'
 
 export default {

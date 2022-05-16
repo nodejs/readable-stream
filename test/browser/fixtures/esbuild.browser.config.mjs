@@ -1,6 +1,6 @@
 import { build } from 'esbuild'
 import alias from 'esbuild-plugin-alias'
-import { createRequire } from 'node:module'
+import { createRequire } from 'module'
 
 const require = createRequire(import.meta.url)
 
