@@ -27,6 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Bundle code
-        run: npm run test:bundlers:prepare:${{ matrix.bundler }}
+        run: npm run test:prepare
       - name: Run Tests on Browsers
         run: npm run test:bundlers ${{ matrix.bundler }}
