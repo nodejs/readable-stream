@@ -38,10 +38,12 @@
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "test:browsers": "node test/browser/runner-browser.mjs",
     "test:browsers:prepare:browserify": "rm -rf tmp/browserify && mkdir -p tmp/browserify && browserify test/browser/test-browser.js -o tmp/browserify/suite.browser.js && cp test/browser/fixtures/index.html tmp/browserify",
-    "test:browsers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.browser.config.js && cp test/browser/fixtures/index.html tmp/rollup",
+    "test:browsers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.browser.config.mjs && cp test/browser/fixtures/index.html tmp/rollup",
+    "test:browsers:prepare:webpack": "rm -rf tmp/webpack && webpack -c test/browser/fixtures/webpack.browser.config.mjs && cp test/browser/fixtures/index.html tmp/webpack",
     "test:bundlers": "node test/browser/runner-node.mjs",
     "test:bundlers:prepare:browserify": "rm -rf tmp/browserify && mkdir -p tmp/browserify && browserify test/browser/test-browser.js --node -o tmp/browserify/suite.node.js",
-    "test:bundlers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.node.config.js",
+    "test:bundlers:prepare:rollup": "rm -rf tmp/rollup && rollup -c test/browser/fixtures/rollup.node.config.mjs",
+    "test:bundlers:prepare:webpack": "rm -rf tmp/webpack && webpack -c test/browser/fixtures/webpack.node.config.mjs",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src lib test",
     "lint": "eslint src"
@@ -74,7 +76,9 @@
     "tap-mocha-reporter": "^5.0.3",
     "tape": "^5.5.3",
     "tar": "^6.1.11",
-    "undici": "^5.1.1"
+    "undici": "^5.1.1",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2"
   },
   "engines": {
     "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
