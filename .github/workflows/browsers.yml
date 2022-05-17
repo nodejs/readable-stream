@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         browser: ['chrome', 'firefox', 'safari', 'edge']
-        bundler: ['browserify', 'rollup', 'webpack']
+        bundler: ['browserify', 'esbuild', 'rollup', 'webpack']
         exclude:
           - os: ubuntu-latest
             browser: safari

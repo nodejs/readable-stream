@@ -12,7 +12,7 @@ function parseEnviroment() {
 
   if (!validBundlers.includes(bundler)) {
     console.error(`Usage: node runner-node.mjs [${validBundlers.join('|')}]`)
-    console.error('\nYou can also use the BUNDLER environment variable')
+    console.error('You can also use the BUNDLER environment variable.')
     process.exit(1)
   }
 

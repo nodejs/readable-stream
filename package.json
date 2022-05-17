@@ -36,7 +36,7 @@
     "build": "node build/build.mjs",
     "postbuild": "prettier -w lib test",
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
-    "test:prepare": "/bin/bash test/browser/fixtures/prepare.sh",
+    "test:prepare": "node test/browser/runner-prepare.mjs",
     "test:browsers": "node test/browser/runner-browser.mjs",
     "test:bundlers": "node test/browser/runner-node.mjs",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",

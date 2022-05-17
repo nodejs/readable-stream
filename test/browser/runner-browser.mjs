@@ -24,7 +24,7 @@ function parseEnviroment() {
 
   if (!validBrowsers.includes(browser) || !validBundlers.includes(bundler)) {
     console.error(`Usage: node runner-browser.mjs [${validBrowsers.join('|')}] [${validBundlers.join('|')}]`)
-    console.error('\nYou can also use the BROWSER and BUNDLER environment variables')
+    console.error('You can also use the BROWSER and BUNDLER environment variables.')
     process.exit(1)
   }
 

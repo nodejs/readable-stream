@@ -20,10 +20,14 @@ function highlightFile(file, color) {
   return `\x1b[${color}m${file.replace(process.cwd() + '/', '')}\x1b[0m`
 }
 
+function info(message) {
+  console.log(`\x1b[34m[INFO]\x1b[0m ${message}`)
+}
+
 async function extract(nodeVersion, tarFile) {
   const sourcesMatcher = sources.map((s) => new RegExp(s))
 
-  console.log(`Extracting Node.js ${nodeVersion} tar file ...`)
+  info(`Extracting Node.js ${nodeVersion} tar file ...`)
   const contents = []
   const tarPrefix = `node-v${nodeVersion}/`
   const parser = new Parse()
@@ -124,7 +128,7 @@ async function processFiles(contents) {
     }
 
     // Write the file
-    console.log(`Creating file ${highlightFile(path, 32)} (${modifications.join(', ')}) ...`)
+    info(`Creating file ${highlightFile(path, 32)} (${modifications.join(', ')}) ...`)
     await writeFile(path, content, 'utf-8')
   }
 }
@@ -132,11 +136,11 @@ async function processFiles(contents) {
 async function downloadNode(nodeVersion) {
   // Download node
   const downloadUrl = `https://nodejs.org/v${nodeVersion}/node-v${nodeVersion}.tar.gz`
-  console.log(`Downloading ${downloadUrl} ...`)
+  info(`Downloading ${downloadUrl} ...`)
   const { statusCode, body } = await request(downloadUrl, { pipelining: 0 })
 
   if (statusCode !== 200) {
-    console.log(`Downloading failed with HTTP code ${statusCode}.`)
+    info(`Downloading failed with HTTP code ${statusCode}.`)
     process.exit(1)
   }
 
@@ -209,7 +213,7 @@ async function main() {
   paths.delete('.')
 
   for (const path of paths.values()) {
-    console.log(`Creating directory ${highlightFile(path, 32)} ...`)
+    info(`Creating directory ${highlightFile(path, 32)} ...`)
     await mkdir(path, { recursive: true, force: true })
   }
 
