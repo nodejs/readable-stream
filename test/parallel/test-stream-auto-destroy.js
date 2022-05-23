@@ -1,99 +1,139 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
 {
-  var r = new stream.Readable({
+  const r = new stream.Readable({
     autoDestroy: true,
-    read: function read() {
-      this.push('hello');
-      this.push('world');
-      this.push(null);
+
+    read() {
+      this.push('hello')
+      this.push('world')
+      this.push(null)
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
+
+    destroy: common.mustCall((err, cb) => cb())
+  })
+  let ended = false
+  r.resume()
+  r.on(
+    'end',
+    common.mustCall(() => {
+      ended = true
     })
-  });
-  var ended = false;
-  r.resume();
-  r.on('end', common.mustCall(function () {
-    ended = true;
-  }));
-  r.on('close', common.mustCall(function () {
-    assert(ended);
-  }));
+  )
+  r.on(
+    'close',
+    common.mustCall(() => {
+      assert(ended)
+    })
+  )
 }
 {
-  var w = new stream.Writable({
+  const w = new stream.Writable({
     autoDestroy: true,
-    write: function write(data, enc, cb) {
-      cb(null);
+
+    write(data, enc, cb) {
+      cb(null)
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
+
+    destroy: common.mustCall((err, cb) => cb())
+  })
+  let finished = false
+  w.write('hello')
+  w.write('world')
+  w.end()
+  w.on(
+    'finish',
+    common.mustCall(() => {
+      finished = true
     })
-  });
-  var finished = false;
-  w.write('hello');
-  w.write('world');
-  w.end();
-  w.on('finish', common.mustCall(function () {
-    finished = true;
-  }));
-  w.on('close', common.mustCall(function () {
-    assert(finished);
-  }));
+  )
+  w.on(
+    'close',
+    common.mustCall(() => {
+      assert(finished)
+    })
+  )
 }
 {
-  var t = new stream.Transform({
+  const t = new stream.Transform({
     autoDestroy: true,
-    transform: function transform(data, enc, cb) {
-      cb(null, data);
+
+    transform(data, enc, cb) {
+      cb(null, data)
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
+
+    destroy: common.mustCall((err, cb) => cb())
+  })
+  let ended = false
+  let finished = false
+  t.write('hello')
+  t.write('world')
+  t.end()
+  t.resume()
+  t.on(
+    'end',
+    common.mustCall(() => {
+      ended = true
     })
-  });
-  var _ended = false;
-  var _finished = false;
-  t.write('hello');
-  t.write('world');
-  t.end();
-  t.resume();
-  t.on('end', common.mustCall(function () {
-    _ended = true;
-  }));
-  t.on('finish', common.mustCall(function () {
-    _finished = true;
-  }));
-  t.on('close', common.mustCall(function () {
-    assert(_ended);
-    assert(_finished);
-  }));
+  )
+  t.on(
+    'finish',
+    common.mustCall(() => {
+      finished = true
+    })
+  )
+  t.on(
+    'close',
+    common.mustCall(() => {
+      assert(ended)
+      assert(finished)
+    })
+  )
 }
-;
+{
+  const r = new stream.Readable({
+    read() {
+      r2.emit('error', new Error('fail'))
+    }
+  })
+  const r2 = new stream.Readable({
+    autoDestroy: true,
+    destroy: common.mustCall((err, cb) => cb())
+  })
+  r.pipe(r2)
+}
+{
+  const r = new stream.Readable({
+    read() {
+      w.emit('error', new Error('fail'))
+    }
+  })
+  const w = new stream.Writable({
+    autoDestroy: true,
+    destroy: common.mustCall((err, cb) => cb())
+  })
+  r.pipe(w)
+}
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

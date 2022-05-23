@@ -1,72 +1,66 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var writable = new stream.Writable();
-writable._writev = common.mustCall(function (chunks, cb) {
-  assert.strictEqual(chunks.length, 2);
-  cb();
-}, 1);
-writable._write = common.mustCall(function (chunk, encoding, cb) {
-  cb();
-}, 1); // first cork
+const writable = new stream.Writable()
+writable._writev = common.mustCall((chunks, cb) => {
+  assert.strictEqual(chunks.length, 2)
+  cb()
+}, 1)
+writable._write = common.mustCall((chunk, encoding, cb) => {
+  cb()
+}, 1) // first cork
 
-writable.cork();
-assert.strictEqual(writable._writableState.corked, 1);
-assert.strictEqual(writable._writableState.bufferedRequestCount, 0); // cork again
+writable.cork()
+assert.strictEqual(writable._writableState.corked, 1)
+assert.strictEqual(writable._writableState.bufferedRequestCount, 0) // cork again
 
-writable.cork();
-assert.strictEqual(writable._writableState.corked, 2); // the first chunk is buffered
+writable.cork()
+assert.strictEqual(writable._writableState.corked, 2) // The first chunk is buffered
 
-writable.write('first chunk');
-assert.strictEqual(writable._writableState.bufferedRequestCount, 1); // first uncork does nothing
+writable.write('first chunk')
+assert.strictEqual(writable._writableState.bufferedRequestCount, 1) // First uncork does nothing
 
-writable.uncork();
-assert.strictEqual(writable._writableState.corked, 1);
-assert.strictEqual(writable._writableState.bufferedRequestCount, 1);
-process.nextTick(uncork); // the second chunk is buffered, because we uncork at the end of tick
+writable.uncork()
+assert.strictEqual(writable._writableState.corked, 1)
+assert.strictEqual(writable._writableState.bufferedRequestCount, 1)
+process.nextTick(uncork) // The second chunk is buffered, because we uncork at the end of tick
 
-writable.write('second chunk');
-assert.strictEqual(writable._writableState.corked, 1);
-assert.strictEqual(writable._writableState.bufferedRequestCount, 2);
+writable.write('second chunk')
+assert.strictEqual(writable._writableState.corked, 1)
+assert.strictEqual(writable._writableState.bufferedRequestCount, 2)
 
 function uncork() {
-  // second uncork flushes the buffer
-  writable.uncork();
-  assert.strictEqual(writable._writableState.corked, 0);
-  assert.strictEqual(writable._writableState.bufferedRequestCount, 0); // verify that end() uncorks correctly
+  // Second uncork flushes the buffer
+  writable.uncork()
+  assert.strictEqual(writable._writableState.corked, 0)
+  assert.strictEqual(writable._writableState.bufferedRequestCount, 0) // Verify that end() uncorks correctly
 
-  writable.cork();
-  writable.write('third chunk');
-  writable.end(); // end causes an uncork() as well
+  writable.cork()
+  writable.write('third chunk')
+  writable.end() // End causes an uncork() as well
 
-  assert.strictEqual(writable._writableState.corked, 0);
-  assert.strictEqual(writable._writableState.bufferedRequestCount, 0);
+  assert.strictEqual(writable._writableState.corked, 0)
+  assert.strictEqual(writable._writableState.bufferedRequestCount, 0)
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

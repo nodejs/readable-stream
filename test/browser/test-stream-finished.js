@@ -1,60 +1,57 @@
-"use strict";
+'use strict'
 
+const { Writable, Readable, Transform, finished } = require('../../lib/ours/index')
 
-var common = require('../common');
+const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
 
-var _require = require('../../'),
-    Writable = _require.Writable,
-    Readable = _require.Readable,
-    Transform = _require.Transform,
-    finished = _require.finished;
-
-module.exports = function (t) {
-  t.test('readable finished', function (t) {
-
-    var rs = new Readable({
+module.exports = function (test) {
+  test('readable finished', function (t) {
+    t.plan(1)
+    const rs = new Readable({
       read: function read() {}
-    });
-    finished(rs, common.mustCall(function (err) {
-      t.ok(!err, 'no error');
-      t.end();
-    }));
-    rs.push(null);
-    rs.resume();
-  });
-  t.test('writable finished', function (t) {
-    var ws = new Writable({
+    })
+    finished(rs, (err) => {
+      t.ifErr(err)
+    })
+    rs.push(null)
+    rs.resume()
+  })
+  test('writable finished', function (t) {
+    t.plan(1)
+    const ws = new Writable({
       write: function write(data, enc, cb) {
-        cb();
+        cb()
       }
-    });
-    finished(ws, common.mustCall(function (err) {
-      t.ok(!err, 'no error');
-      t.end();
-    }));
-    ws.end();
-  });
-  t.test('transform finished', function (t) {
-    var tr = new Transform({
+    })
+    finished(ws, (err) => {
+      t.ifErr(err)
+    })
+    ws.end()
+  })
+  test('transform finished', function (t) {
+    t.plan(3)
+    const tr = new Transform({
       transform: function transform(data, enc, cb) {
-        cb();
+        cb()
       }
-    });
-    var finish = false;
-    var ended = false;
+    })
+    let finish = false
+    let ended = false
     tr.on('end', function () {
-      ended = true;
-    });
+      ended = true
+    })
     tr.on('finish', function () {
-      finish = true;
-    });
-    finished(tr, common.mustCall(function (err) {
-      t.ok(!err, 'no error');
-      t.ok(finish);
-      t.ok(ended);
-      t.end();
-    }));
-    tr.end();
-    tr.resume();
-  });
-};
+      finish = true
+    })
+    finished(tr, (err) => {
+      t.ifErr(err)
+      t.ok(finish)
+      t.ok(ended)
+    })
+    tr.end()
+    tr.resume()
+  })
+}
+
+module.exports[kReadableStreamSuiteName] = 'stream-finished'
+module.exports[kReadableStreamSuiteHasMultipleTests] = true

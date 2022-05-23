@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,45 +18,41 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var readable = new stream.Readable(); // _read is a noop, here.
+const readable = new stream.Readable() // _read is a noop, here.
 
-readable._read = Function(); // default state of a stream is not "paused"
+readable._read = Function() // Default state of a stream is not "paused"
 
-assert.ok(!readable.isPaused()); // make the stream start flowing...
+assert.ok(!readable.isPaused()) // Make the stream start flowing...
 
-readable.on('data', Function()); // still not paused.
+readable.on('data', Function()) // still not paused.
 
-assert.ok(!readable.isPaused());
-readable.pause();
-assert.ok(readable.isPaused());
-readable.resume();
-assert.ok(!readable.isPaused());
-;
+assert.ok(!readable.isPaused())
+readable.pause()
+assert.ok(readable.isPaused())
+readable.resume()
+assert.ok(!readable.isPaused())
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

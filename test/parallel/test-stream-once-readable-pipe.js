@@ -1,88 +1,76 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable; // This test ensures that if have 'readable' listener
+const { Readable, Writable } = require('../../lib/ours/index') // This test ensures that if have 'readable' listener
 // on Readable instance it will not disrupt the pipe.
 
-
 {
-  var receivedData = '';
-  var w = new Writable({
-    write: function write(chunk, env, callback) {
-      receivedData += chunk;
-      callback();
+  let receivedData = ''
+  const w = new Writable({
+    write: (chunk, env, callback) => {
+      receivedData += chunk
+      callback()
     }
-  });
-  var data = ['foo', 'bar', 'baz'];
-  var r = new Readable({
-    read: function read() {}
-  });
-  r.once('readable', common.mustCall());
-  r.pipe(w);
-  r.push(data[0]);
-  r.push(data[1]);
-  r.push(data[2]);
-  r.push(null);
-  w.on('finish', common.mustCall(function () {
-    assert.strictEqual(receivedData, data.join(''));
-  }));
+  })
+  const data = ['foo', 'bar', 'baz']
+  const r = new Readable({
+    read: () => {}
+  })
+  r.once('readable', common.mustCall())
+  r.pipe(w)
+  r.push(data[0])
+  r.push(data[1])
+  r.push(data[2])
+  r.push(null)
+  w.on(
+    'finish',
+    common.mustCall(() => {
+      assert.strictEqual(receivedData, data.join(''))
+    })
+  )
 }
 {
-  var _receivedData = '';
-
-  var _w = new Writable({
-    write: function write(chunk, env, callback) {
-      _receivedData += chunk;
-      callback();
+  let receivedData = ''
+  const w = new Writable({
+    write: (chunk, env, callback) => {
+      receivedData += chunk
+      callback()
     }
-  });
-
-  var _data = ['foo', 'bar', 'baz'];
-
-  var _r = new Readable({
-    read: function read() {}
-  });
-
-  _r.pipe(_w);
-
-  _r.push(_data[0]);
-
-  _r.push(_data[1]);
-
-  _r.push(_data[2]);
-
-  _r.push(null);
-
-  _r.once('readable', common.mustCall());
-
-  _w.on('finish', common.mustCall(function () {
-    assert.strictEqual(_receivedData, _data.join(''));
-  }));
+  })
+  const data = ['foo', 'bar', 'baz']
+  const r = new Readable({
+    read: () => {}
+  })
+  r.pipe(w)
+  r.push(data[0])
+  r.push(data[1])
+  r.push(data[2])
+  r.push(null)
+  r.once('readable', common.mustCall())
+  w.on(
+    'finish',
+    common.mustCall(() => {
+      assert.strictEqual(receivedData, data.join(''))
+    })
+  )
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

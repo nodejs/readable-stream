@@ -1,54 +1,45 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable; // Tests that calling .unpipe() un-blocks a stream that is paused because
+const { Readable, Writable } = require('../../lib/ours/index') // Tests that calling .unpipe() un-blocks a stream that is paused because
 // it is waiting on the writable side to finish a write().
 
-
-var rs = new Readable({
+const rs = new Readable({
   highWaterMark: 1,
   // That this gets called at least 20 times is the real test here.
-  read: common.mustCallAtLeast(function () {
-    return rs.push('foo');
-  }, 20)
-});
-var ws = new Writable({
+  read: common.mustCallAtLeast(() => rs.push('foo'), 20)
+})
+const ws = new Writable({
   highWaterMark: 1,
-  write: common.mustCall(function () {
+  write: common.mustCall(() => {
     // Ignore the callback, this write() simply never finishes.
-    setImmediate(function () {
-      return rs.unpipe(ws);
-    });
+    setImmediate(() => rs.unpipe(ws))
   })
-});
-var chunks = 0;
-rs.on('data', common.mustCallAtLeast(function () {
-  chunks++;
-  if (chunks >= 20) rs.pause(); // Finish this test.
-}));
-rs.pipe(ws);
-;
+})
+let chunks = 0
+rs.on(
+  'data',
+  common.mustCallAtLeast(() => {
+    chunks++
+    if (chunks >= 20) rs.pause() // Finish this test.
+  })
+)
+rs.pipe(ws)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

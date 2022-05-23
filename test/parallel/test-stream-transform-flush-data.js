@@ -1,48 +1,43 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Transform = require('../../').Transform;
+const Transform = require('../../lib/ours/index').Transform
 
-var expected = 'asdf';
+const expected = 'asdf'
 
 function _transform(d, e, n) {
-  n();
+  n()
 }
 
 function _flush(n) {
-  n(null, expected);
+  n(null, expected)
 }
 
-var t = new Transform({
+const t = new Transform({
   transform: _transform,
   flush: _flush
-});
-t.end(bufferShim.from('blerg'));
-t.on('data', function (data) {
-  assert.strictEqual(data.toString(), expected);
-});
-;
+})
+t.end(Buffer.from('blerg'))
+t.on('data', (data) => {
+  assert.strictEqual(data.toString(), expected)
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

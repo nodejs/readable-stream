@@ -1,69 +1,64 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable,
-    Transform = _require.Transform;
+const { Readable, Writable, Transform } = require('../../lib/ours/index')
 
 {
-  var stream = new Readable({
+  const stream = new Readable({
     objectMode: true,
-    read: common.mustCall(function () {
-      stream.push(undefined);
-      stream.push(null);
+    read: common.mustCall(() => {
+      stream.push(undefined)
+      stream.push(null)
     })
-  });
-  stream.on('data', common.mustCall(function (chunk) {
-    assert.strictEqual(chunk, undefined);
-  }));
+  })
+  stream.on(
+    'data',
+    common.mustCall((chunk) => {
+      assert.strictEqual(chunk, undefined)
+    })
+  )
 }
 {
-  var _stream = new Writable({
+  const stream = new Writable({
     objectMode: true,
-    write: common.mustCall(function (chunk) {
-      assert.strictEqual(chunk, undefined);
+    write: common.mustCall((chunk) => {
+      assert.strictEqual(chunk, undefined)
     })
-  });
-
-  _stream.write(undefined);
+  })
+  stream.write(undefined)
 }
 {
-  var _stream2 = new Transform({
+  const stream = new Transform({
     objectMode: true,
-    transform: common.mustCall(function (chunk) {
-      _stream2.push(chunk);
+    transform: common.mustCall((chunk) => {
+      stream.push(chunk)
     })
-  });
-
-  _stream2.on('data', common.mustCall(function (chunk) {
-    assert.strictEqual(chunk, undefined);
-  }));
-
-  _stream2.write(undefined);
+  })
+  stream.on(
+    'data',
+    common.mustCall((chunk) => {
+      assert.strictEqual(chunk, undefined)
+    })
+  )
+  stream.write(undefined)
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

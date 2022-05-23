@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,47 +18,46 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var r = new stream.Readable();
+const r = new stream.Readable()
 
 r._read = function (size) {
-  r.push(bufferShim.allocUnsafe(size));
-};
+  r.push(Buffer.allocUnsafe(size))
+}
 
-var w = new stream.Writable();
+const w = new stream.Writable()
 
 w._write = function (data, encoding, cb) {
-  cb(null);
-};
+  process.nextTick(cb, null)
+}
 
-r.pipe(w); // This might sound unrealistic, but it happens in net.js. When
-// `socket.allowHalfOpen === false`, EOF will cause `.destroySoon()` call which
-// ends the writable side of net.Socket.
+r.pipe(w) // end() must be called in nextTick or a WRITE_AFTER_END error occurs.
 
-w.end();
-;
+process.nextTick(() => {
+  // This might sound unrealistic, but it happens in net.js. When
+  // socket.allowHalfOpen === false, EOF will cause .destroySoon() call which
+  // ends the writable side of net.Socket.
+  w.end()
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,47 +1,38 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable; // readable.resume() should not lead to a ._read() call being scheduled
+const { Readable } = require('../../lib/ours/index') // readable.resume() should not lead to a ._read() call being scheduled
 // when we exceed the high water mark already.
 
-
-var readable = new Readable({
+const readable = new Readable({
   read: common.mustNotCall(),
   highWaterMark: 100
-}); // Fill up the internal buffer so that we definitely exceed the HWM:
+}) // Fill up the internal buffer so that we definitely exceed the HWM:
 
-for (var i = 0; i < 10; i++) {
-  readable.push('a'.repeat(200));
-} // Call resume, and pause after one chunk.
+for (let i = 0; i < 10; i++) readable.push('a'.repeat(200)) // Call resume, and pause after one chunk.
 // The .pause() is just so that we don’t empty the buffer fully, which would
 // be a valid reason to call ._read().
 
+readable.resume()
+readable.once(
+  'data',
+  common.mustCall(() => readable.pause())
+)
+/* replacement start */
 
-readable.resume();
-readable.once('data', common.mustCall(function () {
-  return readable.pause();
-}));
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

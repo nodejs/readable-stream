@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,64 +18,58 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var R = require('../../lib/_stream_readable');
+const { Readable: R, Writable: W } = require('../../lib/ours/index')
 
-var W = require('../../lib/_stream_writable');
+const assert = require('assert')
 
-var assert = require('assert/');
-
-var src = new R({
+const src = new R({
   encoding: 'base64'
-});
-var dst = new W();
-var hasRead = false;
-var accum = [];
+})
+const dst = new W()
+let hasRead = false
+const accum = []
 
 src._read = function (n) {
   if (!hasRead) {
-    hasRead = true;
+    hasRead = true
     process.nextTick(function () {
-      src.push(bufferShim.from('1'));
-      src.push(null);
-    });
+      src.push(Buffer.from('1'))
+      src.push(null)
+    })
   }
-};
+}
 
 dst._write = function (chunk, enc, cb) {
-  accum.push(chunk);
-  cb();
-};
+  accum.push(chunk)
+  cb()
+}
 
 src.on('end', function () {
-  assert.strictEqual(String(Buffer.concat(accum)), 'MQ==');
-  clearTimeout(timeout);
-});
-src.pipe(dst);
-var timeout = setTimeout(function () {
-  assert.fail('timed out waiting for _write');
-}, 100);
-;
+  assert.strictEqual(String(Buffer.concat(accum)), 'MQ==')
+  clearTimeout(timeout)
+})
+src.pipe(dst)
+const timeout = setTimeout(function () {
+  assert.fail('timed out waiting for _write')
+}, 100)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

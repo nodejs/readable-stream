@@ -1,45 +1,45 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var transform = new stream.Transform({
+const transform = new stream.Transform({
   transform: _transform,
   highWaterMark: 1
-});
+})
 
 function _transform(chunk, encoding, cb) {
-  assert.strictEqual(transform._writableState.needDrain, true);
-  cb();
+  process.nextTick(() => {
+    assert.strictEqual(transform._writableState.needDrain, true)
+    cb()
+  })
 }
 
-assert.strictEqual(transform._writableState.needDrain, false);
-transform.write('asdasd', common.mustCall(function () {
-  assert.strictEqual(transform._writableState.needDrain, false);
-}));
-assert.strictEqual(transform._writableState.needDrain, true);
-;
+assert.strictEqual(transform._writableState.needDrain, false)
+transform.write(
+  'asdasd',
+  common.mustCall(() => {
+    assert.strictEqual(transform._writableState.needDrain, false)
+  })
+)
+assert.strictEqual(transform._writableState.needDrain, true)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

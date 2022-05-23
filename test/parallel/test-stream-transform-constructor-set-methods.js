@@ -1,62 +1,59 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('assert/'),
-    strictEqual = _require.strictEqual;
+const assert = require('assert')
 
-var _require2 = require('../../'),
-    Transform = _require2.Transform;
+const { Transform } = require('../../lib/ours/index')
 
-var t = new Transform();
-t.on('error', common.expectsError({
-  type: Error,
-  code: 'ERR_METHOD_NOT_IMPLEMENTED',
-  message: 'The _transform() method is not implemented'
-}));
-t.end(bufferShim.from('blerg'));
+const t = new Transform()
+assert.throws(
+  () => {
+    t.end(Buffer.from('blerg'))
+  },
+  {
+    name: 'Error',
+    code: 'ERR_METHOD_NOT_IMPLEMENTED',
+    message: 'The _transform() method is not implemented'
+  }
+)
 
-var _transform = common.mustCall(function (chunk, _, next) {
-  next();
-});
+const _transform = common.mustCall((chunk, _, next) => {
+  next()
+})
 
-var _final = common.mustCall(function (next) {
-  next();
-});
+const _final = common.mustCall((next) => {
+  next()
+})
 
-var _flush = common.mustCall(function (next) {
-  next();
-});
+const _flush = common.mustCall((next) => {
+  next()
+})
 
-var t2 = new Transform({
+const t2 = new Transform({
   transform: _transform,
   flush: _flush,
   final: _final
-});
-strictEqual(t2._transform, _transform);
-strictEqual(t2._flush, _flush);
-strictEqual(t2._final, _final);
-t2.end(bufferShim.from('blerg'));
-t2.resume();
-;
+})
+assert.strictEqual(t2._transform, _transform)
+assert.strictEqual(t2._flush, _flush)
+assert.strictEqual(t2._final, _final)
+t2.end(Buffer.from('blerg'))
+t2.resume()
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

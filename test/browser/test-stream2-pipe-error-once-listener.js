@@ -1,41 +1,43 @@
-'use strict';
-var common = require('../common');
+'use strict'
 
-var inherits = require('inherits');
-var stream = require('../../');
+const inherits = require('inherits')
+
+const stream = require('../../lib/ours/index')
+
+const { kReadableStreamSuiteName } = require('./symbols')
 
 module.exports = function (t) {
-  t.test('pipe error once listener', function (t){
-    t.plan(1);
-    var Read = function() {
-      stream.Readable.call(this);
-    };
-    inherits(Read, stream.Readable);
+  t.plan(1)
 
-    Read.prototype._read = function(size) {
-      this.push('x');
-      this.push(null);
-    };
+  const Read = function () {
+    stream.Readable.call(this)
+  }
 
+  inherits(Read, stream.Readable)
 
-    var Write = function() {
-      stream.Writable.call(this);
-    };
-    inherits(Write, stream.Writable);
+  Read.prototype._read = function (size) {
+    this.push('x')
+    this.push(null)
+  }
 
-    Write.prototype._write = function(buffer, encoding, cb) {
-      this.emit('error', new Error('boom'));
-      this.emit('alldone');
-    };
+  const Write = function () {
+    stream.Writable.call(this)
+  }
 
-    var read = new Read();
-    var write = new Write();
+  inherits(Write, stream.Writable)
 
-    write.once('error', function(err) {});
-    write.once('alldone', function(err) {
-      t.ok(true);
-    });
+  Write.prototype._write = function (buffer, encoding, cb) {
+    this.emit('error', new Error('boom'))
+    this.emit('alldone')
+  }
 
-    read.pipe(write);
-  });
+  const read = new Read()
+  const write = new Write()
+  write.once('error', () => {})
+  write.once('alldone', function () {
+    t.ok(true)
+  })
+  read.pipe(write)
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream2-pipe-error-once-listener'

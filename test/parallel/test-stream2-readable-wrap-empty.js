@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,41 +18,37 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var Readable = require('../../lib/_stream_readable');
+const { Readable } = require('../../lib/ours/index')
 
-var EE = require('events').EventEmitter;
+const EE = require('events').EventEmitter
 
-var oldStream = new EE();
+const oldStream = new EE()
 
-oldStream.pause = function () {};
+oldStream.pause = () => {}
 
-oldStream.resume = function () {};
+oldStream.resume = () => {}
 
-var newStream = new Readable().wrap(oldStream);
-newStream.on('readable', function () {}).on('end', common.mustCall());
-oldStream.emit('end');
-;
+const newStream = new Readable().wrap(oldStream)
+newStream.on('readable', () => {}).on('end', common.mustCall())
+oldStream.emit('end')
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,32 +1,38 @@
-'use strict';
-var common = require('../common');
-var stream = require('../../');
-var inherits = require('inherits');
+'use strict'
+
+const inherits = require('inherits')
+
+const { Stream } = require('../../lib/ours/index')
+
+const { kReadableStreamSuiteName } = require('./symbols')
+
 module.exports = function (t) {
-  t.test('pipe event', function (t) {
-    t.plan(1);
-    function Writable() {
-      this.writable = true;
-      require('stream').Stream.call(this);
-    }
-    inherits(Writable, require('stream').Stream);
+  t.plan(1)
 
-    function Readable() {
-      this.readable = true;
-      require('stream').Stream.call(this);
-    }
-    inherits(Readable, require('stream').Stream);
+  function Writable() {
+    this.writable = true
+    Stream.call(this)
+  }
 
-    var passed = false;
+  inherits(Writable, Stream)
 
-    var w = new Writable();
-    w.on('pipe', function(src) {
-      passed = true;
-    });
+  function Readable() {
+    this.readable = true
+    Stream.call(this)
+  }
 
-    var r = new Readable();
-    r.pipe(w);
+  inherits(Readable, Stream)
+  let passed = false
+  const w = new Writable()
+  w.on('pipe', function (src) {
+    passed = true
+  })
+  const r = new Readable()
 
-    t.ok(passed);
-  });
+  r._read = function () {}
+
+  r.pipe(w)
+  t.ok(passed)
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-event'

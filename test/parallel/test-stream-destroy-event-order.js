@@ -1,45 +1,45 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
+const { Readable } = require('../../lib/ours/index')
 
-var rs = new Readable({
-  read: function read() {}
-});
-var closed = false;
-var errored = false;
-rs.on('close', common.mustCall(function () {
-  closed = true;
-  assert(errored);
-}));
-rs.on('error', common.mustCall(function (err) {
-  errored = true;
-  assert(!closed);
-}));
-rs.destroy(new Error('kaboom'));
-;
+const rs = new Readable({
+  read() {}
+})
+let closed = false
+let errored = false
+rs.on(
+  'close',
+  common.mustCall(() => {
+    closed = true
+    assert(errored)
+  })
+)
+rs.on(
+  'error',
+  common.mustCall((err) => {
+    errored = true
+    assert(!closed)
+  })
+)
+rs.destroy(new Error('kaboom'))
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

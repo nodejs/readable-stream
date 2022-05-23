@@ -1,59 +1,53 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var pushes = 0;
-var total = 65500 + 40 * 1024;
-var rs = new stream.Readable({
+let pushes = 0
+const total = 65500 + 40 * 1024
+const rs = new stream.Readable({
   read: common.mustCall(function () {
     if (pushes++ === 10) {
-      this.push(null);
-      return;
+      this.push(null)
+      return
     }
 
-    var length = this._readableState.length; // We are at most doing two full runs of _reads
+    const length = this._readableState.length // We are at most doing two full runs of _reads
     // before stopping, because Readable is greedy
     // to keep its buffer full
 
-    assert(length <= total);
-    this.push(bufferShim.alloc(65500));
+    assert(length <= total)
+    this.push(Buffer.alloc(65500))
 
-    for (var i = 0; i < 40; i++) {
-      this.push(bufferShim.alloc(1024));
+    for (let i = 0; i < 40; i++) {
+      this.push(Buffer.alloc(1024))
     } // We will be over highWaterMark at this point
     // but a new call to _read is scheduled anyway.
-
   }, 11)
-});
-var ws = stream.Writable({
+})
+const ws = stream.Writable({
   write: common.mustCall(function (data, enc, cb) {
-    setImmediate(cb);
+    setImmediate(cb)
   }, 41 * 10)
-});
-rs.pipe(ws);
-;
+})
+rs.pipe(ws)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

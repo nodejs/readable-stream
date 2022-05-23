@@ -1,58 +1,53 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var reader = new stream.Readable();
-var writer1 = new stream.Writable();
-var writer2 = new stream.Writable(); // 560000 is chosen here because it is larger than the (default) highWaterMark
+const reader = new stream.Readable()
+const writer1 = new stream.Writable()
+const writer2 = new stream.Writable() // 560000 is chosen here because it is larger than the (default) highWaterMark
 // and will cause `.write()` to return false
 // See: https://github.com/nodejs/node/issues/2323
 
-var buffer = bufferShim.allocUnsafe(560000);
+const buffer = Buffer.allocUnsafe(560000)
 
-reader._read = function () {};
+reader._read = () => {}
 
 writer1._write = common.mustCall(function (chunk, encoding, cb) {
-  this.emit('chunk-received');
-  cb();
-}, 1);
+  this.emit('chunk-received')
+  cb()
+}, 1)
 writer1.once('chunk-received', function () {
-  reader.unpipe(writer1);
-  reader.pipe(writer2);
-  reader.push(buffer);
+  reader.unpipe(writer1)
+  reader.pipe(writer2)
+  reader.push(buffer)
   setImmediate(function () {
-    reader.push(buffer);
+    reader.push(buffer)
     setImmediate(function () {
-      reader.push(buffer);
-    });
-  });
-});
+      reader.push(buffer)
+    })
+  })
+})
 writer2._write = common.mustCall(function (chunk, encoding, cb) {
-  cb();
-}, 3);
-reader.pipe(writer1);
-reader.push(buffer);
-;
+  cb()
+}, 3)
+reader.pipe(writer1)
+reader.push(buffer)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

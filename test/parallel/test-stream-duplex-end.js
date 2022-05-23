@@ -1,73 +1,60 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Duplex = require('../../').Duplex;
+const Duplex = require('../../lib/ours/index').Duplex
 
 {
-  var stream = new Duplex({
-    read: function read() {}
-  });
-  assert.strictEqual(stream.allowHalfOpen, true);
-  stream.on('finish', common.mustNotCall());
-  assert.strictEqual(stream.listenerCount('end'), 0);
-  stream.resume();
-  stream.push(null);
+  const stream = new Duplex({
+    read() {}
+  })
+  assert.strictEqual(stream.allowHalfOpen, true)
+  stream.on('finish', common.mustNotCall())
+  assert.strictEqual(stream.listenerCount('end'), 0)
+  stream.resume()
+  stream.push(null)
 }
 {
-  var _stream = new Duplex({
-    read: function read() {},
+  const stream = new Duplex({
+    read() {},
+
     allowHalfOpen: false
-  });
-
-  assert.strictEqual(_stream.allowHalfOpen, false);
-
-  _stream.on('finish', common.mustCall());
-
-  assert.strictEqual(_stream.listenerCount('end'), 1);
-
-  _stream.resume();
-
-  _stream.push(null);
+  })
+  assert.strictEqual(stream.allowHalfOpen, false)
+  stream.on('finish', common.mustCall())
+  assert.strictEqual(stream.listenerCount('end'), 0)
+  stream.resume()
+  stream.push(null)
 }
 {
-  var _stream2 = new Duplex({
-    read: function read() {},
+  const stream = new Duplex({
+    read() {},
+
     allowHalfOpen: false
-  });
-
-  assert.strictEqual(_stream2.allowHalfOpen, false);
-  _stream2._writableState.ended = true;
-
-  _stream2.on('finish', common.mustNotCall());
-
-  assert.strictEqual(_stream2.listenerCount('end'), 1);
-
-  _stream2.resume();
-
-  _stream2.push(null);
+  })
+  assert.strictEqual(stream.allowHalfOpen, false)
+  stream._writableState.ended = true
+  stream.on('finish', common.mustNotCall())
+  assert.strictEqual(stream.listenerCount('end'), 0)
+  stream.resume()
+  stream.push(null)
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

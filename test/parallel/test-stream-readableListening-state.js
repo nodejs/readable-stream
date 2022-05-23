@@ -1,51 +1,52 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var r = new stream.Readable({
-  read: function read() {}
-}); // readableListening state should start in `false`.
+const r = new stream.Readable({
+  read: () => {}
+}) // readableListening state should start in `false`.
 
-assert.strictEqual(r._readableState.readableListening, false);
-r.on('readable', common.mustCall(function () {
-  // Inside the readable event this state should be true.
-  assert.strictEqual(r._readableState.readableListening, true);
-}));
-r.push(bufferShim.from('Testing readableListening state'));
-var r2 = new stream.Readable({
-  read: function read() {}
-}); // readableListening state should start in `false`.
+assert.strictEqual(r._readableState.readableListening, false)
+r.on(
+  'readable',
+  common.mustCall(() => {
+    // Inside the readable event this state should be true.
+    assert.strictEqual(r._readableState.readableListening, true)
+  })
+)
+r.push(Buffer.from('Testing readableListening state'))
+const r2 = new stream.Readable({
+  read: () => {}
+}) // readableListening state should start in `false`.
 
-assert.strictEqual(r2._readableState.readableListening, false);
-r2.on('data', common.mustCall(function (chunk) {
-  // readableListening should be false because we don't have
-  // a `readable` listener
-  assert.strictEqual(r2._readableState.readableListening, false);
-}));
-r2.push(bufferShim.from('Testing readableListening state'));
-;
+assert.strictEqual(r2._readableState.readableListening, false)
+r2.on(
+  'data',
+  common.mustCall((chunk) => {
+    // readableListening should be false because we don't have
+    // a `readable` listener
+    assert.strictEqual(r2._readableState.readableListening, false)
+  })
+)
+r2.push(Buffer.from('Testing readableListening state'))
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

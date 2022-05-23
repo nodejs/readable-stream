@@ -1,15 +1,19 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
+
+const { inspect } = require('util')
 
 {
   // This test ensures that the stream implementation correctly handles values
@@ -17,81 +21,88 @@ var stream = require('../../');
   // rejects invalid values.
   // This number exceeds the range of 32 bit integer arithmetic but should still
   // be handled correctly.
-  var ovfl = Number.MAX_SAFE_INTEGER;
-  var readable = stream.Readable({
+  const ovfl = Number.MAX_SAFE_INTEGER
+  const readable = stream.Readable({
     highWaterMark: ovfl
-  });
-  assert.strictEqual(readable._readableState.highWaterMark, ovfl);
-  var writable = stream.Writable({
+  })
+  assert.strictEqual(readable._readableState.highWaterMark, ovfl)
+  const writable = stream.Writable({
     highWaterMark: ovfl
-  });
-  assert.strictEqual(writable._writableState.highWaterMark, ovfl);
+  })
+  assert.strictEqual(writable._writableState.highWaterMark, ovfl)
 
-  var _loop = function _loop() {
-    var invalidHwm = _arr[_i];
-
-    var _loop2 = function _loop2() {
-      var type = _arr2[_i2];
-      common.expectsError(function () {
-        type({
-          highWaterMark: invalidHwm
-        });
-      }, {
-        type: TypeError,
-        code: 'ERR_INVALID_OPT_VALUE',
-        message: "The value \"".concat(invalidHwm, "\" is invalid for option \"highWaterMark\"")
-      });
-    };
-
-    for (var _i2 = 0, _arr2 = [stream.Readable, stream.Writable]; _i2 < _arr2.length; _i2++) {
-      _loop2();
+  for (const invalidHwm of [true, false, '5', {}, -5, NaN]) {
+    for (const type of [stream.Readable, stream.Writable]) {
+      assert.throws(
+        () => {
+          type({
+            highWaterMark: invalidHwm
+          })
+        },
+        {
+          name: 'TypeError',
+          code: 'ERR_INVALID_ARG_VALUE',
+          message: "The property 'options.highWaterMark' is invalid. " + `Received ${inspect(invalidHwm)}`
+        }
+      )
     }
-  };
-
-  for (var _i = 0, _arr = [true, false, '5', {}, -5, NaN]; _i < _arr.length; _i++) {
-    _loop();
   }
 }
 {
   // This test ensures that the push method's implementation
   // correctly handles the edge case where the highWaterMark and
   // the state.length are both zero
-  var _readable = stream.Readable({
+  const readable = stream.Readable({
     highWaterMark: 0
-  });
+  })
 
-  for (var i = 0; i < 3; i++) {
-    var needMoreData = _readable.push();
-
-    assert.strictEqual(needMoreData, true);
+  for (let i = 0; i < 3; i++) {
+    const needMoreData = readable.push()
+    assert.strictEqual(needMoreData, true)
   }
 }
 {
   // This test ensures that the read(n) method's implementation
   // correctly handles the edge case where the highWaterMark, state.length
   // and n are all zero
-  var _readable2 = stream.Readable({
+  const readable = stream.Readable({
     highWaterMark: 0
-  });
-
-  _readable2._read = common.mustCall();
-
-  _readable2.read(0);
+  })
+  readable._read = common.mustCall()
+  readable.read(0)
 }
-;
+{
+  // Parse size as decimal integer
+  ;['1', '1.0', 1].forEach((size) => {
+    const readable = new stream.Readable({
+      read: common.mustCall(),
+      highWaterMark: 0
+    })
+    readable.read(size)
+    assert.strictEqual(readable._readableState.highWaterMark, Number(size))
+  })
+}
+{
+  // Test highwatermark limit
+  const hwm = 0x40000000 + 1
+  const readable = stream.Readable({
+    read() {}
+  })
+  assert.throws(
+    () => readable.read(hwm),
+    common.expectsError({
+      code: 'ERR_OUT_OF_RANGE',
+      message: 'The value of "size" is out of range.' + ' It must be <= 1GiB. Received ' + hwm
+    })
+  )
+}
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

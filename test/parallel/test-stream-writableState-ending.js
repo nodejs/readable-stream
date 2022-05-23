@@ -1,57 +1,52 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var writable = new stream.Writable();
+const writable = new stream.Writable()
 
 function testStates(ending, finished, ended) {
-  assert.strictEqual(writable._writableState.ending, ending);
-  assert.strictEqual(writable._writableState.finished, finished);
-  assert.strictEqual(writable._writableState.ended, ended);
+  assert.strictEqual(writable._writableState.ending, ending)
+  assert.strictEqual(writable._writableState.finished, finished)
+  assert.strictEqual(writable._writableState.ended, ended)
 }
 
-writable._write = function (chunk, encoding, cb) {
-  // ending, finished, ended start in false.
-  testStates(false, false, false);
-  cb();
-};
+writable._write = (chunk, encoding, cb) => {
+  // Ending, finished, ended start in false.
+  testStates(false, false, false)
+  cb()
+}
 
-writable.on('finish', function () {
-  // ending, finished, ended = true.
-  testStates(true, true, true);
-});
-var result = writable.end('testing function end()', function () {
-  // ending, finished, ended = true.
-  testStates(true, true, true);
-}); // end returns the writable instance
+writable.on('finish', () => {
+  // Ending, finished, ended = true.
+  testStates(true, true, true)
+})
+const result = writable.end('testing function end()', () => {
+  // Ending, finished, ended = true.
+  testStates(true, true, true)
+}) // End returns the writable instance
 
-assert.strictEqual(result, writable); // ending, ended = true.
+assert.strictEqual(result, writable) // Ending, ended = true.
 // finished = false.
 
-testStates(true, false, true);
-;
+testStates(true, false, true)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

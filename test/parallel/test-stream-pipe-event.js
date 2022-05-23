@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,57 +18,51 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
 function Writable() {
-  this.writable = true;
-
-  require('stream').Stream.call(this);
+  this.writable = true
+  stream.Stream.call(this)
 }
 
-Object.setPrototypeOf(Writable.prototype, require('stream').Stream.prototype);
-Object.setPrototypeOf(Writable, require('stream').Stream);
+Object.setPrototypeOf(Writable.prototype, stream.Stream.prototype)
+Object.setPrototypeOf(Writable, stream.Stream)
 
 function Readable() {
-  this.readable = true;
-
-  require('stream').Stream.call(this);
+  this.readable = true
+  stream.Stream.call(this)
 }
 
-Object.setPrototypeOf(Readable.prototype, require('stream').Stream.prototype);
-Object.setPrototypeOf(Readable, require('stream').Stream);
-var passed = false;
-var w = new Writable();
+Object.setPrototypeOf(Readable.prototype, stream.Stream.prototype)
+Object.setPrototypeOf(Readable, stream.Stream)
+let passed = false
+const w = new Writable()
 w.on('pipe', function (src) {
-  passed = true;
-});
-var r = new Readable();
-r.pipe(w);
-assert.ok(passed);
-;
+  passed = true
+})
+const r = new Readable()
+r.pipe(w)
+assert.ok(passed)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

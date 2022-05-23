@@ -1,74 +1,78 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Writable = _require.Writable;
+const { Writable } = require('../../lib/ours/index')
 
 {
   // Sync + Sync
-  var writable = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
-      cb();
-      common.expectsError(cb, {
-        code: 'ERR_MULTIPLE_CALLBACK',
-        type: Error
-      });
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
+      cb()
+      cb()
     })
-  });
-  writable.write('hi');
+  })
+  writable.write('hi')
+  writable.on(
+    'error',
+    common.expectsError({
+      code: 'ERR_MULTIPLE_CALLBACK',
+      name: 'Error'
+    })
+  )
 }
 {
   // Sync + Async
-  var _writable = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
-      cb();
-      process.nextTick(function () {
-        common.expectsError(cb, {
-          code: 'ERR_MULTIPLE_CALLBACK',
-          type: Error
-        });
-      });
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
+      cb()
+      process.nextTick(() => {
+        cb()
+      })
     })
-  });
-
-  _writable.write('hi');
+  })
+  writable.write('hi')
+  writable.on(
+    'error',
+    common.expectsError({
+      code: 'ERR_MULTIPLE_CALLBACK',
+      name: 'Error'
+    })
+  )
 }
 {
   // Async + Async
-  var _writable2 = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
-      process.nextTick(cb);
-      process.nextTick(function () {
-        common.expectsError(cb, {
-          code: 'ERR_MULTIPLE_CALLBACK',
-          type: Error
-        });
-      });
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
+      process.nextTick(cb)
+      process.nextTick(() => {
+        cb()
+      })
     })
-  });
-
-  _writable2.write('hi');
+  })
+  writable.write('hi')
+  writable.on(
+    'error',
+    common.expectsError({
+      code: 'ERR_MULTIPLE_CALLBACK',
+      name: 'Error'
+    })
+  )
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

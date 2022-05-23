@@ -1,36 +1,34 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
+const { Readable } = require('../../lib/ours/index')
 
-var readable = new Readable();
-readable.on('error', common.expectsError({
-  code: 'ERR_METHOD_NOT_IMPLEMENTED',
-  type: Error,
-  message: 'The _read() method is not implemented'
-}));
-readable.read();
-;
+const readable = new Readable()
+readable.read()
+readable.on(
+  'error',
+  common.expectsError({
+    code: 'ERR_METHOD_NOT_IMPLEMENTED',
+    name: 'Error',
+    message: 'The _read() method is not implemented'
+  })
+)
+readable.on('close', common.mustCall())
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

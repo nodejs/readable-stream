@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,117 +18,123 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Stream = require('stream').Stream;
+const { Stream, PassThrough } = require('../../lib/ours/index')
 
 {
-  var source = new Stream();
-  var dest = new Stream();
-  source.pipe(dest);
-  var gotErr = null;
+  const source = new Stream()
+  const dest = new Stream()
+  source.pipe(dest)
+  let gotErr = null
   source.on('error', function (err) {
-    gotErr = err;
-  });
-  var err = new Error('This stream turned into bacon.');
-  source.emit('error', err);
-  assert.strictEqual(gotErr, err);
+    gotErr = err
+  })
+  const err = new Error('This stream turned into bacon.')
+  source.emit('error', err)
+  assert.strictEqual(gotErr, err)
 }
 {
-  var _source = new Stream();
-
-  var _dest = new Stream();
-
-  _source.pipe(_dest);
-
-  var _err = new Error('This stream turned into bacon.');
-
-  var _gotErr = null;
+  const source = new Stream()
+  const dest = new Stream()
+  source.pipe(dest)
+  const err = new Error('This stream turned into bacon.')
+  let gotErr = null
 
   try {
-    _source.emit('error', _err);
+    source.emit('error', err)
   } catch (e) {
-    _gotErr = e;
+    gotErr = e
   }
 
-  assert.strictEqual(_gotErr, _err);
+  assert.strictEqual(gotErr, err)
 }
 {
-  var R = require('../../').Readable;
-
-  var W = require('../../').Writable;
-
-  var r = new R();
-  var w = new W();
-  var removed = false;
+  const R = Stream.Readable
+  const W = Stream.Writable
+  const r = new R({
+    autoDestroy: false
+  })
+  const w = new W({
+    autoDestroy: false
+  })
+  let removed = false
   r._read = common.mustCall(function () {
-    setTimeout(common.mustCall(function () {
-      assert(removed);
-      assert.throws(function () {
-        w.emit('error', new Error('fail'));
-      }, /^Error: fail$/);
-    }), 1);
-  });
-  w.on('error', myOnError);
-  r.pipe(w);
-  w.removeListener('error', myOnError);
-  removed = true;
+    setTimeout(
+      common.mustCall(function () {
+        assert(removed)
+        assert.throws(function () {
+          w.emit('error', new Error('fail'))
+        }, /^Error: fail$/)
+      }),
+      1
+    )
+  })
+  w.on('error', myOnError)
+  r.pipe(w)
+  w.removeListener('error', myOnError)
+  removed = true
 
   function myOnError() {
-    throw new Error('this should not happen');
+    throw new Error('this should not happen')
   }
 }
 {
-  var _R = require('../../').Readable;
+  const R = Stream.Readable
+  const W = Stream.Writable
+  const r = new R()
+  const w = new W()
+  let removed = false
+  r._read = common.mustCall(function () {
+    setTimeout(
+      common.mustCall(function () {
+        assert(removed)
+        w.emit('error', new Error('fail'))
+      }),
+      1
+    )
+  })
+  w.on('error', common.mustCall())
 
-  var _W = require('../../').Writable;
+  w._write = () => {}
 
-  var _r = new _R();
+  r.pipe(w) // Removing some OTHER random listener should not do anything
 
-  var _w = new _W();
-
-  var _removed = false;
-  _r._read = common.mustCall(function () {
-    setTimeout(common.mustCall(function () {
-      assert(_removed);
-
-      _w.emit('error', new Error('fail'));
-    }), 1);
-  });
-
-  _w.on('error', common.mustCall());
-
-  _w._write = function () {};
-
-  _r.pipe(_w); // Removing some OTHER random listener should not do anything
-
-
-  _w.removeListener('error', function () {});
-
-  _removed = true;
+  w.removeListener('error', () => {})
+  removed = true
 }
-;
+{
+  const _err = new Error('this should be handled')
 
-(function () {
-  var t = require('tap');
+  const destination = new PassThrough()
+  destination.once(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  const stream = new Stream()
+  stream.pipe(destination)
+  destination.destroy(_err)
+}
+/* replacement start */
 
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

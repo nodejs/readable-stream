@@ -1,286 +1,581 @@
-"use strict";
+/* replacement start */
+const AbortController = globalThis.AbortController || require('abort-controller').AbortController
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
 
+const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
 
-var common = require('../common');
+if (typeof AbortSignal.abort !== 'function') {
+  AbortSignal.abort = function () {
+    const controller = new AbortController()
+    controller.abort()
+    return controller.signal
+  }
+}
+/* replacement end */
 
-var _require = require('../../'),
-    Writable = _require.Writable;
+;('use strict')
 
-var assert = require('assert/');
+const tap = require('tap')
+
+const silentConsole = {
+  log() {},
+
+  error() {}
+}
+const common = require('../common')
+
+const { Writable, addAbortSignal } = require('../../lib/ours/index')
+
+const assert = require('assert')
 
 {
-  var write = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-  write.on('finish', common.mustNotCall());
-  write.on('close', common.mustCall());
-  write.destroy();
-  assert.strictEqual(write.destroyed, true);
+  })
+  write.on('finish', common.mustNotCall())
+  write.on('close', common.mustCall())
+  write.destroy()
+  assert.strictEqual(write.destroyed, true)
 }
 {
-  var _write = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      this.destroy(new Error('asd'))
+      cb()
     }
-  });
-
-  var expected = new Error('kaboom');
-
-  _write.on('finish', common.mustNotCall());
-
-  _write.on('close', common.mustCall());
-
-  _write.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, expected);
-  }));
-
-  _write.destroy(expected);
-
-  assert.strictEqual(_write.destroyed, true);
+  })
+  write.on('error', common.mustCall())
+  write.on('finish', common.mustNotCall())
+  write.end('asd')
+  assert.strictEqual(write.destroyed, true)
 }
 {
-  var _write2 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-
-  _write2._destroy = function (err, cb) {
-    assert.strictEqual(err, _expected);
-    cb(err);
-  };
-
-  var _expected = new Error('kaboom');
-
-  _write2.on('finish', common.mustNotCall('no finish event'));
-
-  _write2.on('close', common.mustCall());
-
-  _write2.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected);
-  }));
-
-  _write2.destroy(_expected);
-
-  assert.strictEqual(_write2.destroyed, true);
-}
-{
-  var _write3 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
-    },
-    destroy: common.mustCall(function (err, cb) {
-      assert.strictEqual(err, _expected2);
-      cb();
+  })
+  const expected = new Error('kaboom')
+  write.on('finish', common.mustNotCall())
+  write.on('close', common.mustCall())
+  write.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, expected)
     })
-  });
-
-  var _expected2 = new Error('kaboom');
-
-  _write3.on('finish', common.mustNotCall('no finish event'));
-
-  _write3.on('close', common.mustCall()); // error is swallowed by the custom _destroy
-
-
-  _write3.on('error', common.mustNotCall('no error event'));
-
-  _write3.destroy(_expected2);
-
-  assert.strictEqual(_write3.destroyed, true);
+  )
+  write.destroy(expected)
+  assert.strictEqual(write.destroyed, true)
 }
 {
-  var _write4 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
+  })
 
-  _write4._destroy = common.mustCall(function (err, cb) {
-    assert.strictEqual(err, null);
-    cb();
-  });
+  write._destroy = function (err, cb) {
+    assert.strictEqual(err, expected)
+    cb(err)
+  }
 
-  _write4.destroy();
-
-  assert.strictEqual(_write4.destroyed, true);
+  const expected = new Error('kaboom')
+  write.on('finish', common.mustNotCall('no finish event'))
+  write.on('close', common.mustCall())
+  write.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, expected)
+    })
+  )
+  write.destroy(expected)
+  assert.strictEqual(write.destroyed, true)
 }
 {
-  var _write5 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
-    }
-  });
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    },
 
-  _write5._destroy = common.mustCall(function (err, cb) {
-    var _this = this;
+    destroy: common.mustCall(function (err, cb) {
+      assert.strictEqual(err, expected)
+      cb()
+    })
+  })
+  const expected = new Error('kaboom')
+  write.on('finish', common.mustNotCall('no finish event'))
+  write.on('close', common.mustCall()) // Error is swallowed by the custom _destroy
 
-    assert.strictEqual(err, null);
-    process.nextTick(function () {
-      _this.end();
-
-      cb();
-    });
-  });
-  var fail = common.mustNotCall('no finish event');
-
-  _write5.on('finish', fail);
-
-  _write5.on('close', common.mustCall());
-
-  _write5.destroy();
-
-  _write5.removeListener('finish', fail);
-
-  _write5.on('finish', common.mustCall());
-
-  assert.strictEqual(_write5.destroyed, true);
+  write.on('error', common.mustNotCall('no error event'))
+  write.destroy(expected)
+  assert.strictEqual(write.destroyed, true)
 }
 {
-  var _write6 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-
-  var _expected3 = new Error('kaboom');
-
-  _write6._destroy = common.mustCall(function (err, cb) {
-    assert.strictEqual(err, null);
-    cb(_expected3);
-  });
-
-  _write6.on('close', common.mustCall());
-
-  _write6.on('finish', common.mustNotCall('no finish event'));
-
-  _write6.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected3);
-  }));
-
-  _write6.destroy();
-
-  assert.strictEqual(_write6.destroyed, true);
+  })
+  write._destroy = common.mustCall(function (err, cb) {
+    assert.strictEqual(err, null)
+    cb()
+  })
+  write.destroy()
+  assert.strictEqual(write.destroyed, true)
+}
+{
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write._destroy = common.mustCall(function (err, cb) {
+    assert.strictEqual(err, null)
+    process.nextTick(() => {
+      this.end()
+      cb()
+    })
+  })
+  const fail = common.mustNotCall('no finish event')
+  write.on('finish', fail)
+  write.on('close', common.mustCall())
+  write.destroy()
+  assert.strictEqual(write.destroyed, true)
+}
+{
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  const expected = new Error('kaboom')
+  write._destroy = common.mustCall(function (err, cb) {
+    assert.strictEqual(err, null)
+    cb(expected)
+  })
+  write.on('close', common.mustCall())
+  write.on('finish', common.mustNotCall('no finish event'))
+  write.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, expected)
+    })
+  )
+  write.destroy()
+  assert.strictEqual(write.destroyed, true)
 }
 {
   // double error case
-  var _write7 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-
-  _write7.on('close', common.mustCall());
-
-  _write7.on('error', common.mustCall());
-
-  _write7.destroy(new Error('kaboom 1'));
-
-  _write7.destroy(new Error('kaboom 2'));
-
-  assert.strictEqual(_write7._writableState.errorEmitted, true);
-  assert.strictEqual(_write7.destroyed, true);
+  })
+  let ticked = false
+  write.on(
+    'close',
+    common.mustCall(() => {
+      assert.strictEqual(ticked, true)
+    })
+  )
+  write.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(ticked, true)
+      assert.strictEqual(err.message, 'kaboom 1')
+      assert.strictEqual(write._writableState.errorEmitted, true)
+    })
+  )
+  const expected = new Error('kaboom 1')
+  write.destroy(expected)
+  write.destroy(new Error('kaboom 2'))
+  assert.strictEqual(write._writableState.errored, expected)
+  assert.strictEqual(write._writableState.errorEmitted, false)
+  assert.strictEqual(write.destroyed, true)
+  ticked = true
 }
 {
-  var writable = new Writable({
+  const writable = new Writable({
     destroy: common.mustCall(function (err, cb) {
-      process.nextTick(cb, new Error('kaboom 1'));
+      process.nextTick(cb, new Error('kaboom 1'))
     }),
-    write: function write(chunk, enc, cb) {
-      cb();
+
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-  writable.on('close', common.mustCall());
-  writable.on('error', common.expectsError({
-    type: Error,
-    message: 'kaboom 2'
-  }));
-  writable.destroy();
-  assert.strictEqual(writable.destroyed, true);
-  assert.strictEqual(writable._writableState.errorEmitted, false); // Test case where `writable.destroy()` is called again with an error before
+  })
+  let ticked = false
+  writable.on(
+    'close',
+    common.mustCall(() => {
+      writable.on('error', common.mustNotCall())
+      writable.destroy(new Error('hello'))
+      assert.strictEqual(ticked, true)
+      assert.strictEqual(writable._writableState.errorEmitted, true)
+    })
+  )
+  writable.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(ticked, true)
+      assert.strictEqual(err.message, 'kaboom 1')
+      assert.strictEqual(writable._writableState.errorEmitted, true)
+    })
+  )
+  writable.destroy()
+  assert.strictEqual(writable.destroyed, true)
+  assert.strictEqual(writable._writableState.errored, null)
+  assert.strictEqual(writable._writableState.errorEmitted, false) // Test case where `writable.destroy()` is called again with an error before
   // the `_destroy()` callback is called.
 
-  writable.destroy(new Error('kaboom 2'));
-  assert.strictEqual(writable._writableState.errorEmitted, true);
+  writable.destroy(new Error('kaboom 2'))
+  assert.strictEqual(writable._writableState.errorEmitted, false)
+  assert.strictEqual(writable._writableState.errored, null)
+  ticked = true
 }
 {
-  var _write8 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
+  })
+  write.destroyed = true
+  assert.strictEqual(write.destroyed, true) // The internal destroy() mechanism should not be triggered
 
-  _write8.destroyed = true;
-  assert.strictEqual(_write8.destroyed, true); // the internal destroy() mechanism should not be triggered
-
-  _write8.on('close', common.mustNotCall());
-
-  _write8.destroy();
+  write.on('close', common.mustNotCall())
+  write.destroy()
 }
 {
   function MyWritable() {
-    assert.strictEqual(this.destroyed, false);
-    this.destroyed = false;
-    Writable.call(this);
+    assert.strictEqual(this.destroyed, false)
+    this.destroyed = false
+    Writable.call(this)
   }
 
-  Object.setPrototypeOf(MyWritable.prototype, Writable.prototype);
-  Object.setPrototypeOf(MyWritable, Writable);
-  new MyWritable();
+  Object.setPrototypeOf(MyWritable.prototype, Writable.prototype)
+  Object.setPrototypeOf(MyWritable, Writable)
+  new MyWritable()
 }
 {
-  // destroy and destroy callback
-  var _write9 = new Writable({
-    write: function write(chunk, enc, cb) {
-      cb();
+  // Destroy and destroy callback
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
     }
-  });
-
-  _write9.destroy();
-
-  var _expected4 = new Error('kaboom');
-
-  _write9.destroy(_expected4, common.mustCall(function (err) {
-    assert.strictEqual(err, _expected4);
-  }));
+  })
+  write.destroy()
+  const expected = new Error('kaboom')
+  write.destroy(
+    expected,
+    common.mustCall((err) => {
+      assert.strictEqual(err, undefined)
+    })
+  )
 }
 {
   // Checks that `._undestroy()` restores the state so that `final` will be
   // called again.
-  var _write10 = new Writable({
+  const write = new Writable({
     write: common.mustNotCall(),
-    final: common.mustCall(function (cb) {
-      return cb();
-    }, 2)
-  });
+    final: common.mustCall((cb) => cb(), 2),
+    autoDestroy: true
+  })
+  write.end()
+  write.once(
+    'close',
+    common.mustCall(() => {
+      write._undestroy()
 
-  _write10.end();
-
-  _write10.destroy();
-
-  _write10._undestroy();
-
-  _write10.end();
+      write.end()
+    })
+  )
 }
-;
+{
+  const write = new Writable()
+  write.destroy()
+  write.on('error', common.mustNotCall())
+  write.write(
+    'asd',
+    common.expectsError({
+      name: 'Error',
+      code: 'ERR_STREAM_DESTROYED',
+      message: 'Cannot call write after a stream was destroyed'
+    })
+  )
+}
+{
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write.on('error', common.mustNotCall())
+  write.cork()
+  write.write('asd', common.mustCall())
+  write.uncork()
+  write.cork()
+  write.write(
+    'asd',
+    common.expectsError({
+      name: 'Error',
+      code: 'ERR_STREAM_DESTROYED',
+      message: 'Cannot call write after a stream was destroyed'
+    })
+  )
+  write.destroy()
+  write.write(
+    'asd',
+    common.expectsError({
+      name: 'Error',
+      code: 'ERR_STREAM_DESTROYED',
+      message: 'Cannot call write after a stream was destroyed'
+    })
+  )
+  write.uncork()
+}
+{
+  // Call end(cb) after error & destroy
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb(new Error('asd'))
+    }
+  })
+  write.on(
+    'error',
+    common.mustCall(() => {
+      write.destroy()
+      let ticked = false
+      write.end(
+        common.mustCall((err) => {
+          assert.strictEqual(ticked, true)
+          assert.strictEqual(err.code, 'ERR_STREAM_DESTROYED')
+        })
+      )
+      ticked = true
+    })
+  )
+  write.write('asd')
+}
+{
+  // Call end(cb) after finish & destroy
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write.on(
+    'finish',
+    common.mustCall(() => {
+      write.destroy()
+      let ticked = false
+      write.end(
+        common.mustCall((err) => {
+          assert.strictEqual(ticked, true)
+          assert.strictEqual(err.code, 'ERR_STREAM_ALREADY_FINISHED')
+        })
+      )
+      ticked = true
+    })
+  )
+  write.end()
+}
+{
+  // Call end(cb) after error & destroy and don't trigger
+  // unhandled exception.
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      process.nextTick(cb)
+    }
+  })
 
-(function () {
-  var t = require('tap');
+  const _err = new Error('asd')
 
-  t.pass('sync run');
-})();
+  write.once(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err.message, 'asd')
+    })
+  )
+  write.end(
+    'asd',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  write.destroy(_err)
+}
+{
+  // Call buffered write callback with error
+  const _err = new Error('asd')
 
-var _list = process.listeners('uncaughtException');
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      process.nextTick(cb, _err)
+    },
 
-process.removeAllListeners('uncaughtException');
+    autoDestroy: false
+  })
+  write.cork()
+  write.write(
+    'asd',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  write.write(
+    'asd',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  write.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  write.uncork()
+}
+{
+  // Ensure callback order.
+  let state = 0
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      // `setImmediate()` is used on purpose to ensure the callback is called
+      // after `process.nextTick()` callbacks.
+      setImmediate(cb)
+    }
+  })
+  write.write(
+    'asd',
+    common.mustCall(() => {
+      assert.strictEqual(state++, 0)
+    })
+  )
+  write.write(
+    'asd',
+    common.mustCall((err) => {
+      assert.strictEqual(err.code, 'ERR_STREAM_DESTROYED')
+      assert.strictEqual(state++, 1)
+    })
+  )
+  write.destroy()
+}
+{
+  const write = new Writable({
+    autoDestroy: false,
 
-_list.pop();
+    write(chunk, enc, cb) {
+      cb()
+      cb()
+    }
+  })
+  write.on(
+    'error',
+    common.mustCall(() => {
+      assert(write._writableState.errored)
+    })
+  )
+  write.write('asd')
+}
+{
+  const ac = new AbortController()
+  const write = addAbortSignal(
+    ac.signal,
+    new Writable({
+      write(chunk, enc, cb) {
+        cb()
+      }
+    })
+  )
+  write.on(
+    'error',
+    common.mustCall((e) => {
+      assert.strictEqual(e.name, 'AbortError')
+      assert.strictEqual(write.destroyed, true)
+    })
+  )
+  write.write('asd')
+  ac.abort()
+}
+{
+  const ac = new AbortController()
+  const write = new Writable({
+    signal: ac.signal,
 
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write.on(
+    'error',
+    common.mustCall((e) => {
+      assert.strictEqual(e.name, 'AbortError')
+      assert.strictEqual(write.destroyed, true)
+    })
+  )
+  write.write('asd')
+  ac.abort()
+}
+{
+  const signal = AbortSignal.abort()
+  const write = new Writable({
+    signal,
+
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write.on(
+    'error',
+    common.mustCall((e) => {
+      assert.strictEqual(e.name, 'AbortError')
+      assert.strictEqual(write.destroyed, true)
+    })
+  )
+}
+{
+  // Destroy twice
+  const write = new Writable({
+    write(chunk, enc, cb) {
+      cb()
+    }
+  })
+  write.end(common.mustCall())
+  write.destroy()
+  write.destroy()
+}
+{
+  // https://github.com/nodejs/node/issues/39356
+  const s = new Writable({
+    final() {}
+  })
+
+  const _err = new Error('oh no') // Remove `callback` and it works
+
+  s.end(
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  s.on(
+    'error',
+    common.mustCall((err) => {
+      assert.strictEqual(err, _err)
+    })
+  )
+  s.destroy(_err)
+}
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

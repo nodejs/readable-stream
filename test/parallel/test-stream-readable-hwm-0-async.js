@@ -1,44 +1,40 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common'); // This test ensures that Readable stream will continue to call _read
+  error() {}
+}
+const common = require('../common') // This test ensures that Readable stream will continue to call _read
 // for streams with highWaterMark === 0 once the stream returns data
 // by calling push() asynchronously.
 
+const { Readable } = require('../../lib/ours/index')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
-
-var count = 5;
-var r = new Readable({
+let count = 5
+const r = new Readable({
   // Called 6 times: First 5 return data, last one signals end of stream.
-  read: common.mustCall(function () {
-    process.nextTick(common.mustCall(function () {
-      if (count--) r.push('a');else r.push(null);
-    }));
+  read: common.mustCall(() => {
+    process.nextTick(
+      common.mustCall(() => {
+        if (count--) r.push('a')
+        else r.push(null)
+      })
+    )
   }, 6),
   highWaterMark: 0
-});
-r.on('end', common.mustCall());
-r.on('data', common.mustCall(5));
-;
+})
+r.on('end', common.mustCall())
+r.on('data', common.mustCall(5))
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

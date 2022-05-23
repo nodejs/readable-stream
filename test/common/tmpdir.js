@@ -1,101 +1,61 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-require('@babel/polyfill');
+const fs = require('fs')
 
-var util = require('util');
+const path = require('path')
 
-for (var i in util) {
-  exports[i] = util[i];
-}
-/*</replacement>*/
+const { isMainThread } = require('worker_threads')
 
-/* eslint-disable node-core/required-modules */
-
-
-'use strict';
-/*<replacement>*/
-
-
-var objectKeys = objectKeys || function (obj) {
-  var keys = [];
-
-  for (var key in obj) {
-    keys.push(key);
-  }
-
-  return keys;
-};
-/*</replacement>*/
-
-
-var fs = require('fs');
-
-var path = require('path');
-
-function rimrafSync(p) {
-  var st;
-
-  try {
-    st = fs.lstatSync(p);
-  } catch (e) {
-    if (e.code === 'ENOENT') return;
-  }
-
-  try {
-    if (st && st.isDirectory()) rmdirSync(p, null);else fs.unlinkSync(p);
-  } catch (e) {
-    if (e.code === 'ENOENT') return;
-    if (e.code === 'EPERM') return rmdirSync(p, e);
-    if (e.code !== 'EISDIR') throw e;
-    rmdirSync(p, e);
-  }
+function rmSync(pathname) {
+  fs.rmSync(pathname, {
+    maxRetries: 3,
+    recursive: true,
+    force: true
+  })
 }
 
-function rmdirSync(p, originalEr) {
-  try {
-    fs.rmdirSync(p);
-  } catch (e) {
-    if (e.code === 'ENOTDIR') throw originalEr;
-
-    if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
-      var enc = process.platform === 'linux' ? 'buffer' : 'utf8';
-      forEach(fs.readdirSync(p, enc), function (f) {
-        if (f instanceof Buffer) {
-          var buf = Buffer.concat([Buffer.from(p), Buffer.from(path.sep), f]);
-          rimrafSync(buf);
-        } else {
-          rimrafSync(path.join(p, f));
-        }
-      });
-      fs.rmdirSync(p);
-    }
-  }
-}
-
-var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..'); // Using a `.` prefixed name, which is the convention for "hidden" on POSIX,
+const testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..') // Using a `.` prefixed name, which is the convention for "hidden" on POSIX,
 // gets tools to ignore it by default or by simple rules, especially eslint.
 
-var tmpdirName = '.tmp';
-
-if (process.env.TEST_THREAD_ID) {
-  tmpdirName += ".".concat(process.env.TEST_THREAD_ID);
-}
-
-var tmpPath = path.join(testRoot, tmpdirName);
+const tmpdirName = '.tmp.' + (process.env.TEST_SERIAL_ID || process.env.TEST_THREAD_ID || '0')
+const tmpPath = path.join(testRoot, tmpdirName)
+let firstRefresh = true
 
 function refresh() {
-  rimrafSync(this.path);
-  fs.mkdirSync(this.path);
+  rmSync(this.path)
+  fs.mkdirSync(this.path)
+
+  if (firstRefresh) {
+    firstRefresh = false // Clean only when a test uses refresh. This allows for child processes to
+    // use the tmpdir and only the parent will clean on exit.
+
+    process.on('exit', onexit)
+  }
+}
+
+function onexit() {
+  // Change directory to avoid possible EBUSY
+  if (isMainThread) process.chdir(testRoot)
+
+  try {
+    rmSync(tmpPath)
+  } catch (e) {
+    console.error("Can't clean tmpdir:", tmpPath)
+    const files = fs.readdirSync(tmpPath)
+    console.error('Files blocking:', files)
+
+    if (files.some((f) => f.startsWith('.nfs'))) {
+      // Warn about NFS "silly rename"
+      console.error('Note: ".nfs*" might be files that were open and ' + 'unlinked but not closed.')
+      console.error('See http://nfs.sourceforge.net/#faq_d2 for details.')
+    }
+
+    console.error()
+    throw e
+  }
 }
 
 module.exports = {
   path: tmpPath,
-  refresh: refresh
-};
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
+  refresh
 }

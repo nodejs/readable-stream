@@ -1,35 +1,40 @@
-'use strict';
-var common = require('../common');
+'use strict'
 
-var Duplex = require('../../').Transform;
+const { Duplex } = require('../../lib/ours/index')
 
-var stream = new Duplex({ objectMode: true });
+const { kReadableStreamSuiteName } = require('./symbols')
+
 module.exports = function (t) {
-  t.test('duplex', function (t) {
-    t.plan(4);
-    t.ok(stream._readableState.objectMode);
-    t.ok(stream._writableState.objectMode);
+  t.plan(4)
+  const stream = new Duplex({
+    objectMode: true
+  })
+  t.ok(stream._readableState.objectMode)
+  t.ok(stream._writableState.objectMode)
+  let written
+  let read
 
-    var written;
-    var read;
+  stream._write = function (obj, _, cb) {
+    written = obj
+    cb()
+  }
 
-    stream._write = function(obj, _, cb) {
-      written = obj;
-      cb();
-    };
+  stream._read = function () {}
 
-    stream._read = function() {};
-
-    stream.on('data', function(obj) {
-      read = obj;
-    });
-
-    stream.push({ val: 1 });
-    stream.end({ val: 2 });
-
-    stream.on('end', function() {
-      t.equal(read.val, 1);
-      t.equal(written.val, 2);
-    });
-  });
+  stream.on('data', function (obj) {
+    read = obj
+  })
+  stream.on('end', function () {
+    t.equal(read.val, 1)
+    t.equal(written.val, 2)
+  })
+  stream.push({
+    val: 1
+  })
+  stream.end({
+    val: 2
+  })
+  stream.push(null)
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-duplex'

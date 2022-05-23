@@ -1,62 +1,51 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
 function test(throwCodeInbetween) {
   // Check that a pipe does not stall if .read() is called unexpectedly
   // (i.e. the stream is not resumed by the pipe).
-  var n = 1000;
-  var counter = n;
-  var rs = stream.Readable({
+  const n = 1000
+  let counter = n
+  const rs = stream.Readable({
     objectMode: true,
-    read: common.mustCallAtLeast(function () {
-      if (--counter >= 0) rs.push({
-        counter: counter
-      });else rs.push(null);
+    read: common.mustCallAtLeast(() => {
+      if (--counter >= 0)
+        rs.push({
+          counter
+        })
+      else rs.push(null)
     }, n)
-  });
-  var ws = stream.Writable({
+  })
+  const ws = stream.Writable({
     objectMode: true,
-    write: common.mustCall(function (data, enc, cb) {
-      setImmediate(cb);
+    write: common.mustCall((data, enc, cb) => {
+      setImmediate(cb)
     }, n)
-  });
-  setImmediate(function () {
-    return throwCodeInbetween(rs, ws);
-  });
-  rs.pipe(ws);
+  })
+  setImmediate(() => throwCodeInbetween(rs, ws))
+  rs.pipe(ws)
 }
 
-test(function (rs) {
-  return rs.read();
-});
-test(function (rs) {
-  return rs.resume();
-});
-test(function () {
-  return 0;
-});
-;
+test((rs) => rs.read())
+test((rs) => rs.resume())
+test(() => 0)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

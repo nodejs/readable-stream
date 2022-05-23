@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,67 +18,56 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Stream = require('../../');
+const Stream = require('../../lib/ours/index')
 
-var Readable = require('../../').Readable;
-
-var r = new Readable();
-var N = 256;
-var reads = 0;
+const Readable = Stream.Readable
+const r = new Readable()
+const N = 256
+let reads = 0
 
 r._read = function (n) {
-  return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
-};
-
-r.on('end', common.mustCall());
-var w = new Stream();
-w.writable = true;
-var buffered = 0;
-
-w.write = function (c) {
-  buffered += c.length;
-  process.nextTick(drain);
-  return false;
-};
-
-function drain() {
-  assert(buffered <= 3);
-  buffered = 0;
-  w.emit('drain');
+  return r.push(++reads === N ? null : Buffer.allocUnsafe(1))
 }
 
-w.end = common.mustCall(); // Just for kicks, let's mess with the drain count.
-// This verifies that even if it gets negative in the
-// pipe() cleanup function, we'll still function properly.
+r.on('end', common.mustCall())
+const w = new Stream()
+w.writable = true
+let buffered = 0
 
-r.on('readable', function () {
-  w.emit('drain');
-});
-r.pipe(w);
-;
+w.write = function (c) {
+  buffered += c.length
+  process.nextTick(drain)
+  return false
+}
 
-(function () {
-  var t = require('tap');
+function drain() {
+  assert(buffered <= 3)
+  buffered = 0
+  w.emit('drain')
+}
 
-  t.pass('sync run');
-})();
+w.end = common.mustCall()
+r.pipe(w)
+/* replacement start */
 
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

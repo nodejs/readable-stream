@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,79 +18,70 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/'); // If everything aligns so that you do a read(n) of exactly the
+const assert = require('assert') // If everything aligns so that you do a read(n) of exactly the
 // remaining buffer, then make sure that 'end' still emits.
 
+const READSIZE = 100
+const PUSHSIZE = 20
+const PUSHCOUNT = 1000
+const HWM = 50
 
-var READSIZE = 100;
-var PUSHSIZE = 20;
-var PUSHCOUNT = 1000;
-var HWM = 50;
+const Readable = require('../../lib/ours/index').Readable
 
-var Readable = require('../../').Readable;
-
-var r = new Readable({
+const r = new Readable({
   highWaterMark: HWM
-});
-var rs = r._readableState;
-r._read = push;
+})
+const rs = r._readableState
+r._read = push
 r.on('readable', function () {
-  ;
-  false && console.error('>> readable');
-  var ret;
+  silentConsole.error('>> readable')
+  let ret
 
   do {
-    ;
-    false && console.error("  > read(".concat(READSIZE, ")"));
-    ret = r.read(READSIZE);
-    ;
-    false && console.error("  < ".concat(ret && ret.length, " (").concat(rs.length, " remain)"));
-  } while (ret && ret.length === READSIZE);
+    silentConsole.error(`  > read(${READSIZE})`)
+    ret = r.read(READSIZE)
+    silentConsole.error(`  < ${ret && ret.length} (${rs.length} remain)`)
+  } while (ret && ret.length === READSIZE)
 
-  ;
-  false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
-});
-r.on('end', common.mustCall(function () {
-  assert.strictEqual(pushes, PUSHCOUNT + 1);
-}));
-var pushes = 0;
+  silentConsole.error('<< after read()', ret && ret.length, rs.needReadable, rs.length)
+})
+r.on(
+  'end',
+  common.mustCall(function () {
+    assert.strictEqual(pushes, PUSHCOUNT + 1)
+  })
+)
+let pushes = 0
 
 function push() {
-  if (pushes > PUSHCOUNT) return;
+  if (pushes > PUSHCOUNT) return
 
   if (pushes++ === PUSHCOUNT) {
-    ;
-    false && console.error('   push(EOF)');
-    return r.push(null);
+    silentConsole.error('   push(EOF)')
+    return r.push(null)
   }
 
-  ;
-  false && console.error("   push #".concat(pushes));
-  if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
+  silentConsole.error(`   push #${pushes}`)
+  if (r.push(Buffer.allocUnsafe(PUSHSIZE))) setTimeout(push, 1)
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

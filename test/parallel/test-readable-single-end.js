@@ -1,37 +1,30 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable; // This test ensures that there will not be an additional empty 'readable'
+const { Readable } = require('../../lib/ours/index') // This test ensures that there will not be an additional empty 'readable'
 // event when stream has ended (only 1 event signalling about end)
 
+const r = new Readable({
+  read: () => {}
+})
+r.push(null)
+r.on('readable', common.mustCall())
+r.on('end', common.mustCall())
+/* replacement start */
 
-var r = new Readable({
-  read: function read() {}
-});
-r.push(null);
-r.on('readable', common.mustCall());
-r.on('end', common.mustCall());
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

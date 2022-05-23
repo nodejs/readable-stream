@@ -1,74 +1,39 @@
-"use strict";
+'use strict'
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+const path = require('path')
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+const fs = require('fs')
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+const { pathToFileURL } = require('url')
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+const fixturesDir = path.join(__dirname, '..', 'fixtures')
 
-/*<replacement>*/
-require('@babel/polyfill');
-
-var util = require('util');
-
-for (var i in util) {
-  exports[i] = util[i];
+function fixturesPath(...args) {
+  return path.join(fixturesDir, ...args)
 }
-/*</replacement>*/
 
-/* eslint-disable node-core/required-modules */
-
-
-'use strict';
-/*<replacement>*/
-
-
-var objectKeys = objectKeys || function (obj) {
-  var keys = [];
-
-  for (var key in obj) {
-    keys.push(key);
-  }
-
-  return keys;
-};
-/*</replacement>*/
-
-
-var path = require('path');
-
-var fs = require('fs');
-
-var fixturesDir = path.join(__dirname, '..', 'fixtures');
-
-function fixturesPath() {
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  return path.join.apply(path, [fixturesDir].concat(args));
+function fixturesFileURL(...args) {
+  return pathToFileURL(fixturesPath(...args))
 }
 
 function readFixtureSync(args, enc) {
-  if (Array.isArray(args)) return fs.readFileSync(fixturesPath.apply(void 0, _toConsumableArray(args)), enc);
-  return fs.readFileSync(fixturesPath(args), enc);
+  if (Array.isArray(args)) return fs.readFileSync(fixturesPath(...args), enc)
+  return fs.readFileSync(fixturesPath(args), enc)
 }
 
 function readFixtureKey(name, enc) {
-  return fs.readFileSync(fixturesPath('keys', name), enc);
+  return fs.readFileSync(fixturesPath('keys', name), enc)
+}
+
+function readFixtureKeys(enc, ...names) {
+  return names.map((name) => readFixtureKey(name, enc))
 }
 
 module.exports = {
-  fixturesDir: fixturesDir,
+  fixturesDir,
   path: fixturesPath,
+  fileURL: fixturesFileURL,
   readSync: readFixtureSync,
-  readKey: readFixtureKey
-};
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
+  readKey: readFixtureKey,
+  readKeys: readFixtureKeys
 }

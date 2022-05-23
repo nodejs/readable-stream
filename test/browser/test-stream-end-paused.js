@@ -1,32 +1,30 @@
-'use strict';
-var common = require('../common');
+'use strict'
 
+const { Readable } = require('../../lib/ours/index')
 
-// Make sure we don't miss the end event for paused 0-length streams
+const { kReadableStreamSuiteName } = require('./symbols')
 
-var Readable = require('../../').Readable;
-var stream = new Readable();
 module.exports = function (t) {
-  t.test('end pause', function (t) {
-    t.plan(2);
-    var calledRead = false;
-    stream._read = function() {
-      t.notOk(calledRead);
-      calledRead = true;
-      this.push(null);
-    };
+  t.plan(2)
+  const stream = new Readable()
+  let calledRead = false
 
-    stream.on('data', function() {
-      throw new Error('should not ever get data');
-    });
-    stream.pause();
+  stream._read = function () {
+    t.notOk(calledRead)
+    calledRead = true
+    this.push(null)
+  }
 
-    setTimeout(function() {
-      stream.on('end', function() {
-        t.ok(calledRead);
-      });
-      stream.resume();
-    });
-
-  });
+  stream.on('data', function () {
+    throw new Error('should not ever get data')
+  })
+  stream.pause()
+  setTimeout(function () {
+    stream.on('end', function () {
+      t.ok(calledRead)
+    })
+    stream.resume()
+  })
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-end-paused'

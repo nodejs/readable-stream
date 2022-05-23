@@ -1,113 +1,69 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var readable = new stream.Readable({
-  read: function read() {}
-});
-var writables = [];
+const readable = new stream.Readable({
+  read: () => {}
+})
+const writables = []
 
-var _loop = function _loop(i) {
-  var target = new stream.Writable({
-    write: common.mustCall(function (chunk, encoding, callback) {
-      target.output.push(chunk);
-      callback();
+for (let i = 0; i < 5; i++) {
+  const target = new stream.Writable({
+    write: common.mustCall((chunk, encoding, callback) => {
+      target.output.push(chunk)
+      callback()
     }, 1)
-  });
-  target.output = [];
-  target.on('pipe', common.mustCall());
-  readable.pipe(target);
-  writables.push(target);
-};
-
-for (var i = 0; i < 5; i++) {
-  _loop(i);
+  })
+  target.output = []
+  target.on('pipe', common.mustCall())
+  readable.pipe(target)
+  writables.push(target)
 }
 
-var input = bufferShim.from([1, 2, 3, 4, 5]);
-readable.push(input); // The pipe() calls will postpone emission of the 'resume' event using nextTick,
+const input = Buffer.from([1, 2, 3, 4, 5])
+readable.push(input) // The pipe() calls will postpone emission of the 'resume' event using nextTick,
 // so no data will be available to the writable streams until then.
 
-process.nextTick(common.mustCall(function () {
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+process.nextTick(
+  common.mustCall(() => {
+    for (const target of writables) {
+      assert.deepStrictEqual(target.output, [input])
+      target.on('unpipe', common.mustCall())
+      readable.unpipe(target)
+    }
 
-  try {
-    for (var _iterator = writables[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var target = _step.value;
-      assert.deepStrictEqual(target.output, [input]);
-      target.on('unpipe', common.mustCall());
-      readable.unpipe(target);
+    readable.push('something else') // This does not get through.
+
+    readable.push(null)
+    readable.resume() // Make sure the 'end' event gets emitted.
+  })
+)
+readable.on(
+  'end',
+  common.mustCall(() => {
+    for (const target of writables) {
+      assert.deepStrictEqual(target.output, [input])
     }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return != null) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
+  })
+)
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
   }
-
-  readable.push('something else'); // This does not get through.
-
-  readable.push(null);
-  readable.resume(); // Make sure the 'end' event gets emitted.
-}));
-readable.on('end', common.mustCall(function () {
-  var _iteratorNormalCompletion2 = true;
-  var _didIteratorError2 = false;
-  var _iteratorError2 = undefined;
-
-  try {
-    for (var _iterator2 = writables[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-      var target = _step2.value;
-      assert.deepStrictEqual(target.output, [input]);
-    }
-  } catch (err) {
-    _didIteratorError2 = true;
-    _iteratorError2 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-        _iterator2.return();
-      }
-    } finally {
-      if (_didIteratorError2) {
-        throw _iteratorError2;
-      }
-    }
-  }
-}));
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+})
+/* replacement end */

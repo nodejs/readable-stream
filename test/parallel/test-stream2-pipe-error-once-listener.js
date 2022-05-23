@@ -1,21 +1,3 @@
-"use strict";
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -36,84 +18,50 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var Read =
-/*#__PURE__*/
-function (_stream$Readable) {
-  _inherits(Read, _stream$Readable);
-
-  function Read() {
-    _classCallCheck(this, Read);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(Read).apply(this, arguments));
+class Read extends stream.Readable {
+  _read(size) {
+    this.push('x')
+    this.push(null)
   }
+}
 
-  _createClass(Read, [{
-    key: "_read",
-    value: function _read(size) {
-      this.push('x');
-      this.push(null);
-    }
-  }]);
-
-  return Read;
-}(stream.Readable);
-
-var Write =
-/*#__PURE__*/
-function (_stream$Writable) {
-  _inherits(Write, _stream$Writable);
-
-  function Write() {
-    _classCallCheck(this, Write);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(Write).apply(this, arguments));
+class Write extends stream.Writable {
+  _write(buffer, encoding, cb) {
+    this.emit('error', new Error('boom'))
+    this.emit('alldone')
   }
+}
 
-  _createClass(Write, [{
-    key: "_write",
-    value: function _write(buffer, encoding, cb) {
-      this.emit('error', new Error('boom'));
-      this.emit('alldone');
-    }
-  }]);
-
-  return Write;
-}(stream.Writable);
-
-var read = new Read();
-var write = new Write();
-write.once('error', function () {});
+const read = new Read()
+const write = new Write()
+write.once('error', () => {})
 write.once('alldone', function (err) {
-  require('tap').pass();
-});
+  silentConsole.log('ok')
+})
 process.on('exit', function (c) {
-  console.error('error thrown even with listener');
-});
-read.pipe(write);
-;
+  silentConsole.error('error thrown even with listener')
+})
+read.pipe(write)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

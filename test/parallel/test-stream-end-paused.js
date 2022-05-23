@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,53 +18,52 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/'); // Make sure we don't miss the end event for paused 0-length streams
+const assert = require('assert') // Make sure we don't miss the end event for paused 0-length streams
 
+const Readable = require('../../lib/ours/index').Readable
 
-var Readable = require('../../').Readable;
-
-var stream = new Readable();
-var calledRead = false;
+const stream = new Readable()
+let calledRead = false
 
 stream._read = function () {
-  assert(!calledRead);
-  calledRead = true;
-  this.push(null);
-};
+  assert(!calledRead)
+  calledRead = true
+  this.push(null)
+}
 
 stream.on('data', function () {
-  throw new Error('should not ever get data');
-});
-stream.pause();
-setTimeout(common.mustCall(function () {
-  stream.on('end', common.mustCall());
-  stream.resume();
-}), 1);
+  throw new Error('should not ever get data')
+})
+stream.pause()
+setTimeout(
+  common.mustCall(function () {
+    stream.on('end', common.mustCall())
+    stream.resume()
+  }),
+  1
+)
 process.on('exit', function () {
-  assert(calledRead);
-});
-;
+  assert(calledRead)
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,136 +1,133 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Transform = _require.Transform,
-    Readable = _require.Readable,
-    Writable = _require.Writable;
+const { Transform, Readable, Writable } = require('../../lib/ours/index')
 
-var DEFAULT = 16 * 1024;
+const DEFAULT = 16 * 1024
 
 function testTransform(expectedReadableHwm, expectedWritableHwm, options) {
-  var t = new Transform(options);
-  assert.strictEqual(t._readableState.highWaterMark, expectedReadableHwm);
-  assert.strictEqual(t._writableState.highWaterMark, expectedWritableHwm);
-} // test overriding defaultHwm
-
+  const t = new Transform(options)
+  assert.strictEqual(t._readableState.highWaterMark, expectedReadableHwm)
+  assert.strictEqual(t._writableState.highWaterMark, expectedWritableHwm)
+} // Test overriding defaultHwm
 
 testTransform(666, DEFAULT, {
   readableHighWaterMark: 666
-});
+})
 testTransform(DEFAULT, 777, {
   writableHighWaterMark: 777
-});
+})
 testTransform(666, 777, {
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
-}); // test 0 overriding defaultHwm
+}) // test 0 overriding defaultHwm
 
 testTransform(0, DEFAULT, {
   readableHighWaterMark: 0
-});
+})
 testTransform(DEFAULT, 0, {
   writableHighWaterMark: 0
-}); // test highWaterMark overriding
+}) // Test highWaterMark overriding
 
 testTransform(555, 555, {
   highWaterMark: 555,
   readableHighWaterMark: 666
-});
+})
 testTransform(555, 555, {
   highWaterMark: 555,
   writableHighWaterMark: 777
-});
+})
 testTransform(555, 555, {
   highWaterMark: 555,
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
-}); // test highWaterMark = 0 overriding
+}) // Test highWaterMark = 0 overriding
 
 testTransform(0, 0, {
   highWaterMark: 0,
   readableHighWaterMark: 666
-});
+})
 testTransform(0, 0, {
   highWaterMark: 0,
   writableHighWaterMark: 777
-});
+})
 testTransform(0, 0, {
   highWaterMark: 0,
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
-}); // test undefined, null
+}) // Test undefined, null
 
-[undefined, null].forEach(function (v) {
+;[undefined, null].forEach((v) => {
   testTransform(DEFAULT, DEFAULT, {
     readableHighWaterMark: v
-  });
+  })
   testTransform(DEFAULT, DEFAULT, {
     writableHighWaterMark: v
-  });
+  })
   testTransform(666, DEFAULT, {
     highWaterMark: v,
     readableHighWaterMark: 666
-  });
+  })
   testTransform(DEFAULT, 777, {
     highWaterMark: v,
     writableHighWaterMark: 777
-  });
-}); // test NaN
+  })
+}) // test NaN
 
 {
-  common.expectsError(function () {
-    new Transform({
-      readableHighWaterMark: NaN
-    });
-  }, {
-    type: TypeError,
-    code: 'ERR_INVALID_OPT_VALUE',
-    message: 'The value "NaN" is invalid for option "readableHighWaterMark"'
-  });
-  common.expectsError(function () {
-    new Transform({
-      writableHighWaterMark: NaN
-    });
-  }, {
-    type: TypeError,
-    code: 'ERR_INVALID_OPT_VALUE',
-    message: 'The value "NaN" is invalid for option "writableHighWaterMark"'
-  });
-} // test non Duplex streams ignore the options
+  assert.throws(
+    () => {
+      new Transform({
+        readableHighWaterMark: NaN
+      })
+    },
+    {
+      name: 'TypeError',
+      code: 'ERR_INVALID_ARG_VALUE',
+      message: "The property 'options.readableHighWaterMark' is invalid. " + 'Received NaN'
+    }
+  )
+  assert.throws(
+    () => {
+      new Transform({
+        writableHighWaterMark: NaN
+      })
+    },
+    {
+      name: 'TypeError',
+      code: 'ERR_INVALID_ARG_VALUE',
+      message: "The property 'options.writableHighWaterMark' is invalid. " + 'Received NaN'
+    }
+  )
+} // Test non Duplex streams ignore the options
 
 {
-  var r = new Readable({
+  const r = new Readable({
     readableHighWaterMark: 666
-  });
-  assert.strictEqual(r._readableState.highWaterMark, DEFAULT);
-  var w = new Writable({
+  })
+  assert.strictEqual(r._readableState.highWaterMark, DEFAULT)
+  const w = new Writable({
     writableHighWaterMark: 777
-  });
-  assert.strictEqual(w._writableState.highWaterMark, DEFAULT);
+  })
+  assert.strictEqual(w._writableState.highWaterMark, DEFAULT)
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,48 +1,58 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var readable = new stream.Readable({
-  read: function read() {}
-});
-
-function checkError(fn) {
-  common.expectsError(fn, {
-    code: 'ERR_INVALID_ARG_TYPE',
-    type: TypeError
-  });
+function testPushArg(val) {
+  const readable = new stream.Readable({
+    read: () => {}
+  })
+  readable.on(
+    'error',
+    common.expectsError({
+      code: 'ERR_INVALID_ARG_TYPE',
+      name: 'TypeError'
+    })
+  )
+  readable.push(val)
 }
 
-checkError(function () {
-  return readable.push([]);
-});
-checkError(function () {
-  return readable.push({});
-});
-checkError(function () {
-  return readable.push(0);
-});
-;
+testPushArg([])
+testPushArg({})
+testPushArg(0)
 
-(function () {
-  var t = require('tap');
+function testUnshiftArg(val) {
+  const readable = new stream.Readable({
+    read: () => {}
+  })
+  readable.on(
+    'error',
+    common.expectsError({
+      code: 'ERR_INVALID_ARG_TYPE',
+      name: 'TypeError'
+    })
+  )
+  readable.unshift(val)
+}
 
-  t.pass('sync run');
-})();
+testUnshiftArg([])
+testUnshiftArg({})
+testUnshiftArg(0)
+/* replacement start */
 
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

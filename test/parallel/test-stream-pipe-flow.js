@@ -1,95 +1,113 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable,
-    PassThrough = _require.PassThrough;
+const assert = require('assert')
+
+const { Readable, Writable, PassThrough } = require('../../lib/ours/index')
 
 {
-  var ticks = 17;
-  var rs = new Readable({
+  let ticks = 17
+  const rs = new Readable({
     objectMode: true,
-    read: function read() {
-      if (ticks-- > 0) return process.nextTick(function () {
-        return rs.push({});
-      });
-      rs.push({});
-      rs.push(null);
+    read: () => {
+      if (ticks-- > 0) return process.nextTick(() => rs.push({}))
+      rs.push({})
+      rs.push(null)
     }
-  });
-  var ws = new Writable({
+  })
+  const ws = new Writable({
     highWaterMark: 0,
     objectMode: true,
-    write: function write(data, end, cb) {
-      return setImmediate(cb);
-    }
-  });
-  rs.on('end', common.mustCall());
-  ws.on('finish', common.mustCall());
-  rs.pipe(ws);
+    write: (data, end, cb) => setImmediate(cb)
+  })
+  rs.on('end', common.mustCall())
+  ws.on('finish', common.mustCall())
+  rs.pipe(ws)
 }
 {
-  var missing = 8;
-
-  var _rs = new Readable({
+  let missing = 8
+  const rs = new Readable({
     objectMode: true,
-    read: function read() {
-      if (missing--) _rs.push({});else _rs.push(null);
+    read: () => {
+      if (missing--) rs.push({})
+      else rs.push(null)
     }
-  });
-
-  var pt = _rs.pipe(new PassThrough({
+  })
+  const pt = rs
+    .pipe(
+      new PassThrough({
+        objectMode: true,
+        highWaterMark: 2
+      })
+    )
+    .pipe(
+      new PassThrough({
+        objectMode: true,
+        highWaterMark: 2
+      })
+    )
+  pt.on('end', () => {
+    wrapper.push(null)
+  })
+  const wrapper = new Readable({
     objectMode: true,
-    highWaterMark: 2
-  })).pipe(new PassThrough({
-    objectMode: true,
-    highWaterMark: 2
-  }));
-
-  pt.on('end', function () {
-    wrapper.push(null);
-  });
-  var wrapper = new Readable({
-    objectMode: true,
-    read: function read() {
-      process.nextTick(function () {
-        var data = pt.read();
+    read: () => {
+      process.nextTick(() => {
+        let data = pt.read()
 
         if (data === null) {
-          pt.once('readable', function () {
-            data = pt.read();
-            if (data !== null) wrapper.push(data);
-          });
+          pt.once('readable', () => {
+            data = pt.read()
+            if (data !== null) wrapper.push(data)
+          })
         } else {
-          wrapper.push(data);
+          wrapper.push(data)
         }
-      });
+      })
     }
-  });
-  wrapper.resume();
-  wrapper.on('end', common.mustCall());
+  })
+  wrapper.resume()
+  wrapper.on('end', common.mustCall())
 }
-;
+{
+  // Only register drain if there is backpressure.
+  const rs = new Readable({
+    read() {}
+  })
+  const pt = rs.pipe(
+    new PassThrough({
+      objectMode: true,
+      highWaterMark: 2
+    })
+  )
+  assert.strictEqual(pt.listenerCount('drain'), 0)
+  pt.on('finish', () => {
+    assert.strictEqual(pt.listenerCount('drain'), 0)
+  })
+  rs.push('asd')
+  assert.strictEqual(pt.listenerCount('drain'), 0)
+  process.nextTick(() => {
+    rs.push('asd')
+    assert.strictEqual(pt.listenerCount('drain'), 0)
+    rs.push(null)
+    assert.strictEqual(pt.listenerCount('drain'), 0)
+  })
+}
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

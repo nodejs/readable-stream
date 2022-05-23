@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,557 +18,496 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var PassThrough = require('../../lib/_stream_passthrough');
-
-var Transform = require('../../lib/_stream_transform');
+const { PassThrough, Transform } = require('../../lib/ours/index')
 
 {
   // Verify writable side consumption
-  var tx = new Transform({
+  const tx = new Transform({
     highWaterMark: 10
-  });
-  var transformed = 0;
+  })
+  let transformed = 0
 
   tx._transform = function (chunk, encoding, cb) {
-    transformed += chunk.length;
-    tx.push(chunk);
-    cb();
-  };
-
-  for (var i = 1; i <= 10; i++) {
-    tx.write(bufferShim.allocUnsafe(i));
+    transformed += chunk.length
+    tx.push(chunk)
+    cb()
   }
 
-  tx.end();
-  assert.strictEqual(tx.readableLength, 10);
-  assert.strictEqual(transformed, 10);
-  assert.strictEqual(tx._transformState.writechunk.length, 5);
-  assert.deepStrictEqual(tx.writableBuffer.map(function (c) {
-    return c.chunk.length;
-  }), [6, 7, 8, 9, 10]);
+  for (let i = 1; i <= 10; i++) {
+    tx.write(Buffer.allocUnsafe(i))
+  }
+
+  tx.end()
+  assert.strictEqual(tx.readableLength, 10)
+  assert.strictEqual(transformed, 10)
+  assert.deepStrictEqual(
+    tx.writableBuffer.map(function (c) {
+      return c.chunk.length
+    }),
+    [5, 6, 7, 8, 9, 10]
+  )
 }
 {
   // Verify passthrough behavior
-  var pt = new PassThrough();
-  pt.write(bufferShim.from('foog'));
-  pt.write(bufferShim.from('bark'));
-  pt.write(bufferShim.from('bazy'));
-  pt.write(bufferShim.from('kuel'));
-  pt.end();
-  assert.strictEqual(pt.read(5).toString(), 'foogb');
-  assert.strictEqual(pt.read(5).toString(), 'arkba');
-  assert.strictEqual(pt.read(5).toString(), 'zykue');
-  assert.strictEqual(pt.read(5).toString(), 'l');
+  const pt = new PassThrough()
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  pt.write(Buffer.from('bazy'))
+  pt.write(Buffer.from('kuel'))
+  pt.end()
+  assert.strictEqual(pt.read(5).toString(), 'foogb')
+  assert.strictEqual(pt.read(5).toString(), 'arkba')
+  assert.strictEqual(pt.read(5).toString(), 'zykue')
+  assert.strictEqual(pt.read(5).toString(), 'l')
 }
 {
   // Verify object passthrough behavior
-  var _pt = new PassThrough({
+  const pt = new PassThrough({
     objectMode: true
-  });
-
-  _pt.write(1);
-
-  _pt.write(true);
-
-  _pt.write(false);
-
-  _pt.write(0);
-
-  _pt.write('foo');
-
-  _pt.write('');
-
-  _pt.write({
+  })
+  pt.write(1)
+  pt.write(true)
+  pt.write(false)
+  pt.write(0)
+  pt.write('foo')
+  pt.write('')
+  pt.write({
     a: 'b'
-  });
-
-  _pt.end();
-
-  assert.strictEqual(_pt.read(), 1);
-  assert.strictEqual(_pt.read(), true);
-  assert.strictEqual(_pt.read(), false);
-  assert.strictEqual(_pt.read(), 0);
-  assert.strictEqual(_pt.read(), 'foo');
-  assert.strictEqual(_pt.read(), '');
-  assert.deepStrictEqual(_pt.read(), {
+  })
+  pt.end()
+  assert.strictEqual(pt.read(), 1)
+  assert.strictEqual(pt.read(), true)
+  assert.strictEqual(pt.read(), false)
+  assert.strictEqual(pt.read(), 0)
+  assert.strictEqual(pt.read(), 'foo')
+  assert.strictEqual(pt.read(), '')
+  assert.deepStrictEqual(pt.read(), {
     a: 'b'
-  });
+  })
 }
 {
   // Verify passthrough constructor behavior
-  var _pt2 = PassThrough();
-
-  assert(_pt2 instanceof PassThrough);
+  const pt = PassThrough()
+  assert(pt instanceof PassThrough)
 }
 {
   // Verify transform constructor behavior
-  var _pt3 = Transform();
-
-  assert(_pt3 instanceof Transform);
+  const pt = Transform()
+  assert(pt instanceof Transform)
 }
 {
   // Perform a simple transform
-  var _pt4 = new Transform();
+  const pt = new Transform()
 
-  _pt4._transform = function (c, e, cb) {
-    var ret = bufferShim.alloc(c.length, 'x');
+  pt._transform = function (c, e, cb) {
+    const ret = Buffer.alloc(c.length, 'x')
+    pt.push(ret)
+    cb()
+  }
 
-    _pt4.push(ret);
-
-    cb();
-  };
-
-  _pt4.write(bufferShim.from('foog'));
-
-  _pt4.write(bufferShim.from('bark'));
-
-  _pt4.write(bufferShim.from('bazy'));
-
-  _pt4.write(bufferShim.from('kuel'));
-
-  _pt4.end();
-
-  assert.strictEqual(_pt4.read(5).toString(), 'xxxxx');
-  assert.strictEqual(_pt4.read(5).toString(), 'xxxxx');
-  assert.strictEqual(_pt4.read(5).toString(), 'xxxxx');
-  assert.strictEqual(_pt4.read(5).toString(), 'x');
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  pt.write(Buffer.from('bazy'))
+  pt.write(Buffer.from('kuel'))
+  pt.end()
+  assert.strictEqual(pt.read(5).toString(), 'xxxxx')
+  assert.strictEqual(pt.read(5).toString(), 'xxxxx')
+  assert.strictEqual(pt.read(5).toString(), 'xxxxx')
+  assert.strictEqual(pt.read(5).toString(), 'x')
 }
 {
   // Verify simple object transform
-  var _pt5 = new Transform({
+  const pt = new Transform({
     objectMode: true
-  });
+  })
 
-  _pt5._transform = function (c, e, cb) {
-    _pt5.push(JSON.stringify(c));
+  pt._transform = function (c, e, cb) {
+    pt.push(JSON.stringify(c))
+    cb()
+  }
 
-    cb();
-  };
-
-  _pt5.write(1);
-
-  _pt5.write(true);
-
-  _pt5.write(false);
-
-  _pt5.write(0);
-
-  _pt5.write('foo');
-
-  _pt5.write('');
-
-  _pt5.write({
+  pt.write(1)
+  pt.write(true)
+  pt.write(false)
+  pt.write(0)
+  pt.write('foo')
+  pt.write('')
+  pt.write({
     a: 'b'
-  });
-
-  _pt5.end();
-
-  assert.strictEqual(_pt5.read(), '1');
-  assert.strictEqual(_pt5.read(), 'true');
-  assert.strictEqual(_pt5.read(), 'false');
-  assert.strictEqual(_pt5.read(), '0');
-  assert.strictEqual(_pt5.read(), '"foo"');
-  assert.strictEqual(_pt5.read(), '""');
-  assert.strictEqual(_pt5.read(), '{"a":"b"}');
+  })
+  pt.end()
+  assert.strictEqual(pt.read(), '1')
+  assert.strictEqual(pt.read(), 'true')
+  assert.strictEqual(pt.read(), 'false')
+  assert.strictEqual(pt.read(), '0')
+  assert.strictEqual(pt.read(), '"foo"')
+  assert.strictEqual(pt.read(), '""')
+  assert.strictEqual(pt.read(), '{"a":"b"}')
 }
 {
   // Verify async passthrough
-  var _pt6 = new Transform();
+  const pt = new Transform()
 
-  _pt6._transform = function (chunk, encoding, cb) {
+  pt._transform = function (chunk, encoding, cb) {
     setTimeout(function () {
-      _pt6.push(chunk);
+      pt.push(chunk)
+      cb()
+    }, 10)
+  }
 
-      cb();
-    }, 10);
-  };
-
-  _pt6.write(bufferShim.from('foog'));
-
-  _pt6.write(bufferShim.from('bark'));
-
-  _pt6.write(bufferShim.from('bazy'));
-
-  _pt6.write(bufferShim.from('kuel'));
-
-  _pt6.end();
-
-  _pt6.on('finish', common.mustCall(function () {
-    assert.strictEqual(_pt6.read(5).toString(), 'foogb');
-    assert.strictEqual(_pt6.read(5).toString(), 'arkba');
-    assert.strictEqual(_pt6.read(5).toString(), 'zykue');
-    assert.strictEqual(_pt6.read(5).toString(), 'l');
-  }));
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  pt.write(Buffer.from('bazy'))
+  pt.write(Buffer.from('kuel'))
+  pt.end()
+  pt.on(
+    'finish',
+    common.mustCall(function () {
+      assert.strictEqual(pt.read(5).toString(), 'foogb')
+      assert.strictEqual(pt.read(5).toString(), 'arkba')
+      assert.strictEqual(pt.read(5).toString(), 'zykue')
+      assert.strictEqual(pt.read(5).toString(), 'l')
+    })
+  )
 }
 {
   // Verify asymmetric transform (expand)
-  var _pt7 = new Transform(); // emit each chunk 2 times.
+  const pt = new Transform() // Emit each chunk 2 times.
 
-
-  _pt7._transform = function (chunk, encoding, cb) {
+  pt._transform = function (chunk, encoding, cb) {
     setTimeout(function () {
-      _pt7.push(chunk);
-
+      pt.push(chunk)
       setTimeout(function () {
-        _pt7.push(chunk);
+        pt.push(chunk)
+        cb()
+      }, 10)
+    }, 10)
+  }
 
-        cb();
-      }, 10);
-    }, 10);
-  };
-
-  _pt7.write(bufferShim.from('foog'));
-
-  _pt7.write(bufferShim.from('bark'));
-
-  _pt7.write(bufferShim.from('bazy'));
-
-  _pt7.write(bufferShim.from('kuel'));
-
-  _pt7.end();
-
-  _pt7.on('finish', common.mustCall(function () {
-    assert.strictEqual(_pt7.read(5).toString(), 'foogf');
-    assert.strictEqual(_pt7.read(5).toString(), 'oogba');
-    assert.strictEqual(_pt7.read(5).toString(), 'rkbar');
-    assert.strictEqual(_pt7.read(5).toString(), 'kbazy');
-    assert.strictEqual(_pt7.read(5).toString(), 'bazyk');
-    assert.strictEqual(_pt7.read(5).toString(), 'uelku');
-    assert.strictEqual(_pt7.read(5).toString(), 'el');
-  }));
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  pt.write(Buffer.from('bazy'))
+  pt.write(Buffer.from('kuel'))
+  pt.end()
+  pt.on(
+    'finish',
+    common.mustCall(function () {
+      assert.strictEqual(pt.read(5).toString(), 'foogf')
+      assert.strictEqual(pt.read(5).toString(), 'oogba')
+      assert.strictEqual(pt.read(5).toString(), 'rkbar')
+      assert.strictEqual(pt.read(5).toString(), 'kbazy')
+      assert.strictEqual(pt.read(5).toString(), 'bazyk')
+      assert.strictEqual(pt.read(5).toString(), 'uelku')
+      assert.strictEqual(pt.read(5).toString(), 'el')
+    })
+  )
 }
 {
   // Verify asymmetric transform (compress)
-  var _pt8 = new Transform(); // each output is the first char of 3 consecutive chunks,
+  const pt = new Transform() // Each output is the first char of 3 consecutive chunks,
   // or whatever's left.
 
+  pt.state = ''
 
-  _pt8.state = '';
+  pt._transform = function (chunk, encoding, cb) {
+    if (!chunk) chunk = ''
+    const s = chunk.toString()
+    setTimeout(() => {
+      this.state += s.charAt(0)
 
-  _pt8._transform = function (chunk, encoding, cb) {
-    var _this = this;
-
-    if (!chunk) chunk = '';
-    var s = chunk.toString();
-    setTimeout(function () {
-      _this.state += s.charAt(0);
-
-      if (_this.state.length === 3) {
-        _pt8.push(bufferShim.from(_this.state));
-
-        _this.state = '';
+      if (this.state.length === 3) {
+        pt.push(Buffer.from(this.state))
+        this.state = ''
       }
 
-      cb();
-    }, 10);
-  };
+      cb()
+    }, 10)
+  }
 
-  _pt8._flush = function (cb) {
-    // just output whatever we have.
-    _pt8.push(bufferShim.from(this.state));
+  pt._flush = function (cb) {
+    // Just output whatever we have.
+    pt.push(Buffer.from(this.state))
+    this.state = ''
+    cb()
+  }
 
-    this.state = '';
-    cb();
-  };
+  pt.write(Buffer.from('aaaa'))
+  pt.write(Buffer.from('bbbb'))
+  pt.write(Buffer.from('cccc'))
+  pt.write(Buffer.from('dddd'))
+  pt.write(Buffer.from('eeee'))
+  pt.write(Buffer.from('aaaa'))
+  pt.write(Buffer.from('bbbb'))
+  pt.write(Buffer.from('cccc'))
+  pt.write(Buffer.from('dddd'))
+  pt.write(Buffer.from('eeee'))
+  pt.write(Buffer.from('aaaa'))
+  pt.write(Buffer.from('bbbb'))
+  pt.write(Buffer.from('cccc'))
+  pt.write(Buffer.from('dddd'))
+  pt.end() // 'abcdeabcdeabcd'
 
-  _pt8.write(bufferShim.from('aaaa'));
-
-  _pt8.write(bufferShim.from('bbbb'));
-
-  _pt8.write(bufferShim.from('cccc'));
-
-  _pt8.write(bufferShim.from('dddd'));
-
-  _pt8.write(bufferShim.from('eeee'));
-
-  _pt8.write(bufferShim.from('aaaa'));
-
-  _pt8.write(bufferShim.from('bbbb'));
-
-  _pt8.write(bufferShim.from('cccc'));
-
-  _pt8.write(bufferShim.from('dddd'));
-
-  _pt8.write(bufferShim.from('eeee'));
-
-  _pt8.write(bufferShim.from('aaaa'));
-
-  _pt8.write(bufferShim.from('bbbb'));
-
-  _pt8.write(bufferShim.from('cccc'));
-
-  _pt8.write(bufferShim.from('dddd'));
-
-  _pt8.end(); // 'abcdeabcdeabcd'
-
-
-  _pt8.on('finish', common.mustCall(function () {
-    assert.strictEqual(_pt8.read(5).toString(), 'abcde');
-    assert.strictEqual(_pt8.read(5).toString(), 'abcde');
-    assert.strictEqual(_pt8.read(5).toString(), 'abcd');
-  }));
-} // this tests for a stall when data is written to a full stream
+  pt.on(
+    'finish',
+    common.mustCall(function () {
+      assert.strictEqual(pt.read(5).toString(), 'abcde')
+      assert.strictEqual(pt.read(5).toString(), 'abcde')
+      assert.strictEqual(pt.read(5).toString(), 'abcd')
+    })
+  )
+} // This tests for a stall when data is written to a full stream
 // that has empty transforms.
 
 {
   // Verify complex transform behavior
-  var count = 0;
-  var saved = null;
-
-  var _pt9 = new Transform({
+  let count = 0
+  let saved = null
+  const pt = new Transform({
     highWaterMark: 3
-  });
+  })
 
-  _pt9._transform = function (c, e, cb) {
-    if (count++ === 1) saved = c;else {
+  pt._transform = function (c, e, cb) {
+    if (count++ === 1) saved = c
+    else {
       if (saved) {
-        _pt9.push(saved);
-
-        saved = null;
+        pt.push(saved)
+        saved = null
       }
 
-      _pt9.push(c);
+      pt.push(c)
     }
-    cb();
-  };
+    cb()
+  }
 
-  _pt9.once('readable', function () {
+  pt.once('readable', function () {
     process.nextTick(function () {
-      _pt9.write(bufferShim.from('d'));
-
-      _pt9.write(bufferShim.from('ef'), common.mustCall(function () {
-        _pt9.end();
-      }));
-
-      assert.strictEqual(_pt9.read().toString(), 'abcdef');
-      assert.strictEqual(_pt9.read(), null);
-    });
-  });
-
-  _pt9.write(bufferShim.from('abc'));
+      pt.write(Buffer.from('d'))
+      pt.write(
+        Buffer.from('ef'),
+        common.mustCall(function () {
+          pt.end()
+        })
+      )
+      assert.strictEqual(pt.read().toString(), 'abcdef')
+      assert.strictEqual(pt.read(), null)
+    })
+  })
+  pt.write(Buffer.from('abc'))
 }
 {
   // Verify passthrough event emission
-  var _pt10 = new PassThrough();
-
-  var emits = 0;
-
-  _pt10.on('readable', function () {
-    emits++;
-  });
-
-  _pt10.write(bufferShim.from('foog'));
-
-  _pt10.write(bufferShim.from('bark'));
-
-  assert.strictEqual(emits, 0);
-  assert.strictEqual(_pt10.read(5).toString(), 'foogb');
-  assert.strictEqual(String(_pt10.read(5)), 'null');
-  assert.strictEqual(emits, 0);
-
-  _pt10.write(bufferShim.from('bazy'));
-
-  _pt10.write(bufferShim.from('kuel'));
-
-  assert.strictEqual(emits, 0);
-  assert.strictEqual(_pt10.read(5).toString(), 'arkba');
-  assert.strictEqual(_pt10.read(5).toString(), 'zykue');
-  assert.strictEqual(_pt10.read(5), null);
-
-  _pt10.end();
-
-  assert.strictEqual(emits, 1);
-  assert.strictEqual(_pt10.read(5).toString(), 'l');
-  assert.strictEqual(_pt10.read(5), null);
-  assert.strictEqual(emits, 1);
+  const pt = new PassThrough()
+  let emits = 0
+  pt.on('readable', function () {
+    emits++
+  })
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  assert.strictEqual(emits, 0)
+  assert.strictEqual(pt.read(5).toString(), 'foogb')
+  assert.strictEqual(String(pt.read(5)), 'null')
+  assert.strictEqual(emits, 0)
+  pt.write(Buffer.from('bazy'))
+  pt.write(Buffer.from('kuel'))
+  assert.strictEqual(emits, 0)
+  assert.strictEqual(pt.read(5).toString(), 'arkba')
+  assert.strictEqual(pt.read(5).toString(), 'zykue')
+  assert.strictEqual(pt.read(5), null)
+  pt.end()
+  assert.strictEqual(emits, 1)
+  assert.strictEqual(pt.read(5).toString(), 'l')
+  assert.strictEqual(pt.read(5), null)
+  assert.strictEqual(emits, 1)
 }
 {
   // Verify passthrough event emission reordering
-  var _pt11 = new PassThrough();
-
-  var _emits = 0;
-
-  _pt11.on('readable', function () {
-    _emits++;
-  });
-
-  _pt11.write(bufferShim.from('foog'));
-
-  _pt11.write(bufferShim.from('bark'));
-
-  assert.strictEqual(_emits, 0);
-  assert.strictEqual(_pt11.read(5).toString(), 'foogb');
-  assert.strictEqual(_pt11.read(5), null);
-
-  _pt11.once('readable', common.mustCall(function () {
-    assert.strictEqual(_pt11.read(5).toString(), 'arkba');
-    assert.strictEqual(_pt11.read(5), null);
-
-    _pt11.once('readable', common.mustCall(function () {
-      assert.strictEqual(_pt11.read(5).toString(), 'zykue');
-      assert.strictEqual(_pt11.read(5), null);
-
-      _pt11.once('readable', common.mustCall(function () {
-        assert.strictEqual(_pt11.read(5).toString(), 'l');
-        assert.strictEqual(_pt11.read(5), null);
-        assert.strictEqual(_emits, 3);
-      }));
-
-      _pt11.end();
-    }));
-
-    _pt11.write(bufferShim.from('kuel'));
-  }));
-
-  _pt11.write(bufferShim.from('bazy'));
+  const pt = new PassThrough()
+  let emits = 0
+  pt.on('readable', function () {
+    emits++
+  })
+  pt.write(Buffer.from('foog'))
+  pt.write(Buffer.from('bark'))
+  assert.strictEqual(emits, 0)
+  assert.strictEqual(pt.read(5).toString(), 'foogb')
+  assert.strictEqual(pt.read(5), null)
+  pt.once(
+    'readable',
+    common.mustCall(function () {
+      assert.strictEqual(pt.read(5).toString(), 'arkba')
+      assert.strictEqual(pt.read(5), null)
+      pt.once(
+        'readable',
+        common.mustCall(function () {
+          assert.strictEqual(pt.read(5).toString(), 'zykue')
+          assert.strictEqual(pt.read(5), null)
+          pt.once(
+            'readable',
+            common.mustCall(function () {
+              assert.strictEqual(pt.read(5).toString(), 'l')
+              assert.strictEqual(pt.read(5), null)
+              assert.strictEqual(emits, 3)
+            })
+          )
+          pt.end()
+        })
+      )
+      pt.write(Buffer.from('kuel'))
+    })
+  )
+  pt.write(Buffer.from('bazy'))
 }
 {
   // Verify passthrough facade
-  var _pt12 = new PassThrough();
-
-  var datas = [];
-
-  _pt12.on('data', function (chunk) {
-    datas.push(chunk.toString());
-  });
-
-  _pt12.on('end', common.mustCall(function () {
-    assert.deepStrictEqual(datas, ['foog', 'bark', 'bazy', 'kuel']);
-  }));
-
-  _pt12.write(bufferShim.from('foog'));
-
+  const pt = new PassThrough()
+  const datas = []
+  pt.on('data', function (chunk) {
+    datas.push(chunk.toString())
+  })
+  pt.on(
+    'end',
+    common.mustCall(function () {
+      assert.deepStrictEqual(datas, ['foog', 'bark', 'bazy', 'kuel'])
+    })
+  )
+  pt.write(Buffer.from('foog'))
   setTimeout(function () {
-    _pt12.write(bufferShim.from('bark'));
-
+    pt.write(Buffer.from('bark'))
     setTimeout(function () {
-      _pt12.write(bufferShim.from('bazy'));
-
+      pt.write(Buffer.from('bazy'))
       setTimeout(function () {
-        _pt12.write(bufferShim.from('kuel'));
-
+        pt.write(Buffer.from('kuel'))
         setTimeout(function () {
-          _pt12.end();
-        }, 10);
-      }, 10);
-    }, 10);
-  }, 10);
+          pt.end()
+        }, 10)
+      }, 10)
+    }, 10)
+  }, 10)
 }
 {
   // Verify object transform (JSON parse)
-  var jp = new Transform({
+  const jp = new Transform({
     objectMode: true
-  });
+  })
 
   jp._transform = function (data, encoding, cb) {
     try {
-      jp.push(JSON.parse(data));
-      cb();
+      jp.push(JSON.parse(data))
+      cb()
     } catch (er) {
-      cb(er);
+      cb(er)
     }
-  }; // anything except null/undefined is fine.
+  } // Anything except null/undefined is fine.
   // those are "magic" in the stream API, because they signal EOF.
 
-
-  var objects = [{
-    foo: 'bar'
-  }, 100, 'string', {
-    nested: {
-      things: [{
-        foo: 'bar'
-      }, 100, 'string']
+  const objects = [
+    {
+      foo: 'bar'
+    },
+    100,
+    'string',
+    {
+      nested: {
+        things: [
+          {
+            foo: 'bar'
+          },
+          100,
+          'string'
+        ]
+      }
     }
-  }];
-  var ended = false;
+  ]
+  let ended = false
   jp.on('end', function () {
-    ended = true;
-  });
-  forEach(objects, function (obj) {
-    jp.write(JSON.stringify(obj));
-    var res = jp.read();
-    assert.deepStrictEqual(res, obj);
-  });
-  jp.end(); // read one more time to get the 'end' event
+    ended = true
+  })
+  objects.forEach(function (obj) {
+    jp.write(JSON.stringify(obj))
+    const res = jp.read()
+    assert.deepStrictEqual(res, obj)
+  })
+  jp.end() // Read one more time to get the 'end' event
 
-  jp.read();
-  process.nextTick(common.mustCall(function () {
-    assert.strictEqual(ended, true);
-  }));
+  jp.read()
+  process.nextTick(
+    common.mustCall(function () {
+      assert.strictEqual(ended, true)
+    })
+  )
 }
 {
   // Verify object transform (JSON stringify)
-  var js = new Transform({
+  const js = new Transform({
     objectMode: true
-  });
+  })
 
   js._transform = function (data, encoding, cb) {
     try {
-      js.push(JSON.stringify(data));
-      cb();
+      js.push(JSON.stringify(data))
+      cb()
     } catch (er) {
-      cb(er);
+      cb(er)
     }
-  }; // anything except null/undefined is fine.
+  } // Anything except null/undefined is fine.
   // those are "magic" in the stream API, because they signal EOF.
 
-
-  var _objects = [{
-    foo: 'bar'
-  }, 100, 'string', {
-    nested: {
-      things: [{
-        foo: 'bar'
-      }, 100, 'string']
+  const objects = [
+    {
+      foo: 'bar'
+    },
+    100,
+    'string',
+    {
+      nested: {
+        things: [
+          {
+            foo: 'bar'
+          },
+          100,
+          'string'
+        ]
+      }
     }
-  }];
-  var _ended = false;
+  ]
+  let ended = false
   js.on('end', function () {
-    _ended = true;
-  });
-  forEach(_objects, function (obj) {
-    js.write(obj);
-    var res = js.read();
-    assert.strictEqual(res, JSON.stringify(obj));
-  });
-  js.end(); // read one more time to get the 'end' event
+    ended = true
+  })
+  objects.forEach(function (obj) {
+    js.write(obj)
+    const res = js.read()
+    assert.strictEqual(res, JSON.stringify(obj))
+  })
+  js.end() // Read one more time to get the 'end' event
 
-  js.read();
-  process.nextTick(common.mustCall(function () {
-    assert.strictEqual(_ended, true);
-  }));
+  js.read()
+  process.nextTick(
+    common.mustCall(function () {
+      assert.strictEqual(ended, true)
+    })
+  )
 }
+/* replacement start */
 
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
   }
-}
-
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+})
+/* replacement end */

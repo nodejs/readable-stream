@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,83 +18,78 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Readable = require('../../lib/_stream_readable');
+const { Readable } = require('../../lib/ours/index')
 
-var len = 0;
-var chunks = new Array(10);
+let len = 0
+const chunks = new Array(10)
 
-for (var i = 1; i <= 10; i++) {
-  chunks[i - 1] = bufferShim.allocUnsafe(i);
-  len += i;
+for (let i = 1; i <= 10; i++) {
+  chunks[i - 1] = Buffer.allocUnsafe(i)
+  len += i
 }
 
-var test = new Readable();
-var n = 0;
+const test = new Readable()
+let n = 0
 
 test._read = function (size) {
-  var chunk = chunks[n++];
+  const chunk = chunks[n++]
   setTimeout(function () {
-    test.push(chunk === undefined ? null : chunk);
-  }, 1);
-};
+    test.push(chunk === undefined ? null : chunk)
+  }, 1)
+}
 
-test.on('end', thrower);
+test.on('end', thrower)
 
 function thrower() {
-  throw new Error('this should not happen!');
+  throw new Error('this should not happen!')
 }
 
-var bytesread = 0;
+let bytesread = 0
 test.on('readable', function () {
-  var b = len - bytesread - 1;
-  var res = test.read(b);
+  const b = len - bytesread - 1
+  const res = test.read(b)
 
   if (res) {
-    bytesread += res.length;
-    console.error("br=".concat(bytesread, " len=").concat(len));
-    setTimeout(next, 1);
+    bytesread += res.length
+    silentConsole.error(`br=${bytesread} len=${len}`)
+    setTimeout(next, 1)
   }
 
-  test.read(0);
-});
-test.read(0);
+  test.read(0)
+})
+test.read(0)
 
 function next() {
-  // now let's make 'end' happen
-  test.removeListener('end', thrower);
-  test.on('end', common.mustCall()); // one to get the last byte
+  // Now let's make 'end' happen
+  test.removeListener('end', thrower)
+  test.on('end', common.mustCall()) // One to get the last byte
 
-  var r = test.read();
-  assert(r);
-  assert.strictEqual(r.length, 1);
-  r = test.read();
-  assert.strictEqual(r, null);
+  let r = test.read()
+  assert(r)
+  assert.strictEqual(r.length, 1)
+  r = test.read()
+  assert.strictEqual(r, null)
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

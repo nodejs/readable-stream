@@ -1,33 +1,37 @@
-'use strict';
-var R = require('../../lib/_stream_readable');
-var inherits = require('inherits');
-var EE = require('events').EventEmitter;
+'use strict'
+
+const inherits = require('inherits')
+
+const { Readable } = require('../../lib/ours/index')
+
+const { kReadableStreamSuiteName } = require('./symbols')
+
 module.exports = function (t) {
-  t.test('compatibility', function (t) {
-    t.plan(1);
+  t.plan(1)
+  let ondataCalled = 0
 
-    var ondataCalled = 0;
+  function TestReader() {
+    Readable.apply(this)
+    this._buffer = Buffer.alloc(100)
 
-    function TestReader() {
-      R.apply(this);
-      this._buffer = Buffer.alloc(100);
-      this._buffer.fill('x');
+    this._buffer.fill('x')
 
-      this.on('data', function() {
-        ondataCalled++;
-      });
-    }
+    this.on('data', function () {
+      ondataCalled++
+    })
+  }
 
-    inherits(TestReader, R);
+  inherits(TestReader, Readable)
 
-    TestReader.prototype._read = function(n) {
-      this.push(this._buffer);
-      this._buffer = Buffer.alloc(0);
-    };
+  TestReader.prototype._read = function (n) {
+    this.push(this._buffer)
+    this._buffer = Buffer.alloc(0)
+  }
 
-    var reader = new TestReader();
-    setTimeout(function() {
-      t.equal(ondataCalled, 1);
-    });
-  });
+  setTimeout(function () {
+    t.equal(ondataCalled, 1)
+  })
+  new TestReader().read()
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream2-compatibility'

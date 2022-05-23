@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,67 +18,80 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/'); // This test verifies that stream.unshift(bufferShim.alloc(0)) or
+const assert = require('assert') // This test verifies that stream.unshift(Buffer.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
 
+const Readable = require('../../lib/ours/index').Readable
 
-var Readable = require('../../').Readable;
-
-var r = new Readable();
-var nChunks = 10;
-var chunk = bufferShim.alloc(10, 'x');
+const r = new Readable()
+let nChunks = 10
+const chunk = Buffer.alloc(10, 'x')
 
 r._read = function (n) {
-  setImmediate(function () {
-    r.push(--nChunks === 0 ? null : chunk);
-  });
-};
+  setImmediate(() => {
+    r.push(--nChunks === 0 ? null : chunk)
+  })
+}
 
-var readAll = false;
-var seen = [];
-r.on('readable', function () {
-  var chunk;
+let readAll = false
+const seen = []
+r.on('readable', () => {
+  let chunk
 
-  while (chunk = r.read()) {
-    seen.push(chunk.toString()); // simulate only reading a certain amount of the data,
+  while ((chunk = r.read()) !== null) {
+    seen.push(chunk.toString()) // Simulate only reading a certain amount of the data,
     // and then putting the rest of the chunk back into the
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
 
-    var putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
-    readAll = !readAll;
-    r.unshift(putBack);
+    const putBack = Buffer.alloc(readAll ? 0 : 5, 'y')
+    readAll = !readAll
+    r.unshift(putBack)
   }
-});
-var expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
-r.on('end', function () {
-  assert.deepStrictEqual(seen, expect);
+})
+const expect = [
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy',
+  'xxxxxxxxxx',
+  'yyyyy'
+]
+r.on('end', () => {
+  assert.deepStrictEqual(seen, expect)
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-  require('tap').pass();
-});
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

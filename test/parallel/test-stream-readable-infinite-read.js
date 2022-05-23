@@ -1,54 +1,51 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
+const { Readable } = require('../../lib/ours/index')
 
-var buf = bufferShim.alloc(8192);
-var readable = new Readable({
+const buf = Buffer.alloc(8192)
+const readable = new Readable({
   read: common.mustCall(function () {
-    this.push(buf);
+    this.push(buf)
   }, 31)
-});
-var i = 0;
-readable.on('readable', common.mustCall(function () {
-  if (i++ === 10) {
-    // We will just terminate now.
-    process.removeAllListeners('readable');
-    return;
-  }
+})
+let i = 0
+readable.on(
+  'readable',
+  common.mustCall(function () {
+    if (i++ === 10) {
+      // We will just terminate now.
+      process.removeAllListeners('readable')
+      return
+    }
 
-  var data = readable.read(); // TODO(mcollina): there is something odd in the highWaterMark logic
-  // investigate.
+    const data = readable.read() // TODO(mcollina): there is something odd in the highWaterMark logic
+    // investigate.
 
-  if (i === 1) {
-    assert.strictEqual(data.length, 8192 * 2);
+    if (i === 1) {
+      assert.strictEqual(data.length, 8192 * 2)
+    } else {
+      assert.strictEqual(data.length, 8192 * 3)
+    }
+  }, 11)
+)
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
   } else {
-    assert.strictEqual(data.length, 8192 * 3);
+    tap.fail(`test failed - exited code ${code}`)
   }
-}, 11));
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+})
+/* replacement end */

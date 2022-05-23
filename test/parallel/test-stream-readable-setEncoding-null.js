@@ -1,39 +1,33 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
+const { Readable } = require('../../lib/ours/index')
 
 {
-  var readable = new Readable({
+  const readable = new Readable({
     encoding: 'hex'
-  });
-  assert.strictEqual(readable._readableState.encoding, 'hex');
-  readable.setEncoding(null);
-  assert.strictEqual(readable._readableState.encoding, 'utf8');
+  })
+  assert.strictEqual(readable._readableState.encoding, 'hex')
+  readable.setEncoding(null)
+  assert.strictEqual(readable._readableState.encoding, 'utf8')
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

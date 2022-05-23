@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,75 +18,70 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/'); // this test verifies that passing a huge number to read(size)
+const assert = require('assert') // This test verifies that passing a huge number to read(size)
 // will push up the highWaterMark, and cause the stream to read
 // more data continuously, but without triggering a nextTick
 // warning or RangeError.
 
+const Readable = require('../../lib/ours/index').Readable // Throw an error if we trigger a nextTick warning.
 
-var Readable = require('../../').Readable; // throw an error if we trigger a nextTick warning.
-
-
-process.throwDeprecation = true;
-var stream = new Readable({
+process.throwDeprecation = true
+const stream = new Readable({
   highWaterMark: 2
-});
-var reads = 0;
-var total = 5000;
+})
+let reads = 0
+let total = 5000
 
 stream._read = function (size) {
-  reads++;
-  size = Math.min(size, total);
-  total -= size;
-  if (size === 0) stream.push(null);else stream.push(bufferShim.allocUnsafe(size));
-};
+  reads++
+  size = Math.min(size, total)
+  total -= size
+  if (size === 0) stream.push(null)
+  else stream.push(Buffer.allocUnsafe(size))
+}
 
-var depth = 0;
+let depth = 0
 
 function flow(stream, size, callback) {
-  depth += 1;
-  var chunk = stream.read(size);
-  if (!chunk) stream.once('readable', flow.bind(null, stream, size, callback));else callback(chunk);
-  depth -= 1;
-  console.log("flow(".concat(depth, "): exit"));
+  depth += 1
+  const chunk = stream.read(size)
+  if (!chunk) stream.once('readable', flow.bind(null, stream, size, callback))
+  else callback(chunk)
+  depth -= 1
+  silentConsole.log(`flow(${depth}): exit`)
 }
 
 flow(stream, 5000, function () {
-  console.log("complete (".concat(depth, ")"));
-});
+  silentConsole.log(`complete (${depth})`)
+})
 process.on('exit', function (code) {
-  assert.strictEqual(reads, 2); // we pushed up the high water mark
+  assert.strictEqual(reads, 2) // We pushed up the high water mark
 
-  assert.strictEqual(stream.readableHighWaterMark, 8192); // length is 0 right now, because we pulled it all out.
+  assert.strictEqual(stream.readableHighWaterMark, 8192) // Length is 0 right now, because we pulled it all out.
 
-  assert.strictEqual(stream.readableLength, 0);
-  assert(!code);
-  assert.strictEqual(depth, 0);
+  assert.strictEqual(stream.readableLength, 0)
+  assert(!code)
+  assert.strictEqual(depth, 0)
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-  require('tap').pass();
-});
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

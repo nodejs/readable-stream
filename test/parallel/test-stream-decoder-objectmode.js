@@ -1,42 +1,37 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var readable = new stream.Readable({
-  read: function read() {},
+const readable = new stream.Readable({
+  read: () => {},
   encoding: 'utf16le',
   objectMode: true
-});
-readable.push(bufferShim.from('abc', 'utf16le'));
-readable.push(bufferShim.from('def', 'utf16le'));
-readable.push(null); // Without object mode, these would be concatenated into a single chunk.
+})
+readable.push(Buffer.from('abc', 'utf16le'))
+readable.push(Buffer.from('def', 'utf16le'))
+readable.push(null) // Without object mode, these would be concatenated into a single chunk.
 
-assert.strictEqual(readable.read(), 'abc');
-assert.strictEqual(readable.read(), 'def');
-assert.strictEqual(readable.read(), null);
-;
+assert.strictEqual(readable.read(), 'abc')
+assert.strictEqual(readable.read(), 'def')
+assert.strictEqual(readable.read(), null)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

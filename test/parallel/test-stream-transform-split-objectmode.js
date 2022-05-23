@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,80 +18,76 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Transform = require('../../').Transform;
+const Transform = require('../../lib/ours/index').Transform
 
-var parser = new Transform({
+const parser = new Transform({
   readableObjectMode: true
-});
-assert(parser._readableState.objectMode);
-assert(!parser._writableState.objectMode);
-assert.strictEqual(parser.readableHighWaterMark, 16);
-assert.strictEqual(parser.writableHighWaterMark, 16 * 1024);
-assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark);
-assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark);
+})
+assert(parser._readableState.objectMode)
+assert(!parser._writableState.objectMode)
+assert.strictEqual(parser.readableHighWaterMark, 16)
+assert.strictEqual(parser.writableHighWaterMark, 16 * 1024)
+assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
+assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
 
 parser._transform = function (chunk, enc, callback) {
   callback(null, {
     val: chunk[0]
-  });
-};
+  })
+}
 
-var parsed;
+let parsed
 parser.on('data', function (obj) {
-  parsed = obj;
-});
-parser.end(bufferShim.from([42]));
+  parsed = obj
+})
+parser.end(Buffer.from([42]))
 process.on('exit', function () {
-  assert.strictEqual(parsed.val, 42);
-});
-var serializer = new Transform({
+  assert.strictEqual(parsed.val, 42)
+})
+const serializer = new Transform({
   writableObjectMode: true
-});
-assert(!serializer._readableState.objectMode);
-assert(serializer._writableState.objectMode);
-assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024);
-assert.strictEqual(serializer.writableHighWaterMark, 16);
-assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark);
-assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark);
+})
+assert(!serializer._readableState.objectMode)
+assert(serializer._writableState.objectMode)
+assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024)
+assert.strictEqual(serializer.writableHighWaterMark, 16)
+assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
+assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
 
 serializer._transform = function (obj, _, callback) {
-  callback(null, bufferShim.from([obj.val]));
-};
+  callback(null, Buffer.from([obj.val]))
+}
 
-var serialized;
+let serialized
 serializer.on('data', function (chunk) {
-  serialized = chunk;
-});
+  serialized = chunk
+})
 serializer.write({
   val: 42
-});
+})
 process.on('exit', function () {
-  assert.strictEqual(serialized[0], 42);
-});
-;
+  assert.strictEqual(serialized[0], 42)
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

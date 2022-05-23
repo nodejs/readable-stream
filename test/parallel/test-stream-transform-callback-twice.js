@@ -1,41 +1,38 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Transform = _require.Transform;
+const { Transform } = require('../../lib/ours/index')
 
-var stream = new Transform({
-  transform: function transform(chunk, enc, cb) {
-    cb();
-    cb();
+const stream = new Transform({
+  transform(chunk, enc, cb) {
+    cb()
+    cb()
   }
-});
-stream.on('error', common.expectsError({
-  type: Error,
-  message: 'Callback called multiple times',
-  code: 'ERR_MULTIPLE_CALLBACK'
-}));
-stream.write('foo');
-;
+})
+stream.on(
+  'error',
+  common.expectsError({
+    name: 'Error',
+    message: 'Callback called multiple times',
+    code: 'ERR_MULTIPLE_CALLBACK'
+  })
+)
+stream.write('foo')
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

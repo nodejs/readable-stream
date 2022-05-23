@@ -1,48 +1,42 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var Readable = require('../../lib/_stream_readable');
+const { Readable } = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var buf = '';
-var euro = bufferShim.from([0xE2, 0x82, 0xAC]);
-var cent = bufferShim.from([0xC2, 0xA2]);
-var source = Buffer.concat([euro, cent]);
-var readable = Readable({
+let buf = ''
+const euro = Buffer.from([0xe2, 0x82, 0xac])
+const cent = Buffer.from([0xc2, 0xa2])
+const source = Buffer.concat([euro, cent])
+const readable = Readable({
   encoding: 'utf8'
-});
-readable.push(source.slice(0, 2));
-readable.push(source.slice(2, 4));
-readable.push(source.slice(4, source.length));
-;
-readable.push(null);
+})
+readable.push(source.slice(0, 2))
+readable.push(source.slice(2, 4))
+readable.push(source.slice(4, 6))
+readable.push(null)
 readable.on('data', function (data) {
-  buf += data;
-});
+  buf += data
+})
 process.on('exit', function () {
-  assert.strictEqual(buf, '€¢');
-});
-;
+  assert.strictEqual(buf, '€¢')
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

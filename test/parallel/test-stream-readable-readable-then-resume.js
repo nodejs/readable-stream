@@ -1,53 +1,51 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable; // This test verifies that a stream could be resumed after
+const { Readable } = require('../../lib/ours/index')
+
+const assert = require('assert') // This test verifies that a stream could be resumed after
 // removing the readable event in the same tick
 
+check(
+  new Readable({
+    objectMode: true,
+    highWaterMark: 1,
 
-check(new Readable({
-  objectMode: true,
-  highWaterMark: 1,
-  read: function read() {
-    if (!this.first) {
-      this.push('hello');
-      this.first = true;
-      return;
+    read() {
+      if (!this.first) {
+        this.push('hello')
+        this.first = true
+        return
+      }
+
+      this.push(null)
     }
-
-    this.push(null);
-  }
-}));
+  })
+)
 
 function check(s) {
-  var readableListener = common.mustNotCall();
-  s.on('readable', readableListener);
-  s.on('end', common.mustCall());
-  s.removeListener('readable', readableListener);
-  s.resume();
+  const readableListener = common.mustNotCall()
+  s.on('readable', readableListener)
+  s.on('end', common.mustCall())
+  assert.strictEqual(s.removeListener, s.off)
+  s.removeListener('readable', readableListener)
+  s.resume()
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

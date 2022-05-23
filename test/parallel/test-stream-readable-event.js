@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,133 +18,117 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Readable = require('../../').Readable;
+const Readable = require('../../lib/ours/index').Readable
 
 {
   // First test, not reading when the readable is added.
   // make sure that on('readable', ...) triggers a readable event.
-  var r = new Readable({
+  const r = new Readable({
     highWaterMark: 3
-  });
-  r._read = common.mustNotCall(); // This triggers a 'readable' event, which is lost.
+  })
+  r._read = common.mustNotCall() // This triggers a 'readable' event, which is lost.
 
-  r.push(bufferShim.from('blerg'));
+  r.push(Buffer.from('blerg'))
   setTimeout(function () {
-    // we're testing what we think we are
-    assert(!r._readableState.reading);
-    r.on('readable', common.mustCall());
-  }, 1);
+    // We're testing what we think we are
+    assert(!r._readableState.reading)
+    r.on('readable', common.mustCall())
+  }, 1)
 }
 {
-  // second test, make sure that readable is re-emitted if there's
+  // Second test, make sure that readable is re-emitted if there's
   // already a length, while it IS reading.
-  var _r = new Readable({
+  const r = new Readable({
     highWaterMark: 3
-  });
+  })
+  r._read = common.mustCall() // This triggers a 'readable' event, which is lost.
 
-  _r._read = common.mustCall(); // This triggers a 'readable' event, which is lost.
-
-  _r.push(bufferShim.from('bl'));
-
+  r.push(Buffer.from('bl'))
   setTimeout(function () {
-    // assert we're testing what we think we are
-    assert(_r._readableState.reading);
-
-    _r.on('readable', common.mustCall());
-  }, 1);
+    // Assert we're testing what we think we are
+    assert(r._readableState.reading)
+    r.on('readable', common.mustCall())
+  }, 1)
 }
 {
   // Third test, not reading when the stream has not passed
   // the highWaterMark but *has* reached EOF.
-  var _r2 = new Readable({
+  const r = new Readable({
     highWaterMark: 30
-  });
+  })
+  r._read = common.mustNotCall() // This triggers a 'readable' event, which is lost.
 
-  _r2._read = common.mustNotCall(); // This triggers a 'readable' event, which is lost.
-
-  _r2.push(bufferShim.from('blerg'));
-
-  _r2.push(null);
-
+  r.push(Buffer.from('blerg'))
+  r.push(null)
   setTimeout(function () {
-    // assert we're testing what we think we are
-    assert(!_r2._readableState.reading);
-
-    _r2.on('readable', common.mustCall());
-  }, 1);
+    // Assert we're testing what we think we are
+    assert(!r._readableState.reading)
+    r.on('readable', common.mustCall())
+  }, 1)
 }
 {
-  // pushing a empty string in non-objectMode should
+  // Pushing an empty string in non-objectMode should
   // trigger next `read()`.
-  var underlyingData = ['', 'x', 'y', '', 'z'];
-  var expected = underlyingData.filter(function (data) {
-    return data;
-  });
-  var result = [];
-
-  var _r3 = new Readable({
+  const underlyingData = ['', 'x', 'y', '', 'z']
+  const expected = underlyingData.filter((data) => data)
+  const result = []
+  const r = new Readable({
     encoding: 'utf8'
-  });
+  })
 
-  _r3._read = function () {
-    var _this = this;
-
-    process.nextTick(function () {
+  r._read = function () {
+    process.nextTick(() => {
       if (!underlyingData.length) {
-        _this.push(null);
+        this.push(null)
       } else {
-        _this.push(underlyingData.shift());
+        this.push(underlyingData.shift())
       }
-    });
-  };
+    })
+  }
 
-  _r3.on('readable', function () {
-    var data = _r3.read();
-
-    if (data !== null) result.push(data);
-  });
-
-  _r3.on('end', common.mustCall(function () {
-    assert.deepStrictEqual(result, expected);
-  }));
+  r.on('readable', () => {
+    const data = r.read()
+    if (data !== null) result.push(data)
+  })
+  r.on(
+    'end',
+    common.mustCall(() => {
+      assert.deepStrictEqual(result, expected)
+    })
+  )
 }
 {
   // #20923
-  var _r4 = new Readable();
+  const r = new Readable()
 
-  _r4._read = function () {// actually doing thing here
-  };
+  r._read = function () {
+    // Actually doing thing here
+  }
 
-  _r4.on('data', function () {});
-
-  _r4.removeAllListeners();
-
-  assert.strictEqual(_r4.eventNames().length, 0);
+  r.on('data', function () {})
+  r.removeAllListeners()
+  assert.strictEqual(r.eventNames().length, 0)
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

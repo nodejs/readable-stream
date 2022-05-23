@@ -1,27 +1,20 @@
-'use strict';
-var Stream = require('../../');
+'use strict'
+
+const { Stream } = require('../../lib/ours/index')
+
+const { kReadableStreamSuiteName } = require('./symbols')
 
 module.exports = function (t) {
-  t.tets('pipe without listenerCount', function (t) {
-    t.plan(2);
-    var r = new Stream({
-      read: function (){}});
-    r.listenerCount = undefined;
-
-    var w = new Stream();
-    w.listenerCount = undefined;
-
-    w.on('pipe', function() {
-      r.emit('error', new Error('Readable Error'));
-      w.emit('error', new Error('Writable Error'));
-    });
-    r.on('error', function (e) {
-      t.ok(e, 'readable error');
-    });
-    w.on('error', function (e) {
-      t.ok(e, 'writable error');
-    });
-    r.pipe(w);
-
-  });
+  t.plan(1)
+  const r = new Stream({
+    read: function () {}
+  })
+  r.listenerCount = undefined
+  const w = new Stream()
+  w.on('pipe', function () {
+    r.emit('error', new Error('Readable Error'))
+  })
+  t.throws(() => r.pipe(w), 'TypeError: this.listenerCount is not a function')
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-without-listenerCount'

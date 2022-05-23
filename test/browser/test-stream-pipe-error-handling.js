@@ -1,102 +1,104 @@
-'use strict';
-var common = require('../common');
-var Stream = require('stream').Stream;
+'use strict'
 
-module.exports = function (t) {
-  t.test('Error Listener Catches', function (t) {
-    t.plan(1);
-    var source = new Stream();
-    var dest = new Stream();
+const { Readable, Writable, Stream } = require('../../lib/ours/index')
 
-    source.pipe(dest);
+const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
 
-    var gotErr = null;
-    source.on('error', function(err) {
-      gotErr = err;
-    });
+module.exports = function (test) {
+  test('Error Listener Catches', function (t) {
+    t.plan(1)
+    const source = new Stream()
+    const dest = new Stream()
 
-    var err = new Error('This stream turned into bacon.');
-    source.emit('error', err);
-    t.strictEqual(gotErr, err);
-  });
+    source._read = function () {}
 
-  t.test('Error WithoutListener Throws', function (t) {
-    t.plan(1);
-    var source = new Stream();
-    var dest = new Stream();
+    source.pipe(dest)
+    let gotErr = null
+    source.on('error', function (err) {
+      gotErr = err
+    })
+    const err = new Error('This stream turned into bacon.')
+    source.emit('error', err)
+    t.strictEqual(gotErr, err)
+  })
+  test('Error WithoutListener Throws', function (t) {
+    t.plan(1)
+    const source = new Stream()
+    const dest = new Stream()
 
-    source.pipe(dest);
+    source._read = function () {}
 
-    var err = new Error('This stream turned into bacon.');
+    source.pipe(dest)
+    const err = new Error('This stream turned into bacon.')
+    let gotErr = null
 
-    var gotErr = null;
     try {
-      source.emit('error', err);
+      source.emit('error', err)
     } catch (e) {
-      gotErr = e;
+      gotErr = e
     }
 
-    t.strictEqual(gotErr, err);
-  });
+    t.strictEqual(gotErr, err)
+  })
+  test('Error With Removed Listener Throws', function (t) {
+    t.plan(2)
+    const onerror = global.onerror
+    const r = new Readable()
+    const w = new Writable()
+    let removed = false
+    let caught = false
 
-  t.test('Error With Removed Listener Throws', function (t) {
-    t.plan(2);
-    var EE = require('events').EventEmitter;
-    var R = require('../../').Readable;
-    var W = require('../../').Writable;
+    global.onerror = () => {
+      t.notOk(caught)
+      global.onerror = onerror
+      return true
+    }
 
-    var r = new R();
-    var w = new W();
-    var removed = false;
+    r._read = function () {
+      setTimeout(function () {
+        t.ok(removed)
+        w.emit('error', new Error('fail'))
+      })
+    }
 
-    r._read = function() {
-      setTimeout(function() {
-        t.ok(removed);
-        t.throws(function() {
-          w.emit('error', new Error('fail'));
-        });
-      });
-    };
-
-    w.on('error', myOnError);
-    r.pipe(w);
-    w.removeListener('error', myOnError);
-    removed = true;
+    w.on('error', myOnError)
+    r.pipe(w)
+    w.removeListener('error', myOnError)
+    removed = true
 
     function myOnError(er) {
-      throw new Error('this should not happen');
+      caught = true
     }
-  });
+  })
+  test('Error Listener Catches When Wrong Listener Is Removed', function (t) {
+    t.plan(2)
+    const r = new Readable()
+    const w = new Writable()
+    let removed = false
+    let caught = false
 
-  t.test('Error With Removed Listener Throws', function (t) {
-    t.plan(2);
-    var EE = require('events').EventEmitter;
-    var R = require('../../').Readable;
-    var W = require('../../').Writable;
+    r._read = function () {
+      setTimeout(function () {
+        t.ok(removed)
+        w.emit('error', new Error('fail'))
+      })
+    }
 
-    var r = new R();
-    var w = new W();
-    var removed = false;
-    var caught = false;
+    w.on('error', myOnError)
 
-    r._read = function() {
-      setTimeout(function() {
-        t.ok(removed);
-        w.emit('error', new Error('fail'));
-      });
-    };
+    w._write = function () {}
 
-    w.on('error', myOnError);
-    w._write = function() {};
+    r.pipe(w) // Removing some OTHER random listener should not do anything
 
-    r.pipe(w);
-    // Removing some OTHER random listener should not do anything
-    w.removeListener('error', function() {});
-    removed = true;
+    w.removeListener('error', function () {})
+    removed = true
 
     function myOnError(er) {
-      t.notOk(caught);
-      caught = true;
+      t.notOk(caught)
+      caught = true
     }
-  });
+  })
 }
+
+module.exports[kReadableStreamSuiteName] = 'stream-pipe-error-handling'
+module.exports[kReadableStreamSuiteHasMultipleTests] = true

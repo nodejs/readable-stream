@@ -1,39 +1,34 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var r = new stream.Stream();
-r.listenerCount = undefined;
-var w = new stream.Stream();
-w.listenerCount = undefined;
+const r = new stream.Stream()
+r.listenerCount = undefined
+const w = new stream.Stream()
+w.listenerCount = undefined
 w.on('pipe', function () {
-  r.emit('error', new Error('Readable Error'));
-  w.emit('error', new Error('Writable Error'));
-});
-r.on('error', common.mustCall());
-w.on('error', common.mustCall());
-r.pipe(w);
-;
+  r.emit('error', new Error('Readable Error'))
+  w.emit('error', new Error('Writable Error'))
+})
+r.on('error', common.mustCall())
+w.on('error', common.mustCall())
+r.pipe(w)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

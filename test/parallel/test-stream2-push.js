@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,124 +18,123 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable;
+const { Readable, Writable } = require('../../lib/ours/index')
 
-var EE = require('events').EventEmitter; // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
+const EE = require('events').EventEmitter // A mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
-
-var stream = new Readable({
+const stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
-});
-var source = new EE();
+})
+const source = new EE()
 
 stream._read = function () {
-  console.error('stream._read');
-  readStart();
-};
+  silentConsole.error('stream._read')
+  readStart()
+}
 
-var ended = false;
+let ended = false
 stream.on('end', function () {
-  ended = true;
-});
+  ended = true
+})
 source.on('data', function (chunk) {
-  var ret = stream.push(chunk);
-  console.error('data', stream.readableLength);
-  if (!ret) readStop();
-});
+  const ret = stream.push(chunk)
+  silentConsole.error('data', stream.readableLength)
+  if (!ret) readStop()
+})
 source.on('end', function () {
-  stream.push(null);
-});
-var reading = false;
+  stream.push(null)
+})
+let reading = false
 
 function readStart() {
-  console.error('readStart');
-  reading = true;
+  silentConsole.error('readStart')
+  reading = true
 }
 
 function readStop() {
-  console.error('readStop');
-  reading = false;
+  silentConsole.error('readStop')
+  reading = false
   process.nextTick(function () {
-    var r = stream.read();
-    if (r !== null) writer.write(r);
-  });
+    const r = stream.read()
+    if (r !== null) writer.write(r)
+  })
 }
 
-var writer = new Writable({
+const writer = new Writable({
   decodeStrings: false
-});
-var written = [];
-var expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
+})
+const written = []
+const expectWritten = [
+  'asdfgasdfgasdfgasdfg',
+  'asdfgasdfgasdfgasdfg',
+  'asdfgasdfgasdfgasdfg',
+  'asdfgasdfgasdfgasdfg',
+  'asdfgasdfgasdfgasdfg',
+  'asdfgasdfgasdfgasdfg'
+]
 
 writer._write = function (chunk, encoding, cb) {
-  console.error("WRITE ".concat(chunk));
-  written.push(chunk);
-  process.nextTick(cb);
-};
+  silentConsole.error(`WRITE ${chunk}`)
+  written.push(chunk)
+  process.nextTick(cb)
+}
 
-writer.on('finish', finish); // now emit some chunks.
+writer.on('finish', finish) // Now emit some chunks.
 
-var chunk = 'asdfg';
-var set = 0;
-readStart();
-data();
+const chunk = 'asdfg'
+let set = 0
+readStart()
+data()
 
 function data() {
-  assert(reading);
-  source.emit('data', chunk);
-  assert(reading);
-  source.emit('data', chunk);
-  assert(reading);
-  source.emit('data', chunk);
-  assert(reading);
-  source.emit('data', chunk);
-  assert(!reading);
-  if (set++ < 5) setTimeout(data, 10);else end();
+  assert(reading)
+  source.emit('data', chunk)
+  assert(reading)
+  source.emit('data', chunk)
+  assert(reading)
+  source.emit('data', chunk)
+  assert(reading)
+  source.emit('data', chunk)
+  assert(!reading)
+  if (set++ < 5) setTimeout(data, 10)
+  else end()
 }
 
 function finish() {
-  console.error('finish');
-  assert.deepStrictEqual(written, expectWritten);
-
-  require('tap').pass();
+  silentConsole.error('finish')
+  assert.deepStrictEqual(written, expectWritten)
+  silentConsole.log('ok')
 }
 
 function end() {
-  source.emit('end');
-  assert(!reading);
-  writer.end(stream.read());
+  source.emit('end')
+  assert(!reading)
+  writer.end(stream.read())
   setImmediate(function () {
-    assert(ended);
-  });
+    assert(ended)
+  })
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

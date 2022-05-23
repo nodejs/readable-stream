@@ -1,101 +1,73 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var _require = require('../../'),
-    Readable = _require.Readable;
+const { Readable } = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
 {
   // Call .setEncoding() while there are bytes already in the buffer.
-  var r = new Readable({
-    read: function read() {}
-  });
-  r.push(bufferShim.from('a'));
-  r.push(bufferShim.from('b'));
-  r.setEncoding('utf8');
-  var chunks = [];
-  r.on('data', function (chunk) {
-    return chunks.push(chunk);
-  });
-  process.nextTick(function () {
-    assert.deepStrictEqual(chunks, ['ab']);
-  });
+  const r = new Readable({
+    read() {}
+  })
+  r.push(Buffer.from('a'))
+  r.push(Buffer.from('b'))
+  r.setEncoding('utf8')
+  const chunks = []
+  r.on('data', (chunk) => chunks.push(chunk))
+  process.nextTick(() => {
+    assert.deepStrictEqual(chunks, ['ab'])
+  })
 }
 {
   // Call .setEncoding() while the buffer contains a complete,
   // but chunked character.
-  var _r = new Readable({
-    read: function read() {}
-  });
-
-  _r.push(bufferShim.from([0xf0]));
-
-  _r.push(bufferShim.from([0x9f]));
-
-  _r.push(bufferShim.from([0x8e]));
-
-  _r.push(bufferShim.from([0x89]));
-
-  _r.setEncoding('utf8');
-
-  var _chunks = [];
-
-  _r.on('data', function (chunk) {
-    return _chunks.push(chunk);
-  });
-
-  process.nextTick(function () {
-    assert.deepStrictEqual(_chunks, ['🎉']);
-  });
+  const r = new Readable({
+    read() {}
+  })
+  r.push(Buffer.from([0xf0]))
+  r.push(Buffer.from([0x9f]))
+  r.push(Buffer.from([0x8e]))
+  r.push(Buffer.from([0x89]))
+  r.setEncoding('utf8')
+  const chunks = []
+  r.on('data', (chunk) => chunks.push(chunk))
+  process.nextTick(() => {
+    assert.deepStrictEqual(chunks, ['🎉'])
+  })
 }
 {
   // Call .setEncoding() while the buffer contains an incomplete character,
   // and finish the character later.
-  var _r2 = new Readable({
-    read: function read() {}
-  });
-
-  _r2.push(bufferShim.from([0xf0]));
-
-  _r2.push(bufferShim.from([0x9f]));
-
-  _r2.setEncoding('utf8');
-
-  _r2.push(bufferShim.from([0x8e]));
-
-  _r2.push(bufferShim.from([0x89]));
-
-  var _chunks2 = [];
-
-  _r2.on('data', function (chunk) {
-    return _chunks2.push(chunk);
-  });
-
-  process.nextTick(function () {
-    assert.deepStrictEqual(_chunks2, ['🎉']);
-  });
+  const r = new Readable({
+    read() {}
+  })
+  r.push(Buffer.from([0xf0]))
+  r.push(Buffer.from([0x9f]))
+  r.setEncoding('utf8')
+  r.push(Buffer.from([0x8e]))
+  r.push(Buffer.from([0x89]))
+  const chunks = []
+  r.on('data', (chunk) => chunks.push(chunk))
+  process.nextTick(() => {
+    assert.deepStrictEqual(chunks, ['🎉'])
+  })
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

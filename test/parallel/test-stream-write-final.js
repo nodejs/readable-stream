@@ -1,48 +1,46 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var shutdown = false;
-var w = new stream.Writable({
+let shutdown = false
+const w = new stream.Writable({
   final: common.mustCall(function (cb) {
-    assert.strictEqual(this, w);
+    assert.strictEqual(this, w)
     setTimeout(function () {
-      shutdown = true;
-      cb();
-    }, 100);
+      shutdown = true
+      cb()
+    }, 100)
   }),
-  write: function write(chunk, e, cb) {
-    process.nextTick(cb);
+  write: function (chunk, e, cb) {
+    process.nextTick(cb)
   }
-});
-w.on('finish', common.mustCall(function () {
-  assert(shutdown);
-}));
-w.write(bufferShim.allocUnsafe(1));
-w.end(bufferShim.allocUnsafe(0));
-;
+})
+w.on(
+  'finish',
+  common.mustCall(function () {
+    assert(shutdown)
+  })
+)
+w.write(Buffer.allocUnsafe(1))
+w.end(Buffer.allocUnsafe(0))
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

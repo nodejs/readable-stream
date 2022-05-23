@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,63 +18,59 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Duplex = require('../../').Duplex;
+const Duplex = require('../../lib/ours/index').Duplex
 
-var stream = new Duplex({
+const stream = new Duplex({
   objectMode: true
-});
-assert(Duplex() instanceof Duplex);
-assert(stream._readableState.objectMode);
-assert(stream._writableState.objectMode);
-assert(stream.allowHalfOpen);
-assert.strictEqual(stream.listenerCount('end'), 0);
-var written;
-var read;
+})
+assert(Duplex() instanceof Duplex)
+assert(stream._readableState.objectMode)
+assert(stream._writableState.objectMode)
+assert(stream.allowHalfOpen)
+assert.strictEqual(stream.listenerCount('end'), 0)
+let written
+let read
 
-stream._write = function (obj, _, cb) {
-  written = obj;
-  cb();
-};
+stream._write = (obj, _, cb) => {
+  written = obj
+  cb()
+}
 
-stream._read = function () {};
+stream._read = () => {}
 
-stream.on('data', function (obj) {
-  read = obj;
-});
+stream.on('data', (obj) => {
+  read = obj
+})
 stream.push({
   val: 1
-});
+})
 stream.end({
   val: 2
-});
-process.on('exit', function () {
-  assert.strictEqual(read.val, 1);
-  assert.strictEqual(written.val, 2);
-});
-;
+})
+process.on('exit', () => {
+  assert.strictEqual(read.val, 1)
+  assert.strictEqual(written.val, 2)
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

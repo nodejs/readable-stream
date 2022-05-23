@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,58 +18,60 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var PassThrough = stream.PassThrough;
-var src = new PassThrough({
+const PassThrough = stream.PassThrough
+const src = new PassThrough({
   objectMode: true
-});
-var tx = new PassThrough({
+})
+const tx = new PassThrough({
   objectMode: true
-});
-var dest = new PassThrough({
+})
+const dest = new PassThrough({
   objectMode: true
-});
-var expect = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-var results = [];
-dest.on('data', common.mustCall(function (x) {
-  results.push(x);
-}, expect.length));
-src.pipe(tx).pipe(dest);
-var i = -1;
-var int = setInterval(common.mustCall(function () {
-  if (results.length === expect.length) {
-    src.end();
-    clearInterval(int);
-    assert.deepStrictEqual(results, expect);
+})
+const expect = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const results = []
+dest.on(
+  'data',
+  common.mustCall(function (x) {
+    results.push(x)
+  }, expect.length)
+)
+src.pipe(tx).pipe(dest)
+let i = -1
+const int = setInterval(
+  common.mustCall(function () {
+    if (results.length === expect.length) {
+      src.end()
+      clearInterval(int)
+      assert.deepStrictEqual(results, expect)
+    } else {
+      src.write(i++)
+    }
+  }, expect.length + 1),
+  1
+)
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
   } else {
-    src.write(i++);
+    tap.fail(`test failed - exited code ${code}`)
   }
-}, expect.length + 1), 1);
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+})
+/* replacement end */

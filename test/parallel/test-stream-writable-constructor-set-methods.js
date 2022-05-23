@@ -1,60 +1,58 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var _require = require('assert/'),
-    strictEqual = _require.strictEqual;
+const assert = require('assert')
 
-var _require2 = require('../../'),
-    Writable = _require2.Writable;
+const { Writable } = require('../../lib/ours/index')
 
-var w = new Writable();
-w.on('error', common.expectsError({
-  type: Error,
-  code: 'ERR_METHOD_NOT_IMPLEMENTED',
-  message: 'The _write() method is not implemented'
-}));
-w.end(bufferShim.from('blerg'));
+const bufferBlerg = Buffer.from('blerg')
+const w = new Writable()
+assert.throws(
+  () => {
+    w.end(bufferBlerg)
+  },
+  {
+    name: 'Error',
+    code: 'ERR_METHOD_NOT_IMPLEMENTED',
+    message: 'The _write() method is not implemented'
+  }
+)
 
-var _write = common.mustCall(function (chunk, _, next) {
-  next();
-});
+const _write = common.mustCall((chunk, _, next) => {
+  next()
+})
 
-var _writev = common.mustCall(function (chunks, next) {
-  strictEqual(chunks.length, 2);
-  next();
-});
+const _writev = common.mustCall((chunks, next) => {
+  assert.strictEqual(chunks.length, 2)
+  next()
+})
 
-var w2 = new Writable({
+const w2 = new Writable({
   write: _write,
   writev: _writev
-});
-strictEqual(w2._write, _write);
-strictEqual(w2._writev, _writev);
-w2.write(bufferShim.from('blerg'));
-w2.cork();
-w2.write(bufferShim.from('blerg'));
-w2.write(bufferShim.from('blerg'));
-w2.end();
-;
+})
+assert.strictEqual(w2._write, _write)
+assert.strictEqual(w2._writev, _writev)
+w2.write(bufferBlerg)
+w2.cork()
+w2.write(bufferBlerg)
+w2.write(bufferBlerg)
+w2.end()
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

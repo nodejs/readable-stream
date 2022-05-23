@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,47 +18,42 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var Readable = require('../../').Readable; // This tests synchronous read callbacks and verifies that even if they nest
+const Readable = require('../../lib/ours/index').Readable // This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error
 
-
-var r = new Readable();
-var N = 256 * 1024;
-var reads = 0;
+const r = new Readable()
+const N = 256 * 1024
+let reads = 0
 
 r._read = function (n) {
-  var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
-  r.push(chunk);
-};
+  const chunk = reads++ === N ? null : Buffer.allocUnsafe(1)
+  r.push(chunk)
+}
 
 r.on('readable', function onReadable() {
-  if (!(r.readableLength % 256)) console.error('readable', r.readableLength);
-  r.read(N * 2);
-});
-r.on('end', common.mustCall());
-r.read(0);
-;
+  if (!(r.readableLength % 256)) silentConsole.error('readable', r.readableLength)
+  r.read(N * 2)
+})
+r.on('end', common.mustCall())
+r.read(0)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

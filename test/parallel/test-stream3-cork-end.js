@@ -1,106 +1,99 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var Writable = stream.Writable; // Test the buffering behavior of Writable streams.
+const Writable = stream.Writable // Test the buffering behavior of Writable streams.
 //
 // The call to cork() triggers storing chunks which are flushed
 // on calling end() and the stream subsequently ended.
 //
 // node version target: 0.12
 
-var expectedChunks = ['please', 'buffer', 'me', 'kindly'];
-var inputChunks = expectedChunks.slice(0);
-var seenChunks = [];
-var seenEnd = false;
-var w = new Writable(); // lets arrange to store the chunks
+const expectedChunks = ['please', 'buffer', 'me', 'kindly']
+const inputChunks = expectedChunks.slice(0)
+let seenChunks = []
+let seenEnd = false
+const w = new Writable() // Let's arrange to store the chunks.
 
 w._write = function (chunk, encoding, cb) {
-  // stream end event is not seen before the last write
-  assert.ok(!seenEnd); // default encoding given none was specified
+  // Stream end event is not seen before the last write.
+  assert.ok(!seenEnd) // Default encoding given none was specified.
 
-  assert.strictEqual(encoding, 'buffer');
-  seenChunks.push(chunk);
-  cb();
-}; // lets record the stream end event
+  assert.strictEqual(encoding, 'buffer')
+  seenChunks.push(chunk)
+  cb()
+} // Let's record the stream end event.
 
-
-w.on('finish', function () {
-  seenEnd = true;
-});
+w.on('finish', () => {
+  seenEnd = true
+})
 
 function writeChunks(remainingChunks, callback) {
-  var writeChunk = remainingChunks.shift();
-  var writeState;
+  const writeChunk = remainingChunks.shift()
+  let writeState
 
   if (writeChunk) {
-    setImmediate(function () {
-      writeState = w.write(writeChunk); // we were not told to stop writing
+    setImmediate(() => {
+      writeState = w.write(writeChunk) // We were not told to stop writing.
 
-      assert.ok(writeState);
-      writeChunks(remainingChunks, callback);
-    });
+      assert.ok(writeState)
+      writeChunks(remainingChunks, callback)
+    })
   } else {
-    callback();
+    callback()
   }
-} // do an initial write
+} // Do an initial write.
 
+w.write('stuff') // The write was immediate.
 
-w.write('stuff'); // the write was immediate
+assert.strictEqual(seenChunks.length, 1) // Reset the seen chunks.
 
-assert.strictEqual(seenChunks.length, 1); // reset the seen chunks
+seenChunks = [] // Trigger stream buffering.
 
-seenChunks = []; // trigger stream buffering
+w.cork() // Write the bufferedChunks.
 
-w.cork(); // write the bufferedChunks
+writeChunks(inputChunks, () => {
+  // Should not have seen anything yet.
+  assert.strictEqual(seenChunks.length, 0) // Trigger flush and ending the stream.
 
-writeChunks(inputChunks, function () {
-  // should not have seen anything yet
-  assert.strictEqual(seenChunks.length, 0); // trigger flush and ending the stream
+  w.end() // Stream should not ended in current tick.
 
-  w.end(); // stream should not ended in current tick
+  assert.ok(!seenEnd) // Buffered bytes should be seen in current tick.
 
-  assert.ok(!seenEnd); // buffered bytes should be seen in current tick
+  assert.strictEqual(seenChunks.length, 4) // Did the chunks match.
 
-  assert.strictEqual(seenChunks.length, 4); // did the chunks match
+  for (let i = 0, l = expectedChunks.length; i < l; i++) {
+    const seen = seenChunks[i] // There was a chunk.
 
-  for (var i = 0, l = expectedChunks.length; i < l; i++) {
-    var seen = seenChunks[i]; // there was a chunk
+    assert.ok(seen)
+    const expected = Buffer.from(expectedChunks[i]) // It was what we expected.
 
-    assert.ok(seen);
-    var expected = bufferShim.from(expectedChunks[i]); // it was what we expected
-
-    assert.deepEqual(seen, expected);
+    assert.ok(seen.equals(expected))
   }
 
-  setImmediate(function () {
-    // stream should have ended in next tick
-    assert.ok(seenEnd);
-  });
-});
-;
+  setImmediate(() => {
+    // Stream should have ended in next tick.
+    assert.ok(seenEnd)
+  })
+})
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

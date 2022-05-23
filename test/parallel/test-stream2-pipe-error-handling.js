@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,117 +18,109 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
 {
-  var count = 1000;
-  var source = new stream.Readable();
+  let count = 1000
+  const source = new stream.Readable()
 
   source._read = function (n) {
-    n = Math.min(count, n);
-    count -= n;
-    source.push(bufferShim.allocUnsafe(n));
-  };
-
-  var unpipedDest;
-
-  source.unpipe = function (dest) {
-    unpipedDest = dest;
-    stream.Readable.prototype.unpipe.call(this, dest);
-  };
-
-  var dest = new stream.Writable();
-
-  dest._write = function (chunk, encoding, cb) {
-    cb();
-  };
-
-  source.pipe(dest);
-  var gotErr = null;
-  dest.on('error', function (err) {
-    gotErr = err;
-  });
-  var unpipedSource;
-  dest.on('unpipe', function (src) {
-    unpipedSource = src;
-  });
-  var err = new Error('This stream turned into bacon.');
-  dest.emit('error', err);
-  assert.strictEqual(gotErr, err);
-  assert.strictEqual(unpipedSource, source);
-  assert.strictEqual(unpipedDest, dest);
-}
-{
-  var _count = 1000;
-
-  var _source = new stream.Readable();
-
-  _source._read = function (n) {
-    n = Math.min(_count, n);
-    _count -= n;
-
-    _source.push(bufferShim.allocUnsafe(n));
-  };
-
-  var _unpipedDest;
-
-  _source.unpipe = function (dest) {
-    _unpipedDest = dest;
-    stream.Readable.prototype.unpipe.call(this, dest);
-  };
-
-  var _dest = new stream.Writable();
-
-  _dest._write = function (chunk, encoding, cb) {
-    cb();
-  };
-
-  _source.pipe(_dest);
-
-  var _unpipedSource;
-
-  _dest.on('unpipe', function (src) {
-    _unpipedSource = src;
-  });
-
-  var _err = new Error('This stream turned into bacon.');
-
-  var _gotErr = null;
-
-  try {
-    _dest.emit('error', _err);
-  } catch (e) {
-    _gotErr = e;
+    n = Math.min(count, n)
+    count -= n
+    source.push(Buffer.allocUnsafe(n))
   }
 
-  assert.strictEqual(_gotErr, _err);
-  assert.strictEqual(_unpipedSource, _source);
-  assert.strictEqual(_unpipedDest, _dest);
+  let unpipedDest
+
+  source.unpipe = function (dest) {
+    unpipedDest = dest
+    stream.Readable.prototype.unpipe.call(this, dest)
+  }
+
+  const dest = new stream.Writable()
+
+  dest._write = function (chunk, encoding, cb) {
+    cb()
+  }
+
+  source.pipe(dest)
+  let gotErr = null
+  dest.on('error', function (err) {
+    gotErr = err
+  })
+  let unpipedSource
+  dest.on('unpipe', function (src) {
+    unpipedSource = src
+  })
+  const err = new Error('This stream turned into bacon.')
+  dest.emit('error', err)
+  assert.strictEqual(gotErr, err)
+  assert.strictEqual(unpipedSource, source)
+  assert.strictEqual(unpipedDest, dest)
 }
-;
+{
+  let count = 1000
+  const source = new stream.Readable()
 
-(function () {
-  var t = require('tap');
+  source._read = function (n) {
+    n = Math.min(count, n)
+    count -= n
+    source.push(Buffer.allocUnsafe(n))
+  }
 
-  t.pass('sync run');
-})();
+  let unpipedDest
 
-var _list = process.listeners('uncaughtException');
+  source.unpipe = function (dest) {
+    unpipedDest = dest
+    stream.Readable.prototype.unpipe.call(this, dest)
+  }
 
-process.removeAllListeners('uncaughtException');
+  const dest = new stream.Writable({
+    autoDestroy: false
+  })
 
-_list.pop();
+  dest._write = function (chunk, encoding, cb) {
+    cb()
+  }
 
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+  source.pipe(dest)
+  let unpipedSource
+  dest.on('unpipe', function (src) {
+    unpipedSource = src
+  })
+  const err = new Error('This stream turned into bacon.')
+  let gotErr = null
+
+  try {
+    dest.emit('error', err)
+  } catch (e) {
+    gotErr = e
+  }
+
+  assert.strictEqual(gotErr, err)
+  assert.strictEqual(unpipedSource, source)
+  assert.strictEqual(unpipedDest, dest)
+}
+/* replacement start */
+
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

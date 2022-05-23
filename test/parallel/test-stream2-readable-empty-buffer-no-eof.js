@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,23 +18,26 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Readable = require('../../').Readable;
+const Readable = require('../../lib/ours/index').Readable
 
-test1();
-test2();
+test1()
+test2()
 
 function test1() {
-  var r = new Readable(); // should not end when we get a bufferShim.alloc(0) or '' as the _read
+  const r = new Readable() // Should not end when we get a Buffer.alloc(0) or '' as the _read
   // result that just means that there is *temporarily* no data, but to
   // go ahead and try again later.
   //
@@ -46,114 +47,101 @@ function test1() {
   // r.read(0) again later, otherwise there is no more work being done
   // and the process just exits.
 
-  var buf = bufferShim.alloc(5, 'x');
-  var reads = 5;
+  const buf = Buffer.alloc(5, 'x')
+  let reads = 5
 
   r._read = function (n) {
     switch (reads--) {
       case 5:
-        return setImmediate(function () {
-          return r.push(buf);
-        });
+        return setImmediate(() => {
+          return r.push(buf)
+        })
 
       case 4:
-        setImmediate(function () {
-          return r.push(bufferShim.alloc(0));
-        });
-        return setImmediate(r.read.bind(r, 0));
+        setImmediate(() => {
+          return r.push(Buffer.alloc(0))
+        })
+        return setImmediate(r.read.bind(r, 0))
 
       case 3:
-        setTimeout(r.read.bind(r, 0), 50);
-        return process.nextTick(function () {
-          return r.push(bufferShim.alloc(0));
-        });
+        setImmediate(r.read.bind(r, 0))
+        return process.nextTick(() => {
+          return r.push(Buffer.alloc(0))
+        })
 
       case 2:
-        setImmediate(r.read.bind(r, 0));
-        return r.push(bufferShim.alloc(0));
+        setImmediate(r.read.bind(r, 0))
+        return r.push(Buffer.alloc(0))
       // Not-EOF!
 
       case 1:
-        return r.push(buf);
+        return r.push(buf)
 
       case 0:
-        return r.push(null);
+        return r.push(null)
       // EOF
 
       default:
-        throw new Error('unreachable');
-    }
-  };
-
-  var results = [];
-
-  function flow() {
-    var chunk;
-
-    while (null !== (chunk = r.read())) {
-      results.push(String(chunk));
+        throw new Error('unreachable')
     }
   }
 
-  r.on('readable', flow);
-  r.on('end', function () {
-    results.push('EOF');
-  });
-  flow();
-  process.on('exit', function () {
-    assert.deepStrictEqual(results, ['xxxxx', 'xxxxx', 'EOF']);
+  const results = []
 
-    require('tap').pass();
-  });
+  function flow() {
+    let chunk
+
+    while (null !== (chunk = r.read())) results.push(String(chunk))
+  }
+
+  r.on('readable', flow)
+  r.on('end', () => {
+    results.push('EOF')
+  })
+  flow()
+  process.on('exit', () => {
+    assert.deepStrictEqual(results, ['xxxxx', 'xxxxx', 'EOF'])
+    silentConsole.log('ok')
+  })
 }
 
 function test2() {
-  var r = new Readable({
+  const r = new Readable({
     encoding: 'base64'
-  });
-  var reads = 5;
+  })
+  let reads = 5
 
   r._read = function (n) {
-    if (!reads--) return r.push(null); // EOF
-    else return r.push(bufferShim.from('x'));
-  };
+    if (!reads--) return r.push(null) // EOF
 
-  var results = [];
-
-  function flow() {
-    var chunk;
-
-    while (null !== (chunk = r.read())) {
-      results.push(String(chunk));
-    }
+    return r.push(Buffer.from('x'))
   }
 
-  r.on('readable', flow);
-  r.on('end', function () {
-    results.push('EOF');
-  });
-  flow();
-  process.on('exit', function () {
-    assert.deepStrictEqual(results, ['eHh4', 'eHg=', 'EOF']);
+  const results = []
 
-    require('tap').pass();
-  });
+  function flow() {
+    let chunk
+
+    while (null !== (chunk = r.read())) results.push(String(chunk))
+  }
+
+  r.on('readable', flow)
+  r.on('end', () => {
+    results.push('EOF')
+  })
+  flow()
+  process.on('exit', () => {
+    assert.deepStrictEqual(results, ['eHh4', 'eHg=', 'EOF'])
+    silentConsole.log('ok')
+  })
 }
+/* replacement start */
 
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

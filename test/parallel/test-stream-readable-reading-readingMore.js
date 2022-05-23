@@ -1,178 +1,167 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var Readable = require('../../').Readable;
+const Readable = require('../../lib/ours/index').Readable
 
 {
-  var readable = new Readable({
-    read: function read(size) {}
-  });
-  var state = readable._readableState; // Starting off with false initially.
+  const readable = new Readable({
+    read(size) {}
+  })
+  const state = readable._readableState // Starting off with false initially.
 
-  assert.strictEqual(state.reading, false);
-  assert.strictEqual(state.readingMore, false);
-  readable.on('data', common.mustCall(function (data) {
-    // while in a flowing state with a 'readable' listener
-    // we should not be reading more
-    if (readable.readableFlowing) assert.strictEqual(state.readingMore, true); // reading as long as we've not ended
+  assert.strictEqual(state.reading, false)
+  assert.strictEqual(state.readingMore, false)
+  readable.on(
+    'data',
+    common.mustCall((data) => {
+      // While in a flowing state with a 'readable' listener
+      // we should not be reading more
+      if (readable.readableFlowing) assert.strictEqual(state.readingMore, true) // Reading as long as we've not ended
 
-    assert.strictEqual(state.reading, !state.ended);
-  }, 2));
+      assert.strictEqual(state.reading, !state.ended)
+    }, 2)
+  )
 
   function onStreamEnd() {
     // End of stream; state.reading is false
     // And so should be readingMore.
-    assert.strictEqual(state.readingMore, false);
-    assert.strictEqual(state.reading, false);
+    assert.strictEqual(state.readingMore, false)
+    assert.strictEqual(state.reading, false)
   }
 
-  var expectedReadingMore = [true, false];
-  readable.on('readable', common.mustCall(function () {
-    // there is only one readingMore scheduled from on('data'),
-    // after which everything is governed by the .read() call
-    assert.strictEqual(state.readingMore, expectedReadingMore.shift()); // if the stream has ended, we shouldn't be reading
+  const expectedReadingMore = [true, true, false]
+  readable.on(
+    'readable',
+    common.mustCall(() => {
+      // There is only one readingMore scheduled from on('data'),
+      // after which everything is governed by the .read() call
+      assert.strictEqual(state.readingMore, expectedReadingMore.shift()) // If the stream has ended, we shouldn't be reading
 
-    assert.strictEqual(state.ended, !state.reading);
-    var data = readable.read();
-    if (data === null) // reached end of stream
-      process.nextTick(common.mustCall(onStreamEnd, 1));
-  }, 2));
-  readable.on('end', common.mustCall(onStreamEnd));
-  readable.push('pushed');
-  readable.read(6); // reading
+      assert.strictEqual(state.ended, !state.reading) // Consume all the data
 
-  assert.strictEqual(state.reading, true);
-  assert.strictEqual(state.readingMore, true); // add chunk to front
+      while (readable.read() !== null);
 
-  readable.unshift('unshifted'); // end
+      if (expectedReadingMore.length === 0)
+        // Reached end of stream
+        process.nextTick(common.mustCall(onStreamEnd, 1))
+    }, 3)
+  )
+  readable.on('end', common.mustCall(onStreamEnd))
+  readable.push('pushed')
+  readable.read(6) // reading
 
-  readable.push(null);
+  assert.strictEqual(state.reading, true)
+  assert.strictEqual(state.readingMore, true) // add chunk to front
+
+  readable.unshift('unshifted') // end
+
+  readable.push(null)
 }
 {
-  var _readable = new Readable({
-    read: function read(size) {}
-  });
+  const readable = new Readable({
+    read(size) {}
+  })
+  const state = readable._readableState // Starting off with false initially.
 
-  var _state = _readable._readableState; // Starting off with false initially.
+  assert.strictEqual(state.reading, false)
+  assert.strictEqual(state.readingMore, false)
+  readable.on(
+    'data',
+    common.mustCall((data) => {
+      // While in a flowing state without a 'readable' listener
+      // we should be reading more
+      if (readable.readableFlowing) assert.strictEqual(state.readingMore, true) // Reading as long as we've not ended
 
-  assert.strictEqual(_state.reading, false);
-  assert.strictEqual(_state.readingMore, false);
-
-  _readable.on('data', common.mustCall(function (data) {
-    // while in a flowing state without a 'readable' listener
-    // we should be reading more
-    if (_readable.readableFlowing) assert.strictEqual(_state.readingMore, true); // reading as long as we've not ended
-
-    assert.strictEqual(_state.reading, !_state.ended);
-  }, 2));
+      assert.strictEqual(state.reading, !state.ended)
+    }, 2)
+  )
 
   function onStreamEnd() {
     // End of stream; state.reading is false
     // And so should be readingMore.
-    assert.strictEqual(_state.readingMore, false);
-    assert.strictEqual(_state.reading, false);
+    assert.strictEqual(state.readingMore, false)
+    assert.strictEqual(state.reading, false)
   }
 
-  _readable.on('end', common.mustCall(onStreamEnd));
+  readable.on('end', common.mustCall(onStreamEnd))
+  readable.push('pushed') // Stop emitting 'data' events
 
-  _readable.push('pushed'); // stop emitting 'data' events
+  assert.strictEqual(state.flowing, true)
+  readable.pause() // paused
 
+  assert.strictEqual(state.reading, false)
+  assert.strictEqual(state.flowing, false)
+  readable.resume()
+  assert.strictEqual(state.reading, false)
+  assert.strictEqual(state.flowing, true) // add chunk to front
 
-  assert.strictEqual(_state.flowing, true);
+  readable.unshift('unshifted') // end
 
-  _readable.pause(); // paused
-
-
-  assert.strictEqual(_state.reading, false);
-  assert.strictEqual(_state.flowing, false);
-
-  _readable.resume();
-
-  assert.strictEqual(_state.reading, false);
-  assert.strictEqual(_state.flowing, true); // add chunk to front
-
-  _readable.unshift('unshifted'); // end
-
-
-  _readable.push(null);
+  readable.push(null)
 }
 {
-  var _readable2 = new Readable({
-    read: function read(size) {}
-  });
+  const readable = new Readable({
+    read(size) {}
+  })
+  const state = readable._readableState // Starting off with false initially.
 
-  var _state2 = _readable2._readableState; // Starting off with false initially.
-
-  assert.strictEqual(_state2.reading, false);
-  assert.strictEqual(_state2.readingMore, false);
-  var onReadable = common.mustNotCall;
-
-  _readable2.on('readable', onReadable);
-
-  _readable2.on('data', common.mustCall(function (data) {
-    // reading as long as we've not ended
-    assert.strictEqual(_state2.reading, !_state2.ended);
-  }, 2));
-
-  _readable2.removeListener('readable', onReadable);
+  assert.strictEqual(state.reading, false)
+  assert.strictEqual(state.readingMore, false)
+  const onReadable = common.mustNotCall
+  readable.on('readable', onReadable)
+  readable.on(
+    'data',
+    common.mustCall((data) => {
+      // Reading as long as we've not ended
+      assert.strictEqual(state.reading, !state.ended)
+    }, 2)
+  )
+  readable.removeListener('readable', onReadable)
 
   function onStreamEnd() {
     // End of stream; state.reading is false
     // And so should be readingMore.
-    assert.strictEqual(_state2.readingMore, false);
-    assert.strictEqual(_state2.reading, false);
+    assert.strictEqual(state.readingMore, false)
+    assert.strictEqual(state.reading, false)
   }
 
-  _readable2.on('end', common.mustCall(onStreamEnd));
+  readable.on('end', common.mustCall(onStreamEnd))
+  readable.push('pushed') // We are still not flowing, we will be resuming in the next tick
 
-  _readable2.push('pushed'); // we are still not flowing, we will be resuming in the next tick
-
-
-  assert.strictEqual(_state2.flowing, false); // wait for nextTick, so the readableListener flag resets
+  assert.strictEqual(state.flowing, false) // Wait for nextTick, so the readableListener flag resets
 
   process.nextTick(function () {
-    _readable2.resume(); // stop emitting 'data' events
+    readable.resume() // Stop emitting 'data' events
 
+    assert.strictEqual(state.flowing, true)
+    readable.pause() // paused
 
-    assert.strictEqual(_state2.flowing, true);
+    assert.strictEqual(state.flowing, false)
+    readable.resume()
+    assert.strictEqual(state.flowing, true) // add chunk to front
 
-    _readable2.pause(); // paused
+    readable.unshift('unshifted') // end
 
-
-    assert.strictEqual(_state2.flowing, false);
-
-    _readable2.resume();
-
-    assert.strictEqual(_state2.flowing, true); // add chunk to front
-
-    _readable2.unshift('unshifted'); // end
-
-
-    _readable2.push(null);
-  });
+    readable.push(null)
+  })
 }
-;
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

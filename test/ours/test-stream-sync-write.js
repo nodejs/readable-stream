@@ -1,38 +1,49 @@
-require('../common');
-var util = require('util');
-var stream = require('../../');
-var WritableStream = stream.Writable;
+'use strict'
 
+require('../common')
 
-var InternalStream = function() {
-    WritableStream.call(this);
-};
-util.inherits(InternalStream, WritableStream);
+const t = require('tap')
 
-InternalStream.prototype._write = function(chunk, encoding, callback) {
-    callback();
-};
+const util = require('util')
 
-var internalStream = new InternalStream();
+const stream = require('../../lib/ours/index')
 
+const WritableStream = stream.Writable
+t.plan(1)
 
-
-var ExternalStream = function(writable) {
-    this._writable = writable;
-    WritableStream.call(this);
-};
-util.inherits(ExternalStream, WritableStream);
-
-ExternalStream.prototype._write = function(chunk, encoding, callback) {
-    this._writable.write(chunk, encoding, callback);
-};
-
-
-
-var externalStream = new ExternalStream(internalStream);
-
-for (var i = 0; i < 2000; i++) {
-    externalStream.write(i.toString());
+const InternalStream = function () {
+  WritableStream.call(this)
 }
 
-require('tap').pass('sync done');
+util.inherits(InternalStream, WritableStream)
+let invocations = 0
+
+InternalStream.prototype._write = function (chunk, encoding, callback) {
+  callback()
+}
+
+const internalStream = new InternalStream()
+
+const ExternalStream = function (writable) {
+  this._writable = writable
+  WritableStream.call(this)
+}
+
+util.inherits(ExternalStream, WritableStream)
+
+ExternalStream.prototype._write = function (chunk, encoding, callback) {
+  this._writable.write(chunk, encoding, callback)
+}
+
+const externalStream = new ExternalStream(internalStream)
+
+for (let i = 0; i < 2000; i++) {
+  externalStream.write(i.toString(), () => {
+    invocations++
+  })
+}
+
+externalStream.end()
+externalStream.on('finish', () => {
+  t.equal(invocations, 2000)
+})

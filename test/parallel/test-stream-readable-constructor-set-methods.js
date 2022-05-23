@@ -1,36 +1,31 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var Readable = require('../../').Readable;
+const Readable = require('../../lib/ours/index').Readable
 
-var _read = common.mustCall(function _read(n) {
-  this.push(null);
-});
+const _read = common.mustCall(function _read(n) {
+  this.push(null)
+})
 
-var r = new Readable({
+const r = new Readable({
   read: _read
-});
-r.resume();
-;
+})
+r.resume()
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

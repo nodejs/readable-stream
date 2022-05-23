@@ -1,5 +1,3 @@
-"use strict";
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,57 +18,52 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var Readable = require('../../').Readable;
+const Readable = require('../../lib/ours/index').Readable
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var s = new Readable({
+const s = new Readable({
   highWaterMark: 20,
   encoding: 'ascii'
-});
-var list = ['1', '2', '3', '4', '5', '6'];
+})
+const list = ['1', '2', '3', '4', '5', '6']
 
 s._read = function (n) {
-  var one = list.shift();
+  const one = list.shift()
 
   if (!one) {
-    s.push(null);
+    s.push(null)
   } else {
-    var two = list.shift();
-    s.push(one);
-    s.push(two);
+    const two = list.shift()
+    s.push(one)
+    s.push(two)
   }
-};
+}
 
-s.read(0); // ACTUALLY [1, 3, 5, 6, 4, 2]
+s.read(0) // ACTUALLY [1, 3, 5, 6, 4, 2]
 
 process.on('exit', function () {
-  assert.deepStrictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6');
+  assert.strictEqual(s.readableBuffer.join(','), '1,2,3,4,5,6')
+  silentConsole.log('ok')
+})
+/* replacement start */
 
-  require('tap').pass();
-});
-;
-
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

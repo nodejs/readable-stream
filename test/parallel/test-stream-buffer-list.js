@@ -1,47 +1,92 @@
-"use strict";
+// Flags: --expose-internals
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-require('../common');
+  error() {}
+}
+require('../common')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var BufferList = require('../../lib/internal/streams/buffer_list'); // Test empty buffer list.
+const BufferList = require('../../lib/internal/streams/buffer_list') // Test empty buffer list.
 
+const emptyList = new BufferList()
+emptyList.shift()
+assert.deepStrictEqual(emptyList, new BufferList())
+assert.strictEqual(emptyList.join(','), '')
+assert.deepStrictEqual(emptyList.concat(0), Buffer.alloc(0))
+const buf = Buffer.from('foo')
 
-var emptyList = new BufferList();
-emptyList.shift();
-assert.deepStrictEqual(emptyList, new BufferList());
-assert.strictEqual(emptyList.join(','), '');
-assert.deepStrictEqual(emptyList.concat(0), bufferShim.alloc(0));
-var buf = bufferShim.from('foo'); // Test buffer list with one element.
+function testIterator(list, count) {
+  // test iterator
+  let len = 0 // eslint-disable-next-line no-unused-vars
 
-var list = new BufferList();
-list.push(buf);
-var copy = list.concat(3);
-assert.notStrictEqual(copy, buf);
-assert.deepStrictEqual(copy, buf);
-assert.strictEqual(list.join(','), 'foo');
-var shifted = list.shift();
-assert.strictEqual(shifted, buf);
-assert.deepStrictEqual(list, new BufferList());
-;
+  for (const x of list) {
+    len++
+  }
 
-(function () {
-  var t = require('tap');
+  assert.strictEqual(len, count)
+} // Test buffer list with one element.
 
-  t.pass('sync run');
-})();
+const list = new BufferList()
+testIterator(list, 0)
+list.push(buf)
+testIterator(list, 1)
 
-var _list = process.listeners('uncaughtException');
+for (const x of list) {
+  assert.strictEqual(x, buf)
+}
 
-process.removeAllListeners('uncaughtException');
+const copy = list.concat(3)
+testIterator(copy, 3)
+assert.notStrictEqual(copy, buf)
+assert.deepStrictEqual(copy, buf)
+assert.strictEqual(list.join(','), 'foo')
+const shifted = list.shift()
+testIterator(list, 0)
+assert.strictEqual(shifted, buf)
+assert.deepStrictEqual(list, new BufferList())
+{
+  const list = new BufferList()
+  list.push('foo')
+  list.push('bar')
+  list.push('foo')
+  list.push('bar')
+  assert.strictEqual(list.consume(6, true), 'foobar')
+  assert.strictEqual(list.consume(6, true), 'foobar')
+}
+{
+  const list = new BufferList()
+  list.push('foo')
+  list.push('bar')
+  assert.strictEqual(list.consume(5, true), 'fooba')
+}
+{
+  const list = new BufferList()
+  list.push(buf)
+  list.push(buf)
+  list.push(buf)
+  list.push(buf)
+  assert.strictEqual(list.consume(6).toString(), 'foofoo')
+  assert.strictEqual(list.consume(6).toString(), 'foofoo')
+}
+{
+  const list = new BufferList()
+  list.push(buf)
+  list.push(buf)
+  assert.strictEqual(list.consume(5).toString(), 'foofo')
+}
+/* replacement start */
 
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

@@ -1,59 +1,54 @@
-"use strict";
+'use strict'
 
-/*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
-/*</replacement>*/
+const tap = require('tap')
 
+const silentConsole = {
+  log() {},
 
-var common = require('../common');
+  error() {}
+}
+const common = require('../common')
 
-var stream = require('../../');
+const stream = require('../../lib/ours/index')
 
-var assert = require('assert/');
+const assert = require('assert')
 
-var writable = new stream.Writable({
+const writable = new stream.Writable({
   write: common.mustCall(function (chunk, encoding, cb) {
-    assert.strictEqual(readable._readableState.awaitDrain, 0);
+    assert.strictEqual(readable._readableState.awaitDrainWriters, null)
 
     if (chunk.length === 32 * 1024) {
       // first chunk
-      readable.push(bufferShim.alloc(34 * 1024)); // above hwm
+      readable.push(Buffer.alloc(34 * 1024)) // above hwm
       // We should check if awaitDrain counter is increased in the next
       // tick, because awaitDrain is incremented after this method finished
 
-      process.nextTick(function () {
-        assert.strictEqual(readable._readableState.awaitDrain, 1);
-      });
+      process.nextTick(() => {
+        assert.strictEqual(readable._readableState.awaitDrainWriters, writable)
+      })
     }
 
-    cb();
+    process.nextTick(cb)
   }, 3)
-}); // A readable stream which produces two buffers.
+}) // A readable stream which produces two buffers.
 
-var bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
+const bufs = [Buffer.alloc(32 * 1024), Buffer.alloc(33 * 1024)] // above hwm
 
-var readable = new stream.Readable({
-  read: function read() {
+const readable = new stream.Readable({
+  read: function () {
     while (bufs.length > 0) {
-      this.push(bufs.shift());
+      this.push(bufs.shift())
     }
   }
-});
-readable.pipe(writable);
-;
+})
+readable.pipe(writable)
+/* replacement start */
 
-(function () {
-  var t = require('tap');
-
-  t.pass('sync run');
-})();
-
-var _list = process.listeners('uncaughtException');
-
-process.removeAllListeners('uncaughtException');
-
-_list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */
