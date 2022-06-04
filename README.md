@@ -32,7 +32,7 @@ The breaking changes introduced by v4 are composed of the combined breaking chan
 * [Node v17](https://nodejs.org/en/blog/release/v17.0.0/)
 * [Node v18](https://nodejs.org/en/blog/release/v18.0.0/)
 
-This also include _many_ new features.
+This also includes _many_ new features.
 
 ## Version 3.x.x
 
