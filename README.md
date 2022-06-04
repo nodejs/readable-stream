@@ -23,7 +23,7 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
 ## Version 4.x.x
 
 v4.x.x of `readable-stream` is a cut from Node 18. This version supports Node 12, 14, 16 and 18, as well as evergreen browsers.
-The breaking changes introduced by v4 are composed by the combined breaking changes in
+The breaking changes introduced by v4 are composed of the combined breaking changes in:
 * [Node v12](https://nodejs.org/en/blog/release/v12.0.0/)
 * [Node v13](https://nodejs.org/en/blog/release/v13.0.0/)
 * [Node v14](https://nodejs.org/en/blog/release/v14.0.0/)
