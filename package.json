@@ -64,7 +64,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.0",
     "eslint-plugin-promise": "^6.0.0",
-    "playwright": "^1.21.1",
     "prettier": "^2.6.2",
     "process-es6": "^0.11.6",
     "rollup": "^2.72.1",
@@ -76,6 +75,9 @@
     "undici": "^5.1.1",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.21.1"
   },
   "engines": {
     "node": "^12.22.0 || ^14.17.0 || >=16.0.0"

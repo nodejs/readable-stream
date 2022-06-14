@@ -24,13 +24,14 @@ As of version 2.0.0 **readable-stream** uses semantic versioning.
 
 v4.x.x of `readable-stream` is a cut from Node 18. This version supports Node 12, 14, 16 and 18, as well as evergreen browsers.
 The breaking changes introduced by v4 are composed of the combined breaking changes in:
-* [Node v12](https://nodejs.org/en/blog/release/v12.0.0/)
-* [Node v13](https://nodejs.org/en/blog/release/v13.0.0/)
-* [Node v14](https://nodejs.org/en/blog/release/v14.0.0/)
-* [Node v15](https://nodejs.org/en/blog/release/v15.0.0/)
-* [Node v16](https://nodejs.org/en/blog/release/v16.0.0/)
-* [Node v17](https://nodejs.org/en/blog/release/v17.0.0/)
-* [Node v18](https://nodejs.org/en/blog/release/v18.0.0/)
+
+- [Node v12](https://nodejs.org/en/blog/release/v12.0.0/)
+- [Node v13](https://nodejs.org/en/blog/release/v13.0.0/)
+- [Node v14](https://nodejs.org/en/blog/release/v14.0.0/)
+- [Node v15](https://nodejs.org/en/blog/release/v15.0.0/)
+- [Node v16](https://nodejs.org/en/blog/release/v16.0.0/)
+- [Node v17](https://nodejs.org/en/blog/release/v17.0.0/)
+- [Node v18](https://nodejs.org/en/blog/release/v18.0.0/)
 
 This also includes _many_ new features.
 
@@ -70,14 +71,7 @@ without any changes, if you are just using one of the main classes and
 functions.
 
 ```js
-const {
-  Readable,
-  Writable,
-  Transform,
-  Duplex,
-  pipeline,
-  finished
-} = require('readable-stream')
+const { Readable, Writable, Transform, Duplex, pipeline, finished } = require('readable-stream')
 ```
 
 Note that `require('stream')` will return `Stream`, while
@@ -85,25 +79,186 @@ Note that `require('stream')` will return `Stream`, while
 whatever is exported directly, but rather use one of the properties as
 shown in the example above.
 
-## Usage In Browsers
+## Usage with Bundlers and Browsers
 
-You will need a bundler like [`browserify`](https://github.com/browserify/browserify#readme), [`webpack`](https://webpack.js.org/), [`parcel`](https://github.com/parcel-bundler/parcel#readme) or similar. With Webpack 5 (which unlike other bundlers does not polyfill Node.js core modules and globals like `process`) you will also need to:
+### Browserify
 
-1. Install polyfills by running `npm install buffer process --save-dev`
-2. Create a [`webpack.config.js`](https://webpack.js.org/guides/getting-started/#using-a-configuration) file containing:
+Running with [Browserify](https://browserify.org/) works out of the box.
+
+### ESBuild
+
+When using ESBuild for the server, you don't need any special configuration value.
+
+When using ESBuild for the browser, instead, you need to install the following packages:
+
+- [esbuild-plugin-alias](https://github.com/igoradamenko/esbuild-plugin-alias)
+- [crypto-browserify](https://github.com/browserify/crypto-browserify)
+- [path-browserify](https://github.com/browserify/path-browserify)
+- [stream-browserify](https://github.com/browserify/stream-browserify)
+
+Then make sure your esbuild configuration file (let's say `esbuild.browser.config.mjs`) looks like the following one:
 
 ```js
-const webpack = require('webpack')
+import { build } from 'esbuild'
+import alias from 'esbuild-plugin-alias'
+import { createRequire } from 'module'
 
-module.exports = {
+const require = createRequire(import.meta.url)
+
+build({
+  entryPoints: ['index.js'],
+  outfile: 'bundle.js',
+  bundle: true,
+  platform: 'browser',
   plugins: [
+    alias({
+      crypto: require.resolve('crypto-browserify'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify')
+    })
+  ],
+  define: {
+    global: 'globalThis'
+  },
+  inject: ['esbuild-browsers-shims.mjs']
+}).catch(() => process.exit(1))
+```
+
+The content of `esbuild-browsers-shims.mjs` should be the following:
+
+```js
+import * as bufferModule from 'buffer-es6'
+import * as processModule from 'process-es6'
+
+export const process = processModule
+export const Buffer = bufferModule.Buffer
+
+export function setImmediate(fn, ...args) {
+  setTimeout(() => fn(...args), 1)
+}
+```
+
+Finally, build your bundle by running:
+
+```
+node esbuild.browser.config.mjs
+```
+
+### Rollup
+
+You will need to install the following plugins:
+
+- [@rollup/plugin-commonjs](https://github.com/rollup/plugins)
+- [@rollup/plugin-node-resolve](https://github.com/rollup/plugins)
+
+For the browser, you also need the following plugins:
+
+- [@rollup/plugin-inject](https://github.com/rollup/plugins)
+- [rollup-plugin-polyfill-node](https://github.com/FredKSchott/rollup-plugin-polyfill-node)
+
+When bundling for the server, set your `rollup.config.mjs` to be similar to this:
+
+```js
+import commonjs from '@rollup/plugin-commonjs'
+import nodeResolve from '@rollup/plugin-node-resolve'
+
+export default {
+  input: ['source.js'],
+  output: {
+    file: 'destination.js'
+  },
+  plugins: [
+    commonjs(),
+    nodeResolve({
+      browser: false,
+      preferBuiltins: true
+    })
+  ]
+}
+```
+
+When bundling for the browser, set your `rollup.config.mjs` to be similar to this:
+
+```js
+import commonjs from '@rollup/plugin-commonjs'
+import inject from '@rollup/plugin-inject'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import { resolve } from 'path'
+import nodePolyfill from 'rollup-plugin-polyfill-node'
+
+export default {
+  input: ['index.js'],
+  output: {
+    intro: 'function setImmediate(fn, ...args) { setTimeout(() => fn(...args), 1) }',
+    file: 'destination.js'
+  },
+  plugins: [
+    commonjs(),
+    nodePolyfill(),
+    inject({
+      process: resolve('node_modules/process-es6/browser.js'),
+      Buffer: [resolve('node_modules/buffer-es6/index.js'), 'Buffer']
+    }),
+    nodeResolve({
+      browser: true,
+      preferBuiltins: false
+    })
+  ]
+}
+```
+
+You are good to go:
+
+```
+rollup -c rollup.config.mjs
+```
+
+### Webpack
+
+When using Webpack for the server, you don't need any special configuration value.
+
+When using Webpack for the browser, instead, you need to install the following packages:
+
+- [esbuild-plugin-alias](https://github.com/igoradamenko/esbuild-plugin-alias)
+- [crypto-browserify](https://github.com/browserify/crypto-browserify)
+- [path-browserify](https://github.com/browserify/path-browserify)
+- [stream-browserify](https://github.com/browserify/stream-browserify)
+
+And then change your `webpack.config.mjs` file to be similar to the following one:
+
+```js
+import { createRequire } from 'module'
+import { resolve } from 'path'
+import { fileURLToPath } from 'url'
+import webpack from 'webpack'
+
+const require = createRequire(import.meta.url)
+const rootDir = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../../')
+
+export default {
+  entry: 'source.js',
+  output: {
+    filename: 'destination.js'
+  },
+  mode: 'production',
+  target: 'web',
+  performance: false,
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: 'function setImmediate(fn, ...args) { setTimeout(() => fn(...args), 1) }',
+      raw: true
+    }),
     new webpack.ProvidePlugin({
-      process: 'process/browser'
+      process: require.resolve('process-es6'),
+      Buffer: [require.resolve('buffer-es6'), 'Buffer']
     })
   ],
   resolve: {
+    aliasFields: ['browser'],
     fallback: {
-      buffer: require.resolve('buffer/')
+      crypto: require.resolve('crypto-browserify'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify')
     }
   }
 }

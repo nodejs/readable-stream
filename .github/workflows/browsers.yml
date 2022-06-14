@@ -20,15 +20,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Use Node.js 16
+      - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Restore cached dependencies
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ matrix.os }}-${{ hashFiles('package.json') }}
+          key: node-modules-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.bundler }}-${{ hashFiles('package.json') }}
       - name: Install dependencies
         run: npm install
       - name: Install Browser

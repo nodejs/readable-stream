@@ -10,23 +10,23 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [12.x, 14.x, 16.x, 18.x]
+        node: [12.x, 14.x, 16.x, 18.x]
         bundler: ['browserify', 'esbuild', 'rollup', 'webpack']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+      - name: Use Node.js ${{ matrix.node }} on ${{ matrix.os }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node: ${{ matrix.node }}
       - name: Restore cached dependencies
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node-modules-${{ matrix.os }}-${{ hashFiles('package.json') }}
+          key: node-modules-${{ matrix.os }}-node${{ matrix.node }}-${{ matrix.bundler }}-${{ hashFiles('package.json') }}
       - name: Install dependencies
-        run: npm install
+        run: npm install --omit=optional
       - name: Bundle code
         run: npm run test:prepare ${{ matrix.bundler }}
-      - name: Run Tests on Browsers
+      - name: Run Tests on Bundlers
         run: npm run test:bundlers ${{ matrix.bundler }}
