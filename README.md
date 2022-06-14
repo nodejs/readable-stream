@@ -8,7 +8,7 @@
 [![Browsers Build](https://github.com/nodejs/readable-stream/workflows/Browsers/badge.svg)](https://github.com/nodejs/readable-stream/actions?query=workflow%3ABrowsers)
 
 ```bash
-npm install --save readable-stream
+npm install readable-stream
 ```
 
 This package is a mirror of the streams implementations in Node.js 18.0.0.
@@ -19,6 +19,20 @@ If you want to guarantee a stable streams base, regardless of what version of
 Node you, or the users of your libraries are using, use **readable-stream** _only_ and avoid the _"stream"_ module in Node-core, for background see [this blogpost](http://r.va.gg/2014/06/why-i-dont-use-nodes-core-stream-module.html).
 
 As of version 2.0.0 **readable-stream** uses semantic versioning.
+
+## Version 4.x.x
+
+v4.x.x of `readable-stream` is a cut from Node 18. This version supports Node 12, 14, 16 and 18, as well as evergreen browsers.
+The breaking changes introduced by v4 are composed of the combined breaking changes in:
+* [Node v12](https://nodejs.org/en/blog/release/v12.0.0/)
+* [Node v13](https://nodejs.org/en/blog/release/v13.0.0/)
+* [Node v14](https://nodejs.org/en/blog/release/v14.0.0/)
+* [Node v15](https://nodejs.org/en/blog/release/v15.0.0/)
+* [Node v16](https://nodejs.org/en/blog/release/v16.0.0/)
+* [Node v17](https://nodejs.org/en/blog/release/v17.0.0/)
+* [Node v18](https://nodejs.org/en/blog/release/v18.0.0/)
+
+This also includes _many_ new features.
 
 ## Version 3.x.x
 
@@ -56,7 +70,14 @@ without any changes, if you are just using one of the main classes and
 functions.
 
 ```js
-const { Readable, Writable, Transform, Duplex, pipeline, finished } = require('readable-stream')
+const {
+  Readable,
+  Writable,
+  Transform,
+  Duplex,
+  pipeline,
+  finished
+} = require('readable-stream')
 ```
 
 Note that `require('stream')` will return `Stream`, while
