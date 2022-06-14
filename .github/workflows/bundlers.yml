@@ -18,7 +18,7 @@ jobs:
       - name: Use Node.js ${{ matrix.node }} on ${{ matrix.os }}
         uses: actions/setup-node@v3
         with:
-          node: ${{ matrix.node }}
+          node-version: ${{ matrix.node }}
       - name: Restore cached dependencies
         uses: actions/cache@v3
         with:
