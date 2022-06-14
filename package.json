@@ -1,7 +1,7 @@
 {
   "name": "readable-stream",
-  "version": "3.6.0",
-  "description": "Streams3, a user-land copy of the stream library from Node.js",
+  "version": "4.0.0",
+  "description": "Node.js Streams, a user-land copy of the stream library from Node.js",
   "homepage": "https://github.com/nodejs/readable-stream",
   "license": "MIT",
   "licenses": [
