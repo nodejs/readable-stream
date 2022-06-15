@@ -24,6 +24,6 @@ jobs:
           path: node_modules
           key: node-modules-${{ matrix.os }}-node${{ matrix.node }}-${{ hashFiles('package.json') }}
       - name: Install dependencies
-        run: npm install --omit=optional
+        run: npm install
       - name: Run Tests
         run: npm run coverage

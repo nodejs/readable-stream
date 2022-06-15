@@ -32,6 +32,8 @@ jobs:
           key: node-modules-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.bundler }}-${{ hashFiles('package.json') }}
       - name: Install dependencies
         run: npm install
+      - name: Install Playwright
+        run: npm install -D playwright
       - name: Install Browser
         run: ./node_modules/.bin/playwright install ${{ fromJSON('{"chrome":"chromium","edge":"msedge","firefox":"firefox","safari":"webkit"}')[matrix.browser] }}
       - name: Bundle code
