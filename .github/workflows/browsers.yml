@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Install Playwright
-        run: npm install -D playwright
+        run: npm install -D playwright@^1.22.2
       - name: Install Browser
         run: ./node_modules/.bin/playwright install ${{ fromJSON('{"chrome":"chromium","edge":"msedge","firefox":"firefox","safari":"webkit"}')[matrix.browser] }}
       - name: Bundle code

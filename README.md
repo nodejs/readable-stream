@@ -282,7 +282,53 @@ Node.js. The responsibilities of the Streams Working Group include:
 
 <a name="members"></a>
 
-## Team Members
+# Running browsers test locally
+
+If you want to run tests locally, you have to perform the additional steps:
+
+1. Install `playwright` and one or more of the required browsers:
+
+   ```shell
+   npm install -D playwright@^1.22.2
+   ./node_modules/.bin/playwright install $EXECUTABLE
+   ```
+
+   Where `$EXECUTABLE` must be one of:
+
+   - `chrome`
+   - `firefox`
+   - `webkit`
+   - `msedge`
+
+2. Prepare your bundler of choice for tests:
+
+   ```shell
+   npm run test:prepare $BUNDLER
+   ```
+
+   Where `BUNDLER` must be one of:
+
+   - `browserify`
+   - `esbuild`
+   - `rollup`
+   - `webpack`
+
+After that, you can run tests by running:
+
+```shell
+npm run test:browsers $BROWSER $BUNDLER
+```
+
+Where `$BROWSER` can be one of:
+
+- `chrome`
+- `firefox`
+- `safari`
+- `edge`
+
+and `$BUNDLER` is the one you chose before.
+
+# Team Members
 
 - **Mathias Buus** ([@mafintosh](https://github.com/mafintosh)) &lt;mathiasbuus@gmail.com&gt;
 - **Matteo Collina** ([@mcollina](https://github.com/mcollina)) &lt;matteo.collina@gmail.com&gt;
