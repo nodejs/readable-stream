@@ -124,7 +124,7 @@ const isOSX = process.platform === 'darwin'
 
 const isPi = (() => {
   try {
-    var _$exec
+    var _exec
 
     // Normal Raspberry Pi detection is to find the `Raspberry Pi` string in
     // the contents of `/sys/firmware/devicetree/base/model` but that doesn't
@@ -133,7 +133,7 @@ const isPi = (() => {
       encoding: 'utf8'
     })
     return (
-      ((_$exec = /^Hardware\s*:\s*(.*)$/im.exec(cpuinfo)) === null || _$exec === undefined ? undefined : _$exec[1]) ===
+      ((_exec = /^Hardware\s*:\s*(.*)$/im.exec(cpuinfo)) === null || _exec === undefined ? undefined : _exec[1]) ===
       'BCM2835'
     )
   } catch {

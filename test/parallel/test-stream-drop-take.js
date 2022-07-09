@@ -55,7 +55,6 @@ const naturals = () =>
     deepStrictEqual(await from([1, 2]).drop(0).toArray(), [1, 2])
     deepStrictEqual(await from([1, 2]).take(0).toArray(), [])
   })().then(common.mustCall()) // Asynchronous streams
-
   ;(async () => {
     deepStrictEqual(await fromAsync([1, 2, 3]).drop(2).toArray(), [3])
     deepStrictEqual(await fromAsync([1, 2, 3]).take(1).toArray(), [1])
@@ -66,7 +65,6 @@ const naturals = () =>
     deepStrictEqual(await fromAsync([1, 2]).take(0).toArray(), [])
   })().then(common.mustCall()) // Infinite streams
   // Asynchronous streams
-
   ;(async () => {
     deepStrictEqual(await naturals().take(1).toArray(), [1])
     deepStrictEqual(await naturals().drop(1).take(1).toArray(), [2])
