@@ -73,7 +73,6 @@ function read100() {
 function readn(n, then) {
   silentConsole.error(`read ${n}`)
   expectEndingData -= n
-
   ;(function read() {
     const c = r.read(n)
     silentConsole.error('c', c)

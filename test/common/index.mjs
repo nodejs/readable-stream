@@ -1,7 +1,7 @@
-import { createRequire } from 'module';
+import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url);
-const common = require('./index.js');
+const require = createRequire(import.meta.url)
+const common = require('./index.js')
 
 const {
   isMainThread,
@@ -47,7 +47,7 @@ const {
   getBufferSources,
   getTTYfd,
   runWithInvalidFD
-} = common;
+} = common
 
 export {
   isMainThread,
@@ -94,4 +94,4 @@ export {
   getTTYfd,
   runWithInvalidFD,
   createRequire
-};
+}

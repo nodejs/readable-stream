@@ -14,7 +14,6 @@ const internalStreamsAbortControllerPolyfill = [
   `
   'use strict'
 
-  const abortControllerModule = require('abort-controller');
   `
 ]
 
@@ -30,7 +29,7 @@ const internalStreamsInspectCustom = ['inspect.custom', "Symbol.for('nodejs.util
 
 const internalStreamsNoRequireAbortController = [
   'const \\{ AbortController \\} = .+',
-  'const AbortController = globalThis.AbortController || abortControllerModule.AbortController;'
+  'const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;'
 ]
 
 const internalStreamsRequireInternal = ["require\\('internal/([^']+)'\\)", "require('../$1')"]
