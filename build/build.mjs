@@ -135,7 +135,7 @@ async function processFiles(contents) {
 
 async function downloadNode(nodeVersion) {
   // Download node
-  const downloadUrl = `https://nodejs.org/v${nodeVersion}/node-v${nodeVersion}.tar.gz`
+  const downloadUrl = `https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}.tar.gz`
   info(`Downloading ${downloadUrl} ...`)
   const { statusCode, body } = await request(downloadUrl, { pipelining: 0 })
 
