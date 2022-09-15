@@ -1,0 +1,3 @@
+// workaround for browserify bug: https://github.com/browserify/browserify/issues/1986
+
+module.exports = require('./node_modules/process')
