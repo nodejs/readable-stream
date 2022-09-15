@@ -16,8 +16,7 @@ export default {
     commonjs(),
     nodePolyfill(),
     inject({
-      process: resolve('node_modules/process-es6/browser.js'),
-      Buffer: [resolve('node_modules/buffer-es6/index.js'), 'Buffer']
+      process: resolve('node_modules/process/browser.js')
     }),
     nodeResolve({
       browser: true,

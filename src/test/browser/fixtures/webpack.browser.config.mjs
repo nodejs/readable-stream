@@ -21,8 +21,7 @@ export default {
       raw: true
     }),
     new webpack.ProvidePlugin({
-      process: require.resolve('process-es6'),
-      Buffer: [require.resolve('buffer-es6'), 'Buffer']
+      process: require.resolve('process')
     })
   ],
   resolve: {

@@ -34,8 +34,6 @@ const internalStreamsNoRequireAbortController = [
 
 const internalStreamsRequireInternal = ["require\\('internal/([^']+)'\\)", "require('../$1')"]
 
-const internalStreamsNoRequireBuffer = ["const \\{ Buffer \\} = require\\('buffer'\\);", '']
-
 const internalStreamsRequireErrors = ["require\\('internal/errors'\\)", "require('../../ours/errors')"]
 
 const internalStreamsRequireEventEmitter = ['const EE =', 'const { EventEmitter: EE } =']
@@ -233,7 +231,6 @@ export const replacements = {
     internalStreamsNoRequireAbortController
   ],
   'lib/internal/streams/.+': [
-    internalStreamsNoRequireBuffer,
     internalStreamsRequireErrors,
     internalStreamsRequireEventEmitter,
     internalStreamsRequirePrimordials,

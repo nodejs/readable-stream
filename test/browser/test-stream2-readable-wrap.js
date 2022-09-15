@@ -1,4 +1,8 @@
-'use strict'
+/* replacement start */
+const { Buffer } = require('buffer')
+/* replacement end */
+
+;('use strict')
 
 const { EventEmitter: EE } = require('events')
 
