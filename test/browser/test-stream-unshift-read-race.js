@@ -1,8 +1,9 @@
+'use strict'
 /* replacement start */
+
 const { Buffer } = require('buffer')
 /* replacement end */
-
-;('use strict') // This test verifies that:
+// This test verifies that:
 // 1. unshift() does not cause colliding _read() calls.
 // 2. unshift() after the 'end' event is an error, but after the EOF
 //    signalling null, it is ok, and just creates a new readable chunk.
