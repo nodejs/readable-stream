@@ -1,4 +1,8 @@
 'use strict'
+/* replacement start */
+
+const { Buffer } = require('buffer')
+/* replacement end */
 
 const stream = require('../../lib/ours/index')
 
