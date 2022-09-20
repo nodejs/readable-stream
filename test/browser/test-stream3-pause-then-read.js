@@ -51,6 +51,7 @@ module.exports = function (t) {
   function readn(n, then) {
     // console.error('read %d', n);
     expectEndingData -= n
+
     ;(function read() {
       const c = r.read(n)
 

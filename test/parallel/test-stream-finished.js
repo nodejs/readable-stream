@@ -760,7 +760,12 @@ testClosed(
           },
           common.mustCall(function (res) {
             res.resume()
-            server.close()
+            finished(
+              res,
+              common.mustCall(() => {
+                server.close()
+              })
+            )
           })
         )
         .end()

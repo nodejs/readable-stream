@@ -18,6 +18,8 @@ export const skippedSources = [
   'lib/_stream_wrap.js',
   'test/parallel/test-stream-consumers.js',
   'test/parallel/test-stream-destroy.js',
+  'test/parallel/test-stream-duplex.js',
+  'test/parallel/test-stream-readable-strategy-option.js',
   'test/parallel/test-stream-map.js',
   'test/parallel/test-stream-pipeline.js',
   'test/parallel/test-stream-readable-async-iterators.js',

@@ -36,6 +36,7 @@ class AggregateError extends Error {
 
 module.exports = {
   AggregateError,
+  kEmptyObject: Object.freeze({}),
   once(callback) {
     let called = false
     return function (...args) {

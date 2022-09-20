@@ -1,7 +1,7 @@
-import { createRequire } from 'module'
+import { createRequire } from 'module';
 
-const require = createRequire(import.meta.url)
-const common = require('./index.js')
+const require = createRequire(import.meta.url);
+const common = require('./index.js');
 
 const {
   isMainThread,
@@ -23,6 +23,7 @@ const {
   hasCrypto,
   hasIPv6,
   childShouldThrowAndAbort,
+  checkoutEOL,
   createZeroFilledFile,
   platformTimeout,
   allowGlobals,
@@ -35,6 +36,7 @@ const {
   canCreateSymLink,
   getCallSite,
   mustNotCall,
+  mustNotMutateObjectDeep,
   printSkipMessage,
   skip,
   nodeProcessAborted,
@@ -46,8 +48,9 @@ const {
   getArrayBufferViews,
   getBufferSources,
   getTTYfd,
-  runWithInvalidFD
-} = common
+  runWithInvalidFD,
+  spawnPromisified,
+} = common;
 
 export {
   isMainThread,
@@ -69,6 +72,7 @@ export {
   hasCrypto,
   hasIPv6,
   childShouldThrowAndAbort,
+  checkoutEOL,
   createZeroFilledFile,
   platformTimeout,
   allowGlobals,
@@ -81,6 +85,7 @@ export {
   canCreateSymLink,
   getCallSite,
   mustNotCall,
+  mustNotMutateObjectDeep,
   printSkipMessage,
   skip,
   nodeProcessAborted,
@@ -93,5 +98,6 @@ export {
   getBufferSources,
   getTTYfd,
   runWithInvalidFD,
-  createRequire
-}
+  createRequire,
+  spawnPromisified,
+};

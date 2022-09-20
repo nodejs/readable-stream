@@ -117,7 +117,7 @@ const Readable = require('../../lib/ours/index').Readable
 
   assert.strictEqual(state.reading, false)
   assert.strictEqual(state.readingMore, false)
-  const onReadable = common.mustNotCall
+  const onReadable = common.mustNotCall()
   readable.on('readable', onReadable)
   readable.on(
     'data',
