@@ -91,6 +91,7 @@ function oneTo5() {
       .toArray()
     assert.deepStrictEqual(result, [1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
   })().then(common.mustCall()) // flatMap works on an objectMode stream where mappign returns a stream
+
   ;(async () => {
     const result = await oneTo5()
       .flatMap(() => {

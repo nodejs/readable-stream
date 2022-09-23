@@ -57,6 +57,7 @@ class MyWritable extends stream.Writable {
   m.write('foo')
   m.end()
 })()
+
 ;(function changeDefaultEncodingToAscii() {
   const m = new MyWritable(
     function (isBuffer, type, enc) {
@@ -86,6 +87,7 @@ assert.throws(
     message: 'Unknown encoding: {}'
   }
 )
+
 ;(function checkVariableCaseEncoding() {
   const m = new MyWritable(
     function (isBuffer, type, enc) {

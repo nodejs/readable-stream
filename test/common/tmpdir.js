@@ -22,8 +22,8 @@ const tmpPath = path.join(testRoot, tmpdirName)
 let firstRefresh = true
 
 function refresh() {
-  rmSync(this.path)
-  fs.mkdirSync(this.path)
+  rmSync(tmpPath)
+  fs.mkdirSync(tmpPath)
 
   if (firstRefresh) {
     firstRefresh = false // Clean only when a test uses refresh. This allows for child processes to

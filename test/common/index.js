@@ -26,14 +26,14 @@ const process = global.process // Some tests tamper with the process global.
 
 const assert = require('assert')
 
-const { exec, execSync, spawnSync } = require('child_process')
+const { exec, execSync, spawn, spawnSync } = require('child_process')
 
 const fs = require('fs') // Do not require 'os' until needed so that test-os-checked-function can
 // monkey patch it. If 'os' is required here, that test will fail.
 
 const path = require('path')
 
-const util = require('util')
+const { inspect } = require('util')
 
 const { isMainThread } = require('worker_threads')
 
@@ -94,7 +94,7 @@ if (
       ) {
         console.log(
           'NOTE: The test started as a child_process using these flags:',
-          util.inspect(flags),
+          inspect(flags),
           'Use NODE_SKIP_FLAG_CHECK to run the test with the original flags.'
         )
         const args = [...flags, ...process.execArgv, ...process.argv.slice(1)]
@@ -124,7 +124,7 @@ const isOSX = process.platform === 'darwin'
 
 const isPi = (() => {
   try {
-    var _exec
+    var _$exec
 
     // Normal Raspberry Pi detection is to find the `Raspberry Pi` string in
     // the contents of `/sys/firmware/devicetree/base/model` but that doesn't
@@ -133,7 +133,7 @@ const isPi = (() => {
       encoding: 'utf8'
     })
     return (
-      ((_exec = /^Hardware\s*:\s*(.*)$/im.exec(cpuinfo)) === null || _exec === undefined ? undefined : _exec[1]) ===
+      ((_$exec = /^Hardware\s*:\s*(.*)$/im.exec(cpuinfo)) === null || _$exec === undefined ? undefined : _$exec[1]) ===
       'BCM2835'
     )
   } catch {
@@ -154,7 +154,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
   const async_wrap = internalBinding('async_wrap')
   process.on('exit', () => {
     // Iterate through handles to make sure nothing crashes
-    for (const k in initHandles) util.inspect(initHandles[k])
+    for (const k in initHandles) inspect(initHandles[k])
   })
   const _queueDestroyAsyncId = async_wrap.queueDestroyAsyncId
 
@@ -167,7 +167,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
       throw new Error(`same id added to destroy list twice (${id})`)
     }
 
-    destroyListList[id] = util.inspect(new Error())
+    destroyListList[id] = inspect(new Error())
 
     _queueDestroyAsyncId(id)
   }
@@ -185,7 +185,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
 
         initHandles[id] = {
           resource,
-          stack: util.inspect(new Error()).substr(6)
+          stack: inspect(new Error()).substr(6)
         }
       },
 
@@ -202,7 +202,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
           throw new Error(`destroy called for same id (${id})`)
         }
 
-        destroydIdsList[id] = util.inspect(new Error())
+        destroydIdsList[id] = inspect(new Error())
       }
     })
     .enable()
@@ -307,6 +307,10 @@ if (global.gc) {
   knownGlobals.push(global.gc)
 }
 
+if (global.Performance) {
+  knownGlobals.push(global.Performance)
+}
+
 if (global.performance) {
   knownGlobals.push(global.performance)
 }
@@ -334,6 +338,10 @@ if (hasCrypto && global.crypto) {
   knownGlobals.push(global.Crypto)
   knownGlobals.push(global.CryptoKey)
   knownGlobals.push(global.SubtleCrypto)
+}
+
+if (global.CustomEvent) {
+  knownGlobals.push(global.CustomEvent)
 }
 
 if (global.ReadableStream) {
@@ -443,7 +451,7 @@ function _mustCallInner(fn, criteria = 1, field) {
   const context = {
     [field]: criteria,
     actual: 0,
-    stack: util.inspect(new Error()),
+    stack: inspect(new Error()),
     name: fn.name || '<anonymous>'
   } // Add the exit listener only once to avoid listener leak warnings
 
@@ -531,9 +539,59 @@ function getCallSite(top) {
 function mustNotCall(msg) {
   const callSite = getCallSite(mustNotCall)
   return function mustNotCall(...args) {
-    const argsInfo = args.length > 0 ? `\ncalled with arguments: ${args.map(util.inspect).join(', ')}` : ''
+    const argsInfo = args.length > 0 ? `\ncalled with arguments: ${args.map((arg) => inspect(arg)).join(', ')}` : ''
     assert.fail(`${msg || 'function should not have been called'} at ${callSite}` + argsInfo)
   }
+}
+
+const _mustNotMutateObjectDeepProxies = new WeakMap()
+
+function mustNotMutateObjectDeep(original) {
+  // Return primitives and functions directly. Primitives are immutable, and
+  // proxied functions are impossible to compare against originals, e.g. with
+  // `assert.deepEqual()`.
+  if (original === null || typeof original !== 'object') {
+    return original
+  }
+
+  const cachedProxy = _mustNotMutateObjectDeepProxies.get(original)
+
+  if (cachedProxy) {
+    return cachedProxy
+  }
+
+  const _mustNotMutateObjectDeepHandler = {
+    __proto__: null,
+
+    defineProperty(target, property, descriptor) {
+      assert.fail(`Expected no side effects, got ${inspect(property)} ` + 'defined')
+    },
+
+    deleteProperty(target, property) {
+      assert.fail(`Expected no side effects, got ${inspect(property)} ` + 'deleted')
+    },
+
+    get(target, prop, receiver) {
+      return mustNotMutateObjectDeep(Reflect.get(target, prop, receiver))
+    },
+
+    preventExtensions(target) {
+      assert.fail('Expected no side effects, got extensions prevented on ' + inspect(target))
+    },
+
+    set(target, property, value, receiver) {
+      assert.fail(`Expected no side effects, got ${inspect(value)} ` + `assigned to ${inspect(property)}`)
+    },
+
+    setPrototypeOf(target, prototype) {
+      assert.fail(`Expected no side effects, got set prototype to ${prototype}`)
+    }
+  }
+  const proxy = new Proxy(original, _mustNotMutateObjectDeepHandler)
+
+  _mustNotMutateObjectDeepProxies.set(original, proxy)
+
+  return proxy
 }
 
 function printSkipMessage(msg) {
@@ -629,7 +687,7 @@ function expectWarning(nameOrMap, expected, code) {
     catchWarning = {}
     process.on('warning', (warning) => {
       if (!catchWarning[warning.name]) {
-        throw new TypeError(`"${warning.name}" was triggered without being expected.\n` + util.inspect(warning))
+        throw new TypeError(`"${warning.name}" was triggered without being expected.\n` + inspect(warning))
       }
 
       catchWarning[warning.name](warning)
@@ -650,7 +708,7 @@ function expectsError(validator, exact) {
     if (args.length !== 1) {
       // Do not use `assert.strictEqual()` to prevent `inspect` from
       // always being called.
-      assert.fail(`Expected one argument, got ${util.inspect(args)}`)
+      assert.fail(`Expected one argument, got ${inspect(args)}`)
     }
 
     const error = args.pop()
@@ -695,6 +753,8 @@ function getArrayBufferViews(buf) {
     Uint32Array,
     Float32Array,
     Float64Array,
+    BigInt64Array,
+    BigUint64Array,
     DataView
   ]
 
@@ -755,19 +815,29 @@ function invalidArgTypeHelper(input) {
   }
 
   if (typeof input === 'object') {
-    if (input.constructor && input.constructor.name) {
+    var _input$constructor
+
+    if (
+      (_input$constructor = input.constructor) !== null &&
+      _input$constructor !== undefined &&
+      _input$constructor.name
+    ) {
       return ` Received an instance of ${input.constructor.name}`
     }
 
-    return ` Received ${util.inspect(input, {
+    return ` Received ${inspect(input, {
       depth: -1
     })}`
   }
 
-  let inspected = util.inspect(input, {
+  let inspected = inspect(input, {
     colors: false
   })
-  if (inspected.length > 25) inspected = `${inspected.slice(0, 25)}...`
+
+  if (inspected.length > 28) {
+    inspected = `${inspected.slice(inspected, 0, 25)}...`
+  }
+
   return ` Received type ${typeof input} (${inspected})`
 }
 
@@ -822,6 +892,38 @@ function requireNoPackageJSONAbove(dir = __dirname) {
   }
 }
 
+function spawnPromisified(...args) {
+  let stderr = ''
+  let stdout = ''
+  const child = spawn(...args)
+  child.stderr.setEncoding('utf8')
+  child.stderr.on('data', (data) => {
+    stderr += data
+  })
+  child.stdout.setEncoding('utf8')
+  child.stdout.on('data', (data) => {
+    stdout += data
+  })
+  return new Promise((resolve, reject) => {
+    child.on('close', (code, signal) => {
+      resolve({
+        code,
+        signal,
+        stderr,
+        stdout
+      })
+    })
+    child.on('error', (code, signal) => {
+      reject({
+        code,
+        signal,
+        stderr,
+        stdout
+      })
+    })
+  })
+}
+
 const common = {
   allowGlobals,
   buildType,
@@ -856,6 +958,7 @@ const common = {
   mustCall,
   mustCallAtLeast,
   mustNotCall,
+  mustNotMutateObjectDeep,
   mustSucceed,
   nodeProcessAborted,
   PIPE,
@@ -870,6 +973,7 @@ const common = {
   skipIfEslintMissing,
   skipIfInspectorDisabled,
   skipIfWorker,
+  spawnPromisified,
 
   get enoughTestMem() {
     return require('os').totalmem() > 0x70000000
@@ -885,7 +989,7 @@ const common = {
 
     const re = isWindows ? /Loopback Pseudo-Interface/ : /lo/
     return Object.keys(iFaces).some((name) => {
-      return re.test(name) && iFaces[name].some(({ family }) => family === 6)
+      return re.test(name) && iFaces[name].some(({ family }) => family === 'IPv6')
     })
   },
 
