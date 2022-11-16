@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,20 +12,14 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   // Works on a synchronous stream
   ;(async () => {
@@ -40,7 +31,6 @@ const assert = require('assert')
         .fill()
         .map((_, i) => i)
     ]
-
     for (const test of tests) {
       const stream = Readable.from(test)
       const result = await stream.toArray()
@@ -72,7 +62,6 @@ const assert = require('assert')
         .fill()
         .map((_, i) => i)
     ]
-
     for (const test of tests) {
       const stream = Readable.from(test).map((x) => Promise.resolve(x))
       const result = await stream.toArray()
@@ -130,8 +119,8 @@ const assert = require('assert')
     }, /ERR_INVALID_ARG_TYPE/)
     .then(common.mustCall())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

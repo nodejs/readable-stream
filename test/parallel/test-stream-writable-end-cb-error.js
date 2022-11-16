@@ -1,28 +1,20 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 {
   // Invoke end callback on failure.
   const writable = new stream.Writable()
-
   const _err = new Error('kaboom')
-
   writable._write = (chunk, encoding, cb) => {
     process.nextTick(cb, _err)
   }
-
   writable.on(
     'error',
     common.mustCall((err) => {
@@ -44,11 +36,9 @@ const stream = require('../../lib/ours/index')
 {
   // Don't invoke end callback twice
   const writable = new stream.Writable()
-
   writable._write = (chunk, encoding, cb) => {
     process.nextTick(cb)
   }
-
   let called = false
   writable.end(
     'asd',
@@ -76,7 +66,6 @@ const stream = require('../../lib/ours/index')
     write(chunk, encoding, callback) {
       setImmediate(callback)
     },
-
     finish(callback) {
       setImmediate(callback)
     }
@@ -111,8 +100,8 @@ const stream = require('../../lib/ours/index')
   )
   w.on('finish', common.mustNotCall())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

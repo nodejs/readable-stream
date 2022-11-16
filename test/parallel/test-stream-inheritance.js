@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const { Readable, Writable, Duplex, Transform } = require('../../lib/ours/index')
-
 const readable = new Readable({
   read() {}
 })
@@ -21,7 +16,6 @@ const writable = new Writable({
 })
 const duplex = new Duplex({
   read() {},
-
   write() {}
 })
 const transform = new Transform({
@@ -44,13 +38,13 @@ assert.ok(!(writable instanceof Transform))
 assert.ok(!(duplex instanceof Transform))
 assert.ok(transform instanceof Transform)
 assert.ok(!(null instanceof Writable))
-assert.ok(!(undefined instanceof Writable)) // Simple inheritance check for `Writable` works fine in a subclass constructor.
+assert.ok(!(undefined instanceof Writable))
 
+// Simple inheritance check for `Writable` works fine in a subclass constructor.
 function CustomWritable() {
   assert.ok(this instanceof CustomWritable, `${this} does not inherit from CustomWritable`)
   assert.ok(this instanceof Writable, `${this} does not inherit from Writable`)
 }
-
 Object.setPrototypeOf(CustomWritable, Writable)
 Object.setPrototypeOf(CustomWritable.prototype, Writable.prototype)
 new CustomWritable()
@@ -59,13 +53,11 @@ assert.throws(CustomWritable, {
   constructor: assert.AssertionError,
   message: 'undefined does not inherit from CustomWritable'
 })
-
 class OtherCustomWritable extends Writable {}
-
 assert(!(new OtherCustomWritable() instanceof CustomWritable))
 assert(!(new CustomWritable() instanceof OtherCustomWritable))
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

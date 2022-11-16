@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   // Call .setEncoding() while there are bytes already in the buffer.
   const r = new Readable({
@@ -61,8 +56,8 @@ const assert = require('assert')
     assert.deepStrictEqual(chunks, ['🎉'])
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

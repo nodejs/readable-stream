@@ -1,9 +1,7 @@
 'use strict'
 
 const { Stream } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(1)
   const r = new Stream({
@@ -16,5 +14,4 @@ module.exports = function (t) {
   })
   t.throws(() => r.pipe(w), 'TypeError: this.listenerCount is not a function')
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-pipe-without-listenerCount'

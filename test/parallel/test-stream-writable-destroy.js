@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,20 +12,14 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable, addAbortSignal } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const write = new Writable({
     write(chunk, enc, cb) {
@@ -76,12 +67,10 @@ const assert = require('assert')
       cb()
     }
   })
-
   write._destroy = function (err, cb) {
     assert.strictEqual(err, expected)
     cb(err)
   }
-
   const expected = new Error('kaboom')
   write.on('finish', common.mustNotCall('no finish event'))
   write.on('close', common.mustCall())
@@ -99,7 +88,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, expected)
       cb()
@@ -107,8 +95,9 @@ const assert = require('assert')
   })
   const expected = new Error('kaboom')
   write.on('finish', common.mustNotCall('no finish event'))
-  write.on('close', common.mustCall()) // Error is swallowed by the custom _destroy
+  write.on('close', common.mustCall())
 
+  // Error is swallowed by the custom _destroy
   write.on('error', common.mustNotCall('no error event'))
   write.destroy(expected)
   assert.strictEqual(write.destroyed, true)
@@ -202,7 +191,6 @@ const assert = require('assert')
     destroy: common.mustCall(function (err, cb) {
       process.nextTick(cb, new Error('kaboom 1'))
     }),
-
     write(chunk, enc, cb) {
       cb()
     }
@@ -228,9 +216,10 @@ const assert = require('assert')
   writable.destroy()
   assert.strictEqual(writable.destroyed, true)
   assert.strictEqual(writable._writableState.errored, null)
-  assert.strictEqual(writable._writableState.errorEmitted, false) // Test case where `writable.destroy()` is called again with an error before
-  // the `_destroy()` callback is called.
+  assert.strictEqual(writable._writableState.errorEmitted, false)
 
+  // Test case where `writable.destroy()` is called again with an error before
+  // the `_destroy()` callback is called.
   writable.destroy(new Error('kaboom 2'))
   assert.strictEqual(writable._writableState.errorEmitted, false)
   assert.strictEqual(writable._writableState.errored, null)
@@ -243,8 +232,9 @@ const assert = require('assert')
     }
   })
   write.destroyed = true
-  assert.strictEqual(write.destroyed, true) // The internal destroy() mechanism should not be triggered
+  assert.strictEqual(write.destroyed, true)
 
+  // The internal destroy() mechanism should not be triggered
   write.on('close', common.mustNotCall())
   write.destroy()
 }
@@ -254,7 +244,6 @@ const assert = require('assert')
     this.destroyed = false
     Writable.call(this)
   }
-
   Object.setPrototypeOf(MyWritable.prototype, Writable.prototype)
   Object.setPrototypeOf(MyWritable, Writable)
   new MyWritable()
@@ -288,7 +277,6 @@ const assert = require('assert')
     'close',
     common.mustCall(() => {
       write._undestroy()
-
       write.end()
     })
   )
@@ -338,6 +326,7 @@ const assert = require('assert')
 }
 {
   // Call end(cb) after error & destroy
+
   const write = new Writable({
     write(chunk, enc, cb) {
       cb(new Error('asd'))
@@ -361,6 +350,7 @@ const assert = require('assert')
 }
 {
   // Call end(cb) after finish & destroy
+
   const write = new Writable({
     write(chunk, enc, cb) {
       cb()
@@ -385,14 +375,13 @@ const assert = require('assert')
 {
   // Call end(cb) after error & destroy and don't trigger
   // unhandled exception.
+
   const write = new Writable({
     write(chunk, enc, cb) {
       process.nextTick(cb)
     }
   })
-
   const _err = new Error('asd')
-
   write.once(
     'error',
     common.mustCall((err) => {
@@ -409,13 +398,12 @@ const assert = require('assert')
 }
 {
   // Call buffered write callback with error
-  const _err = new Error('asd')
 
+  const _err = new Error('asd')
   const write = new Writable({
     write(chunk, enc, cb) {
       process.nextTick(cb, _err)
     },
-
     autoDestroy: false
   })
   write.cork()
@@ -441,6 +429,7 @@ const assert = require('assert')
 }
 {
   // Ensure callback order.
+
   let state = 0
   const write = new Writable({
     write(chunk, enc, cb) {
@@ -467,7 +456,6 @@ const assert = require('assert')
 {
   const write = new Writable({
     autoDestroy: false,
-
     write(chunk, enc, cb) {
       cb()
       cb()
@@ -505,7 +493,6 @@ const assert = require('assert')
   const ac = new AbortController()
   const write = new Writable({
     signal: ac.signal,
-
     write(chunk, enc, cb) {
       cb()
     }
@@ -524,7 +511,6 @@ const assert = require('assert')
   const signal = AbortSignal.abort()
   const write = new Writable({
     signal,
-
     write(chunk, enc, cb) {
       cb()
     }
@@ -553,9 +539,8 @@ const assert = require('assert')
   const s = new Writable({
     final() {}
   })
-
-  const _err = new Error('oh no') // Remove `callback` and it works
-
+  const _err = new Error('oh no')
+  // Remove `callback` and it works
   s.end(
     common.mustCall((err) => {
       assert.strictEqual(err, _err)
@@ -569,8 +554,8 @@ const assert = require('assert')
   )
   s.destroy(_err)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

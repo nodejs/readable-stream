@@ -1,20 +1,17 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
-const common = require('../common') // Regression test for https://github.com/nodejs/node/issues/12718.
+const common = require('../common')
+
+// Regression test for https://github.com/nodejs/node/issues/12718.
 // Tests that piping a source stream twice to the same destination stream
 // works, and that a subsequent unpipe() call only removes the pipe *once*.
-
 const assert = require('assert')
-
 const { PassThrough, Writable } = require('../../lib/ours/index')
-
 {
   const passThrough = new PassThrough()
   const dest = new Writable({
@@ -69,8 +66,8 @@ const { PassThrough, Writable } = require('../../lib/ours/index')
   assert.strictEqual(passThrough._readableState.pipes.length, 0)
   passThrough.write('foobar')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

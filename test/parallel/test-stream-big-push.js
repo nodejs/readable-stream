@@ -18,28 +18,23 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 const str = 'asdfasdfasdfasdfasdf'
 const r = new stream.Readable({
   highWaterMark: 5,
   encoding: 'utf8'
 })
 let reads = 0
-
 function _read() {
   if (reads === 0) {
     setTimeout(() => {
@@ -54,13 +49,13 @@ function _read() {
     r.push(null)
   }
 }
-
 r._read = common.mustCall(_read, 3)
-r.on('end', common.mustCall()) // Push some data in to start.
+r.on('end', common.mustCall())
+
+// Push some data in to start.
 // We've never gotten any read event at this point.
-
-const ret = r.push(str) // Should be false.  > hwm
-
+const ret = r.push(str)
+// Should be false.  > hwm
 assert(!ret)
 let chunk = r.read()
 assert.strictEqual(chunk, str)
@@ -76,8 +71,8 @@ r.once('readable', () => {
   chunk = r.read()
   assert.strictEqual(chunk, null)
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

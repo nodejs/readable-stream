@@ -1,9 +1,7 @@
 'use strict'
 
 const { Readable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(10)
   const str = 'asdfasdfasdfasdfasdf'
@@ -14,7 +12,6 @@ module.exports = function (t) {
   let reads = 0
   let eofed = false
   let ended = false
-
   r._read = function (n) {
     if (reads === 0) {
       setTimeout(function () {
@@ -31,14 +28,15 @@ module.exports = function (t) {
       r.push(null)
     }
   }
-
   r.on('end', function () {
     ended = true
-  }) // push some data in to start.
+  })
+
+  // push some data in to start.
   // we've never gotten any read event at this point.
+  const ret = r.push(str)
 
-  const ret = r.push(str) // should be false.  > hwm
-
+  // should be false.  > hwm
   t.notOk(ret)
   let chunk = r.read()
   t.equal(chunk, str)
@@ -60,5 +58,4 @@ module.exports = function (t) {
     t.equal(reads, 2)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-big-push'

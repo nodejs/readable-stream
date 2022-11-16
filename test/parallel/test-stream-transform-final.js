@@ -1,19 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
+let state = 0
 
-let state = 0 // What you do:
+// What you do:
 //
 // const stream = new stream.Transform({
 //   transform: function transformCallback(chunk, _, next) {
@@ -45,6 +42,7 @@ let state = 0 // What you do:
 // t.end(7, endMethodCallback);
 //
 // The order things are called
+
 // 1. transformCallback part 1
 // 2. dataListener
 // 3. transformCallback part 2
@@ -67,29 +65,29 @@ const t = new stream.Transform({
   transform: common.mustCall(function (chunk, _, next) {
     // transformCallback part 1
     assert.strictEqual(++state, chunk)
-    this.push(state) // transformCallback part 2
-
+    this.push(state)
+    // transformCallback part 2
     assert.strictEqual(++state, chunk + 2)
     process.nextTick(next)
   }, 3),
   final: common.mustCall(function (done) {
-    state++ // finalCallback part 1
-
+    state++
+    // finalCallback part 1
     assert.strictEqual(state, 10)
     setTimeout(function () {
-      state++ // finalCallback part 2
-
+      state++
+      // finalCallback part 2
       assert.strictEqual(state, 11)
       done()
     }, 100)
   }, 1),
   flush: common.mustCall(function (done) {
-    state++ // flushCallback part 1
-
+    state++
+    // flushCallback part 1
     assert.strictEqual(state, 12)
     process.nextTick(function () {
-      state++ // flushCallback part 2
-
+      state++
+      // flushCallback part 2
       assert.strictEqual(state, 13)
       done()
     })
@@ -98,16 +96,16 @@ const t = new stream.Transform({
 t.on(
   'finish',
   common.mustCall(function () {
-    state++ // finishListener
-
+    state++
+    // finishListener
     assert.strictEqual(state, 15)
   }, 1)
 )
 t.on(
   'end',
   common.mustCall(function () {
-    state++ // end event
-
+    state++
+    // end event
     assert.strictEqual(state, 16)
   }, 1)
 )
@@ -123,13 +121,13 @@ t.write(4)
 t.end(
   7,
   common.mustCall(function () {
-    state++ // endMethodCallback
-
+    state++
+    // endMethodCallback
     assert.strictEqual(state, 14)
   }, 1)
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

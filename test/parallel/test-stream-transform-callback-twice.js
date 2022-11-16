@@ -1,16 +1,12 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Transform } = require('../../lib/ours/index')
-
 const stream = new Transform({
   transform(chunk, enc, cb) {
     cb()
@@ -26,8 +22,8 @@ stream.on(
   })
 )
 stream.write('foo')
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

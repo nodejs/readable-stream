@@ -18,21 +18,17 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const Transform = require('../../lib/ours/index').Transform
-
 const parser = new Transform({
   readableObjectMode: true
 })
@@ -42,13 +38,11 @@ assert.strictEqual(parser.readableHighWaterMark, 16)
 assert.strictEqual(parser.writableHighWaterMark, 16 * 1024)
 assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
 assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
-
 parser._transform = function (chunk, enc, callback) {
   callback(null, {
     val: chunk[0]
   })
 }
-
 let parsed
 parser.on('data', function (obj) {
   parsed = obj
@@ -66,11 +60,9 @@ assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024)
 assert.strictEqual(serializer.writableHighWaterMark, 16)
 assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark)
 assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark)
-
 serializer._transform = function (obj, _, callback) {
   callback(null, Buffer.from([obj.val]))
 }
-
 let serialized
 serializer.on('data', function (chunk) {
   serialized = chunk
@@ -81,8 +73,8 @@ serializer.write({
 process.on('exit', function () {
   assert.strictEqual(serialized[0], 42)
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

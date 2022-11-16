@@ -1,26 +1,18 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable } = require('../../lib/ours/index')
-
 const EE = require('events').EventEmitter
-
 class LegacyStream extends EE {
   pause() {}
-
   resume() {}
 }
-
 {
   const err = new Error()
   const oldStream = new LegacyStream()
@@ -55,8 +47,8 @@ class LegacyStream extends EE {
     )
   oldStream.emit('error', err)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

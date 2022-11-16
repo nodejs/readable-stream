@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,20 +12,14 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable, addAbortSignal } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const read = new Readable({
     read() {}
@@ -80,15 +71,15 @@ const assert = require('assert')
 {
   const read = new Readable({
     read() {},
-
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, expected)
       cb()
     })
   })
   const expected = new Error('kaboom')
-  read.on('end', common.mustNotCall('no end event')) // Error is swallowed by the custom _destroy
+  read.on('end', common.mustNotCall('no end event'))
 
+  // Error is swallowed by the custom _destroy
   read.on('error', common.mustNotCall('no error event'))
   read.on('close', common.mustCall())
   read.destroy(expected)
@@ -157,8 +148,9 @@ const assert = require('assert')
   })
   read.resume()
   read.destroyed = true
-  assert.strictEqual(read.destroyed, true) // The internal destroy() mechanism should not be triggered
+  assert.strictEqual(read.destroyed, true)
 
+  // The internal destroy() mechanism should not be triggered
   read.on('end', common.mustNotCall())
   read.destroy()
 }
@@ -168,7 +160,6 @@ const assert = require('assert')
     this.destroyed = false
     Readable.call(this)
   }
-
   Object.setPrototypeOf(MyReadable.prototype, Readable.prototype)
   Object.setPrototypeOf(MyReadable, Readable)
   new MyReadable()
@@ -212,7 +203,6 @@ const assert = require('assert')
     destroy: common.mustCall(function (err, cb) {
       process.nextTick(cb, new Error('kaboom 1'))
     }),
-
     read() {}
   })
   let ticked = false
@@ -234,9 +224,10 @@ const assert = require('assert')
   readable.destroy()
   assert.strictEqual(readable.destroyed, true)
   assert.strictEqual(readable._readableState.errored, null)
-  assert.strictEqual(readable._readableState.errorEmitted, false) // Test case where `readable.destroy()` is called again with an error before
-  // the `_destroy()` callback is called.
+  assert.strictEqual(readable._readableState.errorEmitted, false)
 
+  // Test case where `readable.destroy()` is called again with an error before
+  // the `_destroy()` callback is called.
   readable.destroy(new Error('kaboom 2'))
   assert.strictEqual(readable._readableState.errorEmitted, false)
   assert.strictEqual(readable._readableState.errored, null)
@@ -261,7 +252,6 @@ const assert = require('assert')
 {
   const read = new Readable({
     autoDestroy: false,
-
     read() {
       this.push(null)
       this.push('asd')
@@ -298,7 +288,6 @@ const assert = require('assert')
   const controller = new AbortController()
   const read = new Readable({
     signal: controller.signal,
-
     read() {
       this.push('asd')
     }
@@ -318,7 +307,6 @@ const assert = require('assert')
     controller.signal,
     new Readable({
       objectMode: true,
-
       read() {
         return false
       }
@@ -420,8 +408,8 @@ const assert = require('assert')
   read.destroy()
   read.push('asd')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

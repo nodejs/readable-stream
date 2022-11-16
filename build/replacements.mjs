@@ -91,6 +91,8 @@ const internalValidatorsRequireRelativeUtil = ["require\\('internal/util'\\)", "
 
 const internalValidatorsRequireUtilTypes = ["require\\('internal/util/types'\\)", "require('../ours/util').types"]
 
+const internalValidatorsNumericSeparator = ['4_294_967_295', '4294967295']
+
 const streamIndexIsUint8Array = [
   "Stream._isUint8Array = require\\('internal/util/types'\\).isUint8Array;",
   `
@@ -253,7 +255,8 @@ export const replacements = {
     internalValidatorsRequireRelativeUtil,
     internalValidatorsRequireUtilTypes,
     internalValidatorsNoRequireSignals,
-    internalValidatorsNoCoalesceAssignment
+    internalValidatorsNoCoalesceAssignment,
+    internalValidatorsNumericSeparator
   ],
   'lib/stream.js': [
     streamIndexIsUint8Array,

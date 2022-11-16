@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable, Readable, Duplex } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   // Multiple callback.
   new Writable({
@@ -45,6 +40,7 @@ const assert = require('assert')
 }
 {
   // Synchronous error.
+
   new Writable({
     construct: common.mustCall((callback) => {
       callback(new Error('test'))
@@ -59,6 +55,7 @@ const assert = require('assert')
 }
 {
   // Synchronous error.
+
   new Readable({
     construct: common.mustCall((callback) => {
       callback(new Error('test'))
@@ -73,6 +70,7 @@ const assert = require('assert')
 }
 {
   // Asynchronous error.
+
   new Writable({
     construct: common.mustCall((callback) => {
       process.nextTick(callback, new Error('test'))
@@ -87,6 +85,7 @@ const assert = require('assert')
 }
 {
   // Asynchronous error.
+
   new Readable({
     construct: common.mustCall((callback) => {
       process.nextTick(callback, new Error('test'))
@@ -99,7 +98,6 @@ const assert = require('assert')
     })
   )
 }
-
 function testDestroy(factory) {
   {
     let constructed = false
@@ -199,7 +197,6 @@ function testDestroy(factory) {
     s.destroy(new Error())
   }
 }
-
 testDestroy(
   (opts) =>
     new Readable({
@@ -290,6 +287,7 @@ testDestroy(
 }
 {
   // https://github.com/nodejs/node/issues/34448
+
   let constructed = false
   const d = new Duplex({
     readable: false,
@@ -301,11 +299,9 @@ testDestroy(
         })
       )
     }),
-
     write(chunk, encoding, callback) {
       callback()
     },
-
     read() {
       this.push(null)
     }
@@ -328,8 +324,8 @@ testDestroy(
     read: common.mustNotCall()
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

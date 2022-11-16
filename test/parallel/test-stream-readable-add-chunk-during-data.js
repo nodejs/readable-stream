@@ -1,17 +1,15 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
+const { Readable } = require('../../lib/ours/index')
 
-const { Readable } = require('../../lib/ours/index') // Verify that .push() and .unshift() can be called from 'data' listeners.
+// Verify that .push() and .unshift() can be called from 'data' listeners.
 
 for (const method of ['push', 'unshift']) {
   const r = new Readable({
@@ -33,8 +31,8 @@ for (const method of ['push', 'unshift']) {
   )
   r.push('Hello, world')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

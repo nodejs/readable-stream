@@ -1,17 +1,15 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
+const { Readable, Writable } = require('../../lib/ours/index')
 
-const { Readable, Writable } = require('../../lib/ours/index') // This test ensures that if have 'readable' listener
+// This test ensures that if have 'readable' listener
 // on Readable instance it will not disrupt the pipe.
 
 {
@@ -64,8 +62,8 @@ const { Readable, Writable } = require('../../lib/ours/index') // This test ensu
     })
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,18 +1,14 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
-} // https://github.com/nodejs/node/issues/35926
+}
+// https://github.com/nodejs/node/issues/35926
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 let loops = 5
 const src = new stream.Readable({
   read() {
@@ -34,8 +30,8 @@ dst.on(
     assert.ok(src.isPaused())
   })
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

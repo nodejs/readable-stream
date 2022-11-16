@@ -1,23 +1,19 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const inherits = require('inherits')
-
 const { Readable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 inherits(TestReader, Readable)
-
 function TestReader(n, opts) {
   Readable.call(this, opts)
   this.pos = 0
   this.len = n || 100
 }
-
 TestReader.prototype._read = function (n) {
   setTimeout(
     function () {
@@ -26,25 +22,23 @@ TestReader.prototype._read = function (n) {
         this.push(null)
         return this.push(null)
       }
-
       n = Math.min(n, this.len - this.pos)
-
       if (n <= 0) {
         // double push(null) to test eos handling
         this.push(null)
         return this.push(null)
       }
-
       this.pos += n
       const ret = Buffer.alloc(n)
-      ret.fill('a') // console.log('this.push(ret)', ret);
+      ret.fill('a')
+
+      // console.log('this.push(ret)', ret);
 
       return this.push(ret)
     }.bind(this),
     1
   )
 }
-
 module.exports = function (test) {
   test('setEncoding utf8', function (t) {
     t.plan(1)
@@ -65,7 +59,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -103,7 +96,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -138,7 +130,6 @@ module.exports = function (test) {
     tr.on('readable', function flow() {
       // console.log('readable once');
       let chunk
-
       while ((chunk = tr.read(13)) !== null) {
         out.push(chunk)
       }
@@ -171,7 +162,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -200,7 +190,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -239,7 +228,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -274,7 +262,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(13)) !== null) {
         out.push(chunk)
       }
@@ -307,7 +294,6 @@ module.exports = function (test) {
     ]
     tr.on('readable', function flow() {
       let chunk
-
       while ((chunk = tr.read(10)) !== null) {
         out.push(chunk)
       }
@@ -322,6 +308,5 @@ module.exports = function (test) {
     t.equal(tr.setEncoding('utf8'), tr)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-set-encoding'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

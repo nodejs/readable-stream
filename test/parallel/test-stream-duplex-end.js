@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const Duplex = require('../../lib/ours/index').Duplex
-
 {
   const stream = new Duplex({
     read() {}
@@ -26,7 +21,6 @@ const Duplex = require('../../lib/ours/index').Duplex
 {
   const stream = new Duplex({
     read() {},
-
     allowHalfOpen: false
   })
   assert.strictEqual(stream.allowHalfOpen, false)
@@ -38,7 +32,6 @@ const Duplex = require('../../lib/ours/index').Duplex
 {
   const stream = new Duplex({
     read() {},
-
     allowHalfOpen: false
   })
   assert.strictEqual(stream.allowHalfOpen, false)
@@ -48,8 +41,8 @@ const Duplex = require('../../lib/ours/index').Duplex
   stream.resume()
   stream.push(null)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

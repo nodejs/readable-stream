@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,28 +12,18 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable, Readable, Transform, finished, Duplex, PassThrough, Stream } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const EE = require('events')
-
 const fs = require('fs')
-
 const { promisify } = require('util')
-
 const http = require('http')
-
 {
   const rs = new Readable({
     read() {}
@@ -85,7 +72,6 @@ const http = require('http')
 }
 {
   const finishedPromise = promisify(finished)
-
   async function run() {
     const rs = fs.createReadStream(__filename)
     const done = common.mustCall()
@@ -98,7 +84,6 @@ const http = require('http')
     assert(ended)
     done()
   }
-
   run()
 }
 {
@@ -170,7 +155,6 @@ const http = require('http')
 {
   // Promisified abort works
   const finishedPromise = promisify(finished)
-
   async function run() {
     const ac = new AbortController()
     const { signal } = ac
@@ -180,7 +164,6 @@ const http = require('http')
       signal
     })
   }
-
   assert
     .rejects(run, {
       name: 'AbortError'
@@ -190,7 +173,6 @@ const http = require('http')
 {
   // Promisified pre-aborted works
   const finishedPromise = promisify(finished)
-
   async function run() {
     const signal = new EventTarget()
     signal.aborted = true
@@ -199,7 +181,6 @@ const http = require('http')
       signal
     })
   }
-
   assert
     .rejects(run, {
       name: 'AbortError'
@@ -220,7 +201,6 @@ const http = require('http')
   finished(rs, common.mustSucceed())
   rs.push(null)
   rs.emit('close') // Should not trigger an error
-
   rs.resume()
 }
 {
@@ -232,11 +212,11 @@ const http = require('http')
     })
   )
   rs.emit('close') // Should trigger error
-
   rs.push(null)
   rs.resume()
-} // Test faulty input values and options.
+}
 
+// Test faulty input values and options.
 {
   const rs = new Readable({
     read() {}
@@ -256,8 +236,9 @@ const http = require('http')
   finished(rs, null, common.mustCall())
   rs.push(null)
   rs.resume()
-} // Test that calling returned function removes listeners
+}
 
+// Test that calling returned function removes listeners
 {
   const ws = new Writable({
     write(data, env, cb) {
@@ -329,11 +310,11 @@ const http = require('http')
   w.end('asd')
   w.destroy()
 }
-
 function testClosed(factory) {
   {
     // If already destroyed but finished is cancelled in same tick
     // don't invoke the callback,
+
     const s = factory()
     s.destroy()
     const dispose = finished(s, common.mustNotCall())
@@ -341,12 +322,14 @@ function testClosed(factory) {
   }
   {
     // If already destroyed invoked callback.
+
     const s = factory()
     s.destroy()
     finished(s, common.mustCall())
   }
   {
     // Don't invoke until destroy has completed.
+
     let destroyed = false
     const s = factory({
       destroy(err, cb) {
@@ -366,9 +349,9 @@ function testClosed(factory) {
   }
   {
     // Invoke callback even if close is inhibited.
+
     const s = factory({
       emitClose: false,
-
       destroy(err, cb) {
         cb()
         finished(s, common.mustCall())
@@ -378,6 +361,7 @@ function testClosed(factory) {
   }
   {
     // Invoke with deep async.
+
     const s = factory({
       destroy(err, cb) {
         setImmediate(() => {
@@ -391,13 +375,16 @@ function testClosed(factory) {
     s.destroy()
   }
 }
-
-testClosed((opts) => new Readable({ ...opts }))
+testClosed(
+  (opts) =>
+    new Readable({
+      ...opts
+    })
+)
 testClosed(
   (opts) =>
     new Writable({
       write() {},
-
       ...opts
     })
 )
@@ -406,7 +393,6 @@ testClosed(
     write(chunk, encoding, cb) {
       cb()
     },
-
     autoDestroy: false
   })
   w.end('asd')
@@ -419,7 +405,6 @@ testClosed(
     write(chunk, encoding, cb) {
       cb(new Error())
     },
-
     autoDestroy: false
   })
   w.write('asd')
@@ -488,7 +473,6 @@ testClosed(
 {
   const d = new Duplex({
     final(cb) {},
-
     // Never close writable side for test purpose
     read() {
       this.push(null)
@@ -509,7 +493,6 @@ testClosed(
 {
   const d = new Duplex({
     final(cb) {},
-
     // Never close writable side for test purpose
     read() {
       this.push(null)
@@ -541,7 +524,6 @@ testClosed(
 {
   // Regression https://github.com/nodejs/node/issues/33130
   const response = new PassThrough()
-
   class HelloWorld extends Duplex {
     constructor(response) {
       super({
@@ -558,23 +540,18 @@ testClosed(
         }
       })
     }
-
     _read() {
       const { response } = this
       this.readMore = true
-
       if (response.readableLength) {
         this.readMore = false
       }
-
       let data
-
       while ((data = response.read()) !== null) {
         this.push(data)
       }
     }
   }
-
   const instance = new HelloWorld(response)
   instance.setEncoding('utf8')
   instance.end()
@@ -587,11 +564,9 @@ testClosed(
       response.end()
     })
     let res = ''
-
     for await (const data of instance) {
       res += data
     }
-
     assert.strictEqual(res, 'chunk 1chunk 2chunk 3')
   })().then(common.mustCall())
 }
@@ -694,9 +669,7 @@ testClosed(
 }
 {
   const w = new Writable()
-
   const _err = new Error()
-
   w.destroy(_err)
   assert.strictEqual(w.errored, _err)
   finished(
@@ -771,8 +744,8 @@ testClosed(
         .end()
     })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

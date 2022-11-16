@@ -1,15 +1,13 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const stream = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 const queue = []
-
 for (let decode = 0; decode < 2; decode++) {
   for (let uncork = 0; uncork < 2; uncork++) {
     for (let multi = 0; multi < 2; multi++) {
@@ -17,14 +15,13 @@ for (let decode = 0; decode < 2; decode++) {
     }
   }
 }
-
 function runTest(decode, uncork, multi) {
   return function (t) {
-    t.plan(8) // console.log('# decode=%j uncork=%j multi=%j', decode, uncork, multi);
+    t.plan(8)
 
+    // console.log('# decode=%j uncork=%j multi=%j', decode, uncork, multi);
     let counter = 0
     let expectCount = 0
-
     function cnt(msg) {
       expectCount++
       const expect = expectCount
@@ -32,20 +29,16 @@ function runTest(decode, uncork, multi) {
         if (er) {
           throw er
         }
-
         counter++
         t.equal(counter, expect)
       }
     }
-
     const w = new stream.Writable({
       decodeStrings: decode
     })
-
     w._write = function (chunk, e, cb) {
       t.ok(false, 'Should not call _write')
     }
-
     const expectChunks = decode
       ? [
           {
@@ -92,7 +85,6 @@ function runTest(decode, uncork, multi) {
           }
         ]
     let actualChunks
-
     w._writev = function (chunks, cb) {
       actualChunks = chunks.map(function (chunk) {
         return {
@@ -102,28 +94,21 @@ function runTest(decode, uncork, multi) {
       })
       cb()
     }
-
     w.cork()
     w.write('hello, ', 'ascii', cnt('hello'))
     w.write('world', 'utf8', cnt('world'))
-
     if (multi) {
       w.cork()
     }
-
     w.write(Buffer.from('!'), 'buffer', cnt('!'))
     w.write('\nand then...', 'binary', cnt('and then'))
-
     if (multi) {
       w.uncork()
     }
-
     w.write('facebea7deadbeefdecafbad', 'hex', cnt('hex'))
-
     if (uncork) {
       w.uncork()
     }
-
     w.end(cnt('end'))
     w.on('finish', function () {
       // make sure finish comes after all the write cb
@@ -132,13 +117,11 @@ function runTest(decode, uncork, multi) {
     })
   }
 }
-
 module.exports = function (test) {
   for (let i = 0; i < queue.length; i++) {
     const tr = queue[i]
     test('round ' + i, runTest(tr[0], tr[1], tr[2]))
   }
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-writev'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

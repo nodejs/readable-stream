@@ -18,21 +18,17 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Stream, PassThrough } = require('../../lib/ours/index')
-
 {
   const source = new Stream()
   const dest = new Stream()
@@ -51,13 +47,11 @@ const { Stream, PassThrough } = require('../../lib/ours/index')
   source.pipe(dest)
   const err = new Error('This stream turned into bacon.')
   let gotErr = null
-
   try {
     source.emit('error', err)
   } catch (e) {
     gotErr = e
   }
-
   assert.strictEqual(gotErr, err)
 }
 {
@@ -85,7 +79,6 @@ const { Stream, PassThrough } = require('../../lib/ours/index')
   r.pipe(w)
   w.removeListener('error', myOnError)
   removed = true
-
   function myOnError() {
     throw new Error('this should not happen')
   }
@@ -106,17 +99,14 @@ const { Stream, PassThrough } = require('../../lib/ours/index')
     )
   })
   w.on('error', common.mustCall())
-
   w._write = () => {}
-
-  r.pipe(w) // Removing some OTHER random listener should not do anything
-
+  r.pipe(w)
+  // Removing some OTHER random listener should not do anything
   w.removeListener('error', () => {})
   removed = true
 }
 {
   const _err = new Error('this should be handled')
-
   const destination = new PassThrough()
   destination.once(
     'error',
@@ -128,8 +118,8 @@ const { Stream, PassThrough } = require('../../lib/ours/index')
   stream.pipe(destination)
   destination.destroy(_err)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

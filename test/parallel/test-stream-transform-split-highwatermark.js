@@ -1,26 +1,21 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const { Transform, Readable, Writable } = require('../../lib/ours/index')
-
 const DEFAULT = 16 * 1024
-
 function testTransform(expectedReadableHwm, expectedWritableHwm, options) {
   const t = new Transform(options)
   assert.strictEqual(t._readableState.highWaterMark, expectedReadableHwm)
   assert.strictEqual(t._writableState.highWaterMark, expectedWritableHwm)
-} // Test overriding defaultHwm
+}
 
+// Test overriding defaultHwm
 testTransform(666, DEFAULT, {
   readableHighWaterMark: 666
 })
@@ -30,8 +25,9 @@ testTransform(DEFAULT, 777, {
 testTransform(666, 777, {
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
-}) // Test highWaterMark overriding
+})
 
+// Test highWaterMark overriding
 testTransform(555, 555, {
   highWaterMark: 555,
   readableHighWaterMark: 666
@@ -44,8 +40,9 @@ testTransform(555, 555, {
   highWaterMark: 555,
   readableHighWaterMark: 666,
   writableHighWaterMark: 777
-}) // Test undefined, null
+})
 
+// Test undefined, null
 ;[undefined, null].forEach((v) => {
   testTransform(DEFAULT, DEFAULT, {
     readableHighWaterMark: v
@@ -61,8 +58,9 @@ testTransform(555, 555, {
     highWaterMark: v,
     writableHighWaterMark: 777
   })
-}) // test NaN
+})
 
+// test NaN
 {
   assert.throws(
     () => {
@@ -88,8 +86,9 @@ testTransform(555, 555, {
       message: "The property 'options.writableHighWaterMark' is invalid. " + 'Received NaN'
     }
   )
-} // Test non Duplex streams ignore the options
+}
 
+// Test non Duplex streams ignore the options
 {
   const r = new Readable({
     readableHighWaterMark: 666
@@ -100,8 +99,8 @@ testTransform(555, 555, {
   })
   assert.strictEqual(w._writableState.highWaterMark, DEFAULT)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

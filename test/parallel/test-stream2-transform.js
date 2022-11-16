@@ -18,38 +18,31 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { PassThrough, Transform } = require('../../lib/ours/index')
-
 {
   // Verify writable side consumption
   const tx = new Transform({
     highWaterMark: 10
   })
   let transformed = 0
-
   tx._transform = function (chunk, encoding, cb) {
     transformed += chunk.length
     tx.push(chunk)
     cb()
   }
-
   for (let i = 1; i <= 10; i++) {
     tx.write(Buffer.allocUnsafe(i))
   }
-
   tx.end()
   assert.strictEqual(tx.readableLength, 10)
   assert.strictEqual(transformed, 10)
@@ -111,13 +104,11 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
 {
   // Perform a simple transform
   const pt = new Transform()
-
   pt._transform = function (c, e, cb) {
     const ret = Buffer.alloc(c.length, 'x')
     pt.push(ret)
     cb()
   }
-
   pt.write(Buffer.from('foog'))
   pt.write(Buffer.from('bark'))
   pt.write(Buffer.from('bazy'))
@@ -133,12 +124,10 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
   const pt = new Transform({
     objectMode: true
   })
-
   pt._transform = function (c, e, cb) {
     pt.push(JSON.stringify(c))
     cb()
   }
-
   pt.write(1)
   pt.write(true)
   pt.write(false)
@@ -160,14 +149,12 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
 {
   // Verify async passthrough
   const pt = new Transform()
-
   pt._transform = function (chunk, encoding, cb) {
     setTimeout(function () {
       pt.push(chunk)
       cb()
     }, 10)
   }
-
   pt.write(Buffer.from('foog'))
   pt.write(Buffer.from('bark'))
   pt.write(Buffer.from('bazy'))
@@ -185,8 +172,9 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
 }
 {
   // Verify asymmetric transform (expand)
-  const pt = new Transform() // Emit each chunk 2 times.
+  const pt = new Transform()
 
+  // Emit each chunk 2 times.
   pt._transform = function (chunk, encoding, cb) {
     setTimeout(function () {
       pt.push(chunk)
@@ -196,7 +184,6 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
       }, 10)
     }, 10)
   }
-
   pt.write(Buffer.from('foog'))
   pt.write(Buffer.from('bark'))
   pt.write(Buffer.from('bazy'))
@@ -217,33 +204,29 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
 }
 {
   // Verify asymmetric transform (compress)
-  const pt = new Transform() // Each output is the first char of 3 consecutive chunks,
+  const pt = new Transform()
+
+  // Each output is the first char of 3 consecutive chunks,
   // or whatever's left.
-
   pt.state = ''
-
   pt._transform = function (chunk, encoding, cb) {
     if (!chunk) chunk = ''
     const s = chunk.toString()
     setTimeout(() => {
       this.state += s.charAt(0)
-
       if (this.state.length === 3) {
         pt.push(Buffer.from(this.state))
         this.state = ''
       }
-
       cb()
     }, 10)
   }
-
   pt._flush = function (cb) {
     // Just output whatever we have.
     pt.push(Buffer.from(this.state))
     this.state = ''
     cb()
   }
-
   pt.write(Buffer.from('aaaa'))
   pt.write(Buffer.from('bbbb'))
   pt.write(Buffer.from('cccc'))
@@ -258,8 +241,9 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
   pt.write(Buffer.from('bbbb'))
   pt.write(Buffer.from('cccc'))
   pt.write(Buffer.from('dddd'))
-  pt.end() // 'abcdeabcdeabcd'
+  pt.end()
 
+  // 'abcdeabcdeabcd'
   pt.on(
     'finish',
     common.mustCall(function () {
@@ -268,9 +252,10 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
       assert.strictEqual(pt.read(5).toString(), 'abcd')
     })
   )
-} // This tests for a stall when data is written to a full stream
-// that has empty transforms.
+}
 
+// This tests for a stall when data is written to a full stream
+// that has empty transforms.
 {
   // Verify complex transform behavior
   let count = 0
@@ -278,7 +263,6 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
   const pt = new Transform({
     highWaterMark: 3
   })
-
   pt._transform = function (c, e, cb) {
     if (count++ === 1) saved = c
     else {
@@ -286,12 +270,10 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
         pt.push(saved)
         saved = null
       }
-
       pt.push(c)
     }
     cb()
   }
-
   pt.once('readable', function () {
     process.nextTick(function () {
       pt.write(Buffer.from('d'))
@@ -402,7 +384,6 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
   const jp = new Transform({
     objectMode: true
   })
-
   jp._transform = function (data, encoding, cb) {
     try {
       jp.push(JSON.parse(data))
@@ -410,9 +391,10 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
     } catch (er) {
       cb(er)
     }
-  } // Anything except null/undefined is fine.
-  // those are "magic" in the stream API, because they signal EOF.
+  }
 
+  // Anything except null/undefined is fine.
+  // those are "magic" in the stream API, because they signal EOF.
   const objects = [
     {
       foo: 'bar'
@@ -440,8 +422,8 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
     const res = jp.read()
     assert.deepStrictEqual(res, obj)
   })
-  jp.end() // Read one more time to get the 'end' event
-
+  jp.end()
+  // Read one more time to get the 'end' event
   jp.read()
   process.nextTick(
     common.mustCall(function () {
@@ -454,7 +436,6 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
   const js = new Transform({
     objectMode: true
   })
-
   js._transform = function (data, encoding, cb) {
     try {
       js.push(JSON.stringify(data))
@@ -462,9 +443,10 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
     } catch (er) {
       cb(er)
     }
-  } // Anything except null/undefined is fine.
-  // those are "magic" in the stream API, because they signal EOF.
+  }
 
+  // Anything except null/undefined is fine.
+  // those are "magic" in the stream API, because they signal EOF.
   const objects = [
     {
       foo: 'bar'
@@ -492,8 +474,8 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
     const res = js.read()
     assert.strictEqual(res, JSON.stringify(obj))
   })
-  js.end() // Read one more time to get the 'end' event
-
+  js.end()
+  // Read one more time to get the 'end' event
   js.read()
   process.nextTick(
     common.mustCall(function () {
@@ -501,8 +483,8 @@ const { PassThrough, Transform } = require('../../lib/ours/index')
     })
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

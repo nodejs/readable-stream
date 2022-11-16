@@ -18,23 +18,18 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 const queue = []
-
 for (let decode = 0; decode < 2; decode++) {
   for (let uncork = 0; uncork < 2; uncork++) {
     for (let multi = 0; multi < 2; multi++) {
@@ -42,20 +37,16 @@ for (let decode = 0; decode < 2; decode++) {
     }
   }
 }
-
 run()
-
 function run() {
   const t = queue.pop()
   if (t) test(t[0], t[1], t[2], run)
   else silentConsole.log('ok')
 }
-
 function test(decode, uncork, multi, next) {
   silentConsole.log(`# decode=${decode} uncork=${uncork} multi=${multi}`)
   let counter = 0
   let expectCount = 0
-
   function cnt(msg) {
     expectCount++
     const expect = expectCount
@@ -65,7 +56,6 @@ function test(decode, uncork, multi, next) {
       assert.strictEqual(counter, expect)
     }
   }
-
   const w = new stream.Writable({
     decodeStrings: decode
   })
@@ -116,7 +106,6 @@ function test(decode, uncork, multi, next) {
         }
       ]
   let actualChunks
-
   w._writev = function (chunks, cb) {
     actualChunks = chunks.map(function (chunk) {
       return {
@@ -126,7 +115,6 @@ function test(decode, uncork, multi, next) {
     })
     cb()
   }
-
   w.cork()
   w.write('hello, ', 'ascii', cnt('hello'))
   w.write('world', 'utf8', cnt('world'))
@@ -144,7 +132,6 @@ function test(decode, uncork, multi, next) {
     next()
   })
 }
-
 {
   const w = new stream.Writable({
     writev: common.mustCall(function (chunks, cb) {
@@ -153,8 +140,8 @@ function test(decode, uncork, multi, next) {
   })
   w.write('asd', common.mustCall())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,31 +1,23 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const { Readable, Writable, promises } = stream
-
 const { finished, pipeline } = require('../../lib/stream/promises')
-
 const fs = require('fs')
-
 const assert = require('assert')
-
 const { promisify } = require('util')
-
 assert.strictEqual(promises.pipeline, pipeline)
 assert.strictEqual(promises.finished, finished)
 assert.strictEqual(pipeline, promisify(stream.pipeline))
-assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
+assert.strictEqual(finished, promisify(stream.finished))
 
+// pipeline success
 {
   let finished = false
   const processed = []
@@ -42,11 +34,9 @@ assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
   write.on('finish', () => {
     finished = true
   })
-
   for (let i = 0; i < expected.length; i++) {
     read.push(expected[i])
   }
-
   read.push(null)
   pipeline(read, write).then(
     common.mustCall((value) => {
@@ -54,8 +44,9 @@ assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
       assert.deepStrictEqual(processed, expected)
     })
   )
-} // pipeline error
+}
 
+// pipeline error
 {
   const read = new Readable({
     read() {}
@@ -72,8 +63,9 @@ assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
       assert.ok(err, 'should have an error')
     })
   )
-} // finished success
+}
 
+// finished success
 {
   async function run() {
     const rs = fs.createReadStream(__filename)
@@ -85,10 +77,10 @@ assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
     await finished(rs)
     assert(ended)
   }
-
   run().then(common.mustCall())
-} // finished error
+}
 
+// finished error
 {
   const rs = fs.createReadStream('file-does-not-exist')
   assert
@@ -97,8 +89,8 @@ assert.strictEqual(finished, promisify(stream.finished)) // pipeline success
     })
     .then(common.mustCall())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,32 +1,25 @@
 'use strict'
 
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 function forEach(xs, f) {
   for (let i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i)
   }
 }
-
 function toArray(callback) {
   const stream = new Writable({
     objectMode: true
   })
   const list = []
-
   stream.write = function (chunk) {
     list.push(chunk)
   }
-
   stream.end = function () {
     callback(list)
   }
-
   return stream
 }
-
 function fromArray(list) {
   const r = new Readable({
     objectMode: true
@@ -38,9 +31,7 @@ function fromArray(list) {
   r.push(null)
   return r
 }
-
 function noop() {}
-
 module.exports = function (test) {
   test('can read objects from stream', function (t) {
     t.plan(3)
@@ -114,12 +105,10 @@ module.exports = function (test) {
         two: '2'
       }
     ]
-
     r._read = function (n) {
       const item = list.shift()
       r.push(item || null)
     }
-
     r.pipe(
       toArray(function (list) {
         t.deepEqual(list, [
@@ -146,14 +135,12 @@ module.exports = function (test) {
         two: '2'
       }
     ]
-
     r._read = function (n) {
       const item = list.shift()
       process.nextTick(function () {
         r.push(item || null)
       })
     }
-
     r.pipe(
       toArray(function (list) {
         t.deepEqual(list, [
@@ -223,11 +210,9 @@ module.exports = function (test) {
     })
     let calls = 0
     const list = ['1', '2', '3', '4', '5', '6', '7', '8']
-
     r._read = function (n) {
       calls++
     }
-
     forEach(list, function (c) {
       r.push(c)
     })
@@ -246,9 +231,7 @@ module.exports = function (test) {
       highWaterMark: 6,
       objectMode: true
     })
-
     r._read = function (n) {}
-
     for (let i = 0; i < 6; i++) {
       const bool = r.push(i)
       t.equal(bool, i !== 5)
@@ -259,14 +242,12 @@ module.exports = function (test) {
     const w = new Writable({
       objectMode: true
     })
-
     w._write = function (chunk, encoding, cb) {
       t.deepEqual(chunk, {
         foo: 'bar'
       })
       cb()
     }
-
     w.on('finish', function () {})
     w.write({
       foo: 'bar'
@@ -279,12 +260,10 @@ module.exports = function (test) {
       objectMode: true
     })
     const list = []
-
     w._write = function (chunk, encoding, cb) {
       list.push(chunk)
       cb()
     }
-
     w.on('finish', function () {
       t.deepEqual(list, [0, 1, 2, 3, 4])
     })
@@ -301,12 +280,10 @@ module.exports = function (test) {
       objectMode: true
     })
     const list = []
-
     w._write = function (chunk, encoding, cb) {
       list.push(chunk)
       process.nextTick(cb)
     }
-
     w.on('finish', function () {
       t.deepEqual(list, ['0', '1', '2', '3', '4'])
     })
@@ -323,7 +300,6 @@ module.exports = function (test) {
       objectMode: true
     })
     let called = false
-
     w._write = function (chunk, encoding, cb) {
       t.equal(chunk, 'foo')
       process.nextTick(function () {
@@ -331,7 +307,6 @@ module.exports = function (test) {
         cb()
       })
     }
-
     w.on('finish', function () {
       t.equal(called, true)
     })
@@ -339,6 +314,5 @@ module.exports = function (test) {
     w.end()
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-objects'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

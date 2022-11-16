@@ -1,22 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const r = new stream.Readable({
     captureRejections: true,
-
     read() {}
   })
   r.push('hello')
@@ -37,7 +31,6 @@ const assert = require('assert')
   const w = new stream.Writable({
     captureRejections: true,
     highWaterMark: 1,
-
     write(chunk, enc, cb) {
       process.nextTick(cb)
     }
@@ -60,8 +53,8 @@ const assert = require('assert')
     }, 2)
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

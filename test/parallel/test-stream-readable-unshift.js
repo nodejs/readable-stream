@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable } = require('../../lib/ours/index')
-
 {
   // Check that strings are saved as Buffer
   const readable = new Readable({
@@ -62,7 +57,6 @@ const { Readable } = require('../../lib/ours/index')
 }
 {
   const streamEncoding = 'base64'
-
   function checkEncoding(readable) {
     // chunk encodings
     const encodings = ['utf8', 'binary', 'hex', 'base64']
@@ -74,11 +68,11 @@ const { Readable } = require('../../lib/ours/index')
         assert.strictEqual(chunk.toString(encoding), string)
       }, encodings.length)
     )
-
     for (const encoding of encodings) {
-      const string = 'abc' // If encoding is the same as the state.encoding the string is
-      // saved as is
+      const string = 'abc'
 
+      // If encoding is the same as the state.encoding the string is
+      // saved as is
       const expect = encoding !== streamEncoding ? Buffer.from(string, encoding).toString(streamEncoding) : string
       expected.push({
         encoding,
@@ -87,7 +81,6 @@ const { Readable } = require('../../lib/ours/index')
       readable.unshift(string, encoding)
     }
   }
-
   const r1 = new Readable({
     read() {}
   })
@@ -95,7 +88,6 @@ const { Readable } = require('../../lib/ours/index')
   checkEncoding(r1)
   const r2 = new Readable({
     read() {},
-
     encoding: streamEncoding
   })
   checkEncoding(r2)
@@ -104,7 +96,6 @@ const { Readable } = require('../../lib/ours/index')
   // Both .push & .unshift should have the same behaviour
   // When setting an encoding, each chunk should be emitted with that encoding
   const encoding = 'base64'
-
   function checkEncoding(readable) {
     const string = 'abc'
     readable.on(
@@ -116,7 +107,6 @@ const { Readable } = require('../../lib/ours/index')
     readable.push(string)
     readable.unshift(string)
   }
-
   const r1 = new Readable({
     read() {}
   })
@@ -124,7 +114,6 @@ const { Readable } = require('../../lib/ours/index')
   checkEncoding(r1)
   const r2 = new Readable({
     read() {},
-
     encoding
   })
   checkEncoding(r2)
@@ -133,7 +122,6 @@ const { Readable } = require('../../lib/ours/index')
   // Check that ObjectMode works
   const readable = new Readable({
     objectMode: true,
-
     read() {}
   })
   const chunks = ['a', 1, {}, []]
@@ -143,7 +131,6 @@ const { Readable } = require('../../lib/ours/index')
       assert.strictEqual(chunk, chunks.pop())
     }, chunks.length)
   )
-
   for (const chunk of chunks) {
     readable.unshift(chunk)
   }
@@ -151,31 +138,26 @@ const { Readable } = require('../../lib/ours/index')
 {
   // Should not throw: https://github.com/nodejs/node/issues/27192
   const highWaterMark = 50
-
   class ArrayReader extends Readable {
     constructor(opt) {
       super({
         highWaterMark
-      }) // The error happened only when pushing above hwm
-
+      })
+      // The error happened only when pushing above hwm
       this.buffer = new Array(highWaterMark * 2).fill(0).map(String)
     }
-
     _read(size) {
       while (this.buffer.length) {
         const chunk = this.buffer.shift()
-
         if (!this.buffer.length) {
           this.push(chunk)
           this.push(null)
           return true
         }
-
         if (!this.push(chunk)) return
       }
     }
   }
-
   function onRead() {
     while (null !== stream.read()) {
       // Remove the 'readable' listener before unshifting
@@ -187,7 +169,6 @@ const { Readable } = require('../../lib/ours/index')
       break
     }
   }
-
   const stream = new ArrayReader()
   stream.once('readable', common.mustCall(onRead))
   stream.on(
@@ -195,8 +176,8 @@ const { Readable } = require('../../lib/ours/index')
     common.mustCall(() => {})
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

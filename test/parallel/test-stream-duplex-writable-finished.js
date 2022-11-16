@@ -1,32 +1,28 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Duplex } = require('../../lib/ours/index')
+const assert = require('assert')
 
-const assert = require('assert') // basic
-
+// basic
 {
   // Find it on Duplex.prototype
   assert(Reflect.has(Duplex.prototype, 'writableFinished'))
-} // event
+}
 
+// event
 {
   const duplex = new Duplex()
-
   duplex._write = (chunk, encoding, cb) => {
     // The state finished should start in false.
     assert.strictEqual(duplex.writableFinished, false)
     cb()
   }
-
   duplex.on(
     'finish',
     common.mustCall(() => {
@@ -40,8 +36,8 @@ const assert = require('assert') // basic
     })
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Transform } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const transform = new Transform({
     transform(chunk, enc, cb) {}
@@ -63,7 +58,6 @@ const assert = require('assert')
   const expected = new Error('kaboom')
   const transform = new Transform({
     transform(chunk, enc, cb) {},
-
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, expected)
       cb()
@@ -72,8 +66,9 @@ const assert = require('assert')
   transform.resume()
   transform.on('end', common.mustNotCall('no end event'))
   transform.on('close', common.mustCall())
-  transform.on('finish', common.mustNotCall('no finish event')) // Error is swallowed by the custom _destroy
+  transform.on('finish', common.mustNotCall('no finish event'))
 
+  // Error is swallowed by the custom _destroy
   transform.on('error', common.mustNotCall('no error event'))
   transform.destroy(expected)
 }
@@ -130,8 +125,8 @@ const assert = require('assert')
   )
   transform.destroy()
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const r = new stream.Readable({
     read: common.mustCall(function () {
@@ -145,8 +140,8 @@ const assert = require('assert')
   t.write('content')
   t.end()
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -16,22 +13,15 @@ if (typeof AbortSignal.abort !== 'function') {
 // Flags: --expose-internals
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const { addAbortSignal, Readable } = require('../../lib/ours/index')
-
 const { addAbortSignalNoValidate } = require('../../lib/internal/streams/add-abort-signal')
-
 {
   assert.throws(() => {
     addAbortSignal('INVALID_SIGNAL')
@@ -47,8 +37,8 @@ const { addAbortSignalNoValidate } = require('../../lib/internal/streams/add-abo
   })
   assert.deepStrictEqual(r, addAbortSignalNoValidate('INVALID_SIGNAL', r))
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

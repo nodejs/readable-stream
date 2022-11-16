@@ -1,21 +1,14 @@
 'use strict'
 
 require('../common')
-
 const t = require('tap')
-
 const util = require('util')
-
 const fakeTimers = require('@sinonjs/fake-timers')
-
 const Transform = require('../../lib/ours/index').Transform
-
 t.plan(1)
-
 function MyTransform() {
   Transform.call(this)
 }
-
 util.inherits(MyTransform, Transform)
 const clock = fakeTimers.install({
   toFake: ['setImmediate', 'nextTick']

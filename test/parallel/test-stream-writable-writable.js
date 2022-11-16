@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Writable } = require('../../lib/ours/index')
-
 {
   const w = new Writable({
     write() {}
@@ -52,8 +47,8 @@ const { Writable } = require('../../lib/ours/index')
   w.end()
   assert.strictEqual(w.writable, false)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -18,23 +18,18 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const EE = require('events').EventEmitter
-
 function runTest(highWaterMark, objectMode, produce) {
   const old = new EE()
   const r = new Readable({
@@ -43,17 +38,16 @@ function runTest(highWaterMark, objectMode, produce) {
   })
   assert.strictEqual(r, r.wrap(old))
   r.on('end', common.mustCall())
-
   old.pause = function () {
     old.emit('pause')
     flowing = false
   }
-
   old.resume = function () {
     old.emit('resume')
     flow()
-  } // Make sure pause is only emitted once.
+  }
 
+  // Make sure pause is only emitted once.
   let pausing = false
   r.on('pause', () => {
     assert.strictEqual(pausing, false)
@@ -66,33 +60,27 @@ function runTest(highWaterMark, objectMode, produce) {
   let chunks = 10
   let oldEnded = false
   const expected = []
-
   function flow() {
     flowing = true
-
     while (flowing && chunks-- > 0) {
       const item = produce()
       expected.push(item)
       old.emit('data', item)
     }
-
     if (chunks <= 0) {
       oldEnded = true
       old.emit('end')
     }
   }
-
   const w = new Writable({
     highWaterMark: highWaterMark * 2,
     objectMode
   })
   const written = []
-
   w._write = function (chunk, encoding, cb) {
     written.push(chunk)
     setTimeout(cb, 1)
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -101,13 +89,11 @@ function runTest(highWaterMark, objectMode, produce) {
   )
   r.pipe(w)
   flow()
-
   function performAsserts() {
     assert(oldEnded)
     assert.deepStrictEqual(written, expected)
   }
 }
-
 runTest(100, false, function () {
   return Buffer.allocUnsafe(100)
 })
@@ -136,8 +122,8 @@ const objectChunks = [
 runTest(1, true, function () {
   return objectChunks.shift()
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,21 +1,16 @@
 // Flags: --expose-internals
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable, Transform, Writable, finished, PassThrough } = require('../../lib/ours/index')
-
 const compose = require('../../lib/internal/streams/compose')
-
 const assert = require('assert')
-
 {
   let res = ''
   compose(
@@ -237,7 +232,6 @@ const assert = require('assert')
 }
 {
   const _err = new Error('asd')
-
   compose(
     new Transform({
       objectMode: true,
@@ -268,7 +262,6 @@ const assert = require('assert')
 }
 {
   const _err = new Error('asd')
-
   compose(
     new Transform({
       objectMode: true,
@@ -279,12 +272,10 @@ const assert = require('assert')
     async function* (source) {
       // eslint-disable-line require-yield
       let tmp = ''
-
       for await (const chunk of source) {
         tmp += chunk
         throw _err
       }
-
       return tmp
     },
     new Transform({
@@ -304,8 +295,9 @@ const assert = require('assert')
     })
 }
 {
-  let buf = '' // Convert into readable Duplex.
+  let buf = ''
 
+  // Convert into readable Duplex.
   const s1 = compose(
     (async function* () {
       yield 'Hello'
@@ -333,8 +325,8 @@ const assert = require('assert')
   )
 }
 {
-  let buf = '' // Convert into transform duplex.
-
+  let buf = ''
+  // Convert into transform duplex.
   const s2 = compose(async function* (source) {
     for await (const chunk of source) {
       yield String(chunk).toUpperCase()
@@ -354,21 +346,24 @@ const assert = require('assert')
   )
 }
 {
-  let buf = '' // Convert into readable Duplex.
+  let buf = ''
 
+  // Convert into readable Duplex.
   const s1 = compose(
     (async function* () {
       yield 'Hello'
       yield 'World'
     })()
-  ) // Convert into transform duplex.
+  )
 
+  // Convert into transform duplex.
   const s2 = compose(async function* (source) {
     for await (const chunk of source) {
       yield String(chunk).toUpperCase()
     }
-  }) // Convert into writable duplex.
+  })
 
+  // Convert into writable duplex.
   const s3 = compose(async function (source) {
     for await (const chunk of source) {
       buf += chunk
@@ -384,8 +379,9 @@ const assert = require('assert')
   )
 }
 {
-  let buf = '' // Convert into readable Duplex.
+  let buf = ''
 
+  // Convert into readable Duplex.
   const s1 = compose(
     (async function* () {
       yield 'Hello'
@@ -438,8 +434,9 @@ const assert = require('assert')
   }
 }
 {
-  let buf = '' // Convert into readable Duplex.
+  let buf = ''
 
+  // Convert into readable Duplex.
   const s1 = compose(
     (async function* () {
       yield 'Hello'
@@ -454,7 +451,6 @@ const assert = require('assert')
       for await (const chunk of source) {
         buf += chunk
       }
-
       return buf
     }
   )
@@ -466,8 +462,9 @@ const assert = require('assert')
   )
 }
 {
-  let buf = '' // Convert into readable Duplex.
+  let buf = ''
 
+  // Convert into readable Duplex.
   const s1 = compose(
     'HelloWorld',
     async function* (source) {
@@ -489,8 +486,8 @@ const assert = require('assert')
     })
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

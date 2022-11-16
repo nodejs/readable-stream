@@ -1,16 +1,12 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable } = require('../../lib/ours/index')
-
 {
   const w = new Writable({
     write: common.mustCall((chunk, encoding, cb) => {
@@ -50,8 +46,8 @@ const { Writable } = require('../../lib/ours/index')
   w.end()
   w.destroy()
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

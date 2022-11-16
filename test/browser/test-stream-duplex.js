@@ -1,9 +1,7 @@
 'use strict'
 
 const { Duplex } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(4)
   const stream = new Duplex({
@@ -13,14 +11,11 @@ module.exports = function (t) {
   t.ok(stream._writableState.objectMode)
   let written
   let read
-
   stream._write = function (obj, _, cb) {
     written = obj
     cb()
   }
-
   stream._read = function () {}
-
   stream.on('data', function (obj) {
     read = obj
   })
@@ -36,5 +31,4 @@ module.exports = function (t) {
   })
   stream.push(null)
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-duplex'

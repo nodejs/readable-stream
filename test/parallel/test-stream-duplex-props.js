@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const { Duplex } = require('../../lib/ours/index')
-
 {
   const d = new Duplex({
     objectMode: true,
@@ -35,8 +30,8 @@ const { Duplex } = require('../../lib/ours/index')
   assert.strictEqual(d.readableObjectMode, false)
   assert.strictEqual(d.readableHighWaterMark, 10)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

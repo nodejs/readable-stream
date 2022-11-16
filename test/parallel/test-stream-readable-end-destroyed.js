@@ -1,18 +1,15 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 {
   // Don't emit 'end' after 'close'.
+
   const r = new Readable()
   r.on('end', common.mustNotCall())
   r.resume()
@@ -24,8 +21,8 @@ const { Readable } = require('../../lib/ours/index')
     })
   )
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

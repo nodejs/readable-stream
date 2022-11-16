@@ -18,36 +18,36 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
+const readable = new stream.Readable()
 
-const readable = new stream.Readable() // _read is a noop, here.
+// _read is a noop, here.
+readable._read = Function()
 
-readable._read = Function() // Default state of a stream is not "paused"
+// Default state of a stream is not "paused"
+assert.ok(!readable.isPaused())
 
-assert.ok(!readable.isPaused()) // Make the stream start flowing...
+// Make the stream start flowing...
+readable.on('data', Function())
 
-readable.on('data', Function()) // still not paused.
-
+// still not paused.
 assert.ok(!readable.isPaused())
 readable.pause()
 assert.ok(readable.isPaused())
 readable.resume()
 assert.ok(!readable.isPaused())
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

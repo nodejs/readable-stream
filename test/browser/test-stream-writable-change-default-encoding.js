@@ -1,27 +1,22 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const inherits = require('inherits')
-
 const stream = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 inherits(MyWritable, stream.Writable)
-
 MyWritable.prototype._write = function (chunk, encoding, callback) {
   this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding)
   callback()
 }
-
 function MyWritable(fn, options) {
   stream.Writable.call(this, options)
   this.fn = fn
 }
-
 module.exports = function (test) {
   test('defaultCondingIsUtf8', (t) => {
     t.plan(1)
@@ -76,6 +71,5 @@ module.exports = function (test) {
     m.end()
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-writable-change-default-encoding'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

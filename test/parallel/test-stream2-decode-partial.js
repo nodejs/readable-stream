@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 let buf = ''
 const euro = Buffer.from([0xe2, 0x82, 0xac])
 const cent = Buffer.from([0xc2, 0xa2])
@@ -30,8 +25,8 @@ readable.on('data', function (data) {
 process.on('exit', function () {
   assert.strictEqual(buf, '€¢')
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -18,34 +18,30 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const { Readable, Writable } = require('../../lib/ours/index')
+const EE = require('events').EventEmitter
 
-const EE = require('events').EventEmitter // A mock thing a bit like the net.Socket/tcp_wrap.handle interaction
+// A mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
 const stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
 })
 const source = new EE()
-
 stream._read = function () {
   silentConsole.error('stream._read')
   readStart()
 }
-
 let ended = false
 stream.on('end', function () {
   ended = true
@@ -59,12 +55,10 @@ source.on('end', function () {
   stream.push(null)
 })
 let reading = false
-
 function readStart() {
   silentConsole.error('readStart')
   reading = true
 }
-
 function readStop() {
   silentConsole.error('readStop')
   reading = false
@@ -73,7 +67,6 @@ function readStop() {
     if (r !== null) writer.write(r)
   })
 }
-
 const writer = new Writable({
   decodeStrings: false
 })
@@ -86,20 +79,19 @@ const expectWritten = [
   'asdfgasdfgasdfgasdfg',
   'asdfgasdfgasdfgasdfg'
 ]
-
 writer._write = function (chunk, encoding, cb) {
   silentConsole.error(`WRITE ${chunk}`)
   written.push(chunk)
   process.nextTick(cb)
 }
+writer.on('finish', finish)
 
-writer.on('finish', finish) // Now emit some chunks.
+// Now emit some chunks.
 
 const chunk = 'asdfg'
 let set = 0
 readStart()
 data()
-
 function data() {
   assert(reading)
   source.emit('data', chunk)
@@ -113,13 +105,11 @@ function data() {
   if (set++ < 5) setTimeout(data, 10)
   else end()
 }
-
 function finish() {
   silentConsole.error('finish')
   assert.deepStrictEqual(written, expectWritten)
   silentConsole.log('ok')
 }
-
 function end() {
   source.emit('end')
   assert(!reading)
@@ -128,8 +118,8 @@ function end() {
     assert(ended)
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

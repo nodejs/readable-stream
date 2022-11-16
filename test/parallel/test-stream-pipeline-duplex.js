@@ -1,22 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { pipeline, Duplex, PassThrough } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const remote = new PassThrough()
 const local = new Duplex({
   read() {},
-
   write(chunk, enc, callback) {
     callback()
   }
@@ -32,8 +26,8 @@ pipeline(
 setImmediate(() => {
   remote.end()
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Duplex } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const duplex = new Duplex({
     readable: false
@@ -50,17 +45,15 @@ const assert = require('assert')
   assert.strictEqual(duplex.readable, false)
   duplex.on('data', common.mustNotCall())
   duplex.on('end', common.mustNotCall())
-
   async function run() {
     for await (const chunk of duplex) {
       assert(false, chunk)
     }
   }
-
   run().then(common.mustCall())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

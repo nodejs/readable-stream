@@ -1,22 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const { mustCall, mustNotCall } = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const { strictEqual } = require('assert')
-
 async function asyncSupport() {
   const finallyMustCall = mustCall()
   const bodyMustCall = mustCall()
-
   async function* infiniteGenerate() {
     try {
       while (true) yield 'a'
@@ -24,20 +18,16 @@ async function asyncSupport() {
       finallyMustCall()
     }
   }
-
   const stream = Readable.from(infiniteGenerate())
-
   for await (const chunk of stream) {
     bodyMustCall()
     strictEqual(chunk, 'a')
     break
   }
 }
-
 async function syncSupport() {
   const finallyMustCall = mustCall()
   const bodyMustCall = mustCall()
-
   function* infiniteGenerate() {
     try {
       while (true) yield 'a'
@@ -45,20 +35,16 @@ async function syncSupport() {
       finallyMustCall()
     }
   }
-
   const stream = Readable.from(infiniteGenerate())
-
   for await (const chunk of stream) {
     bodyMustCall()
     strictEqual(chunk, 'a')
     break
   }
 }
-
 async function syncPromiseSupport() {
   const returnMustBeAwaited = mustCall()
   const bodyMustCall = mustCall()
-
   function* infiniteGenerate() {
     try {
       while (true) yield Promise.resolve('a')
@@ -72,22 +58,18 @@ async function syncPromiseSupport() {
       }
     }
   }
-
   const stream = Readable.from(infiniteGenerate())
-
   for await (const chunk of stream) {
     bodyMustCall()
     strictEqual(chunk, 'a')
     break
   }
 }
-
 async function syncRejectedSupport() {
   const returnMustBeAwaited = mustCall()
   const bodyMustNotCall = mustNotCall()
   const catchMustCall = mustCall()
   const secondNextMustNotCall = mustNotCall()
-
   function* generate() {
     try {
       yield Promise.reject('a')
@@ -102,9 +84,7 @@ async function syncRejectedSupport() {
       }
     }
   }
-
   const stream = Readable.from(generate())
-
   try {
     for await (const chunk of stream) {
       bodyMustNotCall(chunk)
@@ -113,7 +93,6 @@ async function syncRejectedSupport() {
     catchMustCall()
   }
 }
-
 async function noReturnAfterThrow() {
   const returnMustNotCall = mustNotCall()
   const bodyMustNotCall = mustNotCall()
@@ -123,12 +102,10 @@ async function noReturnAfterThrow() {
     [Symbol.asyncIterator]() {
       return this
     },
-
     async next() {
       nextMustCall()
       throw new Error('a')
     },
-
     async return() {
       returnMustNotCall()
       return {
@@ -136,7 +113,6 @@ async function noReturnAfterThrow() {
       }
     }
   })
-
   try {
     for await (const chunk of stream) {
       bodyMustNotCall(chunk)
@@ -145,7 +121,6 @@ async function noReturnAfterThrow() {
     catchMustCall()
   }
 }
-
 async function closeStreamWhileNextIsPending() {
   const finallyMustCall = mustCall()
   const dataMustCall = mustCall()
@@ -157,7 +132,6 @@ async function closeStreamWhileNextIsPending() {
   const yielded = new Promise((resolve) => {
     resolveYielded = mustCall(resolve)
   })
-
   async function* infiniteGenerate() {
     try {
       while (true) {
@@ -169,7 +143,6 @@ async function closeStreamWhileNextIsPending() {
       finallyMustCall()
     }
   }
-
   const stream = Readable.from(infiniteGenerate())
   stream.on('data', (data) => {
     dataMustCall()
@@ -180,11 +153,9 @@ async function closeStreamWhileNextIsPending() {
     resolveDestroy()
   })
 }
-
 async function closeAfterNullYielded() {
   const finallyMustCall = mustCall()
   const dataMustCall = mustCall(3)
-
   function* generate() {
     try {
       yield 'a'
@@ -194,14 +165,12 @@ async function closeAfterNullYielded() {
       finallyMustCall()
     }
   }
-
   const stream = Readable.from(generate())
   stream.on('data', (chunk) => {
     dataMustCall()
     strictEqual(chunk, 'a')
   })
 }
-
 Promise.all([
   asyncSupport(),
   syncSupport(),
@@ -211,8 +180,8 @@ Promise.all([
   closeStreamWhileNextIsPending(),
   closeAfterNullYielded()
 ]).then(mustCall())
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable } = require('../../lib/ours/index')
-
 const MAX = 42
 const BATCH = 10
 {
@@ -25,39 +20,32 @@ const BATCH = 10
           this.destroy(err)
           return
         }
-
         if (data.length === 0) {
           silentConsole.log('pushing null')
           this.push(null)
           return
         }
-
         silentConsole.log('pushing')
         data.forEach((d) => this.push(d))
       })
     }, Math.floor(MAX / BATCH) + 2)
   })
   let i = 0
-
   function fetchData(cb) {
     if (i > MAX) {
       setTimeout(cb, 10, null, [])
     } else {
       const array = []
       const max = i + BATCH
-
       for (; i < max; i++) {
         array.push(i)
       }
-
       setTimeout(cb, 10, null, array)
     }
   }
-
   readable.on('readable', () => {
     let data
     silentConsole.log('readable emitted')
-
     while ((data = readable.read()) !== null) {
       silentConsole.log(data)
     }
@@ -79,35 +67,29 @@ const BATCH = 10
           this.destroy(err)
           return
         }
-
         if (data.length === 0) {
           silentConsole.log('pushing null')
           this.push(null)
           return
         }
-
         silentConsole.log('pushing')
         data.forEach((d) => this.push(d))
       })
     }, Math.floor(MAX / BATCH) + 2)
   })
   let i = 0
-
   function fetchData(cb) {
     if (i > MAX) {
       setTimeout(cb, 10, null, [])
     } else {
       const array = []
       const max = i + BATCH
-
       for (; i < max; i++) {
         array.push(i)
       }
-
       setTimeout(cb, 10, null, array)
     }
   }
-
   readable.on('data', (data) => {
     silentConsole.log('data emitted', data)
   })
@@ -128,10 +110,8 @@ const BATCH = 10
           this.destroy(err)
           return
         }
-
         silentConsole.log('pushing')
         data.forEach((d) => this.push(d))
-
         if (data[BATCH - 1] >= MAX) {
           silentConsole.log('pushing null')
           this.push(null)
@@ -140,18 +120,14 @@ const BATCH = 10
     }, Math.floor(MAX / BATCH) + 1)
   })
   let i = 0
-
   function fetchData(cb) {
     const array = []
     const max = i + BATCH
-
     for (; i < max; i++) {
       array.push(i)
     }
-
     setTimeout(cb, 10, null, array)
   }
-
   readable.on('data', (data) => {
     silentConsole.log('data emitted', data)
   })
@@ -194,8 +170,8 @@ const BATCH = 10
     readable.push(null)
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')
