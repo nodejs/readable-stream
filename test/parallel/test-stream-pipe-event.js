@@ -18,34 +18,27 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 function Writable() {
   this.writable = true
   stream.Stream.call(this)
 }
-
 Object.setPrototypeOf(Writable.prototype, stream.Stream.prototype)
 Object.setPrototypeOf(Writable, stream.Stream)
-
 function Readable() {
   this.readable = true
   stream.Stream.call(this)
 }
-
 Object.setPrototypeOf(Readable.prototype, stream.Stream.prototype)
 Object.setPrototypeOf(Readable, stream.Stream)
 let passed = false
@@ -56,8 +49,8 @@ w.on('pipe', function (src) {
 const r = new Readable()
 r.pipe(w)
 assert.ok(passed)
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

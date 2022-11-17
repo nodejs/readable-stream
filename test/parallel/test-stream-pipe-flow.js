@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable, Writable, PassThrough } = require('../../lib/ours/index')
-
 {
   let ticks = 17
   const rs = new Readable({
@@ -62,7 +57,6 @@ const { Readable, Writable, PassThrough } = require('../../lib/ours/index')
     read: () => {
       process.nextTick(() => {
         let data = pt.read()
-
         if (data === null) {
           pt.once('readable', () => {
             data = pt.read()
@@ -101,8 +95,8 @@ const { Readable, Writable, PassThrough } = require('../../lib/ours/index')
     assert.strictEqual(pt.listenerCount('drain'), 0)
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -18,28 +18,23 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable: R } = require('../../lib/ours/index')
-
 class TestReader extends R {
   constructor(n, opts) {
     super(opts)
     this.pos = 0
     this.len = n || 100
   }
-
   _read(n) {
     setTimeout(() => {
       if (this.pos >= this.len) {
@@ -47,22 +42,18 @@ class TestReader extends R {
         this.push(null)
         return this.push(null)
       }
-
       n = Math.min(n, this.len - this.pos)
-
       if (n <= 0) {
         // Double push(null) to test eos handling
         this.push(null)
         return this.push(null)
       }
-
       this.pos += n
       const ret = Buffer.alloc(n, 'a')
       return this.push(ret)
     }, 1)
   }
 }
-
 {
   // Verify utf8 encoding
   const tr = new TestReader(100)
@@ -82,7 +73,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -121,7 +111,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -156,7 +145,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(13))) out.push(chunk)
   })
   tr.on(
@@ -189,7 +177,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -219,7 +206,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -259,7 +245,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -295,7 +280,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(13))) out.push(chunk)
   })
   tr.on(
@@ -329,7 +313,6 @@ class TestReader extends R {
   ]
   tr.on('readable', function flow() {
     let chunk
-
     while (null !== (chunk = tr.read(10))) out.push(chunk)
   })
   tr.on(
@@ -344,8 +327,8 @@ class TestReader extends R {
   const tr = new TestReader(100)
   assert.deepStrictEqual(tr.setEncoding('utf8'), tr)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

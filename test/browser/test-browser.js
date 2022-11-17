@@ -1,31 +1,25 @@
 'use strict'
 
 const logger = globalThis.logger || console.log
-
 const tape = require('tape')
-
 const { createDeferredPromise } = require('../../lib/ours/util')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 let totalTests = 0
 let completed = 0
 let failed = 0
-
 async function test(rootName, fn) {
   // Gather all tests in the file
   const tests = {}
-
   function addTests(name, fn) {
     tests[`${rootName} - ${name}`] = fn
   }
-
   if (fn[kReadableStreamSuiteHasMultipleTests]) {
     fn(addTests)
   } else {
     tests[rootName] = fn
-  } // Execute each test in a separate harness and then output overall results
+  }
 
+  // Execute each test in a separate harness and then output overall results
   for (const [name, subtest] of Object.entries(tests)) {
     const currentIndex = ++totalTests
     const harness = tape.createHarness()
@@ -35,7 +29,6 @@ async function test(rootName, fn) {
       if (row.startsWith('TAP version') || row.match(new RegExp(`^# (?:${name})`))) {
         return
       }
-
       messages.push(row.trim().replace(/^/gm, '    '))
     })
     harness.onFinish(() => {
@@ -43,40 +36,39 @@ async function test(rootName, fn) {
       messages.push(`${success ? 'ok' : 'not ok'} ${currentIndex} - ${name}`)
       logger(messages.join('\n'))
       completed++
-
       if (!success) {
         failed++
       }
-
       resolve()
     })
     harness(name, subtest)
     await promise
   }
 }
-
 async function runTests(suites) {
   // Setup an interval
   const interval = setInterval(() => {
     if (completed < totalTests) {
       return
     }
-
     clearInterval(interval)
     logger(`1..${totalTests}`)
     logger(`# tests ${totalTests}`)
     logger(`# pass  ${completed - failed}`)
     logger(`# fail  ${failed}`)
-    logger(`# ${failed === 0 ? 'ok' : 'not ok'}`) // This line is used by the playwright script to detect we're done
+    logger(`# ${failed === 0 ? 'ok' : 'not ok'}`)
 
+    // This line is used by the playwright script to detect we're done
     logger('# readable-stream-finished')
-  }, 100) // Execute each test serially, to avoid side-effects errors when dealing with global error handling
+  }, 100)
 
+  // Execute each test serially, to avoid side-effects errors when dealing with global error handling
   for (const suite of suites) {
     await test(suite[kReadableStreamSuiteName], suite)
   }
-} // Important: Do not try to make the require dynamic because bundlers will not like it
+}
 
+// Important: Do not try to make the require dynamic because bundlers will not like it
 runTests([
   require('./test-stream-big-packet'),
   require('./test-stream-big-push'),

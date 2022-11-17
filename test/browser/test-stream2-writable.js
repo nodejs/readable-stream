@@ -1,23 +1,19 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const inherits = require('inherits')
-
 const { Duplex, Writable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 inherits(TestWriter, Writable)
-
 function TestWriter() {
   Writable.apply(this, arguments)
   this.buffer = []
   this.written = 0
 }
-
 TestWriter.prototype._write = function (chunk, encoding, cb) {
   // simulate a small unpredictable latency
   setTimeout(
@@ -29,30 +25,23 @@ TestWriter.prototype._write = function (chunk, encoding, cb) {
     Math.floor(Math.random() * 10)
   )
 }
-
 inherits(Processstdout, Writable)
-
 function Processstdout() {
   Writable.apply(this, arguments)
   this.buffer = []
   this.written = 0
 }
-
 Processstdout.prototype._write = function (chunk, encoding, cb) {
   // console.log(chunk.toString());
   cb()
 }
-
 const chunks = new Array(50)
-
 for (let i = 0; i < chunks.length; i++) {
   chunks[i] = new Array(i + 1).join('x')
 }
-
 if (!process.stdout) {
   process.stdout = new Processstdout()
 }
-
 module.exports = function (test) {
   test('write fast', function (t) {
     t.plan(1)
@@ -77,10 +66,8 @@ module.exports = function (test) {
       t.same(tw.buffer, chunks, 'got chunks in the right order')
     })
     let i = 0
-
     ;(function W() {
       tw.write(chunks[i++])
-
       if (i < chunks.length) {
         setTimeout(W, 10)
       } else {
@@ -102,14 +89,11 @@ module.exports = function (test) {
       drains++
     })
     let i = 0
-
     ;(function W() {
       let ret
-
       do {
         ret = tw.write(chunks[i++])
       } while (ret !== false && i < chunks.length)
-
       if (i < chunks.length) {
         t.ok(tw._writableState.length >= 50)
         tw.once('drain', W)
@@ -139,16 +123,17 @@ module.exports = function (test) {
     tw.on('finish', function () {
       forEach(chunks, function (chunk, i) {
         const actual = Buffer.from(tw.buffer[i])
-        chunk = Buffer.from(chunk) // Some combination of encoding and length result in the last byte replaced by two extra null bytes
+        chunk = Buffer.from(chunk)
 
+        // Some combination of encoding and length result in the last byte replaced by two extra null bytes
         if (actual[actual.length - 1] === 0) {
           chunk = Buffer.concat([chunk.slice(0, chunk.length - 1), Buffer.from([0, 0])])
-        } // In some cases instead there is one byte less
+        }
 
+        // In some cases instead there is one byte less
         if (actual.length === chunk.length - 1) {
           chunk = chunk.slice(0, chunk.length - 1)
         }
-
         t.same(actual, chunk, 'got the expected chunks ' + i)
       })
     })
@@ -165,13 +150,11 @@ module.exports = function (test) {
       highWaterMark: 100,
       decodeStrings: false
     })
-
     tw._write = function (chunk, encoding, cb) {
       t.equals(typeof chunk, 'string')
       chunk = Buffer.from(chunk, encoding)
       return TestWriter.prototype._write.call(this, chunk, encoding, cb)
     }
-
     const encodings = [
       'hex',
       'utf8',
@@ -188,16 +171,17 @@ module.exports = function (test) {
     tw.on('finish', function () {
       forEach(chunks, function (chunk, i) {
         const actual = Buffer.from(tw.buffer[i])
-        chunk = Buffer.from(chunk) // Some combination of encoding and length result in the last byte replaced by two extra null bytes
+        chunk = Buffer.from(chunk)
 
+        // Some combination of encoding and length result in the last byte replaced by two extra null bytes
         if (actual[actual.length - 1] === 0) {
           chunk = Buffer.concat([chunk.slice(0, chunk.length - 1), Buffer.from([0, 0])])
-        } // In some cases instead there is one byte less
+        }
 
+        // In some cases instead there is one byte less
         if (actual.length === chunk.length - 1) {
           chunk = chunk.slice(0, chunk.length - 1)
         }
-
         t.same(actual, chunk, 'got the expected chunks ' + i)
       })
     })
@@ -282,11 +266,9 @@ module.exports = function (test) {
     t.plan(1)
     const tw = new Writable()
     const hex = '018b5e9a8f6236ffe30e31baf80d2cf6eb'
-
     tw._write = function (chunk, encoding, cb) {
       t.equal(chunk.toString('hex'), hex)
     }
-
     const buf = Buffer.from(hex, 'hex')
     tw.write(buf, 'binary')
   })
@@ -295,9 +277,7 @@ module.exports = function (test) {
     const w = new Writable({
       autoDestroy: false
     })
-
     w._write = function () {}
-
     let gotError = false
     w.on('error', function (er) {
       gotError = true
@@ -308,11 +288,8 @@ module.exports = function (test) {
   test('duplexes are pipable', function (t) {
     t.plan(1)
     const d = new Duplex()
-
     d._read = function () {}
-
     d._write = function () {}
-
     let gotError = false
     d.on('error', function (er) {
       gotError = true
@@ -323,9 +300,7 @@ module.exports = function (test) {
   test('end(chunk) two times is an error', function (t) {
     t.plan(2)
     const w = new Writable()
-
     w._write = function () {}
-
     let gotError = false
     w.on('error', function (er) {
       gotError = true
@@ -341,7 +316,6 @@ module.exports = function (test) {
     t.plan(2)
     const w = new Writable()
     let wrote = false
-
     w._write = function (chunk, e, cb) {
       t.notOk(this.writing)
       wrote = true
@@ -351,7 +325,6 @@ module.exports = function (test) {
         cb()
       })
     }
-
     w.on('finish', function () {
       t.ok(wrote)
     })
@@ -362,14 +335,12 @@ module.exports = function (test) {
     t.plan(1)
     const w = new Writable()
     let writeCb = false
-
     w._write = function (chunk, e, cb) {
       setTimeout(function () {
         writeCb = true
         cb()
       }, 10)
     }
-
     w.on('finish', function () {
       t.ok(writeCb)
     })
@@ -380,11 +351,9 @@ module.exports = function (test) {
     t.plan(1)
     const w = new Writable()
     let writeCb = false
-
     w._write = function (chunk, e, cb) {
       cb()
     }
-
     w.on('finish', function () {
       t.ok(writeCb)
     })
@@ -396,24 +365,20 @@ module.exports = function (test) {
   test('finish is emitted if last chunk is empty', function (t) {
     t.plan(1)
     const w = new Writable()
-
     w._write = function (chunk, e, cb) {
       process.nextTick(cb)
     }
-
     w.on('finish', () => {
       t.ok(true)
     })
     w.write(Buffer.alloc(1))
     w.end(Buffer.alloc(0))
   })
-
   function forEach(xs, f) {
     for (let i = 0, l = xs.length; i < l; i++) {
       f(xs[i], i)
     }
   }
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-writable'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

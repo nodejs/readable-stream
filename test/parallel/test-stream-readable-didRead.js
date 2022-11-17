@@ -1,25 +1,18 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { isDisturbed, isErrored, Readable } = require('../../lib/ours/index')
-
 function noop() {}
-
 function check(readable, data, fn) {
   assert.strictEqual(readable.readableDidRead, false)
   assert.strictEqual(isDisturbed(readable), false)
   assert.strictEqual(isErrored(readable), false)
-
   if (data === -1) {
     readable.on(
       'error',
@@ -31,31 +24,26 @@ function check(readable, data, fn) {
     readable.on('end', common.mustNotCall())
   } else {
     readable.on('error', common.mustNotCall())
-
     if (data === -2) {
       readable.on('end', common.mustNotCall())
     } else {
       readable.on('end', common.mustCall())
     }
-
     if (data > 0) {
       readable.on('data', common.mustCallAtLeast(data))
     } else {
       readable.on('data', common.mustNotCall())
     }
   }
-
   readable.on('close', common.mustCall())
   fn()
   setImmediate(() => {
     assert.strictEqual(readable.readableDidRead, data > 0)
-
     if (data > 0) {
       assert.strictEqual(isDisturbed(readable), true)
     }
   })
 }
-
 {
   const readable = new Readable({
     read() {
@@ -119,8 +107,8 @@ function check(readable, data, fn) {
     readable.off('data', noop)
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

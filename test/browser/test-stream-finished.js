@@ -1,9 +1,7 @@
 'use strict'
 
 const { Writable, Readable, Transform, finished } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 module.exports = function (test) {
   test('readable finished', function (t) {
     t.plan(1)
@@ -52,6 +50,5 @@ module.exports = function (test) {
     tr.resume()
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-finished'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

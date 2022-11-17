@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable } = require('../../lib/ours/index')
-
 const buf = Buffer.alloc(8192)
 const readable = new Readable({
   read: common.mustCall(function () {
@@ -28,10 +23,9 @@ readable.on(
       process.removeAllListeners('readable')
       return
     }
-
-    const data = readable.read() // TODO(mcollina): there is something odd in the highWaterMark logic
+    const data = readable.read()
+    // TODO(mcollina): there is something odd in the highWaterMark logic
     // investigate.
-
     if (i === 1) {
       assert.strictEqual(data.length, 8192 * 2)
     } else {
@@ -39,8 +33,8 @@ readable.on(
     }
   }, 11)
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

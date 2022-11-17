@@ -1,13 +1,9 @@
 'use strict'
 
 const crypto = require('crypto')
-
 const inherits = require('inherits')
-
 const stream = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   try {
     crypto.randomBytes(9)
@@ -16,34 +12,25 @@ module.exports = function (t) {
     t.ok(true, 'does not suport random, skipping')
     return
   }
-
   t.plan(2)
-
   function TestWriter() {
     stream.Writable.call(this)
   }
-
   inherits(TestWriter, stream.Writable)
-
   TestWriter.prototype._write = function (buffer, encoding, callback) {
     // console.log('write called');
     // super slow write stream (callback never called)
   }
-
   const dest = new TestWriter()
-
   function TestReader(id) {
     stream.Readable.call(this)
     this.reads = 0
   }
-
   inherits(TestReader, stream.Readable)
-
   TestReader.prototype._read = function (size) {
     this.reads += 1
     this.push(crypto.randomBytes(size))
   }
-
   const src1 = new TestReader()
   const src2 = new TestReader()
   src1.pipe(dest)
@@ -62,5 +49,4 @@ module.exports = function (t) {
     t.equal(src2.reads, 1)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-unpipe-drain'

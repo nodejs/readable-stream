@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Writable } = require('../../lib/ours/index')
-
 const bufferBlerg = Buffer.from('blerg')
 const w = new Writable()
 assert.throws(
@@ -25,16 +20,13 @@ assert.throws(
     message: 'The _write() method is not implemented'
   }
 )
-
 const _write = common.mustCall((chunk, _, next) => {
   next()
 })
-
 const _writev = common.mustCall((chunks, next) => {
   assert.strictEqual(chunks.length, 2)
   next()
 })
-
 const w2 = new Writable({
   write: _write,
   writev: _writev
@@ -46,8 +38,8 @@ w2.cork()
 w2.write(bufferBlerg)
 w2.write(bufferBlerg)
 w2.end()
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

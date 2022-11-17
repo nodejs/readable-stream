@@ -1,34 +1,28 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const ABC = new Uint8Array([0x41, 0x42, 0x43])
 const DEF = new Uint8Array([0x44, 0x45, 0x46])
 const GHI = new Uint8Array([0x47, 0x48, 0x49])
 {
   // Simple Writable test.
+
   let n = 0
   const writable = new Writable({
     write: common.mustCall((chunk, encoding, cb) => {
       assert(chunk instanceof Buffer)
-
       if (n++ === 0) {
         assert.strictEqual(String(chunk), 'ABC')
       } else {
         assert.strictEqual(String(chunk), 'DEF')
       }
-
       cb()
     }, 2)
   })
@@ -37,6 +31,7 @@ const GHI = new Uint8Array([0x47, 0x48, 0x49])
 }
 {
   // Writable test, pass in Uint8Array in object mode.
+
   const writable = new Writable({
     objectMode: true,
     write: common.mustCall((chunk, encoding, cb) => {
@@ -93,8 +88,8 @@ const GHI = new Uint8Array([0x47, 0x48, 0x49])
   const out = readable.read()
   assert.strictEqual(out, 'ABCDEF')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

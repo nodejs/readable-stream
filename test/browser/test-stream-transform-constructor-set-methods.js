@@ -1,29 +1,24 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const { Transform } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(4)
   let _transformCalled = false
-
   function _transform(d, e, n) {
     _transformCalled = true
     n()
   }
-
   let _flushCalled = false
-
   function _flush(n) {
     _flushCalled = true
     n()
   }
-
   const tr = new Transform({
     transform: _transform,
     flush: _flush
@@ -37,5 +32,4 @@ module.exports = function (t) {
     t.ok(_flushCalled)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-transform-constructor-set-methods'

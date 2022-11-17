@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,22 +12,15 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const { once } = require('events')
-
 {
   // forEach works on synchronous streams with a synchronous predicate
   const stream = Readable.from([1, 2, 3])
@@ -147,8 +137,8 @@ const { once } = require('events')
       signal: ac.signal,
       concurrency: 2
     }
-  ) // pump
-
+  )
+  // pump
   assert
     .rejects(
       async () => {
@@ -193,12 +183,12 @@ const { once } = require('events')
   const stream = Readable.from([1, 2, 3, 4, 5])
   Object.defineProperty(stream, 'map', {
     value: common.mustNotCall(() => {})
-  }) // Check that map isn't getting called.
-
+  })
+  // Check that map isn't getting called.
   stream.forEach(() => true)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

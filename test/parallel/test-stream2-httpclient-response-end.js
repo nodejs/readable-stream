@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const http = require('http')
-
 const msg = 'Hello'
 const server = http
   .createServer(function (req, res) {
@@ -33,7 +28,6 @@ const server = http
           common.mustCall(function () {
             silentConsole.log('readable event')
             let chunk
-
             while ((chunk = res.read()) !== null) {
               data += chunk
             }
@@ -50,8 +44,8 @@ const server = http
       }
     )
   })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

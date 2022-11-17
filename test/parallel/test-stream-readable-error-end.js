@@ -1,16 +1,12 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 {
   const r = new Readable({
     read() {}
@@ -22,8 +18,8 @@ const { Readable } = require('../../lib/ours/index')
   r.push(null)
   r.destroy(new Error('kaboom'))
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

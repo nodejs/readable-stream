@@ -18,51 +18,42 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 const chunk = Buffer.from('hallo')
-
 class TestWriter extends stream.Writable {
   _write(buffer, encoding, callback) {
     callback(null)
   }
 }
+const dest = new TestWriter()
 
-const dest = new TestWriter() // Set this high so that we'd trigger a nextTick warning
+// Set this high so that we'd trigger a nextTick warning
 // and/or RangeError if we do maybeReadMore wrong.
-
 class TestReader extends stream.Readable {
   constructor() {
     super({
       highWaterMark: 0x10000
     })
   }
-
   _read(size) {
     this.push(chunk)
   }
 }
-
 const src = new TestReader()
-
 for (let i = 0; i < 10; i++) {
   src.pipe(dest)
   src.unpipe(dest)
 }
-
 assert.strictEqual(src.listeners('end').length, 0)
 assert.strictEqual(src.listeners('readable').length, 0)
 assert.strictEqual(dest.listeners('unpipe').length, 0)
@@ -77,8 +68,8 @@ process.on('exit', function () {
   assert(src.readableLength >= src.readableHighWaterMark)
   silentConsole.log('ok')
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

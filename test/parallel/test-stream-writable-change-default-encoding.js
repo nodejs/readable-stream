@@ -18,33 +18,27 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 class MyWritable extends stream.Writable {
   constructor(fn, options) {
     super(options)
     this.fn = fn
   }
-
   _write(chunk, encoding, callback) {
     this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding)
     callback()
   }
 }
-
 ;(function defaultCondingIsUtf8() {
   const m = new MyWritable(
     function (isBuffer, type, enc) {
@@ -57,7 +51,6 @@ class MyWritable extends stream.Writable {
   m.write('foo')
   m.end()
 })()
-
 ;(function changeDefaultEncodingToAscii() {
   const m = new MyWritable(
     function (isBuffer, type, enc) {
@@ -70,8 +63,9 @@ class MyWritable extends stream.Writable {
   m.setDefaultEncoding('ascii')
   m.write('bar')
   m.end()
-})() // Change default encoding to invalid value.
+})()
 
+// Change default encoding to invalid value.
 assert.throws(
   () => {
     const m = new MyWritable((isBuffer, type, enc) => {}, {
@@ -87,7 +81,6 @@ assert.throws(
     message: 'Unknown encoding: {}'
   }
 )
-
 ;(function checkVariableCaseEncoding() {
   const m = new MyWritable(
     function (isBuffer, type, enc) {
@@ -101,8 +94,8 @@ assert.throws(
   m.write('bar')
   m.end()
 })()
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

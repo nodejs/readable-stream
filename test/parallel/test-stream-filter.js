@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,30 +12,21 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const { once } = require('events')
-
 const st = require('timers').setTimeout
-
 function setTimeout(ms) {
   return new Promise((resolve) => {
     st(resolve, ms)
   })
 }
-
 {
   // Filter works on synchronous streams with a synchronous predicate
   const stream = Readable.from([1, 2, 3, 4, 5]).filter((x) => x < 3)
@@ -90,7 +78,6 @@ function setTimeout(ms) {
   )
   ;(async () => {
     let i = 1
-
     for await (const item of stream) {
       assert.strictEqual(item, 1)
       if (++i === 5) break
@@ -106,11 +93,9 @@ function setTimeout(ms) {
         this.push(null)
         return
       }
-
       this.push(Uint8Array.from([i]))
       i++
     },
-
     highWaterMark: 0
   }).filter(
     common.mustCall(async ([x]) => {
@@ -129,7 +114,6 @@ function setTimeout(ms) {
     if (x === 3) {
       throw new Error('boom')
     }
-
     return true
   })
   assert.rejects(stream.map((x) => x + x).toArray(), /boom/).then(common.mustCall())
@@ -140,7 +124,6 @@ function setTimeout(ms) {
     if (x === 3) {
       throw new Error('boom')
     }
-
     return true
   })
   assert.rejects(stream.filter(() => true).toArray(), /boom/).then(common.mustCall())
@@ -158,8 +141,8 @@ function setTimeout(ms) {
       signal: ac.signal,
       concurrency: 2
     }
-  ) // pump
-
+  )
+  // pump
   assert
     .rejects(
       async () => {
@@ -193,7 +176,6 @@ function setTimeout(ms) {
   )
   ;(async () => {
     const expected = [1, 2]
-
     for await (const item of stream) {
       assert.strictEqual(item, expected.shift())
     }
@@ -220,12 +202,12 @@ function setTimeout(ms) {
   const stream = Readable.from([1, 2, 3, 4, 5])
   Object.defineProperty(stream, 'map', {
     value: common.mustNotCall(() => {})
-  }) // Check that map isn't getting called.
-
+  })
+  // Check that map isn't getting called.
   stream.filter(() => true)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

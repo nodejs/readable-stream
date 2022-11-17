@@ -1,32 +1,28 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable } = require('../../lib/ours/index')
+const assert = require('assert')
 
-const assert = require('assert') // basic
-
+// basic
 {
   // Find it on Writable.prototype
   assert(Reflect.has(Writable.prototype, 'writableFinished'))
-} // event
+}
 
+// event
 {
   const writable = new Writable()
-
   writable._write = (chunk, encoding, cb) => {
     // The state finished should start in false.
     assert.strictEqual(writable.writableFinished, false)
     cb()
   }
-
   writable.on(
     'finish',
     common.mustCall(() => {
@@ -42,6 +38,7 @@ const assert = require('assert') // basic
 }
 {
   // Emit finish asynchronously.
+
   const w = new Writable({
     write(chunk, encoding, cb) {
       cb()
@@ -52,6 +49,7 @@ const assert = require('assert') // basic
 }
 {
   // Emit prefinish synchronously.
+
   const w = new Writable({
     write(chunk, encoding, cb) {
       cb()
@@ -69,11 +67,11 @@ const assert = require('assert') // basic
 }
 {
   // Emit prefinish synchronously w/ final.
+
   const w = new Writable({
     write(chunk, encoding, cb) {
       cb()
     },
-
     final(cb) {
       cb()
     }
@@ -90,12 +88,12 @@ const assert = require('assert') // basic
 }
 {
   // Call _final synchronously.
+
   let sync = true
   const w = new Writable({
     write(chunk, encoding, cb) {
       cb()
     },
-
     final: common.mustCall((cb) => {
       assert.strictEqual(sync, true)
       cb()
@@ -104,8 +102,8 @@ const assert = require('assert') // basic
   w.end()
   sync = false
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

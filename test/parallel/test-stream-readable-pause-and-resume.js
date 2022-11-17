@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable } = require('../../lib/ours/index')
-
 let ticks = 18
 let expectedData = 19
 const rs = new Readable({
@@ -25,7 +20,6 @@ const rs = new Readable({
 })
 rs.on('end', common.mustCall())
 readAndPause()
-
 function readAndPause() {
   // Does a on(data) -> pause -> wait -> resume -> on(data) ... loop.
   // Expects on(data) to never fire if the stream is paused.
@@ -42,14 +36,11 @@ function readAndPause() {
 
   rs.on('data', ondata)
 }
-
 {
   const readable = new Readable({
     read() {}
   })
-
   function read() {}
-
   readable.setEncoding('utf8')
   readable.on('readable', read)
   readable.removeListener('readable', read)
@@ -60,13 +51,10 @@ function readAndPause() {
 }
 {
   const { PassThrough } = require('../../lib/ours/index')
-
   const source3 = new PassThrough()
   const target3 = new PassThrough()
   const chunk = Buffer.allocUnsafe(1000)
-
   while (target3.write(chunk));
-
   source3.pipe(target3)
   target3.on(
     'drain',
@@ -76,8 +64,8 @@ function readAndPause() {
   )
   target3.on('data', () => {})
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -18,37 +18,30 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 function toArray(callback) {
   const stream = new Writable({
     objectMode: true
   })
   const list = []
-
   stream.write = function (chunk) {
     list.push(chunk)
   }
-
   stream.end = common.mustCall(function () {
     callback(list)
   })
   return stream
 }
-
 function fromArray(list) {
   const r = new Readable({
     objectMode: true
@@ -60,7 +53,6 @@ function fromArray(list) {
   r.push(null)
   return r
 }
-
 {
   // Verify that objects can be read from the stream
   const r = fromArray([
@@ -135,12 +127,10 @@ function fromArray(list) {
       two: '2'
     }
   ]
-
   r._read = function (n) {
     const item = list.shift()
     r.push(item || null)
   }
-
   r.pipe(
     toArray(
       common.mustCall(function (list) {
@@ -169,14 +159,12 @@ function fromArray(list) {
       two: '2'
     }
   ]
-
   r._read = function (n) {
     const item = list.shift()
     process.nextTick(function () {
       r.push(item || null)
     })
   }
-
   r.pipe(
     toArray(
       common.mustCall(function (list) {
@@ -253,11 +241,9 @@ function fromArray(list) {
   })
   let calls = 0
   const list = ['1', '2', '3', '4', '5', '6', '7', '8']
-
   r._read = function (n) {
     calls++
   }
-
   list.forEach(function (c) {
     r.push(c)
   })
@@ -277,7 +263,6 @@ function fromArray(list) {
     objectMode: true
   })
   r._read = common.mustNotCall()
-
   for (let i = 0; i < 6; i++) {
     const bool = r.push(i)
     assert.strictEqual(bool, i !== 5)
@@ -288,14 +273,12 @@ function fromArray(list) {
   const w = new Writable({
     objectMode: true
   })
-
   w._write = function (chunk, encoding, cb) {
     assert.deepStrictEqual(chunk, {
       foo: 'bar'
     })
     cb()
   }
-
   w.on('finish', common.mustCall())
   w.write({
     foo: 'bar'
@@ -308,12 +291,10 @@ function fromArray(list) {
     objectMode: true
   })
   const list = []
-
   w._write = function (chunk, encoding, cb) {
     list.push(chunk)
     cb()
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -333,12 +314,10 @@ function fromArray(list) {
     objectMode: true
   })
   const list = []
-
   w._write = function (chunk, encoding, cb) {
     list.push(chunk)
     process.nextTick(cb)
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -358,7 +337,6 @@ function fromArray(list) {
     objectMode: true
   })
   let called = false
-
   w._write = function (chunk, encoding, cb) {
     assert.strictEqual(chunk, 'foo')
     process.nextTick(function () {
@@ -366,7 +344,6 @@ function fromArray(list) {
       cb()
     })
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -376,8 +353,8 @@ function fromArray(list) {
   w.write('foo')
   w.end()
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

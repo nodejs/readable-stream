@@ -18,30 +18,27 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
+const assert = require('assert')
 
-const assert = require('assert') // Make sure we don't miss the end event for paused 0-length streams
+// Make sure we don't miss the end event for paused 0-length streams
 
 const Readable = require('../../lib/ours/index').Readable
-
 const stream = new Readable()
 let calledRead = false
-
 stream._read = function () {
   assert(!calledRead)
   calledRead = true
   this.push(null)
 }
-
 stream.on('data', function () {
   throw new Error('should not ever get data')
 })
@@ -57,8 +54,8 @@ process.on('exit', function () {
   assert(calledRead)
   silentConsole.log('ok')
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

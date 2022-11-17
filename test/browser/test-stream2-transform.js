@@ -1,13 +1,12 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const { PassThrough, Transform } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 module.exports = function (test) {
   test('writable side consumption', function (t) {
     t.plan(3)
@@ -15,17 +14,14 @@ module.exports = function (test) {
       highWaterMark: 10
     })
     let transformed = 0
-
     tx._transform = function (chunk, encoding, cb) {
       transformed += chunk.length
       tx.push(chunk)
       cb()
     }
-
     for (let i = 1; i <= 10; i++) {
       tx.write(Buffer.alloc(i))
     }
-
     tx.end()
     t.equal(tx._readableState.length, 10)
     t.equal(transformed, 10)
@@ -77,14 +73,12 @@ module.exports = function (test) {
   test('simple transform', function (t) {
     t.plan(4)
     const pt = new Transform()
-
     pt._transform = function (c, e, cb) {
       const ret = Buffer.alloc(c.length)
       ret.fill('x')
       pt.push(ret)
       cb()
     }
-
     pt.write(Buffer.from('foog'))
     pt.write(Buffer.from('bark'))
     pt.write(Buffer.from('bazy'))
@@ -100,12 +94,10 @@ module.exports = function (test) {
     const pt = new Transform({
       objectMode: true
     })
-
     pt._transform = function (c, e, cb) {
       pt.push(JSON.stringify(c))
       cb()
     }
-
     pt.write(1)
     pt.write(true)
     pt.write(false)
@@ -127,14 +119,12 @@ module.exports = function (test) {
   test('async passthrough', function (t) {
     t.plan(4)
     const pt = new Transform()
-
     pt._transform = function (chunk, encoding, cb) {
       setTimeout(function () {
         pt.push(chunk)
         cb()
       }, 10)
     }
-
     pt.write(Buffer.from('foog'))
     pt.write(Buffer.from('bark'))
     pt.write(Buffer.from('bazy'))
@@ -149,8 +139,9 @@ module.exports = function (test) {
   })
   test('assymetric transform (expand)', function (t) {
     t.plan(7)
-    const pt = new Transform() // emit each chunk 2 times.
+    const pt = new Transform()
 
+    // emit each chunk 2 times.
     pt._transform = function (chunk, encoding, cb) {
       setTimeout(function () {
         pt.push(chunk)
@@ -160,7 +151,6 @@ module.exports = function (test) {
         }, 10)
       }, 10)
     }
-
     pt.write(Buffer.from('foog'))
     pt.write(Buffer.from('bark'))
     pt.write(Buffer.from('bazy'))
@@ -178,39 +168,34 @@ module.exports = function (test) {
   })
   test('assymetric transform (compress)', function (t) {
     t.plan(3)
-    const pt = new Transform() // each output is the first char of 3 consecutive chunks,
+    const pt = new Transform()
+
+    // each output is the first char of 3 consecutive chunks,
     // or whatever's left.
-
     pt.state = ''
-
     pt._transform = function (chunk, encoding, cb) {
       if (!chunk) {
         chunk = ''
       }
-
       const s = chunk.toString()
       setTimeout(
         function () {
           this.state += s.charAt(0)
-
           if (this.state.length === 3) {
             pt.push(Buffer.from(this.state))
             this.state = ''
           }
-
           cb()
         }.bind(this),
         10
       )
     }
-
     pt._flush = function (cb) {
       // just output whatever we have.
       pt.push(Buffer.from(this.state))
       this.state = ''
       cb()
     }
-
     pt.write(Buffer.from('aaaa'))
     pt.write(Buffer.from('bbbb'))
     pt.write(Buffer.from('cccc'))
@@ -225,16 +210,18 @@ module.exports = function (test) {
     pt.write(Buffer.from('bbbb'))
     pt.write(Buffer.from('cccc'))
     pt.write(Buffer.from('dddd'))
-    pt.end() // 'abcdeabcdeabcd'
+    pt.end()
 
+    // 'abcdeabcdeabcd'
     pt.on('finish', function () {
       t.equal(pt.read(5).toString(), 'abcde')
       t.equal(pt.read(5).toString(), 'abcde')
       t.equal(pt.read(5).toString(), 'abcd')
     })
-  }) // this tests for a stall when data is written to a full stream
-  // that has empty transforms.
+  })
 
+  // this tests for a stall when data is written to a full stream
+  // that has empty transforms.
   test('complex transform', function (t) {
     t.plan(2)
     let count = 0
@@ -242,7 +229,6 @@ module.exports = function (test) {
     const pt = new Transform({
       highWaterMark: 3
     })
-
     pt._transform = function (c, e, cb) {
       if (count++ === 1) {
         saved = c
@@ -251,13 +237,10 @@ module.exports = function (test) {
           pt.push(saved)
           saved = null
         }
-
         pt.push(c)
       }
-
       cb()
     }
-
     pt.once('readable', function () {
       process.nextTick(function () {
         pt.write(Buffer.from('d'))
@@ -278,31 +261,38 @@ module.exports = function (test) {
       // console.error('>>> emit readable %d', emits);
       emits++
     })
-    pt.write(Buffer.from('foog')) // console.error('need emit 0');
+    pt.write(Buffer.from('foog'))
 
+    // console.error('need emit 0');
     pt.write(Buffer.from('bark'))
     setTimeout(() => {
       // console.error('should have emitted readable now 1 === %d', emits)
       t.equal(emits, 1)
       t.equal(pt.read(5).toString(), 'foogb')
-      t.equal(pt.read(5) + '', 'null') // console.error('need emit 1');
+      t.equal(pt.read(5) + '', 'null')
 
-      pt.write(Buffer.from('bazy')) // console.error('should have emitted, but not again');
+      // console.error('need emit 1');
 
-      pt.write(Buffer.from('kuel')) // console.error('should have emitted readable now 2 === %d', emits);
+      pt.write(Buffer.from('bazy'))
+      // console.error('should have emitted, but not again');
+      pt.write(Buffer.from('kuel'))
 
+      // console.error('should have emitted readable now 2 === %d', emits);
       setTimeout(() => {
         t.equal(emits, 2)
         t.equal(pt.read(5).toString(), 'arkba')
         t.equal(pt.read(5).toString(), 'zykue')
-        t.equal(pt.read(5), null) // console.error('need emit 2');
+        t.equal(pt.read(5), null)
+
+        // console.error('need emit 2');
 
         pt.end()
         setTimeout(() => {
           t.equal(emits, 3)
           t.equal(pt.read(5).toString(), 'l')
-          t.equal(pt.read(5), null) // console.error('should not have emitted again');
+          t.equal(pt.read(5), null)
 
+          // console.error('should not have emitted again');
           t.equal(emits, 3)
         })
       })
@@ -316,19 +306,21 @@ module.exports = function (test) {
       // console.error('emit readable', emits);
       emits++
     })
-    pt.write(Buffer.from('foog')) // console.error('need emit 0');
-
+    pt.write(Buffer.from('foog'))
+    // console.error('need emit 0');
     pt.write(Buffer.from('bark'))
     setTimeout(() => {
       // console.error('should have emitted readable now 1 === %d', emits);
       t.equal(emits, 1)
       t.equal(pt.read(5).toString(), 'foogb')
-      t.equal(pt.read(5), null) // console.error('need emit 1');
+      t.equal(pt.read(5), null)
 
+      // console.error('need emit 1');
       pt.once('readable', function () {
         t.equal(pt.read(5).toString(), 'arkba')
-        t.equal(pt.read(5), null) // console.error('need emit 2');
+        t.equal(pt.read(5), null)
 
+        // console.error('need emit 2');
         pt.once('readable', function () {
           t.equal(pt.read(5).toString(), 'zykue')
           t.equal(pt.read(5), null)
@@ -345,8 +337,9 @@ module.exports = function (test) {
     })
   })
   test('passthrough facaded', function (t) {
-    t.plan(1) // console.error('passthrough facaded');
+    t.plan(1)
 
+    // console.error('passthrough facaded');
     const pt = new PassThrough()
     const datas = []
     pt.on('data', function (chunk) {
@@ -370,12 +363,12 @@ module.exports = function (test) {
     }, 10)
   })
   test('object transform (json parse)', function (t) {
-    t.plan(5) // console.error('json parse stream');
+    t.plan(5)
 
+    // console.error('json parse stream');
     const jp = new Transform({
       objectMode: true
     })
-
     jp._transform = function (data, encoding, cb) {
       try {
         jp.push(JSON.parse(data))
@@ -383,9 +376,10 @@ module.exports = function (test) {
       } catch (er) {
         cb(er)
       }
-    } // anything except null/undefined is fine.
-    // those are "magic" in the stream API, because they signal EOF.
+    }
 
+    // anything except null/undefined is fine.
+    // those are "magic" in the stream API, because they signal EOF.
     const objects = [
       {
         foo: 'bar'
@@ -413,20 +407,20 @@ module.exports = function (test) {
       const res = jp.read()
       t.same(res, obj)
     })
-    jp.end() // read one more time to get the 'end' event
-
+    jp.end()
+    // read one more time to get the 'end' event
     jp.read()
     process.nextTick(function () {
       t.ok(ended)
     })
   })
   test('object transform (json stringify)', function (t) {
-    t.plan(5) // console.error('json parse stream');
+    t.plan(5)
 
+    // console.error('json parse stream');
     const js = new Transform({
       objectMode: true
     })
-
     js._transform = function (data, encoding, cb) {
       try {
         js.push(JSON.stringify(data))
@@ -434,9 +428,10 @@ module.exports = function (test) {
       } catch (er) {
         cb(er)
       }
-    } // anything except null/undefined is fine.
-    // those are "magic" in the stream API, because they signal EOF.
+    }
 
+    // anything except null/undefined is fine.
+    // those are "magic" in the stream API, because they signal EOF.
     const objects = [
       {
         foo: 'bar'
@@ -464,20 +459,18 @@ module.exports = function (test) {
       const res = js.read()
       t.equal(res, JSON.stringify(obj))
     })
-    js.end() // read one more time to get the 'end' event
-
+    js.end()
+    // read one more time to get the 'end' event
     js.read()
     process.nextTick(function () {
       t.ok(ended)
     })
   })
-
   function forEach(xs, f) {
     for (let i = 0, l = xs.length; i < l; i++) {
       f(xs[i], i)
     }
   }
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-transform'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

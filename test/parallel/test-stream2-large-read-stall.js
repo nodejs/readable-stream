@@ -18,27 +18,25 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
+const assert = require('assert')
 
-const assert = require('assert') // If everything aligns so that you do a read(n) of exactly the
+// If everything aligns so that you do a read(n) of exactly the
 // remaining buffer, then make sure that 'end' still emits.
 
 const READSIZE = 100
 const PUSHSIZE = 20
 const PUSHCOUNT = 1000
 const HWM = 50
-
 const Readable = require('../../lib/ours/index').Readable
-
 const r = new Readable({
   highWaterMark: HWM
 })
@@ -47,13 +45,11 @@ r._read = push
 r.on('readable', function () {
   silentConsole.error('>> readable')
   let ret
-
   do {
     silentConsole.error(`  > read(${READSIZE})`)
     ret = r.read(READSIZE)
     silentConsole.error(`  < ${ret && ret.length} (${rs.length} remain)`)
   } while (ret && ret.length === READSIZE)
-
   silentConsole.error('<< after read()', ret && ret.length, rs.needReadable, rs.length)
 })
 r.on(
@@ -63,20 +59,17 @@ r.on(
   })
 )
 let pushes = 0
-
 function push() {
   if (pushes > PUSHCOUNT) return
-
   if (pushes++ === PUSHCOUNT) {
     silentConsole.error('   push(EOF)')
     return r.push(null)
   }
-
   silentConsole.error(`   push #${pushes}`)
   if (r.push(Buffer.allocUnsafe(PUSHSIZE))) setTimeout(push, 1)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

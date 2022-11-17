@@ -1,22 +1,18 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const Readable = require('../../lib/ours/index').Readable
-
 const readable = new Readable({
   read: () => {}
-}) // Initialized to false.
+})
 
+// Initialized to false.
 assert.strictEqual(readable._readableState.needReadable, false)
 readable.on(
   'readable',
@@ -25,8 +21,9 @@ readable.on(
     assert.strictEqual(readable._readableState.needReadable, false)
     readable.read()
   })
-) // If a readable listener is attached, then a readable event is needed.
+)
 
+// If a readable listener is attached, then a readable event is needed.
 assert.strictEqual(readable._readableState.needReadable, true)
 readable.push('foo')
 readable.push(null)
@@ -69,8 +66,9 @@ setImmediate(
 )
 const flowing = new Readable({
   read: () => {}
-}) // Notice this must be above the on('data') call.
+})
 
+// Notice this must be above the on('data') call.
 flowing.push('foooo')
 flowing.push('bar')
 flowing.push('quo')
@@ -78,9 +76,10 @@ process.nextTick(
   common.mustCall(() => {
     flowing.push(null)
   })
-) // When the buffer already has enough data, and the stream is
-// in flowing mode, there is no need for the readable event.
+)
 
+// When the buffer already has enough data, and the stream is
+// in flowing mode, there is no need for the readable event.
 flowing.on(
   'data',
   common.mustCall(function (data) {
@@ -95,7 +94,6 @@ slowProducer.on(
   common.mustCall(() => {
     const chunk = slowProducer.read(8)
     const state = slowProducer._readableState
-
     if (chunk === null) {
       // The buffer doesn't have enough data, and the stream is not need,
       // we need to notify the reader when data arrives.
@@ -125,8 +123,8 @@ process.nextTick(
     )
   })
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

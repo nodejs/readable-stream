@@ -1,9 +1,7 @@
 'use strict'
 
 const { PassThrough } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(13)
   const src = new PassThrough({
@@ -35,5 +33,4 @@ module.exports = function (t) {
     }
   }, 10)
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-transform-objectmode-falsey-value'

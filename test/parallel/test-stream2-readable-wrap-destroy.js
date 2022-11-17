@@ -1,24 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const EE = require('events').EventEmitter
-
 const oldStream = new EE()
-
 oldStream.pause = () => {}
-
 oldStream.resume = () => {}
-
 {
   new Readable({
     autoDestroy: false,
@@ -33,8 +25,8 @@ oldStream.resume = () => {}
   }).wrap(oldStream)
   oldStream.emit('close')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

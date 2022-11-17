@@ -1,19 +1,16 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 function test(throwCodeInbetween) {
   // Check that a pipe does not stall if .read() is called unexpectedly
   // (i.e. the stream is not resumed by the pipe).
+
   const n = 1000
   let counter = n
   const rs = stream.Readable({
@@ -35,12 +32,11 @@ function test(throwCodeInbetween) {
   setImmediate(() => throwCodeInbetween(rs, ws))
   rs.pipe(ws)
 }
-
 test((rs) => rs.read())
 test((rs) => rs.resume())
 test(() => 0)
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

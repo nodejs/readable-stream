@@ -1,13 +1,12 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const { Readable, Writable, pipeline } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 module.exports = function (test) {
   test('pipeline', function (t) {
     t.plan(3)
@@ -26,11 +25,9 @@ module.exports = function (test) {
     write.on('finish', function () {
       finished = true
     })
-
     for (let i = 0; i < expected.length; i++) {
       read.push(expected[i])
     }
-
     read.push(null)
     pipeline(read, write, (err) => {
       t.ifErr(err)
@@ -40,11 +37,9 @@ module.exports = function (test) {
   })
   test('pipeline missing args', function (t) {
     t.plan(3)
-
     const _read = new Readable({
       read: function read() {}
     })
-
     t.throws(function () {
       pipeline(_read, function () {})
     })
@@ -57,19 +52,15 @@ module.exports = function (test) {
   })
   test('pipeline error', function (t) {
     t.plan(1)
-
     const _read2 = new Readable({
       read: function read() {}
     })
-
     const _write = new Writable({
       write: function write(data, enc, cb) {
         cb()
       }
     })
-
     _read2.push('data')
-
     setImmediate(function () {
       return _read2.destroy()
     })
@@ -79,19 +70,15 @@ module.exports = function (test) {
   })
   test('pipeline destroy', function (t) {
     t.plan(2)
-
     const _read3 = new Readable({
       read: function read() {}
     })
-
     const _write2 = new Writable({
       write: function write(data, enc, cb) {
         cb()
       }
     })
-
     _read3.push('data')
-
     setImmediate(function () {
       return _read3.destroy(new Error('kaboom'))
     })
@@ -101,6 +88,5 @@ module.exports = function (test) {
     t.equal(dst, _write2)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-pipeline'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

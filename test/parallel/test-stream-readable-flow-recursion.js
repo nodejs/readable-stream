@@ -18,31 +18,31 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
+const assert = require('assert')
 
-const assert = require('assert') // This test verifies that passing a huge number to read(size)
+// This test verifies that passing a huge number to read(size)
 // will push up the highWaterMark, and cause the stream to read
 // more data continuously, but without triggering a nextTick
 // warning or RangeError.
 
-const Readable = require('../../lib/ours/index').Readable // Throw an error if we trigger a nextTick warning.
+const Readable = require('../../lib/ours/index').Readable
 
+// Throw an error if we trigger a nextTick warning.
 process.throwDeprecation = true
 const stream = new Readable({
   highWaterMark: 2
 })
 let reads = 0
 let total = 5000
-
 stream._read = function (size) {
   reads++
   size = Math.min(size, total)
@@ -50,9 +50,7 @@ stream._read = function (size) {
   if (size === 0) stream.push(null)
   else stream.push(Buffer.allocUnsafe(size))
 }
-
 let depth = 0
-
 function flow(stream, size, callback) {
   depth += 1
   const chunk = stream.read(size)
@@ -61,22 +59,21 @@ function flow(stream, size, callback) {
   depth -= 1
   silentConsole.log(`flow(${depth}): exit`)
 }
-
 flow(stream, 5000, function () {
   silentConsole.log(`complete (${depth})`)
 })
 process.on('exit', function (code) {
-  assert.strictEqual(reads, 2) // We pushed up the high water mark
-
-  assert.strictEqual(stream.readableHighWaterMark, 8192) // Length is 0 right now, because we pulled it all out.
-
+  assert.strictEqual(reads, 2)
+  // We pushed up the high water mark
+  assert.strictEqual(stream.readableHighWaterMark, 8192)
+  // Length is 0 right now, because we pulled it all out.
   assert.strictEqual(stream.readableLength, 0)
   assert(!code)
   assert.strictEqual(depth, 0)
   silentConsole.log('ok')
 })
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

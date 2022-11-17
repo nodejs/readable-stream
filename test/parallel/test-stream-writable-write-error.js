@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Writable } = require('../../lib/ours/index')
-
 function expectError(w, args, code, sync) {
   if (sync) {
     if (code) {
@@ -43,12 +38,10 @@ function expectError(w, args, code, sync) {
     )
   }
 }
-
 function test(autoDestroy) {
   {
     const w = new Writable({
       autoDestroy,
-
       _write() {}
     })
     w.end()
@@ -57,7 +50,6 @@ function test(autoDestroy) {
   {
     const w = new Writable({
       autoDestroy,
-
       _write() {}
     })
     w.destroy()
@@ -65,7 +57,6 @@ function test(autoDestroy) {
   {
     const w = new Writable({
       autoDestroy,
-
       _write() {}
     })
     expectError(w, [null], 'ERR_STREAM_NULL_VALUES', true)
@@ -73,7 +64,6 @@ function test(autoDestroy) {
   {
     const w = new Writable({
       autoDestroy,
-
       _write() {}
     })
     expectError(w, [{}], 'ERR_INVALID_ARG_TYPE', true)
@@ -82,17 +72,15 @@ function test(autoDestroy) {
     const w = new Writable({
       decodeStrings: false,
       autoDestroy,
-
       _write() {}
     })
     expectError(w, ['asd', 'noencoding'], 'ERR_UNKNOWN_ENCODING', true)
   }
 }
-
 test(false)
 test(true)
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

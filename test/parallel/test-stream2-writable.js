@@ -18,28 +18,23 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Writable: W, Duplex: D } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 class TestWriter extends W {
   constructor(opts) {
     super(opts)
     this.buffer = []
     this.written = 0
   }
-
   _write(chunk, encoding, cb) {
     // Simulate a small unpredictable latency
     setTimeout(() => {
@@ -49,13 +44,10 @@ class TestWriter extends W {
     }, Math.floor(Math.random() * 10))
   }
 }
-
 const chunks = new Array(50)
-
 for (let i = 0; i < chunks.length; i++) {
   chunks[i] = 'x'.repeat(i)
 }
-
 {
   // Verify fast writing
   const tw = new TestWriter({
@@ -87,7 +79,6 @@ for (let i = 0; i < chunks.length; i++) {
     })
   )
   let i = 0
-
   ;(function W() {
     tw.write(chunks[i++])
     if (i < chunks.length) setTimeout(W, 10)
@@ -112,14 +103,11 @@ for (let i = 0; i < chunks.length; i++) {
     drains++
   })
   let i = 0
-
   ;(function W() {
     let ret
-
     do {
       ret = tw.write(chunks[i++])
     } while (ret !== false && i < chunks.length)
-
     if (i < chunks.length) {
       assert(tw.writableLength >= 50)
       tw.once('drain', W)
@@ -163,13 +151,11 @@ for (let i = 0; i < chunks.length; i++) {
     highWaterMark: 100,
     decodeStrings: false
   })
-
   tw._write = function (chunk, encoding, cb) {
     assert.strictEqual(typeof chunk, 'string')
     chunk = Buffer.from(chunk, encoding)
     return TestWriter.prototype._write.call(this, chunk, encoding, cb)
   }
-
   const encodings = [
     'hex',
     'utf8',
@@ -219,8 +205,8 @@ for (let i = 0; i < chunks.length; i++) {
       process.nextTick(
         common.mustCall(function () {
           // Got chunks in the right order
-          assert.deepStrictEqual(tw.buffer, chunks) // Called all callbacks
-
+          assert.deepStrictEqual(tw.buffer, chunks)
+          // Called all callbacks
           assert.deepStrictEqual(callbacks._called, chunks)
         })
       )
@@ -324,7 +310,6 @@ const helloWorldBuffer = Buffer.from('hello world')
   // Verify stream doesn't end while writing
   const w = new W()
   let wrote = false
-
   w._write = function (chunk, e, cb) {
     assert.strictEqual(this.writing, undefined)
     wrote = true
@@ -334,7 +319,6 @@ const helloWorldBuffer = Buffer.from('hello world')
       cb()
     }, 1)
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -349,14 +333,12 @@ const helloWorldBuffer = Buffer.from('hello world')
   // Verify finish does not come before write() callback
   const w = new W()
   let writeCb = false
-
   w._write = function (chunk, e, cb) {
     setTimeout(function () {
       writeCb = true
       cb()
     }, 10)
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -370,11 +352,9 @@ const helloWorldBuffer = Buffer.from('hello world')
   // Verify finish does not come before synchronous _write() callback
   const w = new W()
   let writeCb = false
-
   w._write = function (chunk, e, cb) {
     cb()
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -389,11 +369,9 @@ const helloWorldBuffer = Buffer.from('hello world')
 {
   // Verify finish is emitted if the last chunk is empty
   const w = new W()
-
   w._write = function (chunk, e, cb) {
     process.nextTick(cb)
   }
-
   w.on('finish', common.mustCall())
   w.write(Buffer.allocUnsafe(1))
   w.end(Buffer.alloc(0))
@@ -409,11 +387,9 @@ const helloWorldBuffer = Buffer.from('hello world')
       cb()
     }, 100)
   })
-
   w._write = function (chunk, e, cb) {
     process.nextTick(cb)
   }
-
   w.on(
     'finish',
     common.mustCall(function () {
@@ -473,19 +449,17 @@ const helloWorldBuffer = Buffer.from('hello world')
   w._final = common.mustCall(function (cb) {
     cb(new Error())
   })
-
   w._write = function (chunk, e, cb) {
     process.nextTick(cb)
   }
-
   w.on('error', common.mustCall())
   w.on('prefinish', common.mustNotCall())
   w.on('finish', common.mustNotCall())
   w.write(Buffer.allocUnsafe(1))
   w.end(Buffer.allocUnsafe(0))
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')
