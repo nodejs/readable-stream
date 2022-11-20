@@ -18,105 +18,107 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 // Flags: --expose-internals
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const fromList = require('../../lib/ours/index').Readable._fromList
-
 const BufferList = require('../../lib/internal/streams/buffer_list')
-
 const util = require('util')
-
 function bufferListFromArray(arr) {
   const bl = new BufferList()
-
   for (let i = 0; i < arr.length; ++i) bl.push(arr[i])
-
   return bl
 }
-
 {
   // Verify behavior with buffers
   let list = [Buffer.from('foog'), Buffer.from('bark'), Buffer.from('bazy'), Buffer.from('kuel')]
   list = bufferListFromArray(list)
   assert.strictEqual(typeof list.head, 'object')
   assert.strictEqual(typeof list.tail, 'object')
-  assert.strictEqual(list.length, 4) // Read more than the first element.
+  assert.strictEqual(list.length, 4)
 
+  // Read more than the first element.
   let ret = fromList(6, {
     buffer: list,
     length: 16
   })
-  assert.strictEqual(ret.toString(), 'foogba') // Read exactly the first element.
+  assert.strictEqual(ret.toString(), 'foogba')
 
+  // Read exactly the first element.
   ret = fromList(2, {
     buffer: list,
     length: 10
   })
-  assert.strictEqual(ret.toString(), 'rk') // Read less than the first element.
+  assert.strictEqual(ret.toString(), 'rk')
 
+  // Read less than the first element.
   ret = fromList(2, {
     buffer: list,
     length: 8
   })
-  assert.strictEqual(ret.toString(), 'ba') // Read more than we have.
+  assert.strictEqual(ret.toString(), 'ba')
 
+  // Read more than we have.
   ret = fromList(100, {
     buffer: list,
     length: 6
   })
-  assert.strictEqual(ret.toString(), 'zykuel') // all consumed.
+  assert.strictEqual(ret.toString(), 'zykuel')
 
+  // all consumed.
   assert.deepStrictEqual(list, new BufferList())
 }
 {
   // Verify behavior with strings
   let list = ['foog', 'bark', 'bazy', 'kuel']
-  list = bufferListFromArray(list) // Read more than the first element.
+  list = bufferListFromArray(list)
 
+  // Read more than the first element.
   let ret = fromList(6, {
     buffer: list,
     length: 16,
     decoder: true
   })
-  assert.strictEqual(ret, 'foogba') // Read exactly the first element.
+  assert.strictEqual(ret, 'foogba')
 
+  // Read exactly the first element.
   ret = fromList(2, {
     buffer: list,
     length: 10,
     decoder: true
   })
-  assert.strictEqual(ret, 'rk') // Read less than the first element.
+  assert.strictEqual(ret, 'rk')
 
+  // Read less than the first element.
   ret = fromList(2, {
     buffer: list,
     length: 8,
     decoder: true
   })
-  assert.strictEqual(ret, 'ba') // Read more than we have.
+  assert.strictEqual(ret, 'ba')
 
+  // Read more than we have.
   ret = fromList(100, {
     buffer: list,
     length: 6,
     decoder: true
   })
-  assert.strictEqual(ret, 'zykuel') // all consumed.
+  assert.strictEqual(ret, 'zykuel')
 
+  // all consumed.
   assert.deepStrictEqual(list, new BufferList())
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

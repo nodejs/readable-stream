@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,24 +12,17 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 function sum(p, c) {
   return p + c
 }
-
 {
   // Does the same thing as `(await stream.toArray()).reduce(...)`
   ;(async () => {
@@ -45,14 +35,13 @@ function sum(p, c) {
       [[1, 2], sum],
       [[1, 2, 3], (x, y) => y]
     ]
-
     for (const [values, fn, initial] of tests) {
       const streamReduce = await Readable.from(values).reduce(fn, initial)
       const arrayReduce = values.reduce(fn, initial)
       assert.deepStrictEqual(streamReduce, arrayReduce)
-    } // Does the same thing as `(await stream.toArray()).reduce(...)` with an
+    }
+    // Does the same thing as `(await stream.toArray()).reduce(...)` with an
     // asynchronous reducer
-
     for (const [values, fn, initial] of tests) {
       const streamReduce = await Readable.from(values)
         .map(async (x) => x)
@@ -87,7 +76,6 @@ function sum(p, c) {
           if (p === 1) {
             throw new Error('boom')
           }
-
           return c
         }, 0),
       /boom/
@@ -162,7 +150,6 @@ function sum(p, c) {
             signal.addEventListener('abort', common.mustCall(), {
               once: true
             })
-
             if (c === 3) {
               await new Promise(() => {}) // Explicitly do not pass signal here
             }
@@ -203,8 +190,8 @@ function sum(p, c) {
   const result = Readable.from([1, 2, 3, 4, 5]).reduce(sum, 0)
   assert.ok(result instanceof Promise)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

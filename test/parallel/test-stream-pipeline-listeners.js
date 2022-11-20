@@ -1,26 +1,22 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { pipeline, Duplex, PassThrough, Writable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 process.on(
   'uncaughtException',
   common.mustCall((err) => {
     assert.strictEqual(err.message, 'no way')
   }, 2)
-) // Ensure that listeners is removed if last stream is readable
-// And other stream's listeners unchanged
+)
 
+// Ensure that listeners is removed if last stream is readable
+// And other stream's listeners unchanged
 const a = new PassThrough()
 a.end('foobar')
 const b = new Duplex({
@@ -35,7 +31,6 @@ pipeline(
     if (error) {
       assert.ifError(error)
     }
-
     assert(a.listenerCount('error') > 0)
     assert.strictEqual(b.listenerCount('error'), 0)
     setTimeout(() => {
@@ -43,8 +38,9 @@ pipeline(
       b.destroy(new Error('no way'))
     }, 100)
   })
-) // Async generators
+)
 
+// Async generators
 const c = new PassThrough()
 c.end('foobar')
 const d = pipeline(
@@ -58,7 +54,6 @@ const d = pipeline(
     if (error) {
       assert.ifError(error)
     }
-
     assert(c.listenerCount('error') > 0)
     assert.strictEqual(d.listenerCount('error'), 0)
     setTimeout(() => {
@@ -66,8 +61,9 @@ const d = pipeline(
       d.destroy(new Error('no way'))
     }, 100)
   })
-) // If last stream is not readable, will not throw and remove listeners
+)
 
+// If last stream is not readable, will not throw and remove listeners
 const e = new PassThrough()
 e.end('foobar')
 const f = new Writable({
@@ -82,7 +78,6 @@ pipeline(
     if (error) {
       assert.ifError(error)
     }
-
     assert(e.listenerCount('error') > 0)
     assert(f.listenerCount('error') > 0)
     setTimeout(() => {
@@ -91,8 +86,8 @@ pipeline(
     }, 100)
   })
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

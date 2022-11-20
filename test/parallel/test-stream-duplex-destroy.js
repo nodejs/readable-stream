@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,26 +12,19 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Duplex } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const duplex = new Duplex({
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.resume()
@@ -49,7 +39,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.resume()
@@ -70,7 +59,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex._destroy = common.mustCall(function (err, cb) {
@@ -94,9 +82,7 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {},
-
     destroy: common.mustCall(function (err, cb) {
       assert.strictEqual(err, expected)
       cb()
@@ -104,8 +90,9 @@ const assert = require('assert')
   })
   duplex.resume()
   duplex.on('end', common.mustNotCall('no end event'))
-  duplex.on('finish', common.mustNotCall('no finish event')) // Error is swallowed by the custom _destroy
+  duplex.on('finish', common.mustNotCall('no finish event'))
 
+  // Error is swallowed by the custom _destroy
   duplex.on('error', common.mustNotCall('no error event'))
   duplex.on('close', common.mustCall())
   duplex.destroy(expected)
@@ -116,7 +103,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex._destroy = common.mustCall(function (err, cb) {
@@ -131,7 +117,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.resume()
@@ -158,7 +143,6 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   const expected = new Error('kaboom')
@@ -182,9 +166,7 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {},
-
     allowHalfOpen: true
   })
   duplex.resume()
@@ -198,12 +180,12 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.destroyed = true
-  assert.strictEqual(duplex.destroyed, true) // The internal destroy() mechanism should not be triggered
+  assert.strictEqual(duplex.destroyed, true)
 
+  // The internal destroy() mechanism should not be triggered
   duplex.on('finish', common.mustNotCall())
   duplex.on('end', common.mustNotCall())
   duplex.destroy()
@@ -214,7 +196,6 @@ const assert = require('assert')
     this.destroyed = false
     Duplex.call(this)
   }
-
   Object.setPrototypeOf(MyDuplex.prototype, Duplex.prototype)
   Object.setPrototypeOf(MyDuplex, Duplex)
   new MyDuplex()
@@ -223,11 +204,9 @@ const assert = require('assert')
   const duplex = new Duplex({
     writable: false,
     autoDestroy: true,
-
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.push(null)
@@ -238,11 +217,9 @@ const assert = require('assert')
   const duplex = new Duplex({
     readable: false,
     autoDestroy: true,
-
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.end()
@@ -252,11 +229,9 @@ const assert = require('assert')
   const duplex = new Duplex({
     allowHalfOpen: false,
     autoDestroy: true,
-
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {}
   })
   duplex.push(null)
@@ -280,9 +255,7 @@ const assert = require('assert')
     write(chunk, enc, cb) {
       cb()
     },
-
     read() {},
-
     signal
   })
   let count = 0
@@ -290,15 +263,14 @@ const assert = require('assert')
     'error',
     common.mustCall((e) => {
       assert.strictEqual(count++, 0) // Ensure not called twice
-
       assert.strictEqual(e.name, 'AbortError')
     })
   )
   duplex.on('close', common.mustCall())
   controller.abort()
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

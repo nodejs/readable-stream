@@ -1,17 +1,14 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const { EventEmitter: EE } = require('events')
-
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName, kReadableStreamSuiteHasMultipleTests } = require('./symbols')
-
 let run = 0
-
 module.exports = function (test) {
   function runTest(highWaterMark, objectMode, produce) {
     test('run #' + ++run, (t) => {
@@ -26,59 +23,52 @@ module.exports = function (test) {
       r.on('end', function () {
         ended = true
       })
-
       old.pause = function () {
         // console.error('old.pause()');
         old.emit('pause')
         flowing = false
       }
-
       old.resume = function () {
         // console.error('old.resume()');
         old.emit('resume')
         flow()
       }
-
       let flowing
       let chunks = 10
       let oldEnded = false
       const expected = []
-
       function flow() {
-        flowing = true // eslint-disable-next-line no-unmodified-loop-condition
-
+        flowing = true
+        // eslint-disable-next-line no-unmodified-loop-condition
         while (flowing && chunks-- > 0) {
           const item = produce()
-          expected.push(item) // console.log('old.emit', chunks, flowing);
-
-          old.emit('data', item) // console.log('after emit', chunks, flowing);
+          expected.push(item)
+          // console.log('old.emit', chunks, flowing);
+          old.emit('data', item)
+          // console.log('after emit', chunks, flowing);
         }
 
         if (chunks <= 0) {
-          oldEnded = true // console.log('old end', chunks, flowing);
-
+          oldEnded = true
+          // console.log('old end', chunks, flowing);
           old.emit('end')
         }
       }
-
       const w = new Writable({
         highWaterMark: highWaterMark * 2,
         objectMode
       })
       const written = []
-
       w._write = function (chunk, encoding, cb) {
         // console.log('_write', chunk);
         written.push(chunk)
         setTimeout(cb)
       }
-
       w.on('finish', function () {
         performAsserts()
       })
       r.pipe(w)
       flow()
-
       function performAsserts() {
         t.ok(ended)
         t.ok(oldEnded)
@@ -86,7 +76,6 @@ module.exports = function (test) {
       }
     })
   }
-
   runTest(100, false, function () {
     return Buffer.alloc(100)
   })
@@ -116,6 +105,5 @@ module.exports = function (test) {
     return objectChunks.shift()
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-readable-wrap'
 module.exports[kReadableStreamSuiteHasMultipleTests] = true

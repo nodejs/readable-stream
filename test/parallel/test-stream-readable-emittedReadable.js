@@ -1,22 +1,18 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const Readable = require('../../lib/ours/index').Readable
-
 const readable = new Readable({
   read: () => {}
-}) // Initialized to false.
+})
 
+// Initialized to false.
 assert.strictEqual(readable._readableState.emittedReadable, false)
 const expected = [Buffer.from('foobar'), Buffer.from('quo'), null]
 readable.on(
@@ -24,15 +20,17 @@ readable.on(
   common.mustCall(() => {
     // emittedReadable should be true when the readable event is emitted
     assert.strictEqual(readable._readableState.emittedReadable, true)
-    assert.deepStrictEqual(readable.read(), expected.shift()) // emittedReadable is reset to false during read()
-
+    assert.deepStrictEqual(readable.read(), expected.shift())
+    // emittedReadable is reset to false during read()
     assert.strictEqual(readable._readableState.emittedReadable, false)
   }, 3)
-) // When the first readable listener is just attached,
+)
+
+// When the first readable listener is just attached,
 // emittedReadable should be false
+assert.strictEqual(readable._readableState.emittedReadable, false)
 
-assert.strictEqual(readable._readableState.emittedReadable, false) // These trigger a single 'readable', as things are batched up
-
+// These trigger a single 'readable', as things are batched up
 process.nextTick(
   common.mustCall(() => {
     readable.push('foo')
@@ -42,8 +40,9 @@ process.nextTick(
   common.mustCall(() => {
     readable.push('bar')
   })
-) // These triggers two readable events
+)
 
+// These triggers two readable events
 setImmediate(
   common.mustCall(() => {
     readable.push('quo')
@@ -62,8 +61,8 @@ noRead.on(
   common.mustCall(() => {
     // emittedReadable should be true when the readable event is emitted
     assert.strictEqual(noRead._readableState.emittedReadable, true)
-    noRead.read(0) // emittedReadable is not reset during read(0)
-
+    noRead.read(0)
+    // emittedReadable is not reset during read(0)
     assert.strictEqual(noRead._readableState.emittedReadable, true)
   })
 )
@@ -89,8 +88,8 @@ process.nextTick(
     flowing.push(null)
   })
 )
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

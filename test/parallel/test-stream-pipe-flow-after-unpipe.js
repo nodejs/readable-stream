@@ -1,15 +1,14 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
+const { Readable, Writable } = require('../../lib/ours/index')
 
-const { Readable, Writable } = require('../../lib/ours/index') // Tests that calling .unpipe() un-blocks a stream that is paused because
+// Tests that calling .unpipe() un-blocks a stream that is paused because
 // it is waiting on the writable side to finish a write().
 
 const rs = new Readable({
@@ -32,9 +31,10 @@ rs.on(
     if (chunks >= 20) rs.pause() // Finish this test.
   })
 )
-rs.pipe(ws)
-/* replacement start */
 
+rs.pipe(ws)
+
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

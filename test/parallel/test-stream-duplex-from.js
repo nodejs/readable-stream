@@ -1,20 +1,14 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Duplex, Readable, Writable, pipeline } = require('../../lib/ours/index')
-
 const Blob = globalThis.Blob || require('buffer').Blob
-
 {
   const d = Duplex.from({
     readable: new Readable({
@@ -167,37 +161,34 @@ const Blob = globalThis.Blob || require('buffer').Blob
     ['abc\ndef\nghi'],
     Duplex.from(async function* (source) {
       let rest = ''
-
       for await (const chunk of source) {
         const lines = (rest + chunk.toString()).split('\n')
         rest = lines.pop()
-
         for (const line of lines) {
           yield line
         }
       }
-
       yield rest
     }),
     async function* (source) {
       // eslint-disable-line require-yield
       let ret = ''
-
       for await (const x of source) {
         ret += x
       }
-
       assert.strictEqual(ret, 'abcdefghi')
     },
     common.mustCall(() => {})
   )
-} // Ensure that isDuplexNodeStream was called
+}
 
+// Ensure that isDuplexNodeStream was called
 {
   const duplex = new Duplex()
   assert.strictEqual(Duplex.from(duplex), duplex)
-} // Ensure that Duplex.from works for blobs
+}
 
+// Ensure that Duplex.from works for blobs
 if (typeof Blob !== 'undefined') {
   const blob = new Blob(['blob'])
   const expectedByteLength = blob.size
@@ -208,8 +199,9 @@ if (typeof Blob !== 'undefined') {
       assert.strictEqual(arrayBuffer.byteLength, expectedByteLength)
     })
   )
-} // Ensure that given a promise rejection it emits an error
+}
 
+// Ensure that given a promise rejection it emits an error
 {
   const myErrorMessage = 'myCustomError'
   Duplex.from(Promise.reject(myErrorMessage)).on(
@@ -218,29 +210,30 @@ if (typeof Blob !== 'undefined') {
       assert.strictEqual(error, myErrorMessage)
     })
   )
-} // Ensure that given a promise rejection on an async function it emits an error
+}
 
+// Ensure that given a promise rejection on an async function it emits an error
 {
   const myErrorMessage = 'myCustomError'
-
   async function asyncFn() {
     return Promise.reject(myErrorMessage)
   }
-
   Duplex.from(asyncFn).on(
     'error',
     common.mustCall((error) => {
       assert.strictEqual(error, myErrorMessage)
     })
   )
-} // Ensure that Duplex.from throws an Invalid return value when function is void
+}
 
+// Ensure that Duplex.from throws an Invalid return value when function is void
 {
   assert.throws(() => Duplex.from(() => {}), {
     code: 'ERR_INVALID_RETURN_VALUE'
   })
-} // Ensure data if a sub object has a readable stream it's duplexified
+}
 
+// Ensure data if a sub object has a readable stream it's duplexified
 {
   const msg = Buffer.from('hello')
   const duplex = Duplex.from({
@@ -257,8 +250,9 @@ if (typeof Blob !== 'undefined') {
     })
   )
   assert.strictEqual(duplex.writable, false)
-} // Ensure data if a sub object has a writable stream it's duplexified
+}
 
+// Ensure data if a sub object has a writable stream it's duplexified
 {
   const msg = Buffer.from('hello')
   const duplex = Duplex.from({
@@ -270,8 +264,9 @@ if (typeof Blob !== 'undefined') {
   })
   duplex.write(msg)
   assert.strictEqual(duplex.readable, false)
-} // Ensure data if a sub object has a writable and readable stream it's duplexified
+}
 
+// Ensure data if a sub object has a writable and readable stream it's duplexified
 {
   const msg = Buffer.from('hello')
   const duplex = Duplex.from({
@@ -298,8 +293,9 @@ if (typeof Blob !== 'undefined') {
       })
     )
     .on('end', common.mustCall())
-} // Ensure that given readable stream that throws an error it calls destroy
+}
 
+// Ensure that given readable stream that throws an error it calls destroy
 {
   const myErrorMessage = 'error!'
   const duplex = Duplex.from(
@@ -315,8 +311,9 @@ if (typeof Blob !== 'undefined') {
       assert.strictEqual(msg.message, myErrorMessage)
     })
   )
-} // Ensure that given writable stream that throws an error it calls destroy
+}
 
+// Ensure that given writable stream that throws an error it calls destroy
 {
   const myErrorMessage = 'error!'
   const duplex = Duplex.from(
@@ -334,8 +331,8 @@ if (typeof Blob !== 'undefined') {
   )
   duplex.write('test')
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

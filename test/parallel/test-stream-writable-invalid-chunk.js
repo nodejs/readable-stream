@@ -1,25 +1,19 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 function testWriteType(val, objectMode, code) {
   const writable = new stream.Writable({
     objectMode,
     write: () => {}
   })
   writable.on('error', common.mustNotCall())
-
   if (code) {
     assert.throws(
       () => {
@@ -33,7 +27,6 @@ function testWriteType(val, objectMode, code) {
     writable.write(val)
   }
 }
-
 testWriteType([], false, 'ERR_INVALID_ARG_TYPE')
 testWriteType({}, false, 'ERR_INVALID_ARG_TYPE')
 testWriteType(0, false, 'ERR_INVALID_ARG_TYPE')
@@ -48,8 +41,8 @@ testWriteType(true, true)
 testWriteType(0.0, true)
 testWriteType(undefined, true)
 testWriteType(null, true, 'ERR_STREAM_NULL_VALUES')
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

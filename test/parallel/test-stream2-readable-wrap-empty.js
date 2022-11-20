@@ -18,32 +18,25 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable } = require('../../lib/ours/index')
-
 const EE = require('events').EventEmitter
-
 const oldStream = new EE()
-
 oldStream.pause = () => {}
-
 oldStream.resume = () => {}
-
 const newStream = new Readable().wrap(oldStream)
 newStream.on('readable', () => {}).on('end', common.mustCall())
 oldStream.emit('end')
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

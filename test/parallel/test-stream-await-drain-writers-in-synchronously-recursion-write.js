@@ -1,16 +1,12 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { PassThrough } = require('../../lib/ours/index')
-
 const encode = new PassThrough({
   highWaterMark: 1
 })
@@ -30,8 +26,8 @@ const onData = common.mustCall(() => {
 encode.pipe(decode).on('data', onData)
 send(Buffer.from([0x1]))
 send(Buffer.from([0x2]))
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,10 +1,7 @@
 /* replacement start */
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
-
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
-
 const EventTarget = globalThis.EventTarget || require('event-target-shim').EventTarget
-
 if (typeof AbortSignal.abort !== 'function') {
   AbortSignal.abort = function () {
     const controller = new AbortController()
@@ -15,36 +12,25 @@ if (typeof AbortSignal.abort !== 'function') {
 /* replacement end */
 
 ;('use strict')
-
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const fixtures = require('../common/fixtures')
-
 const { Readable } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const st = require('timers').setTimeout
-
 function setTimeout(ms) {
   return new Promise((resolve) => {
     st(resolve, ms)
   })
 }
-
 const { createReadStream } = require('fs')
-
 function oneTo5() {
   return Readable.from([1, 2, 3, 4, 5])
 }
-
 {
   // flatMap works on synchronous streams with a synchronous mapper
   ;(async () => {
@@ -90,15 +76,15 @@ function oneTo5() {
       })
       .toArray()
     assert.deepStrictEqual(result, [1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
-  })().then(common.mustCall()) // flatMap works on an objectMode stream where mappign returns a stream
-
+  })().then(common.mustCall())
+  // flatMap works on an objectMode stream where mappign returns a stream
   ;(async () => {
     const result = await oneTo5()
       .flatMap(() => {
         return createReadStream(fixtures.path('x.txt'))
       })
-      .toArray() // The resultant stream is in object mode so toArray shouldn't flatten
-
+      .toArray()
+    // The resultant stream is in object mode so toArray shouldn't flatten
     assert.strictEqual(result.length, 5)
     assert.deepStrictEqual(
       Buffer.concat(result).toString(),
@@ -119,8 +105,8 @@ function oneTo5() {
       signal: ac.signal,
       concurrency: 2
     }
-  ) // pump
-
+  )
+  // pump
   assert
     .rejects(
       async () => {
@@ -149,8 +135,8 @@ function oneTo5() {
     {
       signal: AbortSignal.abort()
     }
-  ) // pump
-
+  )
+  // pump
   assert
     .rejects(
       async () => {
@@ -193,12 +179,12 @@ function oneTo5() {
   const stream = oneTo5()
   Object.defineProperty(stream, 'map', {
     value: common.mustNotCall(() => {})
-  }) // Check that map isn't getting called.
-
+  })
+  // Check that map isn't getting called.
   stream.flatMap(() => true)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,33 +1,28 @@
 'use strict'
-/* replacement start */
 
+/* replacement start */
 const { Buffer } = require('buffer')
+
 /* replacement end */
 
 const { Writable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(5)
   let _writeCalled = false
-
   function _write(d, e, n) {
     _writeCalled = true
   }
-
   const w = new Writable({
     write: _write
   })
   w.end(Buffer.from('blerg'))
   let _writevCalled = false
   let dLength = 0
-
   function _writev(d, n) {
     dLength = d.length
     _writevCalled = true
   }
-
   const w2 = new Writable({
     writev: _writev
   })
@@ -43,5 +38,4 @@ module.exports = function (t) {
     t.ok(_writevCalled)
   })
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream-writable-constructor-set-methods'

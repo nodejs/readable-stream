@@ -1,11 +1,8 @@
 'use strict'
 
 const { EventEmitter: EE } = require('events')
-
 const { Readable, Writable } = require('../../lib/ours/index')
-
 const { kReadableStreamSuiteName } = require('./symbols')
-
 module.exports = function (t) {
   t.plan(33)
   const stream = new Readable({
@@ -13,19 +10,17 @@ module.exports = function (t) {
     encoding: 'utf8'
   })
   const source = new EE()
-
   stream._read = function () {
     // console.error('stream._read');
     readStart()
   }
-
   let ended = false
   stream.on('end', function () {
     ended = true
   })
   source.on('data', function (chunk) {
-    const ret = stream.push(chunk) // console.error('data', stream._readableState.length);
-
+    const ret = stream.push(chunk)
+    // console.error('data', stream._readableState.length);
     if (!ret) {
       readStop()
     }
@@ -34,24 +29,20 @@ module.exports = function (t) {
     stream.push(null)
   })
   let reading = false
-
   function readStart() {
     // console.error('readStart');
     reading = true
   }
-
   function readStop() {
     // console.error('readStop');
     reading = false
     process.nextTick(function () {
       const r = stream.read()
-
       if (r !== null) {
         writer.write(r)
       }
     })
   }
-
   const writer = new Writable({
     decodeStrings: false
   })
@@ -64,20 +55,19 @@ module.exports = function (t) {
     'asdfgasdfgasdfgasdfg',
     'asdfgasdfgasdfgasdfg'
   ]
-
   writer._write = function (chunk, encoding, cb) {
     // console.error('WRITE %s', chunk);
     written.push(chunk)
     process.nextTick(cb)
   }
+  writer.on('finish', finish)
 
-  writer.on('finish', finish) // now emit some chunks.
+  // now emit some chunks.
 
   const chunk = 'asdfg'
   let set = 0
   readStart()
   data()
-
   function data() {
     t.ok(reading)
     source.emit('data', chunk)
@@ -88,19 +78,16 @@ module.exports = function (t) {
     t.ok(reading)
     source.emit('data', chunk)
     t.notOk(reading)
-
     if (set++ < 5) {
       setTimeout(data, 10)
     } else {
       end()
     }
   }
-
   function finish() {
     // console.error('finish');
     t.deepEqual(written, expectWritten)
   }
-
   function end() {
     source.emit('end')
     t.notOk(reading)
@@ -110,5 +97,4 @@ module.exports = function (t) {
     })
   }
 }
-
 module.exports[kReadableStreamSuiteName] = 'stream2-push'

@@ -1,20 +1,14 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 if (!common.hasCrypto) common.skip('missing crypto')
-
 const { Readable, pipeline } = require('../../lib/ours/index')
-
 const http2 = require('http2')
-
 {
   const server = http2.createServer((req, res) => {
     pipeline(req, res, common.mustCall())
@@ -45,8 +39,8 @@ const http2 = require('http2')
     })
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

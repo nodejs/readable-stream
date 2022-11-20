@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const { Readable, Duplex } = require('../../lib/ours/index')
-
 {
   const readable = new Readable({
     read() {}
@@ -63,14 +58,13 @@ const { Readable, Duplex } = require('../../lib/ours/index')
 {
   const duplex = new Duplex({
     readable: false,
-
     write() {}
   })
   duplex.destroy()
   assert.strictEqual(duplex.readableAborted, false)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

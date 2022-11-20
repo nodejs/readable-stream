@@ -1,28 +1,21 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const stream = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 {
   const r = new stream.Readable({
     autoDestroy: true,
-
     read() {
       this.push('hello')
       this.push('world')
       this.push(null)
     },
-
     destroy: common.mustCall((err, cb) => cb())
   })
   let ended = false
@@ -43,11 +36,9 @@ const assert = require('assert')
 {
   const w = new stream.Writable({
     autoDestroy: true,
-
     write(data, enc, cb) {
       cb(null)
     },
-
     destroy: common.mustCall((err, cb) => cb())
   })
   let finished = false
@@ -70,11 +61,9 @@ const assert = require('assert')
 {
   const t = new stream.Transform({
     autoDestroy: true,
-
     transform(data, enc, cb) {
       cb(null, data)
     },
-
     destroy: common.mustCall((err, cb) => cb())
   })
   let ended = false
@@ -127,8 +116,8 @@ const assert = require('assert')
   })
   r.pipe(w)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

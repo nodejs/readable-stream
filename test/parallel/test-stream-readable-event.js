@@ -18,29 +18,26 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const Readable = require('../../lib/ours/index').Readable
-
 {
   // First test, not reading when the readable is added.
   // make sure that on('readable', ...) triggers a readable event.
   const r = new Readable({
     highWaterMark: 3
   })
-  r._read = common.mustNotCall() // This triggers a 'readable' event, which is lost.
+  r._read = common.mustNotCall()
 
+  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('blerg'))
   setTimeout(function () {
     // We're testing what we think we are
@@ -51,11 +48,13 @@ const Readable = require('../../lib/ours/index').Readable
 {
   // Second test, make sure that readable is re-emitted if there's
   // already a length, while it IS reading.
+
   const r = new Readable({
     highWaterMark: 3
   })
-  r._read = common.mustCall() // This triggers a 'readable' event, which is lost.
+  r._read = common.mustCall()
 
+  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('bl'))
   setTimeout(function () {
     // Assert we're testing what we think we are
@@ -69,8 +68,9 @@ const Readable = require('../../lib/ours/index').Readable
   const r = new Readable({
     highWaterMark: 30
   })
-  r._read = common.mustNotCall() // This triggers a 'readable' event, which is lost.
+  r._read = common.mustNotCall()
 
+  // This triggers a 'readable' event, which is lost.
   r.push(Buffer.from('blerg'))
   r.push(null)
   setTimeout(function () {
@@ -88,7 +88,6 @@ const Readable = require('../../lib/ours/index').Readable
   const r = new Readable({
     encoding: 'utf8'
   })
-
   r._read = function () {
     process.nextTick(() => {
       if (!underlyingData.length) {
@@ -98,7 +97,6 @@ const Readable = require('../../lib/ours/index').Readable
       }
     })
   }
-
   r.on('readable', () => {
     const data = r.read()
     if (data !== null) result.push(data)
@@ -113,17 +111,15 @@ const Readable = require('../../lib/ours/index').Readable
 {
   // #20923
   const r = new Readable()
-
   r._read = function () {
     // Actually doing thing here
   }
-
   r.on('data', function () {})
   r.removeAllListeners()
   assert.strictEqual(r.eventNames().length, 0)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

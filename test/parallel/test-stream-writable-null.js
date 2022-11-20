@@ -1,18 +1,13 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const assert = require('assert')
-
 const stream = require('../../lib/ours/index')
-
 class MyWritable extends stream.Writable {
   constructor(options) {
     super({
@@ -20,13 +15,11 @@ class MyWritable extends stream.Writable {
       ...options
     })
   }
-
   _write(chunk, encoding, callback) {
     assert.notStrictEqual(chunk, null)
     callback()
   }
 }
-
 {
   const m = new MyWritable({
     objectMode: true
@@ -69,8 +62,8 @@ class MyWritable extends stream.Writable {
   })
   m.write(false, assert.ifError)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

@@ -1,17 +1,15 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
+const { Writable } = require('../../lib/ours/index')
 
-const { Writable } = require('../../lib/ours/index') // Test interaction between calling .destroy() on a writable and pending
+// Test interaction between calling .destroy() on a writable and pending
 // writes.
 
 for (const withPendingData of [false, true]) {
@@ -21,14 +19,12 @@ for (const withPendingData of [false, true]) {
       write(data, enc, cb) {
         callbacks.push(cb)
       },
-
       // Effectively disable the HWM to observe 'drain' events more easily.
       highWaterMark: 1
     })
     let chunksWritten = 0
     let drains = 0
     w.on('drain', () => drains++)
-
     function onWrite(err) {
       if (err) {
         assert.strictEqual(w.destroyed, true)
@@ -37,20 +33,17 @@ for (const withPendingData of [false, true]) {
         chunksWritten++
       }
     }
-
     w.write('abc', onWrite)
     assert.strictEqual(chunksWritten, 0)
     assert.strictEqual(drains, 0)
     callbacks.shift()()
     assert.strictEqual(chunksWritten, 1)
     assert.strictEqual(drains, 1)
-
     if (withPendingData) {
       // Test 2 cases: There either is or is not data still in the write queue.
       // (The second write will never actually get executed either way.)
       w.write('def', onWrite)
     }
-
     if (useEnd) {
       // Again, test 2 cases: Either we indicate that we want to end the
       // writable or not.
@@ -58,7 +51,6 @@ for (const withPendingData of [false, true]) {
     } else {
       w.write('ghi', onWrite)
     }
-
     assert.strictEqual(chunksWritten, 1)
     w.destroy()
     assert.strictEqual(chunksWritten, 1)
@@ -68,8 +60,8 @@ for (const withPendingData of [false, true]) {
     assert.strictEqual(drains, 1)
   }
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

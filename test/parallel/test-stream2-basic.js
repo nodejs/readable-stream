@@ -18,23 +18,18 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { Readable: R, Writable: W } = require('../../lib/ours/index')
-
 const assert = require('assert')
-
 const EE = require('events').EventEmitter
-
 class TestReader extends R {
   constructor(n) {
     super()
@@ -42,19 +37,16 @@ class TestReader extends R {
     this._pos = 0
     this._bufs = 10
   }
-
   _read(n) {
     const max = this._buffer.length - this._pos
     n = Math.max(n, 0)
     const toRead = Math.min(n, max)
-
     if (toRead === 0) {
       // Simulate the read buffer filling up with some more bytes some time
       // in the future.
       setTimeout(() => {
         this._pos = 0
         this._bufs -= 1
-
         if (this._bufs <= 0) {
           // read them all!
           if (!this.ended) this.push(null)
@@ -67,33 +59,27 @@ class TestReader extends R {
       }, 10)
       return
     }
-
     const ret = this._buffer.slice(this._pos, this._pos + toRead)
-
     this._pos += toRead
     this.push(ret)
   }
 }
-
 class TestWriter extends EE {
   constructor() {
     super()
     this.received = []
     this.flush = false
   }
-
   write(c) {
     this.received.push(c.toString())
     this.emit('write', c)
     return true
   }
-
   end(c) {
     if (c) this.write(c)
     this.emit('end', this.received)
   }
 }
-
 {
   // Test basic functionality
   const r = new TestReader(20)
@@ -123,17 +109,13 @@ class TestWriter extends EE {
     })
   )
   let readSize = 1
-
   function flow() {
     let res
-
     while (null !== (res = r.read(readSize++))) {
       reads.push(res.toString())
     }
-
     r.once('readable', flow)
   }
-
   flow()
 }
 {
@@ -151,8 +133,9 @@ class TestWriter extends EE {
 }
 ;[1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (SPLIT) {
   // Verify unpipe
-  const r = new TestReader(5) // Unpipe after 3 writes, then write to another stream instead.
+  const r = new TestReader(5)
 
+  // Unpipe after 3 writes, then write to another stream instead.
   let expect = ['xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx']
   expect = [expect.slice(0, SPLIT), expect.slice(SPLIT)]
   const w = [new TestWriter(), new TestWriter()]
@@ -207,8 +190,9 @@ class TestWriter extends EE {
 }
 ;[1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (SPLIT) {
   // Verify multi-unpipe
-  const r = new TestReader(5) // Unpipe after 3 writes, then write to another stream instead.
+  const r = new TestReader(5)
 
+  // Unpipe after 3 writes, then write to another stream instead.
   let expect = ['xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx', 'xxxxx']
   expect = [expect.slice(0, SPLIT), expect.slice(SPLIT)]
   const w = [new TestWriter(), new TestWriter(), new TestWriter()]
@@ -253,7 +237,6 @@ class TestWriter extends EE {
   r.push(['four'])
   r.push(null)
   const w1 = new R()
-
   w1.write = function (chunk) {
     assert.strictEqual(chunk[0], 'one')
     w1.emit('close')
@@ -262,47 +245,38 @@ class TestWriter extends EE {
       r.pipe(w3)
     })
   }
-
   w1.end = common.mustNotCall()
   r.pipe(w1)
   const expected = ['two', 'two', 'three', 'three', 'four', 'four']
   const w2 = new R()
-
   w2.write = function (chunk) {
     assert.strictEqual(chunk[0], expected.shift())
     assert.strictEqual(counter, 0)
     counter++
-
     if (chunk[0] === 'four') {
       return true
     }
-
     setTimeout(function () {
       counter--
       w2.emit('drain')
     }, 10)
     return false
   }
-
   w2.end = common.mustCall()
   const w3 = new R()
-
   w3.write = function (chunk) {
     assert.strictEqual(chunk[0], expected.shift())
     assert.strictEqual(counter, 1)
     counter++
-
     if (chunk[0] === 'four') {
       return true
     }
-
     setTimeout(function () {
       counter--
       w3.emit('drain')
     }, 50)
     return false
   }
-
   w3.end = common.mustCall(function () {
     assert.strictEqual(counter, 2)
     assert.strictEqual(expected.length, 0)
@@ -319,13 +293,11 @@ class TestWriter extends EE {
   const v = r.read(0)
   assert.strictEqual(v, null)
   const w = new R()
-
   w.write = function (buffer) {
     written = true
     assert.strictEqual(ended, false)
     assert.strictEqual(buffer.toString(), 'foo')
   }
-
   w.end = common.mustCall(function () {
     ended = true
     assert.strictEqual(written, true)
@@ -336,11 +308,9 @@ class TestWriter extends EE {
   // Verify synchronous _read ending
   const r = new R()
   let called = false
-
   r._read = function (n) {
     r.push(null)
   }
-
   r.once('end', function () {
     // Verify that this is called before the next tick
     called = true
@@ -357,12 +327,10 @@ class TestWriter extends EE {
   })
   let onReadable = false
   let readCalled = 0
-
   r._read = function (n) {
     if (readCalled++ === 2) r.push(null)
     else r.push(Buffer.from('asdf'))
   }
-
   r.on('readable', function () {
     onReadable = true
     r.read()
@@ -406,8 +374,8 @@ class TestWriter extends EE {
   })
   assert.strictEqual(w.writableObjectMode, true)
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

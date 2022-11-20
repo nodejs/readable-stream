@@ -18,37 +18,35 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
+const Readable = require('../../lib/ours/index').Readable
 
-const Readable = require('../../lib/ours/index').Readable // This tests synchronous read callbacks and verifies that even if they nest
+// This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error
 
 const r = new Readable()
 const N = 256 * 1024
 let reads = 0
-
 r._read = function (n) {
   const chunk = reads++ === N ? null : Buffer.allocUnsafe(1)
   r.push(chunk)
 }
-
 r.on('readable', function onReadable() {
   if (!(r.readableLength % 256)) silentConsole.error('readable', r.readableLength)
   r.read(N * 2)
 })
 r.on('end', common.mustCall())
 r.read(0)
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

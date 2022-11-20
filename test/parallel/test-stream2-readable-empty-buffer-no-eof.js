@@ -18,26 +18,23 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 require('../common')
-
 const assert = require('assert')
-
 const Readable = require('../../lib/ours/index').Readable
-
 test1()
 test2()
-
 function test1() {
-  const r = new Readable() // Should not end when we get a Buffer.alloc(0) or '' as the _read
+  const r = new Readable()
+
+  // Should not end when we get a Buffer.alloc(0) or '' as the _read
   // result that just means that there is *temporarily* no data, but to
   // go ahead and try again later.
   //
@@ -49,51 +46,40 @@ function test1() {
 
   const buf = Buffer.alloc(5, 'x')
   let reads = 5
-
   r._read = function (n) {
     switch (reads--) {
       case 5:
         return setImmediate(() => {
           return r.push(buf)
         })
-
       case 4:
         setImmediate(() => {
           return r.push(Buffer.alloc(0))
         })
         return setImmediate(r.read.bind(r, 0))
-
       case 3:
         setImmediate(r.read.bind(r, 0))
         return process.nextTick(() => {
           return r.push(Buffer.alloc(0))
         })
-
       case 2:
         setImmediate(r.read.bind(r, 0))
         return r.push(Buffer.alloc(0))
       // Not-EOF!
-
       case 1:
         return r.push(buf)
-
       case 0:
         return r.push(null)
       // EOF
-
       default:
         throw new Error('unreachable')
     }
   }
-
   const results = []
-
   function flow() {
     let chunk
-
     while (null !== (chunk = r.read())) results.push(String(chunk))
   }
-
   r.on('readable', flow)
   r.on('end', () => {
     results.push('EOF')
@@ -104,27 +90,20 @@ function test1() {
     silentConsole.log('ok')
   })
 }
-
 function test2() {
   const r = new Readable({
     encoding: 'base64'
   })
   let reads = 5
-
   r._read = function (n) {
     if (!reads--) return r.push(null) // EOF
-
     return r.push(Buffer.from('x'))
   }
-
   const results = []
-
   function flow() {
     let chunk
-
     while (null !== (chunk = r.read())) results.push(String(chunk))
   }
-
   r.on('readable', flow)
   r.on('end', () => {
     results.push('EOF')
@@ -135,8 +114,8 @@ function test2() {
     silentConsole.log('ok')
   })
 }
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')

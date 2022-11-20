@@ -1,16 +1,12 @@
 'use strict'
 
 const tap = require('tap')
-
 const silentConsole = {
   log() {},
-
   error() {}
 }
 const common = require('../common')
-
 const { pipeline, PassThrough } = require('../../lib/ours/index')
-
 async function runTest() {
   await pipeline(
     '',
@@ -20,10 +16,9 @@ async function runTest() {
     common.mustCall(() => {})
   )
 }
-
 runTest().then(common.mustCall(() => {}))
-/* replacement start */
 
+/* replacement start */
 process.on('beforeExit', (code) => {
   if (code === 0) {
     tap.pass('test succeeded')
