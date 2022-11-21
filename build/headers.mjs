@@ -9,7 +9,7 @@ const bufferRequire = `
 const processRequire = `
   /* replacement start */
 
-  const process = require('process')
+  const process = require('process/')
 
   /* replacement end */
 `
