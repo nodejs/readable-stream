@@ -20,19 +20,14 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-
 require('../common');
-
-var assert = require('assert/');
-
-var Duplex = require('../../').Duplex;
-
-var stream = new Duplex({
+const assert = require('assert/');
+const Duplex = require('../../').Duplex;
+const stream = new Duplex({
   objectMode: true
 });
 assert(Duplex() instanceof Duplex);
@@ -40,17 +35,14 @@ assert(stream._readableState.objectMode);
 assert(stream._writableState.objectMode);
 assert(stream.allowHalfOpen);
 assert.strictEqual(stream.listenerCount('end'), 0);
-var written;
-var read;
-
-stream._write = function (obj, _, cb) {
+let written;
+let read;
+stream._write = (obj, _, cb) => {
   written = obj;
   cb();
 };
-
-stream._read = function () {};
-
-stream.on('data', function (obj) {
+stream._read = () => {};
+stream.on('data', obj => {
   read = obj;
 });
 stream.push({
@@ -59,24 +51,16 @@ stream.push({
 stream.end({
   val: 2
 });
-process.on('exit', function () {
+process.on('exit', () => {
   assert.strictEqual(read.val, 1);
   assert.strictEqual(written.val, 2);
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

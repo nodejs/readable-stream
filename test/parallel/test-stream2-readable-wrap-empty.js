@@ -22,39 +22,23 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var Readable = require('../../lib/_stream_readable');
-
-var EE = require('events').EventEmitter;
-
-var oldStream = new EE();
-
-oldStream.pause = function () {};
-
-oldStream.resume = function () {};
-
-var newStream = new Readable().wrap(oldStream);
-newStream.on('readable', function () {}).on('end', common.mustCall());
+const common = require('../common');
+const Readable = require('../../lib/_stream_readable');
+const EE = require('events').EventEmitter;
+const oldStream = new EE();
+oldStream.pause = () => {};
+oldStream.resume = () => {};
+const newStream = new Readable().wrap(oldStream);
+newStream.on('readable', () => {}).on('end', common.mustCall());
 oldStream.emit('end');
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -1,68 +1,53 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var stream = require('../../');
-
+const common = require('../common');
+const assert = require('assert/');
+const stream = require('../../');
 {
   // This test ensures that the stream implementation correctly handles values
   // for highWaterMark which exceed the range of signed 32 bit integers and
   // rejects invalid values.
+
   // This number exceeds the range of 32 bit integer arithmetic but should still
   // be handled correctly.
-  var ovfl = Number.MAX_SAFE_INTEGER;
-  var readable = stream.Readable({
+  const ovfl = Number.MAX_SAFE_INTEGER;
+  const readable = stream.Readable({
     highWaterMark: ovfl
   });
   assert.strictEqual(readable._readableState.highWaterMark, ovfl);
-  var writable = stream.Writable({
+  const writable = stream.Writable({
     highWaterMark: ovfl
   });
   assert.strictEqual(writable._writableState.highWaterMark, ovfl);
-
-  var _loop = function _loop() {
-    var invalidHwm = _arr[_i];
-
-    var _loop2 = function _loop2() {
-      var type = _arr2[_i2];
-      common.expectsError(function () {
+  for (var _i = 0, _arr = [true, false, '5', {}, -5, NaN]; _i < _arr.length; _i++) {
+    const invalidHwm = _arr[_i];
+    for (var _i2 = 0, _arr2 = [stream.Readable, stream.Writable]; _i2 < _arr2.length; _i2++) {
+      const type = _arr2[_i2];
+      common.expectsError(() => {
         type({
           highWaterMark: invalidHwm
         });
       }, {
         type: TypeError,
         code: 'ERR_INVALID_OPT_VALUE',
-        message: "The value \"".concat(invalidHwm, "\" is invalid for option \"highWaterMark\"")
+        message: `The value "${invalidHwm}" is invalid for option "highWaterMark"`
       });
-    };
-
-    for (var _i2 = 0, _arr2 = [stream.Readable, stream.Writable]; _i2 < _arr2.length; _i2++) {
-      _loop2();
     }
-  };
-
-  for (var _i = 0, _arr = [true, false, '5', {}, -5, NaN]; _i < _arr.length; _i++) {
-    _loop();
   }
 }
 {
   // This test ensures that the push method's implementation
   // correctly handles the edge case where the highWaterMark and
   // the state.length are both zero
-  var _readable = stream.Readable({
+
+  const readable = stream.Readable({
     highWaterMark: 0
   });
-
-  for (var i = 0; i < 3; i++) {
-    var needMoreData = _readable.push();
-
+  for (let i = 0; i < 3; i++) {
+    const needMoreData = readable.push();
     assert.strictEqual(needMoreData, true);
   }
 }
@@ -70,28 +55,19 @@ var stream = require('../../');
   // This test ensures that the read(n) method's implementation
   // correctly handles the edge case where the highWaterMark, state.length
   // and n are all zero
-  var _readable2 = stream.Readable({
+
+  const readable = stream.Readable({
     highWaterMark: 0
   });
-
-  _readable2._read = common.mustCall();
-
-  _readable2.read(0);
+  readable._read = common.mustCall();
+  readable.read(0);
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -1,21 +1,5 @@
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38,44 +22,23 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var stream = require('../../');
-
-var MyWritable =
-/*#__PURE__*/
-function (_stream$Writable) {
-  _inherits(MyWritable, _stream$Writable);
-
-  function MyWritable(fn, options) {
-    var _this;
-
-    _classCallCheck(this, MyWritable);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(MyWritable).call(this, options));
-    _this.fn = fn;
-    return _this;
+const common = require('../common');
+const assert = require('assert/');
+const stream = require('../../');
+class MyWritable extends stream.Writable {
+  constructor(fn, options) {
+    super(options);
+    this.fn = fn;
   }
-
-  _createClass(MyWritable, [{
-    key: "_write",
-    value: function _write(chunk, encoding, callback) {
-      this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
-      callback();
-    }
-  }]);
-
-  return MyWritable;
-}(stream.Writable);
-
+  _write(chunk, encoding, callback) {
+    this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
+    callback();
+  }
+}
 (function defaultCondingIsUtf8() {
-  var m = new MyWritable(function (isBuffer, type, enc) {
+  const m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'utf8');
   }, {
     decodeStrings: false
@@ -83,9 +46,8 @@ function (_stream$Writable) {
   m.write('foo');
   m.end();
 })();
-
 (function changeDefaultEncodingToAscii() {
-  var m = new MyWritable(function (isBuffer, type, enc) {
+  const m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'ascii');
   }, {
     decodeStrings: false
@@ -94,9 +56,8 @@ function (_stream$Writable) {
   m.write('bar');
   m.end();
 })();
-
 common.expectsError(function changeDefaultEncodingToInvalidValue() {
-  var m = new MyWritable(function (isBuffer, type, enc) {}, {
+  const m = new MyWritable(function (isBuffer, type, enc) {}, {
     decodeStrings: false
   });
   m.setDefaultEncoding({});
@@ -107,9 +68,8 @@ common.expectsError(function changeDefaultEncodingToInvalidValue() {
   code: 'ERR_UNKNOWN_ENCODING',
   message: 'Unknown encoding: [object Object]'
 });
-
 (function checkVairableCaseEncoding() {
-  var m = new MyWritable(function (isBuffer, type, enc) {
+  const m = new MyWritable(function (isBuffer, type, enc) {
     assert.strictEqual(enc, 'ascii');
   }, {
     decodeStrings: false
@@ -118,21 +78,12 @@ common.expectsError(function changeDefaultEncodingToInvalidValue() {
   m.write('bar');
   m.end();
 })();
-
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

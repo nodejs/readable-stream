@@ -1,62 +1,42 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var stream = require('../../');
-
+const common = require('../common');
+const stream = require('../../');
 function test(throwCodeInbetween) {
   // Check that a pipe does not stall if .read() is called unexpectedly
   // (i.e. the stream is not resumed by the pipe).
-  var n = 1000;
-  var counter = n;
-  var rs = stream.Readable({
+
+  const n = 1000;
+  let counter = n;
+  const rs = stream.Readable({
     objectMode: true,
-    read: common.mustCallAtLeast(function () {
+    read: common.mustCallAtLeast(() => {
       if (--counter >= 0) rs.push({
-        counter: counter
+        counter
       });else rs.push(null);
     }, n)
   });
-  var ws = stream.Writable({
+  const ws = stream.Writable({
     objectMode: true,
-    write: common.mustCall(function (data, enc, cb) {
+    write: common.mustCall((data, enc, cb) => {
       setImmediate(cb);
     }, n)
   });
-  setImmediate(function () {
-    return throwCodeInbetween(rs, ws);
-  });
+  setImmediate(() => throwCodeInbetween(rs, ws));
   rs.pipe(ws);
 }
-
-test(function (rs) {
-  return rs.read();
-});
-test(function (rs) {
-  return rs.resume();
-});
-test(function () {
-  return 0;
-});
+test(rs => rs.read());
+test(rs => rs.resume());
+test(() => 0);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

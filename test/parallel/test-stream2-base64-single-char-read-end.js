@@ -22,25 +22,18 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
-
-var R = require('../../lib/_stream_readable');
-
-var W = require('../../lib/_stream_writable');
-
-var assert = require('assert/');
-
-var src = new R({
+const R = require('../../lib/_stream_readable');
+const W = require('../../lib/_stream_writable');
+const assert = require('assert/');
+const src = new R({
   encoding: 'base64'
 });
-var dst = new W();
-var hasRead = false;
-var accum = [];
-
+const dst = new W();
+let hasRead = false;
+const accum = [];
 src._read = function (n) {
   if (!hasRead) {
     hasRead = true;
@@ -50,34 +43,24 @@ src._read = function (n) {
     });
   }
 };
-
 dst._write = function (chunk, enc, cb) {
   accum.push(chunk);
   cb();
 };
-
 src.on('end', function () {
   assert.strictEqual(String(Buffer.concat(accum)), 'MQ==');
   clearTimeout(timeout);
 });
 src.pipe(dst);
-var timeout = setTimeout(function () {
+const timeout = setTimeout(function () {
   assert.fail('timed out waiting for _write');
 }, 100);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

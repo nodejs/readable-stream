@@ -1,21 +1,5 @@
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38,100 +22,55 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var Readable = require('../../lib/_stream_readable');
-
-var Writable = require('../../lib/_stream_writable');
-
-var TestReadable =
-/*#__PURE__*/
-function (_Readable) {
-  _inherits(TestReadable, _Readable);
-
-  function TestReadable(opt) {
-    var _this;
-
-    _classCallCheck(this, TestReadable);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TestReadable).call(this, opt));
-    _this._ended = false;
-    return _this;
+const common = require('../common');
+const assert = require('assert/');
+const Readable = require('../../lib/_stream_readable');
+const Writable = require('../../lib/_stream_writable');
+class TestReadable extends Readable {
+  constructor(opt) {
+    super(opt);
+    this._ended = false;
   }
-
-  _createClass(TestReadable, [{
-    key: "_read",
-    value: function _read() {
-      if (this._ended) this.emit('error', new Error('_read called twice'));
-      this._ended = true;
-      this.push(null);
-    }
-  }]);
-
-  return TestReadable;
-}(Readable);
-
-var TestWritable =
-/*#__PURE__*/
-function (_Writable) {
-  _inherits(TestWritable, _Writable);
-
-  function TestWritable(opt) {
-    var _this2;
-
-    _classCallCheck(this, TestWritable);
-
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TestWritable).call(this, opt));
-    _this2._written = [];
-    return _this2;
+  _read() {
+    if (this._ended) this.emit('error', new Error('_read called twice'));
+    this._ended = true;
+    this.push(null);
   }
+}
+class TestWritable extends Writable {
+  constructor(opt) {
+    super(opt);
+    this._written = [];
+  }
+  _write(chunk, encoding, cb) {
+    this._written.push(chunk);
+    cb();
+  }
+}
 
-  _createClass(TestWritable, [{
-    key: "_write",
-    value: function _write(chunk, encoding, cb) {
-      this._written.push(chunk);
+// this one should not emit 'end' until we read() from it later.
+const ender = new TestReadable();
 
-      cb();
-    }
-  }]);
-
-  return TestWritable;
-}(Writable); // this one should not emit 'end' until we read() from it later.
-
-
-var ender = new TestReadable(); // what happens when you pipe() a Readable that's already ended?
-
-var piper = new TestReadable(); // pushes EOF null, and length=0, so this will trigger 'end'
-
+// what happens when you pipe() a Readable that's already ended?
+const piper = new TestReadable();
+// pushes EOF null, and length=0, so this will trigger 'end'
 piper.read();
 setTimeout(common.mustCall(function () {
   ender.on('end', common.mustCall());
-  var c = ender.read();
+  const c = ender.read();
   assert.strictEqual(c, null);
-  var w = new TestWritable();
+  const w = new TestWritable();
   w.on('finish', common.mustCall());
   piper.pipe(w);
 }), 1);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

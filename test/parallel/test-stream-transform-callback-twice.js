@@ -1,17 +1,13 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Transform = _require.Transform;
-
-var stream = new Transform({
-  transform: function transform(chunk, enc, cb) {
+const common = require('../common');
+const _require = require('../../'),
+  Transform = _require.Transform;
+const stream = new Transform({
+  transform(chunk, enc, cb) {
     cb();
     cb();
   }
@@ -23,19 +19,11 @@ stream.on('error', common.expectsError({
 }));
 stream.write('foo');
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -1,19 +1,15 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-
 require('../common');
-
-var assert = require('assert/');
-
-var _require = require('../../'),
-    Readable = _require.Readable;
-
+const assert = require('assert/');
+const _require = require('../../'),
+  Readable = _require.Readable;
 {
-  var readable = new Readable({
+  const readable = new Readable({
     encoding: 'hex'
   });
   assert.strictEqual(readable._readableState.encoding, 'hex');
@@ -21,19 +17,11 @@ var _require = require('../../'),
   assert.strictEqual(readable._readableState.encoding, 'utf8');
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

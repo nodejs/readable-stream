@@ -1,26 +1,21 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable;
-
-var source = Readable({
-  read: function read() {}
+const common = require('../common');
+const assert = require('assert/');
+const _require = require('../../'),
+  Readable = _require.Readable,
+  Writable = _require.Writable;
+const source = Readable({
+  read: () => {}
 });
-var dest1 = Writable({
-  write: function write() {}
+const dest1 = Writable({
+  write: () => {}
 });
-var dest2 = Writable({
-  write: function write() {}
+const dest2 = Writable({
+  write: () => {}
 });
 source.pipe(dest1);
 source.pipe(dest2);
@@ -28,7 +23,9 @@ dest1.on('unpipe', common.mustCall());
 dest2.on('unpipe', common.mustCall());
 assert.strictEqual(source._readableState.pipes[0], dest1);
 assert.strictEqual(source._readableState.pipes[1], dest2);
-assert.strictEqual(source._readableState.pipes.length, 2); // Should be able to unpipe them in the reverse order that they were piped.
+assert.strictEqual(source._readableState.pipes.length, 2);
+
+// Should be able to unpipe them in the reverse order that they were piped.
 
 source.unpipe(dest2);
 assert.strictEqual(source._readableState.pipes, dest1);
@@ -39,65 +36,49 @@ source.unpipe(dest1);
 assert.strictEqual(source._readableState.pipes, null);
 {
   // test `cleanup()` if we unpipe all streams.
-  var _source = Readable({
-    read: function read() {}
+  const source = Readable({
+    read: () => {}
   });
-
-  var _dest = Writable({
-    write: function write() {}
+  const dest1 = Writable({
+    write: () => {}
   });
-
-  var _dest2 = Writable({
-    write: function write() {}
+  const dest2 = Writable({
+    write: () => {}
   });
-
-  var destCount = 0;
-  var srcCheckEventNames = ['end', 'data'];
-  var destCheckEventNames = ['close', 'finish', 'drain', 'error', 'unpipe'];
-  var checkSrcCleanup = common.mustCall(function () {
-    assert.strictEqual(_source._readableState.pipes, null);
-    assert.strictEqual(_source._readableState.pipesCount, 0);
-    assert.strictEqual(_source._readableState.flowing, false);
-    srcCheckEventNames.forEach(function (eventName) {
-      assert.strictEqual(_source.listenerCount(eventName), 0, "source's '".concat(eventName, "' event listeners not removed"));
+  let destCount = 0;
+  const srcCheckEventNames = ['end', 'data'];
+  const destCheckEventNames = ['close', 'finish', 'drain', 'error', 'unpipe'];
+  const checkSrcCleanup = common.mustCall(() => {
+    assert.strictEqual(source._readableState.pipes, null);
+    assert.strictEqual(source._readableState.pipesCount, 0);
+    assert.strictEqual(source._readableState.flowing, false);
+    srcCheckEventNames.forEach(eventName => {
+      assert.strictEqual(source.listenerCount(eventName), 0, `source's '${eventName}' event listeners not removed`);
     });
   });
-
   function checkDestCleanup(dest) {
-    var currentDestId = ++destCount;
-
-    _source.pipe(dest);
-
-    var unpipeChecker = common.mustCall(function () {
-      assert.deepStrictEqual(dest.listeners('unpipe'), [unpipeChecker], "destination{".concat(currentDestId, "} should have a 'unpipe' event ") + 'listener which is `unpipeChecker`');
+    const currentDestId = ++destCount;
+    source.pipe(dest);
+    const unpipeChecker = common.mustCall(() => {
+      assert.deepStrictEqual(dest.listeners('unpipe'), [unpipeChecker], `destination{${currentDestId}} should have a 'unpipe' event ` + 'listener which is `unpipeChecker`');
       dest.removeListener('unpipe', unpipeChecker);
-      destCheckEventNames.forEach(function (eventName) {
-        assert.strictEqual(dest.listenerCount(eventName), 0, "destination{".concat(currentDestId, "}'s '").concat(eventName, "' event ") + 'listeners not removed');
+      destCheckEventNames.forEach(eventName => {
+        assert.strictEqual(dest.listenerCount(eventName), 0, `destination{${currentDestId}}'s '${eventName}' event ` + 'listeners not removed');
       });
       if (--destCount === 0) checkSrcCleanup();
     });
     dest.on('unpipe', unpipeChecker);
   }
-
-  checkDestCleanup(_dest);
-  checkDestCleanup(_dest2);
-
-  _source.unpipe();
+  checkDestCleanup(dest1);
+  checkDestCleanup(dest2);
+  source.unpipe();
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

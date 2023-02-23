@@ -1,36 +1,23 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var Readable = require('../../').Readable;
-
-var _read = common.mustCall(function _read(n) {
+const common = require('../common');
+const Readable = require('../../').Readable;
+const _read = common.mustCall(function _read(n) {
   this.push(null);
 });
-
-var r = new Readable({
+const r = new Readable({
   read: _read
 });
 r.resume();
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

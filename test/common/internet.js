@@ -1,36 +1,26 @@
 "use strict";
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 /*<replacement>*/
 require('@babel/polyfill');
-
 var util = require('util');
-
-for (var i in util) {
-  exports[i] = util[i];
-}
-/*</replacement>*/
-
-/* eslint-disable node-core/required-modules */
-
-
+for (var i in util) exports[i] = util[i];
+/*</replacement>*/ /* eslint-disable node-core/required-modules */
 'use strict';
+
 /*<replacement>*/
-
-
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
-
-  for (var key in obj) {
-    keys.push(key);
-  }
-
+  for (var key in obj) keys.push(key);
   return keys;
 };
 /*</replacement>*/
+
 // Utilities for internet-related tests
 
-
-var addresses = {
+const addresses = {
   // A generic host that has registered common DNS records,
   // supports both IPv4 and IPv6, and provides basic HTTP/HTTPS services
   INET_HOST: 'nodejs.org',
@@ -68,38 +58,24 @@ var addresses = {
   // An accessible IPv4 DNS server
   DNS6_SERVER: '2001:4860:4860::8888'
 };
-var _iteratorNormalCompletion = true;
-var _didIteratorError = false;
-var _iteratorError = undefined;
-
+var _iterator = _createForOfIteratorHelper(objectKeys(addresses)),
+  _step;
 try {
-  for (var _iterator = objectKeys(addresses)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-    var key = _step.value;
-    var envName = "NODE_TEST_".concat(key);
-
+  for (_iterator.s(); !(_step = _iterator.n()).done;) {
+    const key = _step.value;
+    const envName = `NODE_TEST_${key}`;
     if (process.env[envName]) {
       addresses[key] = process.env[envName];
     }
   }
 } catch (err) {
-  _didIteratorError = true;
-  _iteratorError = err;
+  _iterator.e(err);
 } finally {
-  try {
-    if (!_iteratorNormalCompletion && _iterator.return != null) {
-      _iterator.return();
-    }
-  } finally {
-    if (_didIteratorError) {
-      throw _iteratorError;
-    }
-  }
+  _iterator.f();
 }
-
 module.exports = {
-  addresses: addresses
+  addresses
 };
-
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i);

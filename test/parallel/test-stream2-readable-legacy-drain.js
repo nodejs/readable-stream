@@ -22,65 +22,47 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var Stream = require('../../');
-
-var Readable = require('../../').Readable;
-
-var r = new Readable();
-var N = 256;
-var reads = 0;
-
+const common = require('../common');
+const assert = require('assert/');
+const Stream = require('../../');
+const Readable = require('../../').Readable;
+const r = new Readable();
+const N = 256;
+let reads = 0;
 r._read = function (n) {
   return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
 };
-
 r.on('end', common.mustCall());
-var w = new Stream();
+const w = new Stream();
 w.writable = true;
-var buffered = 0;
-
+let buffered = 0;
 w.write = function (c) {
   buffered += c.length;
   process.nextTick(drain);
   return false;
 };
-
 function drain() {
   assert(buffered <= 3);
   buffered = 0;
   w.emit('drain');
 }
+w.end = common.mustCall();
 
-w.end = common.mustCall(); // Just for kicks, let's mess with the drain count.
+// Just for kicks, let's mess with the drain count.
 // This verifies that even if it gets negative in the
 // pipe() cleanup function, we'll still function properly.
-
 r.on('readable', function () {
   w.emit('drain');
 });
 r.pipe(w);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

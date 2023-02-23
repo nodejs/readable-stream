@@ -22,47 +22,40 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+const common = require('../common');
+const assert = require('assert/');
 
-
-var common = require('../common');
-
-var assert = require('assert/'); // This test verifies that:
+// This test verifies that:
 // 1. unshift() does not cause colliding _read() calls.
 // 2. unshift() after the 'end' event is an error, but after the EOF
 //    signalling null, it is ok, and just creates a new readable chunk.
 // 3. push() after the EOF signaling null is an error.
 // 4. _read() is not called after pushing the EOF null chunk.
 
-
-var stream = require('../../');
-
-var hwm = 10;
-var r = stream.Readable({
+const stream = require('../../');
+const hwm = 10;
+const r = stream.Readable({
   highWaterMark: hwm
 });
-var chunks = 10;
-var data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
-
-for (var i = 0; i < data.length; i++) {
-  var c = 'asdf'.charCodeAt(i % 4);
+const chunks = 10;
+const data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
+for (let i = 0; i < data.length; i++) {
+  const c = 'asdf'.charCodeAt(i % 4);
   data[i] = c;
 }
-
-var pos = 0;
-var pushedNull = false;
-
+let pos = 0;
+let pushedNull = false;
 r._read = function (n) {
-  assert(!pushedNull, '_read after null push'); // every third chunk is fast
+  assert(!pushedNull, '_read after null push');
 
+  // every third chunk is fast
   push(!(chunks % 3));
-
   function push(fast) {
     assert(!pushedNull, 'push() after null push');
-    var c = pos >= data.length ? null : data.slice(pos, pos + n);
+    const c = pos >= data.length ? null : data.slice(pos, pos + n);
     pushedNull = c === null;
-
     if (fast) {
       pos += n;
       r.push(c);
@@ -76,7 +69,6 @@ r._read = function (n) {
     }
   }
 };
-
 function pushError() {
   common.expectsError(function () {
     r.push(bufferShim.allocUnsafe(1));
@@ -86,15 +78,12 @@ function pushError() {
     message: 'stream.push() after EOF'
   });
 }
-
-var w = stream.Writable();
-var written = [];
-
+const w = stream.Writable();
+const written = [];
 w._write = function (chunk, encoding, cb) {
   written.push(chunk.toString());
   cb();
 };
-
 r.on('end', common.mustCall(function () {
   common.expectsError(function () {
     r.unshift(bufferShim.allocUnsafe(1));
@@ -106,8 +95,7 @@ r.on('end', common.mustCall(function () {
   w.end();
 }));
 r.on('readable', function () {
-  var chunk;
-
+  let chunk;
   while (null !== (chunk = r.read(10))) {
     w.write(chunk);
     if (chunk.length > 4) r.unshift(bufferShim.from('1234'));
@@ -118,31 +106,24 @@ w.on('finish', common.mustCall(function () {
   // The first got pulled out before the first unshift('1234'), so it's
   // lacking that piece.
   assert.strictEqual(written[0], 'asdfasdfas');
-  var asdf = 'd';
-  console.error("0: ".concat(written[0]));
-
-  for (var _i = 1; _i < written.length; _i++) {
-    console.error("".concat(_i.toString(32), ": ").concat(written[_i]));
-    assert.strictEqual(written[_i].slice(0, 4), '1234');
-
-    for (var j = 4; j < written[_i].length; j++) {
-      var _c = written[_i].charAt(j);
-
-      assert.strictEqual(_c, asdf);
-
+  let asdf = 'd';
+  console.error(`0: ${written[0]}`);
+  for (let i = 1; i < written.length; i++) {
+    console.error(`${i.toString(32)}: ${written[i]}`);
+    assert.strictEqual(written[i].slice(0, 4), '1234');
+    for (let j = 4; j < written[i].length; j++) {
+      const c = written[i].charAt(j);
+      assert.strictEqual(c, asdf);
       switch (asdf) {
         case 'a':
           asdf = 's';
           break;
-
         case 's':
           asdf = 'd';
           break;
-
         case 'd':
           asdf = 'f';
           break;
-
         case 'f':
           asdf = 'a';
           break;
@@ -152,23 +133,14 @@ w.on('finish', common.mustCall(function () {
 }));
 process.on('exit', function () {
   assert.strictEqual(written.length, 18);
-
   require('tap').pass();
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

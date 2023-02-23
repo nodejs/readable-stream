@@ -1,87 +1,69 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Readable = _require.Readable,
-    PassThrough = _require.PassThrough;
-
+const common = require('../common');
+const _require = require('../../'),
+  Readable = _require.Readable,
+  PassThrough = _require.PassThrough;
 function test(r) {
-  var wrapper = new Readable({
-    read: function read() {
-      var data = r.read();
-
+  const wrapper = new Readable({
+    read: () => {
+      let data = r.read();
       if (data) {
         wrapper.push(data);
         return;
       }
-
       r.once('readable', function () {
         data = r.read();
-
         if (data) {
           wrapper.push(data);
-        } // else the end event should fire
-
+        }
+        // else the end event should fire
       });
     }
   });
+
   r.once('end', function () {
     wrapper.push(null);
   });
   wrapper.resume();
   wrapper.once('end', common.mustCall());
 }
-
 {
-  var source = new Readable({
-    read: function read() {}
+  const source = new Readable({
+    read: () => {}
   });
   source.push('foo');
   source.push('bar');
   source.push(null);
-  var pt = source.pipe(new PassThrough());
+  const pt = source.pipe(new PassThrough());
   test(pt);
 }
 {
   // This is the underlying cause of the above test case.
-  var pushChunks = ['foo', 'bar'];
-  var r = new Readable({
-    read: function read() {
-      var chunk = pushChunks.shift();
-
+  const pushChunks = ['foo', 'bar'];
+  const r = new Readable({
+    read: () => {
+      const chunk = pushChunks.shift();
       if (chunk) {
         // synchronous call
         r.push(chunk);
       } else {
         // asynchronous call
-        process.nextTick(function () {
-          return r.push(null);
-        });
+        process.nextTick(() => r.push(null));
       }
     }
   });
   test(r);
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

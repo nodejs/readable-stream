@@ -22,43 +22,34 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
+const assert = require('assert/');
+const stream = require('../../');
+const readable = new stream.Readable();
 
-var assert = require('assert/');
+// _read is a noop, here.
+readable._read = Function();
 
-var stream = require('../../');
+// default state of a stream is not "paused"
+assert.ok(!readable.isPaused());
 
-var readable = new stream.Readable(); // _read is a noop, here.
+// make the stream start flowing...
+readable.on('data', Function());
 
-readable._read = Function(); // default state of a stream is not "paused"
-
-assert.ok(!readable.isPaused()); // make the stream start flowing...
-
-readable.on('data', Function()); // still not paused.
-
+// still not paused.
 assert.ok(!readable.isPaused());
 readable.pause();
 assert.ok(readable.isPaused());
 readable.resume();
 assert.ok(!readable.isPaused());
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

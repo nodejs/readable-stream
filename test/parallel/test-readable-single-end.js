@@ -1,37 +1,28 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
+const common = require('../common');
+const _require = require('../../'),
+  Readable = _require.Readable;
 
-var common = require('../common');
-
-var _require = require('../../'),
-    Readable = _require.Readable; // This test ensures that there will not be an additional empty 'readable'
+// This test ensures that there will not be an additional empty 'readable'
 // event when stream has ended (only 1 event signalling about end)
 
-
-var r = new Readable({
-  read: function read() {}
+const r = new Readable({
+  read: () => {}
 });
 r.push(null);
 r.on('readable', common.mustCall());
 r.on('end', common.mustCall());
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -22,25 +22,21 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+const common = require('../common');
+const Readable = require('../../').Readable;
 
-
-var common = require('../common');
-
-var Readable = require('../../').Readable; // This tests synchronous read callbacks and verifies that even if they nest
+// This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error
 
-
-var r = new Readable();
-var N = 256 * 1024;
-var reads = 0;
-
+const r = new Readable();
+const N = 256 * 1024;
+let reads = 0;
 r._read = function (n) {
-  var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
+  const chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
   r.push(chunk);
 };
-
 r.on('readable', function onReadable() {
   if (!(r.readableLength % 256)) console.error('readable', r.readableLength);
   r.read(N * 2);
@@ -48,19 +44,11 @@ r.on('readable', function onReadable() {
 r.on('end', common.mustCall());
 r.read(0);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -22,114 +22,103 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
-
-var assert = require('assert/');
-
-var fromList = require('../../lib/_stream_readable')._fromList;
-
-var BufferList = require('../../lib/internal/streams/buffer_list');
-
-var util = require('util');
-
+const assert = require('assert/');
+const fromList = require('../../lib/_stream_readable')._fromList;
+const BufferList = require('../../lib/internal/streams/buffer_list');
+const util = require('util');
 function bufferListFromArray(arr) {
-  var bl = new BufferList();
-
-  for (var i = 0; i < arr.length; ++i) {
-    bl.push(arr[i]);
-  }
-
+  const bl = new BufferList();
+  for (let i = 0; i < arr.length; ++i) bl.push(arr[i]);
   return bl;
 }
-
 {
   // Verify behavior with buffers
-  var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
+  let list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
   list = bufferListFromArray(list);
   assert.strictEqual(util.inspect([list], {
     compact: false
-  }).indexOf('BufferList') > 0, true); // read more than the first element.
+  }).indexOf('BufferList') > 0, true);
 
-  var ret = fromList(6, {
+  // read more than the first element.
+  let ret = fromList(6, {
     buffer: list,
     length: 16
   });
-  assert.strictEqual(ret.toString(), 'foogba'); // read exactly the first element.
+  assert.strictEqual(ret.toString(), 'foogba');
 
+  // read exactly the first element.
   ret = fromList(2, {
     buffer: list,
     length: 10
   });
-  assert.strictEqual(ret.toString(), 'rk'); // read less than the first element.
+  assert.strictEqual(ret.toString(), 'rk');
 
+  // read less than the first element.
   ret = fromList(2, {
     buffer: list,
     length: 8
   });
-  assert.strictEqual(ret.toString(), 'ba'); // read more than we have.
+  assert.strictEqual(ret.toString(), 'ba');
 
+  // read more than we have.
   ret = fromList(100, {
     buffer: list,
     length: 6
   });
-  assert.strictEqual(ret.toString(), 'zykuel'); // all consumed.
+  assert.strictEqual(ret.toString(), 'zykuel');
 
+  // all consumed.
   assert.deepStrictEqual(list, new BufferList());
 }
 {
   // Verify behavior with strings
-  var _list2 = ['foog', 'bark', 'bazy', 'kuel'];
-  _list2 = bufferListFromArray(_list2); // read more than the first element.
+  let list = ['foog', 'bark', 'bazy', 'kuel'];
+  list = bufferListFromArray(list);
 
-  var _ret = fromList(6, {
-    buffer: _list2,
+  // read more than the first element.
+  let ret = fromList(6, {
+    buffer: list,
     length: 16,
     decoder: true
   });
+  assert.strictEqual(ret, 'foogba');
 
-  assert.strictEqual(_ret, 'foogba'); // read exactly the first element.
-
-  _ret = fromList(2, {
-    buffer: _list2,
+  // read exactly the first element.
+  ret = fromList(2, {
+    buffer: list,
     length: 10,
     decoder: true
   });
-  assert.strictEqual(_ret, 'rk'); // read less than the first element.
+  assert.strictEqual(ret, 'rk');
 
-  _ret = fromList(2, {
-    buffer: _list2,
+  // read less than the first element.
+  ret = fromList(2, {
+    buffer: list,
     length: 8,
     decoder: true
   });
-  assert.strictEqual(_ret, 'ba'); // read more than we have.
+  assert.strictEqual(ret, 'ba');
 
-  _ret = fromList(100, {
-    buffer: _list2,
+  // read more than we have.
+  ret = fromList(100, {
+    buffer: list,
     length: 6,
     decoder: true
   });
-  assert.strictEqual(_ret, 'zykuel'); // all consumed.
+  assert.strictEqual(ret, 'zykuel');
 
-  assert.deepStrictEqual(_list2, new BufferList());
+  // all consumed.
+  assert.deepStrictEqual(list, new BufferList());
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

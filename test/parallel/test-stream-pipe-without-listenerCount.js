@@ -1,17 +1,13 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var stream = require('../../');
-
-var r = new stream.Stream();
+const common = require('../common');
+const stream = require('../../');
+const r = new stream.Stream();
 r.listenerCount = undefined;
-var w = new stream.Stream();
+const w = new stream.Stream();
 w.listenerCount = undefined;
 w.on('pipe', function () {
   r.emit('error', new Error('Readable Error'));
@@ -21,19 +17,11 @@ r.on('error', common.mustCall());
 w.on('error', common.mustCall());
 r.pipe(w);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

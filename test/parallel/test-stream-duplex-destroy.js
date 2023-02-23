@@ -1,23 +1,19 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Duplex = _require.Duplex;
-
-var assert = require('assert/');
-
+const common = require('../common');
+const _require = require('../../'),
+  Duplex = _require.Duplex;
+const assert = require('assert/');
 {
-  var duplex = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
   duplex.resume();
   duplex.on('end', common.mustNotCall());
@@ -27,202 +23,151 @@ var assert = require('assert/');
   assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
-
-  _duplex.resume();
-
-  var expected = new Error('kaboom');
-
-  _duplex.on('end', common.mustNotCall());
-
-  _duplex.on('finish', common.mustNotCall());
-
-  _duplex.on('error', common.mustCall(function (err) {
+  duplex.resume();
+  const expected = new Error('kaboom');
+  duplex.on('end', common.mustNotCall());
+  duplex.on('finish', common.mustNotCall());
+  duplex.on('error', common.mustCall(err => {
     assert.strictEqual(err, expected);
   }));
-
-  _duplex.destroy(expected);
-
-  assert.strictEqual(_duplex.destroyed, true);
+  duplex.destroy(expected);
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex2 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
-
-  _duplex2._destroy = common.mustCall(function (err, cb) {
-    assert.strictEqual(err, _expected);
+  duplex._destroy = common.mustCall(function (err, cb) {
+    assert.strictEqual(err, expected);
     cb(err);
   });
-
-  var _expected = new Error('kaboom');
-
-  _duplex2.on('finish', common.mustNotCall('no finish event'));
-
-  _duplex2.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected);
+  const expected = new Error('kaboom');
+  duplex.on('finish', common.mustNotCall('no finish event'));
+  duplex.on('error', common.mustCall(err => {
+    assert.strictEqual(err, expected);
   }));
-
-  _duplex2.destroy(_expected);
-
-  assert.strictEqual(_duplex2.destroyed, true);
+  duplex.destroy(expected);
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _expected2 = new Error('kaboom');
-
-  var _duplex3 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const expected = new Error('kaboom');
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {},
+    read() {},
     destroy: common.mustCall(function (err, cb) {
-      assert.strictEqual(err, _expected2);
+      assert.strictEqual(err, expected);
       cb();
     })
   });
+  duplex.resume();
+  duplex.on('end', common.mustNotCall('no end event'));
+  duplex.on('finish', common.mustNotCall('no finish event'));
 
-  _duplex3.resume();
-
-  _duplex3.on('end', common.mustNotCall('no end event'));
-
-  _duplex3.on('finish', common.mustNotCall('no finish event')); // error is swallowed by the custom _destroy
-
-
-  _duplex3.on('error', common.mustNotCall('no error event'));
-
-  _duplex3.on('close', common.mustCall());
-
-  _duplex3.destroy(_expected2);
-
-  assert.strictEqual(_duplex3.destroyed, true);
+  // error is swallowed by the custom _destroy
+  duplex.on('error', common.mustNotCall('no error event'));
+  duplex.on('close', common.mustCall());
+  duplex.destroy(expected);
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex4 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
-
-  _duplex4._destroy = common.mustCall(function (err, cb) {
+  duplex._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
     cb();
   });
-
-  _duplex4.destroy();
-
-  assert.strictEqual(_duplex4.destroyed, true);
+  duplex.destroy();
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex5 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
-
-  _duplex5.resume();
-
-  _duplex5._destroy = common.mustCall(function (err, cb) {
-    var _this = this;
-
+  duplex.resume();
+  duplex._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
-    process.nextTick(function () {
-      _this.push(null);
-
-      _this.end();
-
+    process.nextTick(() => {
+      this.push(null);
+      this.end();
       cb();
     });
   });
-  var fail = common.mustNotCall('no finish or end event');
-
-  _duplex5.on('finish', fail);
-
-  _duplex5.on('end', fail);
-
-  _duplex5.destroy();
-
-  _duplex5.removeListener('end', fail);
-
-  _duplex5.removeListener('finish', fail);
-
-  _duplex5.on('end', common.mustCall());
-
-  _duplex5.on('finish', common.mustCall());
-
-  assert.strictEqual(_duplex5.destroyed, true);
+  const fail = common.mustNotCall('no finish or end event');
+  duplex.on('finish', fail);
+  duplex.on('end', fail);
+  duplex.destroy();
+  duplex.removeListener('end', fail);
+  duplex.removeListener('finish', fail);
+  duplex.on('end', common.mustCall());
+  duplex.on('finish', common.mustCall());
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex6 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
-
-  var _expected3 = new Error('kaboom');
-
-  _duplex6._destroy = common.mustCall(function (err, cb) {
+  const expected = new Error('kaboom');
+  duplex._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
-    cb(_expected3);
+    cb(expected);
   });
-
-  _duplex6.on('finish', common.mustNotCall('no finish event'));
-
-  _duplex6.on('end', common.mustNotCall('no end event'));
-
-  _duplex6.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected3);
+  duplex.on('finish', common.mustNotCall('no finish event'));
+  duplex.on('end', common.mustNotCall('no end event'));
+  duplex.on('error', common.mustCall(err => {
+    assert.strictEqual(err, expected);
   }));
-
-  _duplex6.destroy();
-
-  assert.strictEqual(_duplex6.destroyed, true);
+  duplex.destroy();
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex7 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {},
+    read() {},
     allowHalfOpen: true
   });
-
-  _duplex7.resume();
-
-  _duplex7.on('finish', common.mustNotCall());
-
-  _duplex7.on('end', common.mustNotCall());
-
-  _duplex7.destroy();
-
-  assert.strictEqual(_duplex7.destroyed, true);
+  duplex.resume();
+  duplex.on('finish', common.mustNotCall());
+  duplex.on('end', common.mustNotCall());
+  duplex.destroy();
+  assert.strictEqual(duplex.destroyed, true);
 }
 {
-  var _duplex8 = new Duplex({
-    write: function write(chunk, enc, cb) {
+  const duplex = new Duplex({
+    write(chunk, enc, cb) {
       cb();
     },
-    read: function read() {}
+    read() {}
   });
+  duplex.destroyed = true;
+  assert.strictEqual(duplex.destroyed, true);
 
-  _duplex8.destroyed = true;
-  assert.strictEqual(_duplex8.destroyed, true); // the internal destroy() mechanism should not be triggered
-
-  _duplex8.on('finish', common.mustNotCall());
-
-  _duplex8.on('end', common.mustNotCall());
-
-  _duplex8.destroy();
+  // the internal destroy() mechanism should not be triggered
+  duplex.on('finish', common.mustNotCall());
+  duplex.on('end', common.mustNotCall());
+  duplex.destroy();
 }
 {
   function MyDuplex() {
@@ -230,25 +175,16 @@ var assert = require('assert/');
     this.destroyed = false;
     Duplex.call(this);
   }
-
   Object.setPrototypeOf(MyDuplex.prototype, Duplex.prototype);
   Object.setPrototypeOf(MyDuplex, Duplex);
   new MyDuplex();
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -1,20 +1,16 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Readable = _require.Readable;
-
-var assert = require('assert/');
-
+const common = require('../common');
+const _require = require('../../'),
+  Readable = _require.Readable;
+const assert = require('assert/');
 {
-  var read = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
   read.resume();
   read.on('close', common.mustCall());
@@ -22,152 +18,111 @@ var assert = require('assert/');
   assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read.resume();
-
-  var expected = new Error('kaboom');
-
-  _read.on('end', common.mustNotCall('no end event'));
-
-  _read.on('close', common.mustCall());
-
-  _read.on('error', common.mustCall(function (err) {
+  read.resume();
+  const expected = new Error('kaboom');
+  read.on('end', common.mustNotCall('no end event'));
+  read.on('close', common.mustCall());
+  read.on('error', common.mustCall(err => {
     assert.strictEqual(err, expected);
   }));
-
-  _read.destroy(expected);
-
-  assert.strictEqual(_read.destroyed, true);
+  read.destroy(expected);
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read2 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read2._destroy = common.mustCall(function (err, cb) {
-    assert.strictEqual(err, _expected);
+  read._destroy = common.mustCall(function (err, cb) {
+    assert.strictEqual(err, expected);
     cb(err);
   });
-
-  var _expected = new Error('kaboom');
-
-  _read2.on('end', common.mustNotCall('no end event'));
-
-  _read2.on('close', common.mustCall());
-
-  _read2.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected);
+  const expected = new Error('kaboom');
+  read.on('end', common.mustNotCall('no end event'));
+  read.on('close', common.mustCall());
+  read.on('error', common.mustCall(err => {
+    assert.strictEqual(err, expected);
   }));
-
-  _read2.destroy(_expected);
-
-  assert.strictEqual(_read2.destroyed, true);
+  read.destroy(expected);
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read3 = new Readable({
-    read: function read() {},
+  const read = new Readable({
+    read() {},
     destroy: common.mustCall(function (err, cb) {
-      assert.strictEqual(err, _expected2);
+      assert.strictEqual(err, expected);
       cb();
     })
   });
+  const expected = new Error('kaboom');
+  read.on('end', common.mustNotCall('no end event'));
 
-  var _expected2 = new Error('kaboom');
-
-  _read3.on('end', common.mustNotCall('no end event')); // error is swallowed by the custom _destroy
-
-
-  _read3.on('error', common.mustNotCall('no error event'));
-
-  _read3.on('close', common.mustCall());
-
-  _read3.destroy(_expected2);
-
-  assert.strictEqual(_read3.destroyed, true);
+  // error is swallowed by the custom _destroy
+  read.on('error', common.mustNotCall('no error event'));
+  read.on('close', common.mustCall());
+  read.destroy(expected);
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read4 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read4._destroy = common.mustCall(function (err, cb) {
+  read._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
     cb();
   });
-
-  _read4.destroy();
-
-  assert.strictEqual(_read4.destroyed, true);
+  read.destroy();
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read5 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read5.resume();
-
-  _read5._destroy = common.mustCall(function (err, cb) {
-    var _this = this;
-
+  read.resume();
+  read._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
-    process.nextTick(function () {
-      _this.push(null);
-
+    process.nextTick(() => {
+      this.push(null);
       cb();
     });
   });
-  var fail = common.mustNotCall('no end event');
-
-  _read5.on('end', fail);
-
-  _read5.on('close', common.mustCall());
-
-  _read5.destroy();
-
-  _read5.removeListener('end', fail);
-
-  _read5.on('end', common.mustCall());
-
-  assert.strictEqual(_read5.destroyed, true);
+  const fail = common.mustNotCall('no end event');
+  read.on('end', fail);
+  read.on('close', common.mustCall());
+  read.destroy();
+  read.removeListener('end', fail);
+  read.on('end', common.mustCall());
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read6 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  var _expected3 = new Error('kaboom');
-
-  _read6._destroy = common.mustCall(function (err, cb) {
+  const expected = new Error('kaboom');
+  read._destroy = common.mustCall(function (err, cb) {
     assert.strictEqual(err, null);
-    cb(_expected3);
+    cb(expected);
   });
-
-  _read6.on('end', common.mustNotCall('no end event'));
-
-  _read6.on('error', common.mustCall(function (err) {
-    assert.strictEqual(err, _expected3);
+  read.on('end', common.mustNotCall('no end event'));
+  read.on('error', common.mustCall(err => {
+    assert.strictEqual(err, expected);
   }));
-
-  _read6.destroy();
-
-  assert.strictEqual(_read6.destroyed, true);
+  read.destroy();
+  assert.strictEqual(read.destroyed, true);
 }
 {
-  var _read7 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
+  read.resume();
+  read.destroyed = true;
+  assert.strictEqual(read.destroyed, true);
 
-  _read7.resume();
-
-  _read7.destroyed = true;
-  assert.strictEqual(_read7.destroyed, true); // the internal destroy() mechanism should not be triggered
-
-  _read7.on('end', common.mustNotCall());
-
-  _read7.destroy();
+  // the internal destroy() mechanism should not be triggered
+  read.on('end', common.mustNotCall());
+  read.destroy();
 }
 {
   function MyReadable() {
@@ -175,52 +130,36 @@ var assert = require('assert/');
     this.destroyed = false;
     Readable.call(this);
   }
-
   Object.setPrototypeOf(MyReadable.prototype, Readable.prototype);
   Object.setPrototypeOf(MyReadable, Readable);
   new MyReadable();
 }
 {
   // destroy and destroy callback
-  var _read8 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read8.resume();
-
-  var _expected4 = new Error('kaboom');
-
-  _read8.on('close', common.mustCall());
-
-  _read8.destroy(_expected4, common.mustCall(function (err) {
-    assert.strictEqual(err, _expected4);
+  read.resume();
+  const expected = new Error('kaboom');
+  read.on('close', common.mustCall());
+  read.destroy(expected, common.mustCall(function (err) {
+    assert.strictEqual(err, expected);
   }));
 }
 {
-  var _read9 = new Readable({
-    read: function read() {}
+  const read = new Readable({
+    read() {}
   });
-
-  _read9.destroy();
-
-  _read9.push('hi');
-
-  _read9.on('data', common.mustNotCall());
+  read.destroy();
+  read.push('hi');
+  read.on('data', common.mustNotCall());
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

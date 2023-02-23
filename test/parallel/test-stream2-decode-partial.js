@@ -1,21 +1,16 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
-
-var Readable = require('../../lib/_stream_readable');
-
-var assert = require('assert/');
-
-var buf = '';
-var euro = bufferShim.from([0xE2, 0x82, 0xAC]);
-var cent = bufferShim.from([0xC2, 0xA2]);
-var source = Buffer.concat([euro, cent]);
-var readable = Readable({
+const Readable = require('../../lib/_stream_readable');
+const assert = require('assert/');
+let buf = '';
+const euro = bufferShim.from([0xE2, 0x82, 0xAC]);
+const cent = bufferShim.from([0xC2, 0xA2]);
+const source = Buffer.concat([euro, cent]);
+const readable = Readable({
   encoding: 'utf8'
 });
 readable.push(source.slice(0, 2));
@@ -30,19 +25,11 @@ process.on('exit', function () {
   assert.strictEqual(buf, '€¢');
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -22,26 +22,21 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+const common = require('../common');
+const assert = require('assert/');
 
+// Make sure we don't miss the end event for paused 0-length streams
 
-var common = require('../common');
-
-var assert = require('assert/'); // Make sure we don't miss the end event for paused 0-length streams
-
-
-var Readable = require('../../').Readable;
-
-var stream = new Readable();
-var calledRead = false;
-
+const Readable = require('../../').Readable;
+const stream = new Readable();
+let calledRead = false;
 stream._read = function () {
   assert(!calledRead);
   calledRead = true;
   this.push(null);
 };
-
 stream.on('data', function () {
   throw new Error('should not ever get data');
 });
@@ -54,19 +49,11 @@ process.on('exit', function () {
   assert(calledRead);
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

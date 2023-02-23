@@ -1,38 +1,35 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
+const common = require('../common');
+const assert = require('assert/');
+const Readable = require('../../').Readable;
+const readable = new Readable({
+  read: () => {}
+});
 
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var Readable = require('../../').Readable;
-
-var readable = new Readable({
-  read: function read() {}
-}); // Initialized to false.
-
+// Initialized to false.
 assert.strictEqual(readable._readableState.needReadable, false);
-readable.on('readable', common.mustCall(function () {
+readable.on('readable', common.mustCall(() => {
   // When the readable event fires, needReadable is reset.
   assert.strictEqual(readable._readableState.needReadable, false);
   readable.read();
-})); // If a readable listener is attached, then a readable event is needed.
+}));
 
+// If a readable listener is attached, then a readable event is needed.
 assert.strictEqual(readable._readableState.needReadable, true);
 readable.push('foo');
 readable.push(null);
-readable.on('end', common.mustCall(function () {
+readable.on('end', common.mustCall(() => {
   // No need to emit readable anymore when the stream ends.
   assert.strictEqual(readable._readableState.needReadable, false);
 }));
-var asyncReadable = new Readable({
-  read: function read() {}
+const asyncReadable = new Readable({
+  read: () => {}
 });
-asyncReadable.on('readable', common.mustCall(function () {
+asyncReadable.on('readable', common.mustCall(() => {
   if (asyncReadable.read() !== null) {
     // After each read(), the buffer is empty.
     // If the stream doesn't end now,
@@ -40,35 +37,37 @@ asyncReadable.on('readable', common.mustCall(function () {
     assert.strictEqual(asyncReadable._readableState.needReadable, true);
   }
 }, 2));
-process.nextTick(common.mustCall(function () {
+process.nextTick(common.mustCall(() => {
   asyncReadable.push('foooo');
 }));
-process.nextTick(common.mustCall(function () {
+process.nextTick(common.mustCall(() => {
   asyncReadable.push('bar');
 }));
-setImmediate(common.mustCall(function () {
+setImmediate(common.mustCall(() => {
   asyncReadable.push(null);
   assert.strictEqual(asyncReadable._readableState.needReadable, false);
 }));
-var flowing = new Readable({
-  read: function read() {}
-}); // Notice this must be above the on('data') call.
+const flowing = new Readable({
+  read: () => {}
+});
 
+// Notice this must be above the on('data') call.
 flowing.push('foooo');
 flowing.push('bar');
 flowing.push('quo');
-process.nextTick(common.mustCall(function () {
+process.nextTick(common.mustCall(() => {
   flowing.push(null);
-})); // When the buffer already has enough data, and the stream is
-// in flowing mode, there is no need for the readable event.
+}));
 
+// When the buffer already has enough data, and the stream is
+// in flowing mode, there is no need for the readable event.
 flowing.on('data', common.mustCall(function (data) {
   assert.strictEqual(flowing._readableState.needReadable, false);
 }, 3));
-var slowProducer = new Readable({
-  read: function read() {}
+const slowProducer = new Readable({
+  read: () => {}
 });
-slowProducer.on('readable', common.mustCall(function () {
+slowProducer.on('readable', common.mustCall(() => {
   if (slowProducer.read(8) === null) {
     // The buffer doesn't have enough data, and the stream is not need,
     // we need to notify the reader when data arrives.
@@ -77,32 +76,24 @@ slowProducer.on('readable', common.mustCall(function () {
     assert.strictEqual(slowProducer._readableState.needReadable, false);
   }
 }, 4));
-process.nextTick(common.mustCall(function () {
+process.nextTick(common.mustCall(() => {
   slowProducer.push('foo');
-  process.nextTick(common.mustCall(function () {
+  process.nextTick(common.mustCall(() => {
     slowProducer.push('foo');
-    process.nextTick(common.mustCall(function () {
+    process.nextTick(common.mustCall(() => {
       slowProducer.push('foo');
-      process.nextTick(common.mustCall(function () {
+      process.nextTick(common.mustCall(() => {
         slowProducer.push(null);
       }));
     }));
   }));
 }));
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

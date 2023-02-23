@@ -1,42 +1,28 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var stream = require('../../');
-
-var writable = new stream.Writable();
-
-writable._write = function (chunk, encoding, cb) {
+const common = require('../common');
+const assert = require('assert/');
+const stream = require('../../');
+const writable = new stream.Writable();
+writable._write = (chunk, encoding, cb) => {
   assert.strictEqual(writable._writableState.ended, false);
   cb();
 };
-
 assert.strictEqual(writable._writableState.ended, false);
-writable.end('testing ended state', common.mustCall(function () {
+writable.end('testing ended state', common.mustCall(() => {
   assert.strictEqual(writable._writableState.ended, true);
 }));
 assert.strictEqual(writable._writableState.ended, true);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

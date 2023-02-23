@@ -22,55 +22,37 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
-
-var stream = require('../../');
-
-var assert = require('assert/');
-
+const stream = require('../../');
+const assert = require('assert/');
 function Writable() {
   this.writable = true;
-
   require('stream').Stream.call(this);
 }
-
 Object.setPrototypeOf(Writable.prototype, require('stream').Stream.prototype);
 Object.setPrototypeOf(Writable, require('stream').Stream);
-
 function Readable() {
   this.readable = true;
-
   require('stream').Stream.call(this);
 }
-
 Object.setPrototypeOf(Readable.prototype, require('stream').Stream.prototype);
 Object.setPrototypeOf(Readable, require('stream').Stream);
-var passed = false;
-var w = new Writable();
+let passed = false;
+const w = new Writable();
 w.on('pipe', function (src) {
   passed = true;
 });
-var r = new Readable();
+const r = new Readable();
 r.pipe(w);
 assert.ok(passed);
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

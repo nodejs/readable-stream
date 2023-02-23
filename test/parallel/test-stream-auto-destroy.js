@@ -1,99 +1,80 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var stream = require('../../');
-
-var assert = require('assert/');
-
+const common = require('../common');
+const stream = require('../../');
+const assert = require('assert/');
 {
-  var r = new stream.Readable({
+  const r = new stream.Readable({
     autoDestroy: true,
-    read: function read() {
+    read() {
       this.push('hello');
       this.push('world');
       this.push(null);
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
-    })
+    destroy: common.mustCall((err, cb) => cb())
   });
-  var ended = false;
+  let ended = false;
   r.resume();
-  r.on('end', common.mustCall(function () {
+  r.on('end', common.mustCall(() => {
     ended = true;
   }));
-  r.on('close', common.mustCall(function () {
+  r.on('close', common.mustCall(() => {
     assert(ended);
   }));
 }
 {
-  var w = new stream.Writable({
+  const w = new stream.Writable({
     autoDestroy: true,
-    write: function write(data, enc, cb) {
+    write(data, enc, cb) {
       cb(null);
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
-    })
+    destroy: common.mustCall((err, cb) => cb())
   });
-  var finished = false;
+  let finished = false;
   w.write('hello');
   w.write('world');
   w.end();
-  w.on('finish', common.mustCall(function () {
+  w.on('finish', common.mustCall(() => {
     finished = true;
   }));
-  w.on('close', common.mustCall(function () {
+  w.on('close', common.mustCall(() => {
     assert(finished);
   }));
 }
 {
-  var t = new stream.Transform({
+  const t = new stream.Transform({
     autoDestroy: true,
-    transform: function transform(data, enc, cb) {
+    transform(data, enc, cb) {
       cb(null, data);
     },
-    destroy: common.mustCall(function (err, cb) {
-      return cb();
-    })
+    destroy: common.mustCall((err, cb) => cb())
   });
-  var _ended = false;
-  var _finished = false;
+  let ended = false;
+  let finished = false;
   t.write('hello');
   t.write('world');
   t.end();
   t.resume();
-  t.on('end', common.mustCall(function () {
-    _ended = true;
+  t.on('end', common.mustCall(() => {
+    ended = true;
   }));
-  t.on('finish', common.mustCall(function () {
-    _finished = true;
+  t.on('finish', common.mustCall(() => {
+    finished = true;
   }));
-  t.on('close', common.mustCall(function () {
-    assert(_ended);
-    assert(_finished);
+  t.on('close', common.mustCall(() => {
+    assert(ended);
+    assert(finished);
   }));
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

@@ -1,19 +1,15 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Writable = _require.Writable;
-
+const common = require('../common');
+const _require = require('../../'),
+  Writable = _require.Writable;
 {
   // Sync + Sync
-  var writable = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
       cb();
       common.expectsError(cb, {
         code: 'ERR_MULTIPLE_CALLBACK',
@@ -25,10 +21,10 @@ var _require = require('../../'),
 }
 {
   // Sync + Async
-  var _writable = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
       cb();
-      process.nextTick(function () {
+      process.nextTick(() => {
         common.expectsError(cb, {
           code: 'ERR_MULTIPLE_CALLBACK',
           type: Error
@@ -36,15 +32,14 @@ var _require = require('../../'),
       });
     })
   });
-
-  _writable.write('hi');
+  writable.write('hi');
 }
 {
   // Async + Async
-  var _writable2 = new Writable({
-    write: common.mustCall(function (buf, enc, cb) {
+  const writable = new Writable({
+    write: common.mustCall((buf, enc, cb) => {
       process.nextTick(cb);
-      process.nextTick(function () {
+      process.nextTick(() => {
         common.expectsError(cb, {
           code: 'ERR_MULTIPLE_CALLBACK',
           type: Error
@@ -52,23 +47,14 @@ var _require = require('../../'),
       });
     })
   });
-
-  _writable2.write('hi');
+  writable.write('hi');
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

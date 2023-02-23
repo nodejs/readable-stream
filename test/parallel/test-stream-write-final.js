@@ -1,18 +1,13 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var stream = require('../../');
-
-var shutdown = false;
-var w = new stream.Writable({
+const common = require('../common');
+const assert = require('assert/');
+const stream = require('../../');
+let shutdown = false;
+const w = new stream.Writable({
   final: common.mustCall(function (cb) {
     assert.strictEqual(this, w);
     setTimeout(function () {
@@ -30,19 +25,11 @@ w.on('finish', common.mustCall(function () {
 w.write(bufferShim.allocUnsafe(1));
 w.end(bufferShim.allocUnsafe(0));
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

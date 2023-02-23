@@ -1,16 +1,12 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var _require = require('../../'),
-    Readable = _require.Readable;
-
-var readable = new Readable();
+const common = require('../common');
+const _require = require('../../'),
+  Readable = _require.Readable;
+const readable = new Readable();
 readable.on('error', common.expectsError({
   code: 'ERR_METHOD_NOT_IMPLEMENTED',
   type: Error,
@@ -18,19 +14,11 @@ readable.on('error', common.expectsError({
 }));
 readable.read();
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

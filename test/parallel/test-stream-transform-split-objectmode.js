@@ -22,17 +22,12 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
-
-var assert = require('assert/');
-
-var Transform = require('../../').Transform;
-
-var parser = new Transform({
+const assert = require('assert/');
+const Transform = require('../../').Transform;
+const parser = new Transform({
   readableObjectMode: true
 });
 assert(parser._readableState.objectMode);
@@ -41,14 +36,12 @@ assert.strictEqual(parser.readableHighWaterMark, 16);
 assert.strictEqual(parser.writableHighWaterMark, 16 * 1024);
 assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark);
 assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark);
-
 parser._transform = function (chunk, enc, callback) {
   callback(null, {
     val: chunk[0]
   });
 };
-
-var parsed;
+let parsed;
 parser.on('data', function (obj) {
   parsed = obj;
 });
@@ -56,7 +49,7 @@ parser.end(bufferShim.from([42]));
 process.on('exit', function () {
   assert.strictEqual(parsed.val, 42);
 });
-var serializer = new Transform({
+const serializer = new Transform({
   writableObjectMode: true
 });
 assert(!serializer._readableState.objectMode);
@@ -65,12 +58,10 @@ assert.strictEqual(serializer.readableHighWaterMark, 16 * 1024);
 assert.strictEqual(serializer.writableHighWaterMark, 16);
 assert.strictEqual(parser.readableHighWaterMark, parser._readableState.highWaterMark);
 assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWaterMark);
-
 serializer._transform = function (obj, _, callback) {
   callback(null, bufferShim.from([obj.val]));
 };
-
-var serialized;
+let serialized;
 serializer.on('data', function (chunk) {
   serialized = chunk;
 });
@@ -81,19 +72,11 @@ process.on('exit', function () {
   assert.strictEqual(serialized[0], 42);
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

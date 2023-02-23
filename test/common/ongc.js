@@ -2,40 +2,25 @@
 
 /*<replacement>*/
 require('@babel/polyfill');
-
 var util = require('util');
-
-for (var i in util) {
-  exports[i] = util[i];
-}
+for (var i in util) exports[i] = util[i];
 /*</replacement>*/
-
-
 'use strict';
+
 /*<replacement>*/
-
-
 var objectKeys = objectKeys || function (obj) {
   var keys = [];
-
-  for (var key in obj) {
-    keys.push(key);
-  }
-
+  for (var key in obj) keys.push(key);
   return keys;
 };
 /*</replacement>*/
 
-
-var common = require('../common');
-
-var assert = require('assert');
-
-var gcTrackerMap = new WeakMap();
-var gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
-
+const common = require('../common');
+const assert = require('assert');
+const gcTrackerMap = new WeakMap();
+const gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
 function onGC(obj, gcListener) {
-  var async_hooks =
+  const async_hooks =
   /*require('async_hooks');
   const onGcAsyncHook = async_hooks.createHook({
   init: common.mustCallAtLeast(function(id, type) {
@@ -56,9 +41,7 @@ function onGC(obj, gcListener) {
   gcTrackerMap.set(obj, new async_hooks.AsyncResource(gcTrackerTag));
   obj = null;
 }
-
 module.exports = onGC;
-
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i);

@@ -22,65 +22,49 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
 require('../common');
+const assert = require('assert/');
 
-var assert = require('assert/'); // This test verifies that stream.unshift(bufferShim.alloc(0)) or
+// This test verifies that stream.unshift(bufferShim.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
-
-
-var Readable = require('../../').Readable;
-
-var r = new Readable();
-var nChunks = 10;
-var chunk = bufferShim.alloc(10, 'x');
-
+const Readable = require('../../').Readable;
+const r = new Readable();
+let nChunks = 10;
+const chunk = bufferShim.alloc(10, 'x');
 r._read = function (n) {
-  setImmediate(function () {
+  setImmediate(() => {
     r.push(--nChunks === 0 ? null : chunk);
   });
 };
-
-var readAll = false;
-var seen = [];
-r.on('readable', function () {
-  var chunk;
-
+let readAll = false;
+const seen = [];
+r.on('readable', () => {
+  let chunk;
   while (chunk = r.read()) {
-    seen.push(chunk.toString()); // simulate only reading a certain amount of the data,
+    seen.push(chunk.toString());
+    // simulate only reading a certain amount of the data,
     // and then putting the rest of the chunk back into the
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
-
-    var putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
+    const putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
     readAll = !readAll;
     r.unshift(putBack);
   }
 });
-var expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
-r.on('end', function () {
+const expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
+r.on('end', () => {
   assert.deepStrictEqual(seen, expect);
-
   require('tap').pass();
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

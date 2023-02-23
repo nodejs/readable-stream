@@ -1,69 +1,53 @@
 "use strict";
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var _require = require('../../'),
-    Readable = _require.Readable,
-    Writable = _require.Writable,
-    Transform = _require.Transform;
-
+const common = require('../common');
+const assert = require('assert/');
+const _require = require('../../'),
+  Readable = _require.Readable,
+  Writable = _require.Writable,
+  Transform = _require.Transform;
 {
-  var stream = new Readable({
+  const stream = new Readable({
     objectMode: true,
-    read: common.mustCall(function () {
+    read: common.mustCall(() => {
       stream.push(undefined);
       stream.push(null);
     })
   });
-  stream.on('data', common.mustCall(function (chunk) {
+  stream.on('data', common.mustCall(chunk => {
     assert.strictEqual(chunk, undefined);
   }));
 }
 {
-  var _stream = new Writable({
+  const stream = new Writable({
     objectMode: true,
-    write: common.mustCall(function (chunk) {
+    write: common.mustCall(chunk => {
       assert.strictEqual(chunk, undefined);
     })
   });
-
-  _stream.write(undefined);
+  stream.write(undefined);
 }
 {
-  var _stream2 = new Transform({
+  const stream = new Transform({
     objectMode: true,
-    transform: common.mustCall(function (chunk) {
-      _stream2.push(chunk);
+    transform: common.mustCall(chunk => {
+      stream.push(chunk);
     })
   });
-
-  _stream2.on('data', common.mustCall(function (chunk) {
+  stream.on('data', common.mustCall(chunk => {
     assert.strictEqual(chunk, undefined);
   }));
-
-  _stream2.write(undefined);
+  stream.write(undefined);
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

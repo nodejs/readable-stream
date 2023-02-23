@@ -22,51 +22,44 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var stream = require('../../');
-
-var str = 'asdfasdfasdfasdfasdf';
-var r = new stream.Readable({
+const common = require('../common');
+const assert = require('assert/');
+const stream = require('../../');
+const str = 'asdfasdfasdfasdfasdf';
+const r = new stream.Readable({
   highWaterMark: 5,
   encoding: 'utf8'
 });
-var reads = 0;
-
+let reads = 0;
 function _read() {
   if (reads === 0) {
-    setTimeout(function () {
+    setTimeout(() => {
       r.push(str);
     }, 1);
     reads++;
   } else if (reads === 1) {
-    var _ret = r.push(str);
-
-    assert.strictEqual(_ret, false);
+    const ret = r.push(str);
+    assert.strictEqual(ret, false);
     reads++;
   } else {
     r.push(null);
   }
 }
-
 r._read = common.mustCall(_read, 3);
-r.on('end', common.mustCall()); // push some data in to start.
+r.on('end', common.mustCall());
+
+// push some data in to start.
 // we've never gotten any read event at this point.
-
-var ret = r.push(str); // should be false.  > hwm
-
+const ret = r.push(str);
+// should be false.  > hwm
 assert(!ret);
-var chunk = r.read();
+let chunk = r.read();
 assert.strictEqual(chunk, str);
 chunk = r.read();
 assert.strictEqual(chunk, null);
-r.once('readable', function () {
+r.once('readable', () => {
   // this time, we'll get *all* the remaining data, because
   // it's been added synchronously, as the read WOULD take
   // us below the hwm, and so it triggered a _read() again,
@@ -77,19 +70,11 @@ r.once('readable', function () {
   assert.strictEqual(chunk, null);
 });
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));

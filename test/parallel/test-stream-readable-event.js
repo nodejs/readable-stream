@@ -22,24 +22,20 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-var bufferShim = require('safe-buffer').Buffer;
+const bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-
-
-var common = require('../common');
-
-var assert = require('assert/');
-
-var Readable = require('../../').Readable;
-
+const common = require('../common');
+const assert = require('assert/');
+const Readable = require('../../').Readable;
 {
   // First test, not reading when the readable is added.
   // make sure that on('readable', ...) triggers a readable event.
-  var r = new Readable({
+  const r = new Readable({
     highWaterMark: 3
   });
-  r._read = common.mustNotCall(); // This triggers a 'readable' event, which is lost.
+  r._read = common.mustNotCall();
 
+  // This triggers a 'readable' event, which is lost.
   r.push(bufferShim.from('blerg'));
   setTimeout(function () {
     // we're testing what we think we are
@@ -50,103 +46,79 @@ var Readable = require('../../').Readable;
 {
   // second test, make sure that readable is re-emitted if there's
   // already a length, while it IS reading.
-  var _r = new Readable({
+
+  const r = new Readable({
     highWaterMark: 3
   });
+  r._read = common.mustCall();
 
-  _r._read = common.mustCall(); // This triggers a 'readable' event, which is lost.
-
-  _r.push(bufferShim.from('bl'));
-
+  // This triggers a 'readable' event, which is lost.
+  r.push(bufferShim.from('bl'));
   setTimeout(function () {
     // assert we're testing what we think we are
-    assert(_r._readableState.reading);
-
-    _r.on('readable', common.mustCall());
+    assert(r._readableState.reading);
+    r.on('readable', common.mustCall());
   }, 1);
 }
 {
   // Third test, not reading when the stream has not passed
   // the highWaterMark but *has* reached EOF.
-  var _r2 = new Readable({
+  const r = new Readable({
     highWaterMark: 30
   });
+  r._read = common.mustNotCall();
 
-  _r2._read = common.mustNotCall(); // This triggers a 'readable' event, which is lost.
-
-  _r2.push(bufferShim.from('blerg'));
-
-  _r2.push(null);
-
+  // This triggers a 'readable' event, which is lost.
+  r.push(bufferShim.from('blerg'));
+  r.push(null);
   setTimeout(function () {
     // assert we're testing what we think we are
-    assert(!_r2._readableState.reading);
-
-    _r2.on('readable', common.mustCall());
+    assert(!r._readableState.reading);
+    r.on('readable', common.mustCall());
   }, 1);
 }
 {
   // pushing a empty string in non-objectMode should
   // trigger next `read()`.
-  var underlyingData = ['', 'x', 'y', '', 'z'];
-  var expected = underlyingData.filter(function (data) {
-    return data;
-  });
-  var result = [];
-
-  var _r3 = new Readable({
+  const underlyingData = ['', 'x', 'y', '', 'z'];
+  const expected = underlyingData.filter(data => data);
+  const result = [];
+  const r = new Readable({
     encoding: 'utf8'
   });
-
-  _r3._read = function () {
-    var _this = this;
-
-    process.nextTick(function () {
+  r._read = function () {
+    process.nextTick(() => {
       if (!underlyingData.length) {
-        _this.push(null);
+        this.push(null);
       } else {
-        _this.push(underlyingData.shift());
+        this.push(underlyingData.shift());
       }
     });
   };
-
-  _r3.on('readable', function () {
-    var data = _r3.read();
-
+  r.on('readable', () => {
+    const data = r.read();
     if (data !== null) result.push(data);
   });
-
-  _r3.on('end', common.mustCall(function () {
+  r.on('end', common.mustCall(() => {
     assert.deepStrictEqual(result, expected);
   }));
 }
 {
   // #20923
-  var _r4 = new Readable();
-
-  _r4._read = function () {// actually doing thing here
+  const r = new Readable();
+  r._read = function () {
+    // actually doing thing here
   };
-
-  _r4.on('data', function () {});
-
-  _r4.removeAllListeners();
-
-  assert.strictEqual(_r4.eventNames().length, 0);
+  r.on('data', function () {});
+  r.removeAllListeners();
+  assert.strictEqual(r.eventNames().length, 0);
 }
 ;
-
 (function () {
   var t = require('tap');
-
   t.pass('sync run');
 })();
-
 var _list = process.listeners('uncaughtException');
-
 process.removeAllListeners('uncaughtException');
-
 _list.pop();
-
-_list.forEach(function (e) {
-  return process.on('uncaughtException', e);
-});
+_list.forEach(e => process.on('uncaughtException', e));
