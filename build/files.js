@@ -179,7 +179,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
       /(?:var|const) Buffer = require\('safe-buffer'\)\.Buffer;/
     , `
   const Buffer = require('safe-buffer').Buffer
-  const OurUint8Array = global.Uint8Array || function () {}
+  const OurUint8Array = (typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : {}).Uint8Array || function () {}
 function _uint8ArrayToBuffer(chunk) {
    return Buffer.from(chunk);
 }
