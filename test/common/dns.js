@@ -29,8 +29,6 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-// Naïve DNS parser/serializer.
-
 var assert = require('assert');
 var os = require('os');
 
@@ -49,6 +47,8 @@ var types = {
 var classes = {
   IN: 1
 };
+
+// Naïve DNS parser/serializer.
 
 function readDomainFromPacket(buffer, offset) {
   assert.ok(offset < buffer.length);
@@ -409,7 +409,32 @@ function writeDNSPacket(parsed) {
   }));
 }
 
-module.exports = { types: types, classes: classes, writeDNSPacket: writeDNSPacket, parseDNSPacket: parseDNSPacket };
+var mockedErrorCode = 'ENOTFOUND';
+var mockedSysCall = 'getaddrinfo';
+
+function errorLookupMock() {
+  var code = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : mockedErrorCode;
+  var syscall = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : mockedSysCall;
+
+  return function lookupWithError(host, dnsopts, cb) {
+    var err = new Error(syscall + ' ' + code + ' ' + host);
+    err.code = code;
+    err.errno = code;
+    err.syscall = syscall;
+    err.hostname = host;
+    cb(err);
+  };
+}
+
+module.exports = {
+  types: types,
+  classes: classes,
+  writeDNSPacket: writeDNSPacket,
+  parseDNSPacket: parseDNSPacket,
+  errorLookupMock: errorLookupMock,
+  mockedErrorCode: mockedErrorCode,
+  mockedSysCall: mockedSysCall
+};
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

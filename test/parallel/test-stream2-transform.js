@@ -177,7 +177,7 @@ var Transform = require('../../lib/_stream_transform');
 }
 
 {
-  // Verify assymetric transform (expand)
+  // Verify asymmetric transform (expand)
   var _pt7 = new Transform();
 
   // emit each chunk 2 times.
@@ -209,7 +209,7 @@ var Transform = require('../../lib/_stream_transform');
 }
 
 {
-  // Verify assymetric trasform (compress)
+  // Verify asymmetric transform (compress)
   var _pt8 = new Transform();
 
   // each output is the first char of 3 consecutive chunks,
@@ -265,7 +265,7 @@ var Transform = require('../../lib/_stream_transform');
 // this tests for a stall when data is written to a full stream
 // that has empty transforms.
 {
-  // Verify compex transform behavior
+  // Verify complex transform behavior
   var count = 0;
   var saved = null;
   var _pt9 = new Transform({ highWaterMark: 3 });

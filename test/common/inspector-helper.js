@@ -218,9 +218,10 @@ var InspectorSession = function () {
       if (message.result) resolve(message.result);else reject(message.error);
     } else {
       if (message.method === 'Debugger.scriptParsed') {
-        var script = message['params'];
-        var scriptId = script['scriptId'];
-        var _url = script['url'];
+        var _message$params = message.params,
+            scriptId = _message$params.scriptId,
+            _url = _message$params.url;
+
         this._scriptsIdsByUrl.set(scriptId, _url);
         if (_url === _MAINSCRIPT) this.mainScriptId = scriptId;
       }
@@ -240,11 +241,11 @@ var InspectorSession = function () {
     var _this2 = this;
 
     var msg = JSON.parse(JSON.stringify(message)); // Clone!
-    msg['id'] = this._nextId++;
+    msg.id = this._nextId++;
     if (DEBUG) console.log('[sent]', JSON.stringify(msg));
 
     var responsePromise = new Promise(function (resolve, reject) {
-      _this2._commandResponsePromises.set(msg['id'], { resolve: resolve, reject: reject });
+      _this2._commandResponsePromises.set(msg.id, { resolve: resolve, reject: reject });
     });
 
     return new Promise(function (resolve) {
@@ -294,12 +295,13 @@ var InspectorSession = function () {
     return notification;
   };
 
-  InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, url) {
-    if ('Debugger.paused' === message['method']) {
-      var callFrame = message['params']['callFrames'][0];
-      var location = callFrame['location'];
-      assert.strictEqual(url, this._scriptsIdsByUrl.get(location['scriptId']));
-      assert.strictEqual(line, location['lineNumber']);
+  InspectorSession.prototype._isBreakOnLineNotification = function _isBreakOnLineNotification(message, line, expectedScriptPath) {
+    if ('Debugger.paused' === message.method) {
+      var callFrame = message.params.callFrames[0];
+      var location = callFrame.location;
+      var scriptPath = this._scriptsIdsByUrl.get(location.scriptId);
+      assert.strictEqual(scriptPath.toString(), expectedScriptPath.toString(), scriptPath + ' !== ' + expectedScriptPath);
+      assert.strictEqual(line, location.lineNumber);
       return true;
     }
   };
@@ -314,19 +316,19 @@ var InspectorSession = function () {
 
   InspectorSession.prototype._matchesConsoleOutputNotification = function _matchesConsoleOutputNotification(notification, type, values) {
     if (!Array.isArray(values)) values = [values];
-    if ('Runtime.consoleAPICalled' === notification['method']) {
-      var params = notification['params'];
-      if (params['type'] === type) {
+    if ('Runtime.consoleAPICalled' === notification.method) {
+      var params = notification.params;
+      if (params.type === type) {
         var _i2 = 0;
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = params['args'][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = params.args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var value = _step2.value;
 
-            if (value['value'] !== values[_i2++]) return false;
+            if (value.value !== values[_i2++]) return false;
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -480,7 +482,7 @@ var NodeInstance = function () {
   NodeInstance.prototype.connectInspectorSession = async function connectInspectorSession() {
     console.log('[test]', 'Connecting to a child Node process');
     var response = await this.httpGet(null, '/json/list');
-    var url = response[0]['webSocketDebuggerUrl'];
+    var url = response[0].webSocketDebuggerUrl;
     return this.wsHandshake(url);
   };
 

@@ -173,6 +173,32 @@ var _require2 = require('util'),
 }
 
 {
+  var writable = new Writable({
+    destroy: common.mustCall(function (err, cb) {
+      process.nextTick(cb, new Error('kaboom 1'));
+    }),
+    write: function (chunk, enc, cb) {
+      cb();
+    }
+  });
+
+  writable.on('close', common.mustNotCall());
+  writable.on('error', common.expectsError({
+    type: Error,
+    message: 'kaboom 2'
+  }));
+
+  writable.destroy();
+  assert.strictEqual(writable.destroyed, true);
+  assert.strictEqual(writable._writableState.errorEmitted, false);
+
+  // Test case where `writable.destroy()` is called again with an error before
+  // the `_destroy()` callback is called.
+  writable.destroy(new Error('kaboom 2'));
+  assert.strictEqual(writable._writableState.errorEmitted, true);
+}
+
+{
   var _write8 = new Writable({
     write: function (chunk, enc, cb) {
       cb();
@@ -214,4 +240,20 @@ var _require2 = require('util'),
   _write9.destroy(_expected4, common.mustCall(function (err) {
     assert.strictEqual(_expected4, err);
   }));
+}
+
+{
+  // Checks that `._undestroy()` restores the state so that `final` will be
+  // called again.
+  var _write10 = new Writable({
+    write: common.mustNotCall(),
+    final: common.mustCall(function (cb) {
+      return cb();
+    }, 2)
+  });
+
+  _write10.end();
+  _write10.destroy();
+  _write10._undestroy();
+  _write10.end();
 }

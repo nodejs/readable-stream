@@ -75,13 +75,10 @@ var Timer = { now: function () {} };
 var _require2 = require('./fixtures'),
     fixturesDir = _require2.fixturesDir;
 
-var testRoot = process.env.NODE_TEST_DIR ? fs.realpathSync(process.env.NODE_TEST_DIR) : path.resolve(__dirname, '..');
+var tmpdir = require('./tmpdir');
 
 var noop = function () {};
 
-// Using a `.` prefixed name, which is the convention for "hidden" on POSIX,
-// gets tools to ignore it by default or by simple rules, especially eslint.
-var tmpDirName = '.tmp';
 // PORT should match the definition in test/testpy/__init__.py.
 exports.PORT = +process.env.NODE_COMMON_PORT || 12346;
 exports.isWindows = process.platform === 'win32';
@@ -90,8 +87,10 @@ exports.isAIX = process.platform === 'aix';
 exports.isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
 exports.isSunOS = process.platform === 'sunos';
 exports.isFreeBSD = process.platform === 'freebsd';
+exports.isOpenBSD = process.platform === 'openbsd';
 exports.isLinux = process.platform === 'linux';
-exports.isOSX = process.platform === 'darwin';
+var isOSX = exports.isOSX = process.platform === 'darwin';
+exports.isOSXMojave = isOSX && os.release().startsWith('18');
 
 exports.enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
 var cpus = os.cpus();
@@ -122,7 +121,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
   var _async_wrap = process.binding('async_wrap');
 
   process.on('exit', function () {
-    // itterate through handles to make sure nothing crashes
+    // iterate through handles to make sure nothing crashes
     for (var k in initHandles) {
       util.inspect(initHandles[k]);
     }
@@ -161,55 +160,6 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
     },
   }).enable();*/
 }
-
-function rimrafSync(p) {
-  var st = void 0;
-  try {
-    st = fs.lstatSync(p);
-  } catch (e) {
-    if (e.code === 'ENOENT') return;
-  }
-
-  try {
-    if (st && st.isDirectory()) rmdirSync(p, null);else fs.unlinkSync(p);
-  } catch (e) {
-    if (e.code === 'ENOENT') return;
-    if (e.code === 'EPERM') return rmdirSync(p, e);
-    if (e.code !== 'EISDIR') throw e;
-    rmdirSync(p, e);
-  }
-}
-
-function rmdirSync(p, originalEr) {
-  try {
-    fs.rmdirSync(p);
-  } catch (e) {
-    if (e.code === 'ENOTDIR') throw originalEr;
-    if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
-      var enc = exports.isLinux ? 'buffer' : 'utf8';
-      forEach(fs.readdirSync(p, enc), function (f) {
-        if (f instanceof Buffer) {
-          var buf = Buffer.concat([Buffer.from(p), Buffer.from(path.sep), f]);
-          rimrafSync(buf);
-        } else {
-          rimrafSync(path.join(p, f));
-        }
-      });
-      fs.rmdirSync(p);
-    }
-  }
-}
-
-exports.refreshTmpDir = function () {
-  rimrafSync(exports.tmpDir);
-  fs.mkdirSync(exports.tmpDir);
-};
-
-if (process.env.TEST_THREAD_ID) {
-  exports.PORT += process.env.TEST_THREAD_ID * 100;
-  tmpDirName += '.' + process.env.TEST_THREAD_ID;
-}
-exports.tmpDir = path.join(testRoot, tmpDirName);
 
 var opensslCli = null;
 var inFreeBSDJail = null;
@@ -307,7 +257,7 @@ if (exports.isLinux) {
 } /*</replacement>*/
 
 {
-  var localRelative = path.relative(process.cwd(), exports.tmpDir + '/');
+  var localRelative = path.relative(process.cwd(), tmpdir.path + '/');
   var pipePrefix = exports.isWindows ? '\\\\.\\pipe\\' : localRelative;
   var pipeName = 'node-test.' + process.pid + '.sock';
   exports.PIPE = path.join(pipePrefix, pipeName);
@@ -532,6 +482,14 @@ exports.mustCallAtLeast = function (fn, minimum) {
   return _mustCallInner(fn, minimum, 'minimum');
 };
 
+exports.mustCallAsync = function (fn, exact) {
+  return exports.mustCall(function () {
+    return Promise.resolve(fn.apply(undefined, arguments)).then(exports.mustCall(function (val) {
+      return val;
+    }));
+  }, exact);
+};
+
 function _mustCallInner(fn) {
   var _context;
 
@@ -595,7 +553,7 @@ exports.canCreateSymLink = function () {
     // whoami.exe needs to be the one from System32
     // If unix tools are in the path, they can shadow the one we want,
     // so use the full path while executing whoami
-    var whoamiPath = path.join(process.env['SystemRoot'], 'System32', 'whoami.exe');
+    var whoamiPath = path.join(process.env.SystemRoot, 'System32', 'whoami.exe');
 
     var err = false;
     var output = '';
@@ -779,7 +737,14 @@ exports.expectsError = function expectsError(fn, settings, exact) {
     fn = undefined;
   }
   function innerFn(error) {
+    if (arguments.length !== 1) {
+      // Do not use `assert.strictEqual()` to prevent `util.inspect` from
+      // always being called.
+      assert.fail('Expected one argument, got ' + util.inspect(arguments));
+    }
     assert.strictEqual(error.code, settings.code);
+    var descriptor = Object.getOwnPropertyDescriptor(error, 'message');
+    assert.strictEqual(descriptor.enumerable, false, 'The error message should be non-enumerable');
     if ('type' in settings) {
       var type = settings.type;
       if (type !== Error && !Error.isPrototypeOf(type)) {
@@ -932,6 +897,8 @@ exports.firstInvalidFD = function firstInvalidFD() {
   } catch (e) {}
   return fd;
 };
+
+exports.isCPPSymbolsNotMapped = exports.isWindows || exports.isSunOS || exports.isAIX || exports.isLinuxPPCBE || exports.isFreeBSD;
 
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
