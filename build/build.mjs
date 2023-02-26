@@ -1,5 +1,5 @@
 import { transform } from '@babel/core'
-import { createReadStream } from 'node:fs'
+import { createReadStream, writeFileSync } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
@@ -171,6 +171,17 @@ async function main() {
   // Cleanup existing folder
   await rm('lib', { recursive: true, force: true })
   await rm('test', { recursive: true, force: true })
+
+  // remove obsolete methods from readable-stream
+  const methodNameToRemove = ['fromWeb', 'toWeb']
+  const readableStreamPath = resolve(__dirname, '../lib/internal/streams/readable.js')
+  let readableStreamContent = await readFile(readableStreamPath, 'utf-8')
+
+  for (const method of methodNameToRemove) {
+    const regex = new RegExp(`Readable.+${method} = function\\s\\s*\\([^)]*\\)\\s*{[^}]*}`, 'g')
+    readableStreamContent = readableStreamContent.replace(regex, '')
+    writeFileSync(readableStreamPath, readableStreamContent, 'utf8')
+  }
 
   // Download or open the tar file
   let tarFile
