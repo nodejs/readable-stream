@@ -12,7 +12,7 @@ import prettierConfig from '../prettier.config.cjs'
 import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
 import { headers } from './headers.mjs'
-import { replacements } from './replacements.mjs'
+import { replacements, removeObsoleteReadableMethods } from './replacements.mjs'
 
 const baseMatcher = /^(?:lib|test)/
 const strictMatcher = /^(['"']use strict.+)/
@@ -173,15 +173,8 @@ async function main() {
   await rm('test', { recursive: true, force: true })
 
   // remove obsolete methods from readable-stream
-  const methodNameToRemove = ['fromWeb', 'toWeb']
-  const readableStreamPath = resolve(__dirname, '../lib/internal/streams/readable.js')
-  let readableStreamContent = await readFile(readableStreamPath, 'utf-8')
-
-  for (const method of methodNameToRemove) {
-    const regex = new RegExp(`Readable.+${method} = function\\s\\s*\\([^)]*\\)\\s*{[^}]*}`, 'g')
-    readableStreamContent = readableStreamContent.replace(regex, '')
-    writeFileSync(readableStreamPath, readableStreamContent, 'utf8')
-  }
+  const methodNamesToRemove = ['fromWeb', 'toWeb']
+  await removeObsoleteReadableMethods(methodNamesToRemove)
 
   // Download or open the tar file
   let tarFile

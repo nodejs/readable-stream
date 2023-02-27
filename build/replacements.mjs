@@ -1,3 +1,7 @@
+import { resolve } from 'node:path'
+import { writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+
 const legacyStreamsRequireStream = ["require\\('stream'\\)", "require('./stream')"]
 
 const internalStreamsBufferPolyfill = [
@@ -151,6 +155,17 @@ const testParallelIncludeTap = [
 ]
 
 const testParallelImportStreamInMjs = [" from 'stream';", "from '../../lib/ours/index.js';"]
+
+export const removeObsoleteReadableMethods = async function(methodNames) {
+  const readableStreamPath = resolve(__dirname, '../lib/internal/streams/readable.js')
+  let readableStreamContent = await readFile(readableStreamPath, 'utf-8')
+
+  for (const method of methodNames) {
+    const regex = new RegExp(`Readable.+${method} = function\\s\\s*\\([^)]*\\)\\s*{[^}]*}`, 'g')
+    readableStreamContent = readableStreamContent.replace(regex, '')
+    writeFileSync(readableStreamPath, readableStreamContent, 'utf8')
+  }
+}
 
 const testParallelImportTapInMjs = ["(from 'assert';)", "$1\nimport tap from 'tap';"]
 
