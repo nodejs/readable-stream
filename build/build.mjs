@@ -1,5 +1,5 @@
 import { transform } from '@babel/core'
-import { createReadStream, writeFileSync } from 'node:fs'
+import { createReadStream } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
@@ -12,7 +12,7 @@ import prettierConfig from '../prettier.config.cjs'
 import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
 import { headers } from './headers.mjs'
-import { replacements, removeObsoleteReadableMethods } from './replacements.mjs'
+import { replacements } from './replacements.mjs'
 
 const baseMatcher = /^(?:lib|test)/
 const strictMatcher = /^(['"']use strict.+)/
@@ -171,10 +171,6 @@ async function main() {
   // Cleanup existing folder
   await rm('lib', { recursive: true, force: true })
   await rm('test', { recursive: true, force: true })
-
-  // remove obsolete methods from readable-stream
-  const methodNamesToRemove = ['fromWeb', 'toWeb']
-  await removeObsoleteReadableMethods(methodNamesToRemove)
 
   // Download or open the tar file
   let tarFile
