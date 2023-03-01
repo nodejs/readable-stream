@@ -16,16 +16,16 @@ var objectKeys = objectKeys || function (obj) {
 /*</replacement>*/
 
 // Hijack stdout and stderr
-const stdWrite = {};
+var stdWrite = {};
 function hijackStdWritable(name, listener) {
-  const stream = process[name];
-  const _write = stdWrite[name] = stream.write;
+  var stream = process[name];
+  var _write = stdWrite[name] = stream.write;
   stream.writeTimes = 0;
   stream.write = function (data, callback) {
     try {
       listener(data);
     } catch (e) {
-      process.nextTick(() => {
+      process.nextTick(function () {
         throw e;
       });
     }

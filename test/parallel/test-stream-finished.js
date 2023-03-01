@@ -3,54 +3,54 @@
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Writable = _require.Writable,
   Readable = _require.Readable,
   Transform = _require.Transform,
   finished = _require.finished;
-const assert = require('assert/');
-const fs = require('fs');
-const promisify = require('util-promisify');
+var assert = require('assert/');
+var fs = require('fs');
+var promisify = require('util-promisify');
 {
-  const rs = new Readable({
-    read() {}
+  var rs = new Readable({
+    read: function read() {}
   });
-  finished(rs, common.mustCall(err => {
+  finished(rs, common.mustCall(function (err) {
     assert(!err, 'no error');
   }));
   rs.push(null);
   rs.resume();
 }
 {
-  const ws = new Writable({
-    write(data, enc, cb) {
+  var ws = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  finished(ws, common.mustCall(err => {
+  finished(ws, common.mustCall(function (err) {
     assert(!err, 'no error');
   }));
   ws.end();
 }
 {
-  const tr = new Transform({
-    transform(data, enc, cb) {
+  var tr = new Transform({
+    transform: function transform(data, enc, cb) {
       cb();
     }
   });
-  let finish = false;
-  let ended = false;
-  tr.on('end', () => {
+  var finish = false;
+  var ended = false;
+  tr.on('end', function () {
     ended = true;
   });
-  tr.on('finish', () => {
+  tr.on('finish', function () {
     finish = true;
   });
-  finished(tr, common.mustCall(err => {
+  finished(tr, common.mustCall(function (err) {
     assert(!err, 'no error');
     assert(finish);
     assert(ended);
@@ -59,75 +59,74 @@ const promisify = require('util-promisify');
   tr.resume();
 }
 {
-  const rs = fs.createReadStream(__filename);
-  rs.resume();
-  finished(rs, common.mustCall());
+  var _rs = fs.createReadStream(__filename);
+  _rs.resume();
+  finished(_rs, common.mustCall());
 }
 {
-  const finishedPromise = promisify(finished);
-  function run() {
-    return _run.apply(this, arguments);
-  }
-  function _run() {
-    _run = _asyncToGenerator(function* () {
-      const rs = fs.createReadStream(__filename);
-      const done = common.mustCall();
-      let ended = false;
+  var run = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator(function* () {
+      var rs = fs.createReadStream(__filename);
+      var done = common.mustCall();
+      var ended = false;
       rs.resume();
-      rs.on('end', () => {
+      rs.on('end', function () {
         ended = true;
       });
       yield finishedPromise(rs);
       assert(ended);
       done();
     });
-    return _run.apply(this, arguments);
-  }
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+  var finishedPromise = promisify(finished);
   run();
 }
 {
-  const rs = fs.createReadStream('file-does-not-exist');
-  finished(rs, common.mustCall(err => {
+  var _rs2 = fs.createReadStream('file-does-not-exist');
+  finished(_rs2, common.mustCall(function (err) {
     assert.strictEqual(err.code, 'ENOENT');
   }));
 }
 {
-  const rs = new Readable();
-  finished(rs, common.mustCall(err => {
+  var _rs3 = new Readable();
+  finished(_rs3, common.mustCall(function (err) {
     assert(!err, 'no error');
   }));
-  rs.push(null);
-  rs.emit('close'); // should not trigger an error
-  rs.resume();
+  _rs3.push(null);
+  _rs3.emit('close'); // should not trigger an error
+  _rs3.resume();
 }
 {
-  const rs = new Readable();
-  finished(rs, common.mustCall(err => {
+  var _rs4 = new Readable();
+  finished(_rs4, common.mustCall(function (err) {
     assert(err, 'premature close error');
   }));
-  rs.emit('close'); // should trigger error
-  rs.push(null);
-  rs.resume();
+  _rs4.emit('close'); // should trigger error
+  _rs4.push(null);
+  _rs4.resume();
 }
 
 // Test that calling returned function removes listeners
 {
-  const ws = new Writable({
-    write(data, env, cb) {
+  var _ws = new Writable({
+    write: function write(data, env, cb) {
       cb();
     }
   });
-  const removeListener = finished(ws, common.mustNotCall());
+  var removeListener = finished(_ws, common.mustNotCall());
   removeListener();
-  ws.end();
+  _ws.end();
 }
 {
-  const rs = new Readable();
-  const removeListeners = finished(rs, common.mustNotCall());
+  var _rs5 = new Readable();
+  var removeListeners = finished(_rs5, common.mustNotCall());
   removeListeners();
-  rs.emit('close');
-  rs.push(null);
-  rs.resume();
+  _rs5.emit('close');
+  _rs5.push(null);
+  _rs5.resume();
 }
 ;
 (function () {
@@ -137,4 +136,6 @@ const promisify = require('util-promisify');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

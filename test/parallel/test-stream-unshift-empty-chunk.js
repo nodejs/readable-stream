@@ -22,26 +22,26 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
+var assert = require('assert/');
 
 // This test verifies that stream.unshift(bufferShim.alloc(0)) or
 // stream.unshift('') does not set state.reading=false.
-const Readable = require('../../').Readable;
-const r = new Readable();
-let nChunks = 10;
-const chunk = bufferShim.alloc(10, 'x');
+var Readable = require('../../').Readable;
+var r = new Readable();
+var nChunks = 10;
+var chunk = bufferShim.alloc(10, 'x');
 r._read = function (n) {
-  setImmediate(() => {
+  setImmediate(function () {
     r.push(--nChunks === 0 ? null : chunk);
   });
 };
-let readAll = false;
-const seen = [];
-r.on('readable', () => {
-  let chunk;
+var readAll = false;
+var seen = [];
+r.on('readable', function () {
+  var chunk;
   while (chunk = r.read()) {
     seen.push(chunk.toString());
     // simulate only reading a certain amount of the data,
@@ -49,13 +49,13 @@ r.on('readable', () => {
     // stream, like a parser might do.  We just fill it with
     // 'y' so that it's easy to see which bits were touched,
     // and which were not.
-    const putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
+    var putBack = bufferShim.alloc(readAll ? 0 : 5, 'y');
     readAll = !readAll;
     r.unshift(putBack);
   }
 });
-const expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
-r.on('end', () => {
+var expect = ['xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy', 'xxxxxxxxxx', 'yyyyy'];
+r.on('end', function () {
   assert.deepStrictEqual(seen, expect);
   require('tap').pass();
 });
@@ -67,4 +67,6 @@ r.on('end', () => {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

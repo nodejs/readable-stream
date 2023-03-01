@@ -1,19 +1,19 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const Readable = require('../../').Readable;
-const readable = new Readable({
-  read: () => {}
+var common = require('../common');
+var assert = require('assert/');
+var Readable = require('../../').Readable;
+var readable = new Readable({
+  read: function read() {}
 });
 
 // Initialized to false.
 assert.strictEqual(readable._readableState.emittedReadable, false);
-const expected = [bufferShim.from('foobar'), bufferShim.from('quo'), null];
-readable.on('readable', common.mustCall(() => {
+var expected = [bufferShim.from('foobar'), bufferShim.from('quo'), null];
+readable.on('readable', common.mustCall(function () {
   // emittedReadable should be true when the readable event is emitted
   assert.strictEqual(readable._readableState.emittedReadable, true);
   assert.deepStrictEqual(readable.read(), expected.shift());
@@ -26,24 +26,24 @@ readable.on('readable', common.mustCall(() => {
 assert.strictEqual(readable._readableState.emittedReadable, false);
 
 // These trigger a single 'readable', as things are batched up
-process.nextTick(common.mustCall(() => {
+process.nextTick(common.mustCall(function () {
   readable.push('foo');
 }));
-process.nextTick(common.mustCall(() => {
+process.nextTick(common.mustCall(function () {
   readable.push('bar');
 }));
 
 // these triggers two readable events
-setImmediate(common.mustCall(() => {
+setImmediate(common.mustCall(function () {
   readable.push('quo');
-  process.nextTick(common.mustCall(() => {
+  process.nextTick(common.mustCall(function () {
     readable.push(null);
   }));
 }));
-const noRead = new Readable({
-  read: () => {}
+var noRead = new Readable({
+  read: function read() {}
 });
-noRead.on('readable', common.mustCall(() => {
+noRead.on('readable', common.mustCall(function () {
   // emittedReadable should be true when the readable event is emitted
   assert.strictEqual(noRead._readableState.emittedReadable, true);
   noRead.read(0);
@@ -52,10 +52,10 @@ noRead.on('readable', common.mustCall(() => {
 }));
 noRead.push('foo');
 noRead.push(null);
-const flowing = new Readable({
-  read: () => {}
+var flowing = new Readable({
+  read: function read() {}
 });
-flowing.on('data', common.mustCall(() => {
+flowing.on('data', common.mustCall(function () {
   // When in flowing mode, emittedReadable is always false.
   assert.strictEqual(flowing._readableState.emittedReadable, false);
   flowing.read();
@@ -64,7 +64,7 @@ flowing.on('data', common.mustCall(() => {
 flowing.push('foooo');
 flowing.push('bar');
 flowing.push('quo');
-process.nextTick(common.mustCall(() => {
+process.nextTick(common.mustCall(function () {
   flowing.push(null);
 }));
 ;
@@ -75,4 +75,6 @@ process.nextTick(common.mustCall(() => {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

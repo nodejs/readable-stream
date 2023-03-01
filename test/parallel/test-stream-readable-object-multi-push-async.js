@@ -1,161 +1,170 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var common = require('../common');
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable;
-const MAX = 42;
-const BATCH = 10;
+var MAX = 42;
+var BATCH = 10;
 {
-  const readable = new Readable({
-    objectMode: true,
-    read: common.mustCall(function () {
-      console.log('>> READ');
-      fetchData((err, data) => {
-        if (err) {
-          this.destroy(err);
-          return;
-        }
-        if (data.length === 0) {
-          console.log('pushing null');
-          this.push(null);
-          return;
-        }
-        console.log('pushing');
-        data.forEach(d => this.push(d));
-      });
-    }, Math.floor(MAX / BATCH) + 2)
-  });
-  let i = 0;
-  function fetchData(cb) {
+  var fetchData = function fetchData(cb) {
     if (i > MAX) {
       setTimeout(cb, 10, null, []);
     } else {
-      const array = [];
-      const max = i + BATCH;
+      var array = [];
+      var max = i + BATCH;
       for (; i < max; i++) {
         array.push(i);
       }
       setTimeout(cb, 10, null, array);
     }
-  }
-  readable.on('readable', () => {
-    let data;
+  };
+  var readable = new Readable({
+    objectMode: true,
+    read: common.mustCall(function () {
+      var _this = this;
+      console.log('>> READ');
+      fetchData(function (err, data) {
+        if (err) {
+          _this.destroy(err);
+          return;
+        }
+        if (data.length === 0) {
+          console.log('pushing null');
+          _this.push(null);
+          return;
+        }
+        console.log('pushing');
+        data.forEach(function (d) {
+          return _this.push(d);
+        });
+      });
+    }, Math.floor(MAX / BATCH) + 2)
+  });
+  var i = 0;
+  readable.on('readable', function () {
+    var data;
     console.log('readable emitted');
     while (data = readable.read()) {
       console.log(data);
     }
   });
-  readable.on('end', common.mustCall(() => {
+  readable.on('end', common.mustCall(function () {
     assert.strictEqual(i, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
 {
-  const readable = new Readable({
+  var _fetchData = function _fetchData(cb) {
+    if (_i > MAX) {
+      setTimeout(cb, 10, null, []);
+    } else {
+      var array = [];
+      var max = _i + BATCH;
+      for (; _i < max; _i++) {
+        array.push(_i);
+      }
+      setTimeout(cb, 10, null, array);
+    }
+  };
+  var _readable = new Readable({
     objectMode: true,
     read: common.mustCall(function () {
+      var _this2 = this;
       console.log('>> READ');
-      fetchData((err, data) => {
+      _fetchData(function (err, data) {
         if (err) {
-          this.destroy(err);
+          _this2.destroy(err);
           return;
         }
         if (data.length === 0) {
           console.log('pushing null');
-          this.push(null);
+          _this2.push(null);
           return;
         }
         console.log('pushing');
-        data.forEach(d => this.push(d));
+        data.forEach(function (d) {
+          return _this2.push(d);
+        });
       });
     }, Math.floor(MAX / BATCH) + 2)
   });
-  let i = 0;
-  function fetchData(cb) {
-    if (i > MAX) {
-      setTimeout(cb, 10, null, []);
-    } else {
-      const array = [];
-      const max = i + BATCH;
-      for (; i < max; i++) {
-        array.push(i);
-      }
-      setTimeout(cb, 10, null, array);
-    }
-  }
-  readable.on('data', data => {
+  var _i = 0;
+  _readable.on('data', function (data) {
     console.log('data emitted', data);
   });
-  readable.on('end', common.mustCall(() => {
-    assert.strictEqual(i, (Math.floor(MAX / BATCH) + 1) * BATCH);
+  _readable.on('end', common.mustCall(function () {
+    assert.strictEqual(_i, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
 {
-  const readable = new Readable({
+  var _fetchData2 = function _fetchData2(cb) {
+    var array = [];
+    var max = _i2 + BATCH;
+    for (; _i2 < max; _i2++) {
+      array.push(_i2);
+    }
+    setTimeout(cb, 10, null, array);
+  };
+  var _readable2 = new Readable({
     objectMode: true,
     read: common.mustCall(function () {
+      var _this3 = this;
       console.log('>> READ');
-      fetchData((err, data) => {
+      _fetchData2(function (err, data) {
         if (err) {
-          this.destroy(err);
+          _this3.destroy(err);
           return;
         }
         console.log('pushing');
-        data.forEach(d => this.push(d));
+        data.forEach(function (d) {
+          return _this3.push(d);
+        });
         if (data[BATCH - 1] >= MAX) {
           console.log('pushing null');
-          this.push(null);
+          _this3.push(null);
         }
       });
     }, Math.floor(MAX / BATCH) + 1)
   });
-  let i = 0;
-  function fetchData(cb) {
-    const array = [];
-    const max = i + BATCH;
-    for (; i < max; i++) {
-      array.push(i);
-    }
-    setTimeout(cb, 10, null, array);
-  }
-  readable.on('data', data => {
+  var _i2 = 0;
+  _readable2.on('data', function (data) {
     console.log('data emitted', data);
   });
-  readable.on('end', common.mustCall(() => {
-    assert.strictEqual(i, (Math.floor(MAX / BATCH) + 1) * BATCH);
+  _readable2.on('end', common.mustCall(function () {
+    assert.strictEqual(_i2, (Math.floor(MAX / BATCH) + 1) * BATCH);
   }));
 }
 {
-  const readable = new Readable({
+  var _readable3 = new Readable({
     objectMode: true,
     read: common.mustNotCall()
   });
-  readable.on('data', common.mustNotCall());
-  readable.push(null);
-  let nextTickPassed = false;
-  process.nextTick(() => {
+  _readable3.on('data', common.mustNotCall());
+  _readable3.push(null);
+  var nextTickPassed = false;
+  process.nextTick(function () {
     nextTickPassed = true;
   });
-  readable.on('end', common.mustCall(() => {
+  _readable3.on('end', common.mustCall(function () {
     assert.strictEqual(nextTickPassed, true);
   }));
 }
 {
-  const readable = new Readable({
+  var _readable4 = new Readable({
     objectMode: true,
     read: common.mustCall()
   });
-  readable.on('data', data => {
+  _readable4.on('data', function (data) {
     console.log('data emitted', data);
   });
-  readable.on('end', common.mustCall());
-  setImmediate(() => {
-    readable.push('aaa');
-    readable.push(null);
+  _readable4.on('end', common.mustCall());
+  setImmediate(function () {
+    _readable4.push('aaa');
+    _readable4.push(null);
   });
 }
 ;
@@ -166,4 +175,6 @@ const BATCH = 10;
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,27 +1,27 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var common = require('../common');
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable;
-const buf = bufferShim.alloc(8192);
-const readable = new Readable({
+var buf = bufferShim.alloc(8192);
+var readable = new Readable({
   read: common.mustCall(function () {
     this.push(buf);
   }, 31)
 });
-let i = 0;
+var i = 0;
 readable.on('readable', common.mustCall(function () {
   if (i++ === 10) {
     // We will just terminate now.
     process.removeAllListeners('readable');
     return;
   }
-  const data = readable.read();
+  var data = readable.read();
   // TODO(mcollina): there is something odd in the highWaterMark logic
   // investigate.
   if (i === 1) {
@@ -38,4 +38,6 @@ readable.on('readable', common.mustCall(function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

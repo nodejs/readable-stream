@@ -22,15 +22,15 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const stream = require('../../');
-const r = new stream.Readable();
+var stream = require('../../');
+var r = new stream.Readable();
 r._read = function (size) {
   r.push(bufferShim.allocUnsafe(size));
 };
-const w = new stream.Writable();
+var w = new stream.Writable();
 w._write = function (data, encoding, cb) {
   cb(null);
 };
@@ -48,4 +48,6 @@ w.end();
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

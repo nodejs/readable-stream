@@ -1,15 +1,15 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Writable = _require.Writable;
 {
   // Sync + Sync
-  const writable = new Writable({
-    write: common.mustCall((buf, enc, cb) => {
+  var writable = new Writable({
+    write: common.mustCall(function (buf, enc, cb) {
       cb();
       common.expectsError(cb, {
         code: 'ERR_MULTIPLE_CALLBACK',
@@ -21,10 +21,10 @@ const _require = require('../../'),
 }
 {
   // Sync + Async
-  const writable = new Writable({
-    write: common.mustCall((buf, enc, cb) => {
+  var _writable = new Writable({
+    write: common.mustCall(function (buf, enc, cb) {
       cb();
-      process.nextTick(() => {
+      process.nextTick(function () {
         common.expectsError(cb, {
           code: 'ERR_MULTIPLE_CALLBACK',
           type: Error
@@ -32,14 +32,14 @@ const _require = require('../../'),
       });
     })
   });
-  writable.write('hi');
+  _writable.write('hi');
 }
 {
   // Async + Async
-  const writable = new Writable({
-    write: common.mustCall((buf, enc, cb) => {
+  var _writable2 = new Writable({
+    write: common.mustCall(function (buf, enc, cb) {
       process.nextTick(cb);
-      process.nextTick(() => {
+      process.nextTick(function () {
         common.expectsError(cb, {
           code: 'ERR_MULTIPLE_CALLBACK',
           type: Error
@@ -47,7 +47,7 @@ const _require = require('../../'),
       });
     })
   });
-  writable.write('hi');
+  _writable2.write('hi');
 }
 ;
 (function () {
@@ -57,4 +57,6 @@ const _require = require('../../'),
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

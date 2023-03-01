@@ -3,132 +3,138 @@
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Stream = _require.Stream,
   Writable = _require.Writable,
   Readable = _require.Readable,
   Transform = _require.Transform,
   pipeline = _require.pipeline;
-const assert = require('assert/');
-const http = require('http');
-const promisify = require('util-promisify');
+var assert = require('assert/');
+var http = require('http');
+var promisify = require('util-promisify');
 {
-  let finished = false;
-  const processed = [];
-  const expected = [bufferShim.from('a'), bufferShim.from('b'), bufferShim.from('c')];
-  const read = new Readable({
-    read() {}
+  var finished = false;
+  var processed = [];
+  var expected = [bufferShim.from('a'), bufferShim.from('b'), bufferShim.from('c')];
+  var read = new Readable({
+    read: function read() {}
   });
-  const write = new Writable({
-    write(data, enc, cb) {
+  var write = new Writable({
+    write: function write(data, enc, cb) {
       processed.push(data);
       cb();
     }
   });
-  write.on('finish', () => {
+  write.on('finish', function () {
     finished = true;
   });
-  for (let i = 0; i < expected.length; i++) {
+  for (var i = 0; i < expected.length; i++) {
     read.push(expected[i]);
   }
   read.push(null);
-  pipeline(read, write, common.mustCall(err => {
+  pipeline(read, write, common.mustCall(function (err) {
     assert.ok(!err, 'no error');
     assert.ok(finished);
     assert.deepStrictEqual(processed, expected);
   }));
 }
 {
-  const read = new Readable({
-    read() {}
+  var _read = new Readable({
+    read: function read() {}
   });
-  assert.throws(() => {
-    pipeline(read, () => {});
+  assert.throws(function () {
+    pipeline(_read, function () {});
   }, /ERR_MISSING_ARGS/);
-  assert.throws(() => {
-    pipeline(() => {});
+  assert.throws(function () {
+    pipeline(function () {});
   }, /ERR_MISSING_ARGS/);
-  assert.throws(() => {
+  assert.throws(function () {
     pipeline();
   }, /ERR_MISSING_ARGS/);
 }
 {
-  const read = new Readable({
-    read() {}
+  var _read2 = new Readable({
+    read: function read() {}
   });
-  const write = new Writable({
-    write(data, enc, cb) {
+  var _write = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  read.push('data');
-  setImmediate(() => read.destroy());
-  pipeline(read, write, common.mustCall(err => {
+  _read2.push('data');
+  setImmediate(function () {
+    return _read2.destroy();
+  });
+  pipeline(_read2, _write, common.mustCall(function (err) {
     assert.ok(err, 'should have an error');
   }));
 }
 {
-  const read = new Readable({
-    read() {}
+  var _read3 = new Readable({
+    read: function read() {}
   });
-  const write = new Writable({
-    write(data, enc, cb) {
+  var _write2 = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  read.push('data');
-  setImmediate(() => read.destroy(new Error('kaboom')));
-  const dst = pipeline(read, write, common.mustCall(err => {
+  _read3.push('data');
+  setImmediate(function () {
+    return _read3.destroy(new Error('kaboom'));
+  });
+  var dst = pipeline(_read3, _write2, common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
-  assert.strictEqual(dst, write);
+  assert.strictEqual(dst, _write2);
 }
 {
-  const read = new Readable({
-    read() {}
+  var _read4 = new Readable({
+    read: function read() {}
   });
-  const transform = new Transform({
-    transform(data, enc, cb) {
+  var transform = new Transform({
+    transform: function transform(data, enc, cb) {
       process.nextTick(cb, new Error('kaboom'));
     }
   });
-  const write = new Writable({
-    write(data, enc, cb) {
+  var _write3 = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  read.on('close', common.mustCall());
+  _read4.on('close', common.mustCall());
   transform.on('close', common.mustCall());
-  write.on('close', common.mustCall());
-  const dst = pipeline(read, transform, write, common.mustCall(err => {
+  _write3.on('close', common.mustCall());
+  var _dst = pipeline(_read4, transform, _write3, common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
-  assert.strictEqual(dst, write);
-  read.push('hello');
+  assert.strictEqual(_dst, _write3);
+  _read4.push('hello');
 }
 {
-  const server = http.createServer((req, res) => {
-    const rs = new Readable({
-      read() {
+  var server = http.createServer(function (req, res) {
+    var rs = new Readable({
+      read: function read() {
         rs.push('hello');
         rs.push(null);
       }
     });
-    pipeline(rs, res, () => {});
+    pipeline(rs, res, function () {});
   });
-  server.listen(0, () => {
-    const req = http.request({
+  server.listen(0, function () {
+    var req = http.request({
       port: server.address().port
     });
     req.end();
-    req.on('response', res => {
-      const buf = [];
-      res.on('data', data => buf.push(data));
-      res.on('end', common.mustCall(() => {
+    req.on('response', function (res) {
+      var buf = [];
+      res.on('data', function (data) {
+        return buf.push(data);
+      });
+      res.on('end', common.mustCall(function () {
         assert.deepStrictEqual(Buffer.concat(buf), bufferShim.from('hello'));
         server.close();
       }));
@@ -136,95 +142,95 @@ const promisify = require('util-promisify');
   });
 }
 {
-  const server = http.createServer((req, res) => {
-    let sent = false;
-    const rs = new Readable({
-      read() {
+  var _server = http.createServer(function (req, res) {
+    var sent = false;
+    var rs = new Readable({
+      read: function read() {
         if (sent) {
           return;
         }
         sent = true;
         rs.push('hello');
       },
-      destroy: common.mustCall((err, cb) => {
+      destroy: common.mustCall(function (err, cb) {
         // prevents fd leaks by destroying http pipelines
         cb();
       })
     });
-    pipeline(rs, res, () => {});
+    pipeline(rs, res, function () {});
   });
-  server.listen(0, () => {
-    const req = http.request({
-      port: server.address().port
+  _server.listen(0, function () {
+    var req = http.request({
+      port: _server.address().port
     });
     req.end();
-    req.on('response', res => {
-      setImmediate(() => {
+    req.on('response', function (res) {
+      setImmediate(function () {
         res.destroy();
-        server.close();
+        _server.close();
       });
     });
   });
 }
 {
-  const server = http.createServer((req, res) => {
-    let sent = 0;
-    const rs = new Readable({
-      read() {
+  var _server2 = http.createServer(function (req, res) {
+    var sent = 0;
+    var rs = new Readable({
+      read: function read() {
         if (sent++ > 10) {
           return;
         }
         rs.push('hello');
       },
-      destroy: common.mustCall((err, cb) => {
+      destroy: common.mustCall(function (err, cb) {
         cb();
       })
     });
-    pipeline(rs, res, () => {});
+    pipeline(rs, res, function () {});
   });
-  let cnt = 10;
-  const badSink = new Writable({
-    write(data, enc, cb) {
+  var cnt = 10;
+  var badSink = new Writable({
+    write: function write(data, enc, cb) {
       cnt--;
       if (cnt === 0) process.nextTick(cb, new Error('kaboom'));else cb();
     }
   });
-  server.listen(0, () => {
-    const req = http.request({
-      port: server.address().port
+  _server2.listen(0, function () {
+    var req = http.request({
+      port: _server2.address().port
     });
     req.end();
-    req.on('response', res => {
-      pipeline(res, badSink, common.mustCall(err => {
+    req.on('response', function (res) {
+      pipeline(res, badSink, common.mustCall(function (err) {
         assert.strictEqual(err.message, 'kaboom');
-        server.close();
+        _server2.close();
       }));
     });
   });
 }
 {
-  const server = http.createServer((req, res) => {
+  var _server3 = http.createServer(function (req, res) {
     pipeline(req, res, common.mustCall());
   });
-  server.listen(0, () => {
-    const req = http.request({
-      port: server.address().port
+  _server3.listen(0, function () {
+    var req = http.request({
+      port: _server3.address().port
     });
-    let sent = 0;
-    const rs = new Readable({
-      read() {
+    var sent = 0;
+    var rs = new Readable({
+      read: function read() {
         if (sent++ > 10) {
           return;
         }
         rs.push('hello');
       }
     });
-    pipeline(rs, req, common.mustCall(() => {
-      server.close();
+    pipeline(rs, req, common.mustCall(function () {
+      _server3.close();
     }));
-    req.on('response', res => {
-      let cnt = 10;
-      res.on('data', () => {
+    req.on('response', function (res) {
+      var cnt = 10;
+      res.on('data', function () {
         cnt--;
         if (cnt === 0) rs.destroy();
       });
@@ -232,160 +238,159 @@ const promisify = require('util-promisify');
   });
 }
 {
-  const makeTransform = () => {
-    const tr = new Transform({
-      transform(data, enc, cb) {
+  var makeTransform = function makeTransform() {
+    var tr = new Transform({
+      transform: function transform(data, enc, cb) {
         cb(null, data);
       }
     });
     tr.on('close', common.mustCall());
     return tr;
   };
-  const rs = new Readable({
-    read() {
+  var rs = new Readable({
+    read: function read() {
       rs.push('hello');
     }
   });
-  let cnt = 10;
-  const ws = new Writable({
-    write(data, enc, cb) {
-      cnt--;
-      if (cnt === 0) return process.nextTick(cb, new Error('kaboom'));
+  var _cnt = 10;
+  var ws = new Writable({
+    write: function write(data, enc, cb) {
+      _cnt--;
+      if (_cnt === 0) return process.nextTick(cb, new Error('kaboom'));
       cb();
     }
   });
   rs.on('close', common.mustCall());
   ws.on('close', common.mustCall());
-  pipeline(rs, makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), ws, common.mustCall(err => {
+  pipeline(rs, makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), makeTransform(), ws, common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
 }
 {
-  const oldStream = new Stream();
-  oldStream.pause = oldStream.resume = () => {};
-  oldStream.write = data => {
+  var oldStream = new Stream();
+  oldStream.pause = oldStream.resume = function () {};
+  oldStream.write = function (data) {
     oldStream.emit('data', data);
     return true;
   };
-  oldStream.end = () => {
+  oldStream.end = function () {
     oldStream.emit('end');
   };
-  const expected = [bufferShim.from('hello'), bufferShim.from('world')];
-  const rs = new Readable({
-    read() {
-      for (let i = 0; i < expected.length; i++) {
-        rs.push(expected[i]);
+  var _expected = [bufferShim.from('hello'), bufferShim.from('world')];
+  var _rs = new Readable({
+    read: function read() {
+      for (var _i = 0; _i < _expected.length; _i++) {
+        _rs.push(_expected[_i]);
       }
-      rs.push(null);
+      _rs.push(null);
     }
   });
-  const ws = new Writable({
-    write(data, enc, cb) {
-      assert.deepStrictEqual(data, expected.shift());
+  var _ws = new Writable({
+    write: function write(data, enc, cb) {
+      assert.deepStrictEqual(data, _expected.shift());
       cb();
     }
   });
-  let finished = false;
-  ws.on('finish', () => {
-    finished = true;
+  var _finished = false;
+  _ws.on('finish', function () {
+    _finished = true;
   });
-  pipeline(rs, oldStream, ws, common.mustCall(err => {
+  pipeline(_rs, oldStream, _ws, common.mustCall(function (err) {
     assert(!err, 'no error');
-    assert(finished, 'last stream finished');
+    assert(_finished, 'last stream finished');
   }));
 }
 {
-  const oldStream = new Stream();
-  oldStream.pause = oldStream.resume = () => {};
-  oldStream.write = data => {
-    oldStream.emit('data', data);
+  var _oldStream = new Stream();
+  _oldStream.pause = _oldStream.resume = function () {};
+  _oldStream.write = function (data) {
+    _oldStream.emit('data', data);
     return true;
   };
-  oldStream.end = () => {
-    oldStream.emit('end');
+  _oldStream.end = function () {
+    _oldStream.emit('end');
   };
-  const destroyableOldStream = new Stream();
-  destroyableOldStream.pause = destroyableOldStream.resume = () => {};
-  destroyableOldStream.destroy = common.mustCall(() => {
+  var destroyableOldStream = new Stream();
+  destroyableOldStream.pause = destroyableOldStream.resume = function () {};
+  destroyableOldStream.destroy = common.mustCall(function () {
     destroyableOldStream.emit('close');
   });
-  destroyableOldStream.write = data => {
+  destroyableOldStream.write = function (data) {
     destroyableOldStream.emit('data', data);
     return true;
   };
-  destroyableOldStream.end = () => {
+  destroyableOldStream.end = function () {
     destroyableOldStream.emit('end');
   };
-  const rs = new Readable({
-    read() {
-      rs.destroy(new Error('stop'));
+  var _rs2 = new Readable({
+    read: function read() {
+      _rs2.destroy(new Error('stop'));
     }
   });
-  const ws = new Writable({
-    write(data, enc, cb) {
+  var _ws2 = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  let finished = false;
-  ws.on('finish', () => {
-    finished = true;
+  var _finished2 = false;
+  _ws2.on('finish', function () {
+    _finished2 = true;
   });
-  pipeline(rs, oldStream, destroyableOldStream, ws, common.mustCall(err => {
+  pipeline(_rs2, _oldStream, destroyableOldStream, _ws2, common.mustCall(function (err) {
     assert.deepStrictEqual(err, new Error('stop'));
-    assert(!finished, 'should not finish');
+    assert(!_finished2, 'should not finish');
   }));
 }
 {
-  const pipelinePromise = promisify(pipeline);
-  function run() {
-    return _run.apply(this, arguments);
-  }
-  function _run() {
-    _run = _asyncToGenerator(function* () {
-      const read = new Readable({
-        read() {}
+  var run = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator(function* () {
+      var read = new Readable({
+        read: function read() {}
       });
-      const write = new Writable({
-        write(data, enc, cb) {
+      var write = new Writable({
+        write: function write(data, enc, cb) {
           cb();
         }
       });
       read.push('data');
       read.push(null);
-      let finished = false;
-      write.on('finish', () => {
+      var finished = false;
+      write.on('finish', function () {
         finished = true;
       });
       yield pipelinePromise(read, write);
       assert(finished);
     });
-    return _run.apply(this, arguments);
-  }
+    return function run() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+  var pipelinePromise = promisify(pipeline);
   run();
 }
 {
-  const read = new Readable({
-    read() {}
+  var _read5 = new Readable({
+    read: function read() {}
   });
-  const transform = new Transform({
-    transform(data, enc, cb) {
+  var _transform = new Transform({
+    transform: function transform(data, enc, cb) {
       process.nextTick(cb, new Error('kaboom'));
     }
   });
-  const write = new Writable({
-    write(data, enc, cb) {
+  var _write4 = new Writable({
+    write: function write(data, enc, cb) {
       cb();
     }
   });
-  read.on('close', common.mustCall());
-  transform.on('close', common.mustCall());
-  write.on('close', common.mustCall());
-  process.on('uncaughtException', common.mustCall(err => {
+  _read5.on('close', common.mustCall());
+  _transform.on('close', common.mustCall());
+  _write4.on('close', common.mustCall());
+  process.on('uncaughtException', common.mustCall(function (err) {
     assert.strictEqual(err.message, 'kaboom');
   }));
-  const dst = pipeline(read, transform, write);
-  assert.strictEqual(dst, write);
-  read.push('hello');
+  var _dst2 = pipeline(_read5, _transform, _write4);
+  assert.strictEqual(_dst2, _write4);
+  _read5.push('hello');
 }
 ;
 (function () {
@@ -395,4 +400,6 @@ const promisify = require('util-promisify');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -20,7 +20,7 @@ var objectKeys = objectKeys || function (obj) {
 
 // Utilities for internet-related tests
 
-const addresses = {
+var addresses = {
   // A generic host that has registered common DNS records,
   // supports both IPv4 and IPv6, and provides basic HTTP/HTTPS services
   INET_HOST: 'nodejs.org',
@@ -62,8 +62,8 @@ var _iterator = _createForOfIteratorHelper(objectKeys(addresses)),
   _step;
 try {
   for (_iterator.s(); !(_step = _iterator.n()).done;) {
-    const key = _step.value;
-    const envName = `NODE_TEST_${key}`;
+    var key = _step.value;
+    var envName = "NODE_TEST_".concat(key);
     if (process.env[envName]) {
       addresses[key] = process.env[envName];
     }
@@ -74,7 +74,7 @@ try {
   _iterator.f();
 }
 module.exports = {
-  addresses
+  addresses: addresses
 };
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

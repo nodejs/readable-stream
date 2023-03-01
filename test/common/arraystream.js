@@ -15,15 +15,16 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const _require = require('../../'),
+var _require = require('../../'),
   Stream = _require.Stream;
 function noop() {}
 
 // A stream to push an array into a REPL
 function ArrayStream() {
   this.run = function (data) {
-    forEach(data, line => {
-      this.emit('data', `${line}\n`);
+    var _this = this;
+    forEach(data, function (line) {
+      _this.emit('data', "".concat(line, "\n"));
     });
   };
 }

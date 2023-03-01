@@ -22,34 +22,34 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
+var common = require('../common');
+var assert = require('assert/');
 
 // If everything aligns so that you do a read(n) of exactly the
 // remaining buffer, then make sure that 'end' still emits.
 
-const READSIZE = 100;
-const PUSHSIZE = 20;
-const PUSHCOUNT = 1000;
-const HWM = 50;
-const Readable = require('../../').Readable;
-const r = new Readable({
+var READSIZE = 100;
+var PUSHSIZE = 20;
+var PUSHCOUNT = 1000;
+var HWM = 50;
+var Readable = require('../../').Readable;
+var r = new Readable({
   highWaterMark: HWM
 });
-const rs = r._readableState;
+var rs = r._readableState;
 r._read = push;
 r.on('readable', function () {
   ;
   false && console.error('>> readable');
-  let ret;
+  var ret;
   do {
     ;
-    false && console.error(`  > read(${READSIZE})`);
+    false && console.error("  > read(".concat(READSIZE, ")"));
     ret = r.read(READSIZE);
     ;
-    false && console.error(`  < ${ret && ret.length} (${rs.length} remain)`);
+    false && console.error("  < ".concat(ret && ret.length, " (").concat(rs.length, " remain)"));
   } while (ret && ret.length === READSIZE);
   ;
   false && console.error('<< after read()', ret && ret.length, rs.needReadable, rs.length);
@@ -57,7 +57,7 @@ r.on('readable', function () {
 r.on('end', common.mustCall(function () {
   assert.strictEqual(pushes, PUSHCOUNT + 1);
 }));
-let pushes = 0;
+var pushes = 0;
 function push() {
   if (pushes > PUSHCOUNT) return;
   if (pushes++ === PUSHCOUNT) {
@@ -66,7 +66,7 @@ function push() {
     return r.push(null);
   }
   ;
-  false && console.error(`   push #${pushes}`);
+  false && console.error("   push #".concat(pushes));
   if (r.push(bufferShim.allocUnsafe(PUSHSIZE))) setTimeout(push, 1);
 }
 ;
@@ -77,4 +77,6 @@ function push() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

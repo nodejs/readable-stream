@@ -22,15 +22,15 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const Readable = require('../../').Readable;
+var assert = require('assert/');
+var Readable = require('../../').Readable;
 test1();
 test2();
 function test1() {
-  const r = new Readable();
+  var r = new Readable();
 
   // should not end when we get a bufferShim.alloc(0) or '' as the _read
   // result that just means that there is *temporarily* no data, but to
@@ -42,22 +42,22 @@ function test1() {
   // r.read(0) again later, otherwise there is no more work being done
   // and the process just exits.
 
-  const buf = bufferShim.alloc(5, 'x');
-  let reads = 5;
+  var buf = bufferShim.alloc(5, 'x');
+  var reads = 5;
   r._read = function (n) {
     switch (reads--) {
       case 5:
-        return setImmediate(() => {
+        return setImmediate(function () {
           return r.push(buf);
         });
       case 4:
-        setImmediate(() => {
+        setImmediate(function () {
           return r.push(bufferShim.alloc(0));
         });
         return setImmediate(r.read.bind(r, 0));
       case 3:
         setTimeout(r.read.bind(r, 0), 50);
-        return process.nextTick(() => {
+        return process.nextTick(function () {
           return r.push(bufferShim.alloc(0));
         });
       case 2:
@@ -73,41 +73,41 @@ function test1() {
         throw new Error('unreachable');
     }
   };
-  const results = [];
+  var results = [];
   function flow() {
-    let chunk;
+    var chunk;
     while (null !== (chunk = r.read())) results.push(String(chunk));
   }
   r.on('readable', flow);
-  r.on('end', () => {
+  r.on('end', function () {
     results.push('EOF');
   });
   flow();
-  process.on('exit', () => {
+  process.on('exit', function () {
     assert.deepStrictEqual(results, ['xxxxx', 'xxxxx', 'EOF']);
     require('tap').pass();
   });
 }
 function test2() {
-  const r = new Readable({
+  var r = new Readable({
     encoding: 'base64'
   });
-  let reads = 5;
+  var reads = 5;
   r._read = function (n) {
     if (!reads--) return r.push(null); // EOF
     else return r.push(bufferShim.from('x'));
   };
-  const results = [];
+  var results = [];
   function flow() {
-    let chunk;
+    var chunk;
     while (null !== (chunk = r.read())) results.push(String(chunk));
   }
   r.on('readable', flow);
-  r.on('end', () => {
+  r.on('end', function () {
     results.push('EOF');
   });
   flow();
-  process.on('exit', () => {
+  process.on('exit', function () {
     assert.deepStrictEqual(results, ['eHh4', 'eHg=', 'EOF']);
     require('tap').pass();
   });
@@ -120,4 +120,6 @@ function test2() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

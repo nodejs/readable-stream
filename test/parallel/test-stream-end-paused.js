@@ -22,16 +22,16 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
+var common = require('../common');
+var assert = require('assert/');
 
 // Make sure we don't miss the end event for paused 0-length streams
 
-const Readable = require('../../').Readable;
-const stream = new Readable();
-let calledRead = false;
+var Readable = require('../../').Readable;
+var stream = new Readable();
+var calledRead = false;
 stream._read = function () {
   assert(!calledRead);
   calledRead = true;
@@ -56,4 +56,6 @@ process.on('exit', function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -22,9 +22,9 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const assert = require('assert');
-const os = require('os');
-const types = {
+var assert = require('assert');
+var os = require('os');
+var types = {
   A: 1,
   AAAA: 28,
   NS: 2,
@@ -35,7 +35,7 @@ const types = {
   TXT: 16,
   ANY: 255
 };
-const classes = {
+var classes = {
   IN: 1
 };
 
@@ -43,7 +43,7 @@ const classes = {
 
 function readDomainFromPacket(buffer, offset) {
   assert.ok(offset < buffer.length);
-  const length = buffer[offset];
+  var length = buffer[offset];
   if (length === 0) {
     return {
       nread: 1,
@@ -51,20 +51,20 @@ function readDomainFromPacket(buffer, offset) {
     };
   } else if ((length & 0xC0) === 0) {
     offset += 1;
-    const chunk = buffer.toString('ascii', offset, offset + length);
+    var chunk = buffer.toString('ascii', offset, offset + length);
     // Read the rest of the domain.
-    const _readDomainFromPacket = readDomainFromPacket(buffer, offset + length),
+    var _readDomainFromPacket = readDomainFromPacket(buffer, offset + length),
       nread = _readDomainFromPacket.nread,
       domain = _readDomainFromPacket.domain;
     return {
       nread: 1 + length + nread,
-      domain: domain ? `${chunk}.${domain}` : chunk
+      domain: domain ? "".concat(chunk, ".").concat(domain) : chunk
     };
   } else {
     // Pointer to another part of the packet.
     assert.strictEqual(length & 0xC0, 0xC0);
     // eslint-disable-next-line space-infix-ops, space-unary-ops
-    const pointeeOffset = buffer.readUInt16BE(offset) & ~0xC000;
+    var pointeeOffset = buffer.readUInt16BE(offset) & ~0xC000;
     return {
       nread: 2,
       domain: readDomainFromPacket(buffer, pointeeOffset)
@@ -73,39 +73,39 @@ function readDomainFromPacket(buffer, offset) {
 }
 function parseDNSPacket(buffer) {
   assert.ok(buffer.length > 12);
-  const parsed = {
+  var parsed = {
     id: buffer.readUInt16BE(0),
     flags: buffer.readUInt16BE(2)
   };
-  const counts = [['questions', buffer.readUInt16BE(4)], ['answers', buffer.readUInt16BE(6)], ['authorityAnswers', buffer.readUInt16BE(8)], ['additionalRecords', buffer.readUInt16BE(10)]];
-  let offset = 12;
+  var counts = [['questions', buffer.readUInt16BE(4)], ['answers', buffer.readUInt16BE(6)], ['authorityAnswers', buffer.readUInt16BE(8)], ['additionalRecords', buffer.readUInt16BE(10)]];
+  var offset = 12;
   for (var _i = 0, _counts = counts; _i < _counts.length; _i++) {
-    const _counts$_i = _slicedToArray(_counts[_i], 2),
+    var _counts$_i = _slicedToArray(_counts[_i], 2),
       sectionName = _counts$_i[0],
       count = _counts$_i[1];
     parsed[sectionName] = [];
-    for (let i = 0; i < count; ++i) {
-      const _readDomainFromPacket2 = readDomainFromPacket(buffer, offset),
+    for (var _i2 = 0; _i2 < count; ++_i2) {
+      var _readDomainFromPacket2 = readDomainFromPacket(buffer, offset),
         nread = _readDomainFromPacket2.nread,
         domain = _readDomainFromPacket2.domain;
       offset += nread;
-      const type = buffer.readUInt16BE(offset);
-      const rr = {
-        domain,
+      var type = buffer.readUInt16BE(offset);
+      var rr = {
+        domain: domain,
         cls: buffer.readUInt16BE(offset + 2)
       };
       offset += 4;
-      for (const name in types) {
+      for (var name in types) {
         if (types[name] === type) rr.type = name;
       }
       if (sectionName !== 'questions') {
         rr.ttl = buffer.readInt32BE(offset);
-        const dataLength = buffer.readUInt16BE(offset);
+        var dataLength = buffer.readUInt16BE(offset);
         offset += 6;
         switch (type) {
           case types.A:
             assert.strictEqual(dataLength, 4);
-            rr.address = `${buffer[offset + 0]}.${buffer[offset + 1]}.` + `${buffer[offset + 2]}.${buffer[offset + 3]}`;
+            rr.address = "".concat(buffer[offset + 0], ".").concat(buffer[offset + 1], ".") + "".concat(buffer[offset + 2], ".").concat(buffer[offset + 3]);
             break;
           case types.AAAA:
             assert.strictEqual(dataLength, 16);
@@ -113,10 +113,10 @@ function parseDNSPacket(buffer) {
             break;
           case types.TXT:
             {
-              let position = offset;
+              var position = offset;
               rr.entries = [];
               while (position < offset + dataLength) {
-                const txtLength = buffer[offset];
+                var txtLength = buffer[offset];
                 rr.entries.push(buffer.toString('utf8', position + 1, position + 1 + txtLength));
                 position += 1 + txtLength;
               }
@@ -127,31 +127,31 @@ function parseDNSPacket(buffer) {
             {
               rr.priority = buffer.readInt16BE(buffer, offset);
               offset += 2;
-              const _readDomainFromPacket3 = readDomainFromPacket(buffer, offset),
-                nread = _readDomainFromPacket3.nread,
-                domain = _readDomainFromPacket3.domain;
-              rr.exchange = domain;
-              assert.strictEqual(nread, dataLength);
+              var _readDomainFromPacket3 = readDomainFromPacket(buffer, offset),
+                _nread = _readDomainFromPacket3.nread,
+                _domain = _readDomainFromPacket3.domain;
+              rr.exchange = _domain;
+              assert.strictEqual(_nread, dataLength);
               break;
             }
           case types.NS:
           case types.CNAME:
           case types.PTR:
             {
-              const _readDomainFromPacket4 = readDomainFromPacket(buffer, offset),
-                nread = _readDomainFromPacket4.nread,
-                domain = _readDomainFromPacket4.domain;
-              rr.value = domain;
-              assert.strictEqual(nread, dataLength);
+              var _readDomainFromPacket4 = readDomainFromPacket(buffer, offset),
+                _nread2 = _readDomainFromPacket4.nread,
+                _domain2 = _readDomainFromPacket4.domain;
+              rr.value = _domain2;
+              assert.strictEqual(_nread2, dataLength);
               break;
             }
           case types.SOA:
             {
-              const mname = readDomainFromPacket(buffer, offset);
-              const rname = readDomainFromPacket(buffer, offset + mname.nread);
+              var mname = readDomainFromPacket(buffer, offset);
+              var rname = readDomainFromPacket(buffer, offset + mname.nread);
               rr.nsname = mname.domain;
               rr.hostmaster = rname.domain;
-              const trailerOffset = offset + mname.nread + rname.nread;
+              var trailerOffset = offset + mname.nread + rname.nread;
               rr.serial = buffer.readUInt32BE(trailerOffset);
               rr.refresh = buffer.readUInt32BE(trailerOffset + 4);
               rr.retry = buffer.readUInt32BE(trailerOffset + 8);
@@ -161,7 +161,7 @@ function parseDNSPacket(buffer) {
               break;
             }
           default:
-            throw new Error(`Unknown RR type ${rr.type}`);
+            throw new Error("Unknown RR type ".concat(rr.type));
         }
         offset += dataLength;
       }
@@ -173,14 +173,14 @@ function parseDNSPacket(buffer) {
   return parsed;
 }
 function writeIPv6(ip) {
-  const parts = ip.replace(/^:|:$/g, '').split(':');
-  const buf = Buffer.alloc(16);
-  let offset = 0;
+  var parts = ip.replace(/^:|:$/g, '').split(':');
+  var buf = Buffer.alloc(16);
+  var offset = 0;
   var _iterator = _createForOfIteratorHelper(parts),
     _step;
   try {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      const part = _step.value;
+      var part = _step.value;
       if (part === '') {
         offset += 16 - 2 * (parts.length - 1);
       } else {
@@ -196,20 +196,20 @@ function writeIPv6(ip) {
   return buf;
 }
 function writeDomainName(domain) {
-  return Buffer.concat(domain.split('.').map(label => {
+  return Buffer.concat(domain.split('.').map(function (label) {
     assert(label.length < 64);
     return Buffer.concat([Buffer.from([label.length]), Buffer.from(label, 'ascii')]);
   }).concat([Buffer.alloc(1)]));
 }
 function writeDNSPacket(parsed) {
-  const buffers = [];
-  const kStandardResponseFlags = 0x8180;
+  var buffers = [];
+  var kStandardResponseFlags = 0x8180;
   buffers.push(new Uint16Array([parsed.id, parsed.flags === undefined ? kStandardResponseFlags : parsed.flags, parsed.questions && parsed.questions.length, parsed.answers && parsed.answers.length, parsed.authorityAnswers && parsed.authorityAnswers.length, parsed.additionalRecords && parsed.additionalRecords.length]));
   var _iterator2 = _createForOfIteratorHelper(parsed.questions),
     _step2;
   try {
     for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      const q = _step2.value;
+      var q = _step2.value;
       assert(types[q.type]);
       buffers.push(writeDomainName(q.domain));
       buffers.push(new Uint16Array([types[q.type], q.cls === undefined ? classes.IN : q.cls]));
@@ -223,13 +223,13 @@ function writeDNSPacket(parsed) {
     _step3;
   try {
     for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-      const rr = _step3.value;
+      var rr = _step3.value;
       if (!rr) continue;
       assert(types[rr.type]);
       buffers.push(writeDomainName(rr.domain));
       buffers.push(new Uint16Array([types[rr.type], rr.cls === undefined ? classes.IN : rr.cls]));
       buffers.push(new Int32Array([rr.ttl]));
-      const rdLengthBuf = new Uint16Array(1);
+      var rdLengthBuf = new Uint16Array(1);
       buffers.push(rdLengthBuf);
       switch (rr.type) {
         case 'A':
@@ -241,14 +241,18 @@ function writeDNSPacket(parsed) {
           buffers.push(writeIPv6(rr.address));
           break;
         case 'TXT':
-          const total = rr.entries.map(s => s.length).reduce((a, b) => a + b);
+          var total = rr.entries.map(function (s) {
+            return s.length;
+          }).reduce(function (a, b) {
+            return a + b;
+          });
           // Total length of all strings + 1 byte each for their lengths.
           rdLengthBuf[0] = rr.entries.length + total;
           var _iterator4 = _createForOfIteratorHelper(rr.entries),
             _step4;
           try {
             for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-              const txt = _step4.value;
+              var txt = _step4.value;
               buffers.push(new Uint8Array([Buffer.byteLength(txt)]));
               buffers.push(Buffer.from(txt));
             }
@@ -266,22 +270,22 @@ function writeDNSPacket(parsed) {
         case 'CNAME':
         case 'PTR':
           {
-            const domain = writeDomainName(rr.exchange || rr.value);
+            var domain = writeDomainName(rr.exchange || rr.value);
             rdLengthBuf[0] += domain.length;
             buffers.push(domain);
             break;
           }
         case 'SOA':
           {
-            const mname = writeDomainName(rr.nsname);
-            const rname = writeDomainName(rr.hostmaster);
+            var mname = writeDomainName(rr.nsname);
+            var rname = writeDomainName(rr.hostmaster);
             rdLengthBuf[0] = mname.length + rname.length + 20;
             buffers.push(mname, rname);
             buffers.push(new Uint32Array([rr.serial, rr.refresh, rr.retry, rr.expire, rr.minttl]));
             break;
           }
         default:
-          throw new Error(`Unknown RR type ${rr.type}`);
+          throw new Error("Unknown RR type ".concat(rr.type));
       }
     }
   } catch (err) {
@@ -289,8 +293,8 @@ function writeDNSPacket(parsed) {
   } finally {
     _iterator3.f();
   }
-  return Buffer.concat(buffers.map(typedArray => {
-    const buf = Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
+  return Buffer.concat(buffers.map(function (typedArray) {
+    var buf = Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
     if (os.endianness() === 'LE') {
       if (typedArray.BYTES_PER_ELEMENT === 2) buf.swap16();
       if (typedArray.BYTES_PER_ELEMENT === 4) buf.swap32();
@@ -298,13 +302,13 @@ function writeDNSPacket(parsed) {
     return buf;
   }));
 }
-const mockedErrorCode = 'ENOTFOUND';
-const mockedSysCall = 'getaddrinfo';
+var mockedErrorCode = 'ENOTFOUND';
+var mockedSysCall = 'getaddrinfo';
 function errorLookupMock() {
-  let code = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : mockedErrorCode;
-  let syscall = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : mockedSysCall;
+  var code = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : mockedErrorCode;
+  var syscall = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : mockedSysCall;
   return function lookupWithError(hostname, dnsopts, cb) {
-    const err = new Error(`${syscall} ${code} ${hostname}`);
+    var err = new Error("".concat(syscall, " ").concat(code, " ").concat(hostname));
     err.code = code;
     err.errno = code;
     err.syscall = syscall;
@@ -313,13 +317,13 @@ function errorLookupMock() {
   };
 }
 module.exports = {
-  types,
-  classes,
-  writeDNSPacket,
-  parseDNSPacket,
-  errorLookupMock,
-  mockedErrorCode,
-  mockedSysCall
+  types: types,
+  classes: classes,
+  writeDNSPacket: writeDNSPacket,
+  parseDNSPacket: parseDNSPacket,
+  errorLookupMock: errorLookupMock,
+  mockedErrorCode: mockedErrorCode,
+  mockedSysCall: mockedSysCall
 };
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

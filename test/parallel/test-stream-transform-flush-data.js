@@ -1,25 +1,25 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 require('../common');
-const assert = require('assert/');
-const Transform = require('../../').Transform;
-const expected = 'asdf';
+var assert = require('assert/');
+var Transform = require('../../').Transform;
+var expected = 'asdf';
 function _transform(d, e, n) {
   n();
 }
 function _flush(n) {
   n(null, expected);
 }
-const t = new Transform({
+var t = new Transform({
   transform: _transform,
   flush: _flush
 });
 t.end(bufferShim.from('blerg'));
-t.on('data', data => {
+t.on('data', function (data) {
   assert.strictEqual(data.toString(), expected);
 });
 ;
@@ -30,4 +30,6 @@ t.on('data', data => {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

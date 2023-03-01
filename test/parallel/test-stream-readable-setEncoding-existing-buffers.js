@@ -1,58 +1,64 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const _require = require('../../'),
+var _require = require('../../'),
   Readable = _require.Readable;
-const assert = require('assert/');
+var assert = require('assert/');
 {
   // Call .setEncoding() while there are bytes already in the buffer.
-  const r = new Readable({
-    read() {}
+  var r = new Readable({
+    read: function read() {}
   });
   r.push(bufferShim.from('a'));
   r.push(bufferShim.from('b'));
   r.setEncoding('utf8');
-  const chunks = [];
-  r.on('data', chunk => chunks.push(chunk));
-  process.nextTick(() => {
+  var chunks = [];
+  r.on('data', function (chunk) {
+    return chunks.push(chunk);
+  });
+  process.nextTick(function () {
     assert.deepStrictEqual(chunks, ['ab']);
   });
 }
 {
   // Call .setEncoding() while the buffer contains a complete,
   // but chunked character.
-  const r = new Readable({
-    read() {}
+  var _r = new Readable({
+    read: function read() {}
   });
-  r.push(bufferShim.from([0xf0]));
-  r.push(bufferShim.from([0x9f]));
-  r.push(bufferShim.from([0x8e]));
-  r.push(bufferShim.from([0x89]));
-  r.setEncoding('utf8');
-  const chunks = [];
-  r.on('data', chunk => chunks.push(chunk));
-  process.nextTick(() => {
-    assert.deepStrictEqual(chunks, ['🎉']);
+  _r.push(bufferShim.from([0xf0]));
+  _r.push(bufferShim.from([0x9f]));
+  _r.push(bufferShim.from([0x8e]));
+  _r.push(bufferShim.from([0x89]));
+  _r.setEncoding('utf8');
+  var _chunks = [];
+  _r.on('data', function (chunk) {
+    return _chunks.push(chunk);
+  });
+  process.nextTick(function () {
+    assert.deepStrictEqual(_chunks, ['🎉']);
   });
 }
 {
   // Call .setEncoding() while the buffer contains an incomplete character,
   // and finish the character later.
-  const r = new Readable({
-    read() {}
+  var _r2 = new Readable({
+    read: function read() {}
   });
-  r.push(bufferShim.from([0xf0]));
-  r.push(bufferShim.from([0x9f]));
-  r.setEncoding('utf8');
-  r.push(bufferShim.from([0x8e]));
-  r.push(bufferShim.from([0x89]));
-  const chunks = [];
-  r.on('data', chunk => chunks.push(chunk));
-  process.nextTick(() => {
-    assert.deepStrictEqual(chunks, ['🎉']);
+  _r2.push(bufferShim.from([0xf0]));
+  _r2.push(bufferShim.from([0x9f]));
+  _r2.setEncoding('utf8');
+  _r2.push(bufferShim.from([0x8e]));
+  _r2.push(bufferShim.from([0x89]));
+  var _chunks2 = [];
+  _r2.on('data', function (chunk) {
+    return _chunks2.push(chunk);
+  });
+  process.nextTick(function () {
+    assert.deepStrictEqual(_chunks2, ['🎉']);
   });
 }
 ;
@@ -63,4 +69,6 @@ const assert = require('assert/');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,22 +1,22 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
+var common = require('../common');
 
 // Regression test for https://github.com/nodejs/node/issues/12718.
 // Tests that piping a source stream twice to the same destination stream
 // works, and that a subsequent unpipe() call only removes the pipe *once*.
-const assert = require('assert/');
-const _require = require('../../'),
+var assert = require('assert/');
+var _require = require('../../'),
   PassThrough = _require.PassThrough,
   Writable = _require.Writable;
 {
-  const passThrough = new PassThrough();
-  const dest = new Writable({
-    write: common.mustCall((chunk, encoding, cb) => {
-      assert.strictEqual(`${chunk}`, 'foobar');
+  var passThrough = new PassThrough();
+  var dest = new Writable({
+    write: common.mustCall(function (chunk, encoding, cb) {
+      assert.strictEqual("".concat(chunk), 'foobar');
       cb();
     })
   });
@@ -34,37 +34,37 @@ const _require = require('../../'),
   passThrough.pipe(dest);
 }
 {
-  const passThrough = new PassThrough();
-  const dest = new Writable({
-    write: common.mustCall((chunk, encoding, cb) => {
-      assert.strictEqual(`${chunk}`, 'foobar');
+  var _passThrough = new PassThrough();
+  var _dest = new Writable({
+    write: common.mustCall(function (chunk, encoding, cb) {
+      assert.strictEqual("".concat(chunk), 'foobar');
       cb();
     }, 2)
   });
-  passThrough.pipe(dest);
-  passThrough.pipe(dest);
-  assert.strictEqual(passThrough._events.data.length, 2);
-  assert.strictEqual(passThrough._readableState.pipesCount, 2);
-  assert.strictEqual(passThrough._readableState.pipes[0], dest);
-  assert.strictEqual(passThrough._readableState.pipes[1], dest);
-  passThrough.write('foobar');
+  _passThrough.pipe(_dest);
+  _passThrough.pipe(_dest);
+  assert.strictEqual(_passThrough._events.data.length, 2);
+  assert.strictEqual(_passThrough._readableState.pipesCount, 2);
+  assert.strictEqual(_passThrough._readableState.pipes[0], _dest);
+  assert.strictEqual(_passThrough._readableState.pipes[1], _dest);
+  _passThrough.write('foobar');
 }
 {
-  const passThrough = new PassThrough();
-  const dest = new Writable({
+  var _passThrough2 = new PassThrough();
+  var _dest2 = new Writable({
     write: common.mustNotCall()
   });
-  passThrough.pipe(dest);
-  passThrough.pipe(dest);
-  assert.strictEqual(passThrough._events.data.length, 2);
-  assert.strictEqual(passThrough._readableState.pipesCount, 2);
-  assert.strictEqual(passThrough._readableState.pipes[0], dest);
-  assert.strictEqual(passThrough._readableState.pipes[1], dest);
-  passThrough.unpipe(dest);
-  passThrough.unpipe(dest);
-  assert.strictEqual(passThrough._events.data, undefined);
-  assert.strictEqual(passThrough._readableState.pipesCount, 0);
-  passThrough.write('foobar');
+  _passThrough2.pipe(_dest2);
+  _passThrough2.pipe(_dest2);
+  assert.strictEqual(_passThrough2._events.data.length, 2);
+  assert.strictEqual(_passThrough2._readableState.pipesCount, 2);
+  assert.strictEqual(_passThrough2._readableState.pipes[0], _dest2);
+  assert.strictEqual(_passThrough2._readableState.pipes[1], _dest2);
+  _passThrough2.unpipe(_dest2);
+  _passThrough2.unpipe(_dest2);
+  assert.strictEqual(_passThrough2._events.data, undefined);
+  assert.strictEqual(_passThrough2._readableState.pipesCount, 0);
+  _passThrough2.write('foobar');
 }
 ;
 (function () {
@@ -74,4 +74,6 @@ const _require = require('../../'),
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

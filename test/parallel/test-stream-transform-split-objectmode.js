@@ -22,12 +22,12 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const Transform = require('../../').Transform;
-const parser = new Transform({
+var assert = require('assert/');
+var Transform = require('../../').Transform;
+var parser = new Transform({
   readableObjectMode: true
 });
 assert(parser._readableState.objectMode);
@@ -41,7 +41,7 @@ parser._transform = function (chunk, enc, callback) {
     val: chunk[0]
   });
 };
-let parsed;
+var parsed;
 parser.on('data', function (obj) {
   parsed = obj;
 });
@@ -49,7 +49,7 @@ parser.end(bufferShim.from([42]));
 process.on('exit', function () {
   assert.strictEqual(parsed.val, 42);
 });
-const serializer = new Transform({
+var serializer = new Transform({
   writableObjectMode: true
 });
 assert(!serializer._readableState.objectMode);
@@ -61,7 +61,7 @@ assert.strictEqual(parser.writableHighWaterMark, parser._writableState.highWater
 serializer._transform = function (obj, _, callback) {
   callback(null, bufferShim.from([obj.val]));
 };
-let serialized;
+var serialized;
 serializer.on('data', function (chunk) {
   serialized = chunk;
 });
@@ -79,4 +79,6 @@ process.on('exit', function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

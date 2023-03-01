@@ -15,11 +15,11 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const common = require('../common');
-const path = require('path');
-const kNodeShared = Boolean(process.config.variables.node_shared);
-const kShlibSuffix = process.config.variables.shlib_suffix;
-const kExecPath = path.dirname(process.execPath);
+var common = require('../common');
+var path = require('path');
+var kNodeShared = Boolean(process.config.variables.node_shared);
+var kShlibSuffix = process.config.variables.shlib_suffix;
+var kExecPath = path.dirname(process.execPath);
 
 // If node executable is linked to shared lib, need to take care about the
 // shared lib path.
@@ -42,9 +42,9 @@ function getSharedLibPath() {
   if (common.isWindows) {
     return path.join(kExecPath, 'node.dll');
   } else if (common.isOSX) {
-    return path.join(kExecPath, `libnode.${kShlibSuffix}`);
+    return path.join(kExecPath, "libnode.".concat(kShlibSuffix));
   } else {
-    return path.join(kExecPath, 'lib.target', `libnode.${kShlibSuffix}`);
+    return path.join(kExecPath, 'lib.target', "libnode.".concat(kShlibSuffix));
   }
 }
 
@@ -53,9 +53,9 @@ function getBinaryPath() {
   return kNodeShared ? getSharedLibPath() : process.execPath;
 }
 module.exports = {
-  addLibraryPath,
-  getBinaryPath,
-  getSharedLibPath
+  addLibraryPath: addLibraryPath,
+  getBinaryPath: getBinaryPath,
+  getSharedLibPath: getSharedLibPath
 };
 function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {

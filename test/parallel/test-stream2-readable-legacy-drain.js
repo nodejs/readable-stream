@@ -22,22 +22,22 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const Stream = require('../../');
-const Readable = require('../../').Readable;
-const r = new Readable();
-const N = 256;
-let reads = 0;
+var common = require('../common');
+var assert = require('assert/');
+var Stream = require('../../');
+var Readable = require('../../').Readable;
+var r = new Readable();
+var N = 256;
+var reads = 0;
 r._read = function (n) {
   return r.push(++reads === N ? null : bufferShim.allocUnsafe(1));
 };
 r.on('end', common.mustCall());
-const w = new Stream();
+var w = new Stream();
 w.writable = true;
-let buffered = 0;
+var buffered = 0;
 w.write = function (c) {
   buffered += c.length;
   process.nextTick(drain);
@@ -65,4 +65,6 @@ r.pipe(w);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

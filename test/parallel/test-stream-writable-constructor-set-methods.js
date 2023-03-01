@@ -1,28 +1,28 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('assert/'),
+var common = require('../common');
+var _require = require('assert/'),
   strictEqual = _require.strictEqual;
-const _require2 = require('../../'),
+var _require2 = require('../../'),
   Writable = _require2.Writable;
-const w = new Writable();
+var w = new Writable();
 w.on('error', common.expectsError({
   type: Error,
   code: 'ERR_METHOD_NOT_IMPLEMENTED',
   message: 'The _write() method is not implemented'
 }));
 w.end(bufferShim.from('blerg'));
-const _write = common.mustCall((chunk, _, next) => {
+var _write = common.mustCall(function (chunk, _, next) {
   next();
 });
-const _writev = common.mustCall((chunks, next) => {
+var _writev = common.mustCall(function (chunks, next) {
   strictEqual(chunks.length, 2);
   next();
 });
-const w2 = new Writable({
+var w2 = new Writable({
   write: _write,
   writev: _writev
 });
@@ -41,4 +41,6 @@ w2.end();
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

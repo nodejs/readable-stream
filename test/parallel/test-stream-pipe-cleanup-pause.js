@@ -1,19 +1,19 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const stream = require('../../');
-const reader = new stream.Readable();
-const writer1 = new stream.Writable();
-const writer2 = new stream.Writable();
+var common = require('../common');
+var stream = require('../../');
+var reader = new stream.Readable();
+var writer1 = new stream.Writable();
+var writer2 = new stream.Writable();
 
 // 560000 is chosen here because it is larger than the (default) highWaterMark
 // and will cause `.write()` to return false
 // See: https://github.com/nodejs/node/issues/2323
-const buffer = bufferShim.allocUnsafe(560000);
-reader._read = () => {};
+var buffer = bufferShim.allocUnsafe(560000);
+reader._read = function () {};
 writer1._write = common.mustCall(function (chunk, encoding, cb) {
   this.emit('chunk-received');
   cb();
@@ -42,4 +42,6 @@ reader.push(buffer);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

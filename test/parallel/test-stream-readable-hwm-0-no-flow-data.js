@@ -1,10 +1,10 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
+var common = require('../common');
 
 // Ensure that subscribing the 'data' event will not make the stream flow.
 // The 'data' event will require calling read() by hand.
@@ -12,17 +12,17 @@ const common = require('../common');
 // The test is written for the (somewhat rare) highWaterMark: 0 streams to
 // specifically catch any regressions that might occur with these streams.
 
-const assert = require('assert/');
-const _require = require('../../'),
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable;
-const streamData = ['a', null];
+var streamData = ['a', null];
 
 // Track the calls so we can assert their order later.
-const calls = [];
-const r = new Readable({
-  read: common.mustCall(() => {
+var calls = [];
+var r = new Readable({
+  read: common.mustCall(function () {
     calls.push('_read:' + streamData[0]);
-    process.nextTick(() => {
+    process.nextTick(function () {
       calls.push('push:' + streamData[0]);
       r.push(streamData.shift());
     });
@@ -33,14 +33,14 @@ const r = new Readable({
   objectMode: true
 });
 assert.strictEqual(r.readableFlowing, null);
-r.on('readable', common.mustCall(() => {
+r.on('readable', common.mustCall(function () {
   calls.push('readable');
 }, 2));
 assert.strictEqual(r.readableFlowing, false);
-r.on('data', common.mustCall(data => {
+r.on('data', common.mustCall(function (data) {
   calls.push('data:' + data);
 }, 1));
-r.on('end', common.mustCall(() => {
+r.on('end', common.mustCall(function () {
   calls.push('end');
 }));
 assert.strictEqual(r.readableFlowing, false);
@@ -51,7 +51,7 @@ assert.strictEqual(r.readableFlowing, false);
 //
 // We use setImmediate here to give the stream enough time to emit all the
 // events it's about to emit.
-setImmediate(() => {
+setImmediate(function () {
   // Only the _read, push, readable calls have happened. No data must be
   // emitted yet.
   assert.deepStrictEqual(calls, ['_read:a', 'push:a', 'readable']);
@@ -70,7 +70,7 @@ setImmediate(() => {
   // Using setImmediate again to give the stream enough time to emit all the
   // events it wants to emit.
   assert.strictEqual(r.read(), null);
-  setImmediate(() => {
+  setImmediate(function () {
     // There's a new 'readable' event after the data has been pushed.
     // The 'end' event will be emitted only after a 'read()'.
     //
@@ -85,7 +85,7 @@ setImmediate(() => {
     // ('end' event happening on the next tick after read()) so any changes
     // to it are noted and acknowledged in the future.
     assert.deepStrictEqual(calls, ['_read:a', 'push:a', 'readable', 'data:a', '_read:null', 'push:null', 'readable']);
-    process.nextTick(() => {
+    process.nextTick(function () {
       assert.deepStrictEqual(calls, ['_read:a', 'push:a', 'readable', 'data:a', '_read:null', 'push:null', 'readable', 'end']);
     });
   });
@@ -98,4 +98,6 @@ setImmediate(() => {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,12 +1,12 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const stream = require('../../');
-const assert = require('assert/');
-const writable = new stream.Writable({
+var common = require('../common');
+var stream = require('../../');
+var assert = require('assert/');
+var writable = new stream.Writable({
   write: common.mustCall(function (chunk, encoding, cb) {
     assert.strictEqual(readable._readableState.awaitDrain, 0);
     if (chunk.length === 32 * 1024) {
@@ -14,7 +14,7 @@ const writable = new stream.Writable({
       readable.push(bufferShim.alloc(34 * 1024)); // above hwm
       // We should check if awaitDrain counter is increased in the next
       // tick, because awaitDrain is incremented after this method finished
-      process.nextTick(() => {
+      process.nextTick(function () {
         assert.strictEqual(readable._readableState.awaitDrain, 1);
       });
     }
@@ -23,8 +23,8 @@ const writable = new stream.Writable({
 });
 
 // A readable stream which produces two buffers.
-const bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
-const readable = new stream.Readable({
+var bufs = [bufferShim.alloc(32 * 1024), bufferShim.alloc(33 * 1024)]; // above hwm
+var readable = new stream.Readable({
   read: function read() {
     while (bufs.length > 0) {
       this.push(bufs.shift());
@@ -40,4 +40,6 @@ readable.pipe(writable);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

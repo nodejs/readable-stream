@@ -1,17 +1,17 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var common = require('../common');
+var assert = require('assert/');
+var _require = require('../../'),
   Transform = _require.Transform,
   Readable = _require.Readable,
   Writable = _require.Writable;
-const DEFAULT = 16 * 1024;
+var DEFAULT = 16 * 1024;
 function testTransform(expectedReadableHwm, expectedWritableHwm, options) {
-  const t = new Transform(options);
+  var t = new Transform(options);
   assert.strictEqual(t._readableState.highWaterMark, expectedReadableHwm);
   assert.strictEqual(t._writableState.highWaterMark, expectedWritableHwm);
 }
@@ -67,7 +67,7 @@ testTransform(0, 0, {
 });
 
 // test undefined, null
-[undefined, null].forEach(v => {
+[undefined, null].forEach(function (v) {
   testTransform(DEFAULT, DEFAULT, {
     readableHighWaterMark: v
   });
@@ -86,7 +86,7 @@ testTransform(0, 0, {
 
 // test NaN
 {
-  common.expectsError(() => {
+  common.expectsError(function () {
     new Transform({
       readableHighWaterMark: NaN
     });
@@ -95,7 +95,7 @@ testTransform(0, 0, {
     code: 'ERR_INVALID_OPT_VALUE',
     message: 'The value "NaN" is invalid for option "readableHighWaterMark"'
   });
-  common.expectsError(() => {
+  common.expectsError(function () {
     new Transform({
       writableHighWaterMark: NaN
     });
@@ -108,11 +108,11 @@ testTransform(0, 0, {
 
 // test non Duplex streams ignore the options
 {
-  const r = new Readable({
+  var r = new Readable({
     readableHighWaterMark: 666
   });
   assert.strictEqual(r._readableState.highWaterMark, DEFAULT);
-  const w = new Writable({
+  var w = new Writable({
     writableHighWaterMark: 777
   });
   assert.strictEqual(w._writableState.highWaterMark, DEFAULT);
@@ -125,4 +125,6 @@ testTransform(0, 0, {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

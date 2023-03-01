@@ -22,39 +22,39 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable,
   Writable = _require.Writable;
-const EE = require('events').EventEmitter;
+var EE = require('events').EventEmitter;
 
 // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
-const stream = new Readable({
+var stream = new Readable({
   highWaterMark: 16,
   encoding: 'utf8'
 });
-const source = new EE();
+var source = new EE();
 stream._read = function () {
   console.error('stream._read');
   readStart();
 };
-let ended = false;
+var ended = false;
 stream.on('end', function () {
   ended = true;
 });
 source.on('data', function (chunk) {
-  const ret = stream.push(chunk);
+  var ret = stream.push(chunk);
   console.error('data', stream.readableLength);
   if (!ret) readStop();
 });
 source.on('end', function () {
   stream.push(null);
 });
-let reading = false;
+var reading = false;
 function readStart() {
   console.error('readStart');
   reading = true;
@@ -63,17 +63,17 @@ function readStop() {
   console.error('readStop');
   reading = false;
   process.nextTick(function () {
-    const r = stream.read();
+    var r = stream.read();
     if (r !== null) writer.write(r);
   });
 }
-const writer = new Writable({
+var writer = new Writable({
   decodeStrings: false
 });
-const written = [];
-const expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
+var written = [];
+var expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
 writer._write = function (chunk, encoding, cb) {
-  console.error(`WRITE ${chunk}`);
+  console.error("WRITE ".concat(chunk));
   written.push(chunk);
   process.nextTick(cb);
 };
@@ -81,8 +81,8 @@ writer.on('finish', finish);
 
 // now emit some chunks.
 
-const chunk = 'asdfg';
-let set = 0;
+var chunk = 'asdfg';
+var set = 0;
 readStart();
 data();
 function data() {
@@ -118,4 +118,6 @@ function end() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

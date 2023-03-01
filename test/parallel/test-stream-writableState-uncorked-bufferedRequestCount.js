@@ -1,18 +1,18 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const writable = new stream.Writable();
-writable._writev = common.mustCall((chunks, cb) => {
+var common = require('../common');
+var assert = require('assert/');
+var stream = require('../../');
+var writable = new stream.Writable();
+writable._writev = common.mustCall(function (chunks, cb) {
   assert.strictEqual(chunks.length, 2);
   cb();
 }, 1);
-writable._write = common.mustCall((chunk, encoding, cb) => {
+writable._write = common.mustCall(function (chunk, encoding, cb) {
   cb();
 }, 1);
 
@@ -62,4 +62,6 @@ function uncork() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

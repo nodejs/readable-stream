@@ -16,28 +16,28 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const assert = require('assert');
-const fork = require('child_process').fork;
-const path = require('path');
-const runjs = path.join(__dirname, '..', '..', 'benchmark', 'run.js');
+var assert = require('assert');
+var fork = require('child_process').fork;
+var path = require('path');
+var runjs = path.join(__dirname, '..', '..', 'benchmark', 'run.js');
 function runBenchmark(name, args, env) {
-  const argv = [];
-  for (let i = 0; i < args.length; i++) {
+  var argv = [];
+  for (var _i = 0; _i < args.length; _i++) {
     argv.push('--set');
-    argv.push(args[i]);
+    argv.push(args[_i]);
   }
   argv.push(name);
-  const mergedEnv = Object.assign({}, process.env, env);
-  const child = fork(runjs, argv, {
+  var mergedEnv = Object.assign({}, process.env, env);
+  var child = fork(runjs, argv, {
     env: mergedEnv,
     stdio: ['inherit', 'pipe', 'inherit', 'ipc']
   });
   child.stdout.setEncoding('utf8');
-  let stdout = '';
-  child.stdout.on('data', line => {
+  var stdout = '';
+  child.stdout.on('data', function (line) {
     stdout += line;
   });
-  child.on('exit', (code, signal) => {
+  child.on('exit', function (code, signal) {
     assert.strictEqual(code, 0);
     assert.strictEqual(signal, null);
     // This bit makes sure that each benchmark file is being sent settings such
@@ -46,7 +46,7 @@ function runBenchmark(name, args, env) {
     // file should result in three lines of output: a blank line, a line with
     // the name of the benchmark file, and a line with the only results that we
     // get from testing the benchmark file.
-    assert.ok(/^(?:\n.+?\n.+?\n)+$/.test(stdout), `benchmark file not running exactly one configuration in test: ${stdout}`);
+    assert.ok(/^(?:\n.+?\n.+?\n)+$/.test(stdout), "benchmark file not running exactly one configuration in test: ".concat(stdout));
   });
 }
 module.exports = runBenchmark;

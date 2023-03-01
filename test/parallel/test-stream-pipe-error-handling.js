@@ -22,42 +22,45 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const Stream = require('stream').Stream;
+var common = require('../common');
+var assert = require('assert/');
+var Stream = require('stream').Stream;
 {
-  const source = new Stream();
-  const dest = new Stream();
+  var source = new Stream();
+  var dest = new Stream();
   source.pipe(dest);
-  let gotErr = null;
+  var gotErr = null;
   source.on('error', function (err) {
     gotErr = err;
   });
-  const err = new Error('This stream turned into bacon.');
+  var err = new Error('This stream turned into bacon.');
   source.emit('error', err);
   assert.strictEqual(gotErr, err);
 }
 {
-  const source = new Stream();
-  const dest = new Stream();
-  source.pipe(dest);
-  const err = new Error('This stream turned into bacon.');
-  let gotErr = null;
+  var _source = new Stream();
+  var _dest = new Stream();
+  _source.pipe(_dest);
+  var _err = new Error('This stream turned into bacon.');
+  var _gotErr = null;
   try {
-    source.emit('error', err);
+    _source.emit('error', _err);
   } catch (e) {
-    gotErr = e;
+    _gotErr = e;
   }
-  assert.strictEqual(gotErr, err);
+  assert.strictEqual(_gotErr, _err);
 }
 {
-  const R = require('../../').Readable;
-  const W = require('../../').Writable;
-  const r = new R();
-  const w = new W();
-  let removed = false;
+  var myOnError = function myOnError() {
+    throw new Error('this should not happen');
+  };
+  var R = require('../../').Readable;
+  var W = require('../../').Writable;
+  var r = new R();
+  var w = new W();
+  var removed = false;
   r._read = common.mustCall(function () {
     setTimeout(common.mustCall(function () {
       assert(removed);
@@ -70,28 +73,25 @@ const Stream = require('stream').Stream;
   r.pipe(w);
   w.removeListener('error', myOnError);
   removed = true;
-  function myOnError() {
-    throw new Error('this should not happen');
-  }
 }
 {
-  const R = require('../../').Readable;
-  const W = require('../../').Writable;
-  const r = new R();
-  const w = new W();
-  let removed = false;
-  r._read = common.mustCall(function () {
+  var _R = require('../../').Readable;
+  var _W = require('../../').Writable;
+  var _r = new _R();
+  var _w = new _W();
+  var _removed = false;
+  _r._read = common.mustCall(function () {
     setTimeout(common.mustCall(function () {
-      assert(removed);
-      w.emit('error', new Error('fail'));
+      assert(_removed);
+      _w.emit('error', new Error('fail'));
     }), 1);
   });
-  w.on('error', common.mustCall());
-  w._write = () => {};
-  r.pipe(w);
+  _w.on('error', common.mustCall());
+  _w._write = function () {};
+  _r.pipe(_w);
   // Removing some OTHER random listener should not do anything
-  w.removeListener('error', () => {});
-  removed = true;
+  _w.removeListener('error', function () {});
+  _removed = true;
 }
 ;
 (function () {
@@ -101,4 +101,6 @@ const Stream = require('stream').Stream;
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

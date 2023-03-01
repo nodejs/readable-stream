@@ -22,42 +22,42 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const queue = [];
-for (let decode = 0; decode < 2; decode++) {
-  for (let uncork = 0; uncork < 2; uncork++) {
-    for (let multi = 0; multi < 2; multi++) {
+var common = require('../common');
+var assert = require('assert/');
+var stream = require('../../');
+var queue = [];
+for (var decode = 0; decode < 2; decode++) {
+  for (var uncork = 0; uncork < 2; uncork++) {
+    for (var multi = 0; multi < 2; multi++) {
       queue.push([!!decode, !!uncork, !!multi]);
     }
   }
 }
 run();
 function run() {
-  const t = queue.pop();
+  var t = queue.pop();
   if (t) test(t[0], t[1], t[2], run);else require('tap').pass();
 }
 function test(decode, uncork, multi, next) {
-  require('tap').test(`# decode=${decode} uncork=${uncork} multi=${multi}`);
-  let counter = 0;
-  let expectCount = 0;
+  require('tap').test("# decode=".concat(decode, " uncork=").concat(uncork, " multi=").concat(multi));
+  var counter = 0;
+  var expectCount = 0;
   function cnt(msg) {
     expectCount++;
-    const expect = expectCount;
+    var expect = expectCount;
     return function (er) {
       assert.ifError(er);
       counter++;
       assert.strictEqual(counter, expect);
     };
   }
-  const w = new stream.Writable({
+  var w = new stream.Writable({
     decodeStrings: decode
   });
   w._write = common.mustNotCall('Should not call _write');
-  const expectChunks = decode ? [{
+  var expectChunks = decode ? [{
     encoding: 'buffer',
     chunk: [104, 101, 108, 108, 111, 44, 32]
   }, {
@@ -88,7 +88,7 @@ function test(decode, uncork, multi, next) {
     encoding: 'hex',
     chunk: 'facebea7deadbeefdecafbad'
   }];
-  let actualChunks;
+  var actualChunks;
   w._writev = function (chunks, cb) {
     actualChunks = chunks.map(function (chunk) {
       return {
@@ -123,4 +123,6 @@ function test(decode, uncork, multi, next) {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

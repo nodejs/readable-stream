@@ -10,15 +10,15 @@ function _OverloadYield(value, kind) { this.v = value, this.k = kind; }
 function _asyncIterator(iterable) { var method, async, sync, retry = 2; for ("undefined" != typeof Symbol && (async = Symbol.asyncIterator, sync = Symbol.iterator); retry--;) { if (async && null != (method = iterable[async])) return method.call(iterable); if (sync && null != (method = iterable[sync])) return new AsyncFromSyncIterator(method.call(iterable)); async = "@@asyncIterator", sync = "@@iterator"; } throw new TypeError("Object is not async iterable"); }
 function AsyncFromSyncIterator(s) { function AsyncFromSyncIteratorContinuation(r) { if (Object(r) !== r) return Promise.reject(new TypeError(r + " is not an object.")); var done = r.done; return Promise.resolve(r.value).then(function (value) { return { value: value, done: done }; }); } return AsyncFromSyncIterator = function AsyncFromSyncIterator(s) { this.s = s, this.n = s.next; }, AsyncFromSyncIterator.prototype = { s: null, n: null, next: function next() { return AsyncFromSyncIteratorContinuation(this.n.apply(this.s, arguments)); }, return: function _return(value) { var ret = this.s.return; return void 0 === ret ? Promise.resolve({ value: value, done: !0 }) : AsyncFromSyncIteratorContinuation(ret.apply(this.s, arguments)); }, throw: function _throw(value) { var thr = this.s.return; return void 0 === thr ? Promise.reject(value) : AsyncFromSyncIteratorContinuation(thr.apply(this.s, arguments)); } }, new AsyncFromSyncIterator(s); }
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const _require = require('../common'),
+var _require = require('../common'),
   mustCall = _require.mustCall;
-const once = require('events.once');
-const _require2 = require('../../'),
+var once = require('events.once');
+var _require2 = require('../../'),
   Readable = _require2.Readable;
-const _require3 = require('assert/'),
+var _require3 = require('assert/'),
   strictEqual = _require3.strictEqual;
 function toReadableBasicSupport() {
   return _toReadableBasicSupport.apply(this, arguments);
@@ -36,14 +36,14 @@ function _toReadableBasicSupport() {
       });
       return _generate.apply(this, arguments);
     }
-    const stream = Readable.from(generate());
-    const expected = ['a', 'b', 'c'];
+    var stream = Readable.from(generate());
+    var expected = ['a', 'b', 'c'];
     var _iteratorAbruptCompletion = false;
     var _didIteratorError = false;
     var _iteratorError;
     try {
       for (var _iterator = _asyncIterator(stream), _step; _iteratorAbruptCompletion = !(_step = yield _iterator.next()).done; _iteratorAbruptCompletion = false) {
-        const chunk = _step.value;
+        var chunk = _step.value;
         {
           strictEqual(chunk, expected.shift());
         }
@@ -75,14 +75,14 @@ function _toReadableSyncIterator() {
       yield 'b';
       yield 'c';
     }
-    const stream = Readable.from(generate());
-    const expected = ['a', 'b', 'c'];
+    var stream = Readable.from(generate());
+    var expected = ['a', 'b', 'c'];
     var _iteratorAbruptCompletion2 = false;
     var _didIteratorError2 = false;
     var _iteratorError2;
     try {
       for (var _iterator2 = _asyncIterator(stream), _step2; _iteratorAbruptCompletion2 = !(_step2 = yield _iterator2.next()).done; _iteratorAbruptCompletion2 = false) {
-        const chunk = _step2.value;
+        var chunk = _step2.value;
         {
           strictEqual(chunk, expected.shift());
         }
@@ -109,15 +109,15 @@ function toReadablePromises() {
 }
 function _toReadablePromises() {
   _toReadablePromises = _asyncToGenerator(function* () {
-    const promises = [Promise.resolve('a'), Promise.resolve('b'), Promise.resolve('c')];
-    const stream = Readable.from(promises);
-    const expected = ['a', 'b', 'c'];
+    var promises = [Promise.resolve('a'), Promise.resolve('b'), Promise.resolve('c')];
+    var stream = Readable.from(promises);
+    var expected = ['a', 'b', 'c'];
     var _iteratorAbruptCompletion3 = false;
     var _didIteratorError3 = false;
     var _iteratorError3;
     try {
       for (var _iterator3 = _asyncIterator(stream), _step3; _iteratorAbruptCompletion3 = !(_step3 = yield _iterator3.next()).done; _iteratorAbruptCompletion3 = false) {
-        const chunk = _step3.value;
+        var chunk = _step3.value;
         {
           strictEqual(chunk, expected.shift());
         }
@@ -144,14 +144,14 @@ function toReadableString() {
 }
 function _toReadableString() {
   _toReadableString = _asyncToGenerator(function* () {
-    const stream = Readable.from('abc');
-    const expected = ['a', 'b', 'c'];
+    var stream = Readable.from('abc');
+    var expected = ['a', 'b', 'c'];
     var _iteratorAbruptCompletion4 = false;
     var _didIteratorError4 = false;
     var _iteratorError4;
     try {
       for (var _iterator4 = _asyncIterator(stream), _step4; _iteratorAbruptCompletion4 = !(_step4 = yield _iterator4.next()).done; _iteratorAbruptCompletion4 = false) {
-        const chunk = _step4.value;
+        var chunk = _step4.value;
         {
           strictEqual(chunk, expected.shift());
         }
@@ -189,10 +189,10 @@ function _toReadableOnData() {
       });
       return _generate2.apply(this, arguments);
     }
-    const stream = Readable.from(generate());
-    let iterations = 0;
-    const expected = ['a', 'b', 'c'];
-    stream.on('data', chunk => {
+    var stream = Readable.from(generate());
+    var iterations = 0;
+    var expected = ['a', 'b', 'c'];
+    stream.on('data', function (chunk) {
       iterations++;
       strictEqual(chunk, expected.shift());
     });
@@ -217,12 +217,12 @@ function _toReadableOnDataNonObject() {
       });
       return _generate3.apply(this, arguments);
     }
-    const stream = Readable.from(generate(), {
+    var stream = Readable.from(generate(), {
       objectMode: false
     });
-    let iterations = 0;
-    const expected = ['a', 'b', 'c'];
-    stream.on('data', chunk => {
+    var iterations = 0;
+    var expected = ['a', 'b', 'c'];
+    stream.on('data', function (chunk) {
       iterations++;
       strictEqual(chunk instanceof Buffer, true);
       strictEqual(chunk.toString(), expected.shift());
@@ -246,7 +246,7 @@ function _destroysTheStreamWhenThrowing() {
       });
       return _generate4.apply(this, arguments);
     }
-    const stream = Readable.from(generate());
+    var stream = Readable.from(generate());
     stream.read();
     try {
       yield once(stream, 'error');
@@ -272,7 +272,7 @@ function _asTransformStream() {
         var _iteratorError6;
         try {
           for (var _iterator6 = _asyncIterator(stream), _step6; _iteratorAbruptCompletion6 = !(_step6 = yield _awaitAsyncGenerator(_iterator6.next())).done; _iteratorAbruptCompletion6 = false) {
-            const chunk = _step6.value;
+            var chunk = _step6.value;
             {
               yield chunk.toUpperCase();
             }
@@ -294,23 +294,23 @@ function _asTransformStream() {
       });
       return _generate5.apply(this, arguments);
     }
-    const source = new Readable({
+    var source = new Readable({
       objectMode: true,
-      read() {
+      read: function read() {
         this.push('a');
         this.push('b');
         this.push('c');
         this.push(null);
       }
     });
-    const stream = Readable.from(generate(source));
-    const expected = ['A', 'B', 'C'];
+    var stream = Readable.from(generate(source));
+    var expected = ['A', 'B', 'C'];
     var _iteratorAbruptCompletion5 = false;
     var _didIteratorError5 = false;
     var _iteratorError5;
     try {
       for (var _iterator5 = _asyncIterator(stream), _step5; _iteratorAbruptCompletion5 = !(_step5 = yield _iterator5.next()).done; _iteratorAbruptCompletion5 = false) {
-        const chunk = _step5.value;
+        var chunk = _step5.value;
         {
           strictEqual(chunk, expected.shift());
         }
@@ -341,4 +341,6 @@ Promise.all([toReadableBasicSupport(), toReadableSyncIterator(), toReadablePromi
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

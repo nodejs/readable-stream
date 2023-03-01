@@ -1,12 +1,12 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-let state = 0;
+var common = require('../common');
+var assert = require('assert/');
+var stream = require('../../');
+var state = 0;
 
 /*
 What you do
@@ -59,7 +59,7 @@ The order things are called
 16. endListener
 */
 
-const t = new stream.Transform({
+var t = new stream.Transform({
   objectMode: true,
   transform: common.mustCall(function (chunk, _, next) {
     // transformCallback part 1
@@ -119,4 +119,6 @@ t.end(7, common.mustCall(function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -22,28 +22,28 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const Readable = stream.Readable;
-const Writable = stream.Writable;
-const totalChunks = 100;
-const chunkSize = 99;
-const expectTotalData = totalChunks * chunkSize;
-let expectEndingData = expectTotalData;
-const r = new Readable({
+var assert = require('assert/');
+var stream = require('../../');
+var Readable = stream.Readable;
+var Writable = stream.Writable;
+var totalChunks = 100;
+var chunkSize = 99;
+var expectTotalData = totalChunks * chunkSize;
+var expectEndingData = expectTotalData;
+var r = new Readable({
   highWaterMark: 1000
 });
-let chunks = totalChunks;
+var chunks = totalChunks;
 r._read = function (n) {
   console.log('_read called', chunks);
   if (!(chunks % 2)) setImmediate(push);else if (!(chunks % 3)) process.nextTick(push);else push();
 };
-let totalPushed = 0;
+var totalPushed = 0;
 function push() {
-  const chunk = chunks-- > 0 ? bufferShim.alloc(chunkSize, 'x') : null;
+  var chunk = chunks-- > 0 ? bufferShim.alloc(chunkSize, 'x') : null;
   if (chunk) {
     totalPushed += chunk.length;
   }
@@ -57,10 +57,10 @@ function read100() {
   readn(100, onData);
 }
 function readn(n, then) {
-  console.error(`read ${n}`);
+  console.error("read ".concat(n));
   expectEndingData -= n;
   (function read() {
-    const c = r.read(n);
+    var c = r.read(n);
     console.error('c', c);
     if (!c) r.once('readable', read);else {
       assert.strictEqual(c.length, n);
@@ -74,7 +74,7 @@ function readn(n, then) {
 function onData() {
   expectEndingData -= 100;
   console.error('onData');
-  let seen = 0;
+  var seen = 0;
   r.on('data', function od(c) {
     seen += c.length;
     if (seen >= 100) {
@@ -84,7 +84,7 @@ function onData() {
       if (seen > 100) {
         // oh no, seen too much!
         // put the extra back.
-        const diff = seen - 100;
+        var diff = seen - 100;
         r.unshift(c.slice(c.length - diff));
         console.error('seen too much', seen, diff);
       }
@@ -99,8 +99,8 @@ function onData() {
 function pipeLittle() {
   expectEndingData -= 200;
   console.error('pipe a little');
-  const w = new Writable();
-  let written = 0;
+  var w = new Writable();
+  var written = 0;
   w.on('finish', function () {
     assert.strictEqual(written, 200);
     setImmediate(read1234);
@@ -112,7 +112,7 @@ function pipeLittle() {
       w.end();
       cb();
       if (written > 200) {
-        const diff = written - 200;
+        var diff = written - 200;
         written -= diff;
         r.unshift(chunk.slice(chunk.length - diff));
       }
@@ -144,8 +144,8 @@ function resumePause() {
 }
 function pipe() {
   console.error('pipe the rest');
-  const w = new Writable();
-  let written = 0;
+  var w = new Writable();
+  var written = 0;
   w._write = function (chunk, encoding, cb) {
     written += chunk.length;
     cb();
@@ -166,4 +166,6 @@ function pipe() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,14 +1,14 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 require('../common');
-const stream = require('../../');
-const assert = require('assert/');
-const readable = new stream.Readable({
-  read: () => {},
+var stream = require('../../');
+var assert = require('assert/');
+var readable = new stream.Readable({
+  read: function read() {},
   encoding: 'utf16le',
   objectMode: true
 });
@@ -28,4 +28,6 @@ assert.strictEqual(readable.read(), null);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

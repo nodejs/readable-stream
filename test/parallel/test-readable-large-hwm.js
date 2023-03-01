@@ -1,18 +1,18 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Readable = _require.Readable;
 
 // Make sure that readable completes
 // even when reading larger buffer.
-const bufferSize = 10 * 1024 * 1024;
-let n = 0;
-const r = new Readable({
-  read() {
+var bufferSize = 10 * 1024 * 1024;
+var n = 0;
+var r = new Readable({
+  read: function read() {
     // Try to fill readable buffer piece by piece.
     r.push(bufferShim.alloc(bufferSize / 10));
     if (n++ > 10) {
@@ -20,9 +20,9 @@ const r = new Readable({
     }
   }
 });
-r.on('readable', () => {
+r.on('readable', function () {
   while (true) {
-    const ret = r.read(bufferSize);
+    var ret = r.read(bufferSize);
     if (ret === null) break;
   }
 });
@@ -35,4 +35,6 @@ r.on('end', common.mustCall());
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,28 +1,28 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const writable = new stream.Writable();
+var assert = require('assert/');
+var stream = require('../../');
+var writable = new stream.Writable();
 function testStates(ending, finished, ended) {
   assert.strictEqual(writable._writableState.ending, ending);
   assert.strictEqual(writable._writableState.finished, finished);
   assert.strictEqual(writable._writableState.ended, ended);
 }
-writable._write = (chunk, encoding, cb) => {
+writable._write = function (chunk, encoding, cb) {
   // ending, finished, ended start in false.
   testStates(false, false, false);
   cb();
 };
-writable.on('finish', () => {
+writable.on('finish', function () {
   // ending, finished, ended = true.
   testStates(true, true, true);
 });
-const result = writable.end('testing function end()', () => {
+var result = writable.end('testing function end()', function () {
   // ending, finished, ended = true.
   testStates(true, true, true);
 });
@@ -41,4 +41,6 @@ testStates(true, false, true);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

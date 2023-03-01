@@ -22,15 +22,15 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const Readable = require('../../').Readable;
+var common = require('../common');
+var assert = require('assert/');
+var Readable = require('../../').Readable;
 {
   // First test, not reading when the readable is added.
   // make sure that on('readable', ...) triggers a readable event.
-  const r = new Readable({
+  var r = new Readable({
     highWaterMark: 3
   });
   r._read = common.mustNotCall();
@@ -47,71 +47,74 @@ const Readable = require('../../').Readable;
   // second test, make sure that readable is re-emitted if there's
   // already a length, while it IS reading.
 
-  const r = new Readable({
+  var _r = new Readable({
     highWaterMark: 3
   });
-  r._read = common.mustCall();
+  _r._read = common.mustCall();
 
   // This triggers a 'readable' event, which is lost.
-  r.push(bufferShim.from('bl'));
+  _r.push(bufferShim.from('bl'));
   setTimeout(function () {
     // assert we're testing what we think we are
-    assert(r._readableState.reading);
-    r.on('readable', common.mustCall());
+    assert(_r._readableState.reading);
+    _r.on('readable', common.mustCall());
   }, 1);
 }
 {
   // Third test, not reading when the stream has not passed
   // the highWaterMark but *has* reached EOF.
-  const r = new Readable({
+  var _r2 = new Readable({
     highWaterMark: 30
   });
-  r._read = common.mustNotCall();
+  _r2._read = common.mustNotCall();
 
   // This triggers a 'readable' event, which is lost.
-  r.push(bufferShim.from('blerg'));
-  r.push(null);
+  _r2.push(bufferShim.from('blerg'));
+  _r2.push(null);
   setTimeout(function () {
     // assert we're testing what we think we are
-    assert(!r._readableState.reading);
-    r.on('readable', common.mustCall());
+    assert(!_r2._readableState.reading);
+    _r2.on('readable', common.mustCall());
   }, 1);
 }
 {
   // pushing a empty string in non-objectMode should
   // trigger next `read()`.
-  const underlyingData = ['', 'x', 'y', '', 'z'];
-  const expected = underlyingData.filter(data => data);
-  const result = [];
-  const r = new Readable({
+  var underlyingData = ['', 'x', 'y', '', 'z'];
+  var expected = underlyingData.filter(function (data) {
+    return data;
+  });
+  var result = [];
+  var _r3 = new Readable({
     encoding: 'utf8'
   });
-  r._read = function () {
-    process.nextTick(() => {
+  _r3._read = function () {
+    var _this = this;
+    process.nextTick(function () {
       if (!underlyingData.length) {
-        this.push(null);
+        _this.push(null);
       } else {
-        this.push(underlyingData.shift());
+        _this.push(underlyingData.shift());
       }
     });
   };
-  r.on('readable', () => {
-    const data = r.read();
+  _r3.on('readable', function () {
+    var data = _r3.read();
     if (data !== null) result.push(data);
   });
-  r.on('end', common.mustCall(() => {
+  _r3.on('end', common.mustCall(function () {
     assert.deepStrictEqual(result, expected);
   }));
 }
 {
   // #20923
-  const r = new Readable();
-  r._read = function () {
+  var _r4 = new Readable();
+  _r4._read = function () {
     // actually doing thing here
   };
-  r.on('data', function () {});
-  r.removeAllListeners();
-  assert.strictEqual(r.eventNames().length, 0);
+  _r4.on('data', function () {});
+  _r4.removeAllListeners();
+  assert.strictEqual(_r4.eventNames().length, 0);
 }
 ;
 (function () {
@@ -121,4 +124,6 @@ const Readable = require('../../').Readable;
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

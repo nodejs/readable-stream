@@ -1,92 +1,92 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const stream = require('../../');
+var common = require('../common');
+var assert = require('assert/');
+var stream = require('../../');
 
 // ensure consistency between the finish event when using cork()
 // and writev and when not using them
 
 {
-  const writable = new stream.Writable();
-  writable._write = (chunks, encoding, cb) => {
+  var writable = new stream.Writable();
+  writable._write = function (chunks, encoding, cb) {
     cb(new Error('write test error'));
   };
-  let firstError = false;
+  var firstError = false;
   writable.on('finish', common.mustCall(function () {
     assert.strictEqual(firstError, true);
   }));
   writable.on('prefinish', common.mustCall());
-  writable.on('error', common.mustCall(er => {
+  writable.on('error', common.mustCall(function (er) {
     assert.strictEqual(er.message, 'write test error');
     firstError = true;
   }));
   writable.end('test');
 }
 {
-  const writable = new stream.Writable();
-  writable._write = (chunks, encoding, cb) => {
+  var _writable = new stream.Writable();
+  _writable._write = function (chunks, encoding, cb) {
     setImmediate(cb, new Error('write test error'));
   };
-  let firstError = false;
-  writable.on('finish', common.mustCall(function () {
-    assert.strictEqual(firstError, true);
+  var _firstError = false;
+  _writable.on('finish', common.mustCall(function () {
+    assert.strictEqual(_firstError, true);
   }));
-  writable.on('prefinish', common.mustCall());
-  writable.on('error', common.mustCall(er => {
+  _writable.on('prefinish', common.mustCall());
+  _writable.on('error', common.mustCall(function (er) {
     assert.strictEqual(er.message, 'write test error');
-    firstError = true;
+    _firstError = true;
   }));
-  writable.end('test');
+  _writable.end('test');
 }
 {
-  const writable = new stream.Writable();
-  writable._write = (chunks, encoding, cb) => {
+  var _writable2 = new stream.Writable();
+  _writable2._write = function (chunks, encoding, cb) {
     cb(new Error('write test error'));
   };
-  writable._writev = (chunks, cb) => {
+  _writable2._writev = function (chunks, cb) {
     cb(new Error('writev test error'));
   };
-  let firstError = false;
-  writable.on('finish', common.mustCall(function () {
-    assert.strictEqual(firstError, true);
+  var _firstError2 = false;
+  _writable2.on('finish', common.mustCall(function () {
+    assert.strictEqual(_firstError2, true);
   }));
-  writable.on('prefinish', common.mustCall());
-  writable.on('error', common.mustCall(er => {
+  _writable2.on('prefinish', common.mustCall());
+  _writable2.on('error', common.mustCall(function (er) {
     assert.strictEqual(er.message, 'writev test error');
-    firstError = true;
+    _firstError2 = true;
   }));
-  writable.cork();
-  writable.write('test');
+  _writable2.cork();
+  _writable2.write('test');
   setImmediate(function () {
-    writable.end('test');
+    _writable2.end('test');
   });
 }
 {
-  const writable = new stream.Writable();
-  writable._write = (chunks, encoding, cb) => {
+  var _writable3 = new stream.Writable();
+  _writable3._write = function (chunks, encoding, cb) {
     setImmediate(cb, new Error('write test error'));
   };
-  writable._writev = (chunks, cb) => {
+  _writable3._writev = function (chunks, cb) {
     setImmediate(cb, new Error('writev test error'));
   };
-  let firstError = false;
-  writable.on('finish', common.mustCall(function () {
-    assert.strictEqual(firstError, true);
+  var _firstError3 = false;
+  _writable3.on('finish', common.mustCall(function () {
+    assert.strictEqual(_firstError3, true);
   }));
-  writable.on('prefinish', common.mustCall());
-  writable.on('error', common.mustCall(er => {
+  _writable3.on('prefinish', common.mustCall());
+  _writable3.on('error', common.mustCall(function (er) {
     assert.strictEqual(er.message, 'writev test error');
-    firstError = true;
+    _firstError3 = true;
   }));
-  writable.cork();
-  writable.write('test');
+  _writable3.cork();
+  _writable3.write('test');
   setImmediate(function () {
-    writable.end('test');
+    _writable3.end('test');
   });
 }
 
@@ -94,57 +94,57 @@ const stream = require('../../');
 // https://github.com/nodejs/node/issues/13812
 
 {
-  const rs = new stream.Readable();
+  var rs = new stream.Readable();
   rs.push('ok');
   rs.push(null);
-  rs._read = () => {};
-  const ws = new stream.Writable();
-  let firstError = false;
+  rs._read = function () {};
+  var ws = new stream.Writable();
+  var _firstError4 = false;
   ws.on('finish', common.mustCall(function () {
-    assert.strictEqual(firstError, true);
+    assert.strictEqual(_firstError4, true);
   }));
   ws.on('error', common.mustCall(function () {
-    firstError = true;
+    _firstError4 = true;
   }));
-  ws._write = (chunk, encoding, done) => {
+  ws._write = function (chunk, encoding, done) {
     setImmediate(done, new Error());
   };
   rs.pipe(ws);
 }
 {
-  const rs = new stream.Readable();
-  rs.push('ok');
-  rs.push(null);
-  rs._read = () => {};
-  const ws = new stream.Writable();
-  ws.on('finish', common.mustNotCall());
-  ws.on('error', common.mustCall());
-  ws._write = (chunk, encoding, done) => {
+  var _rs = new stream.Readable();
+  _rs.push('ok');
+  _rs.push(null);
+  _rs._read = function () {};
+  var _ws = new stream.Writable();
+  _ws.on('finish', common.mustNotCall());
+  _ws.on('error', common.mustCall());
+  _ws._write = function (chunk, encoding, done) {
     done(new Error());
   };
-  rs.pipe(ws);
+  _rs.pipe(_ws);
 }
 {
-  const w = new stream.Writable();
-  w._write = (chunk, encoding, cb) => {
+  var w = new stream.Writable();
+  w._write = function (chunk, encoding, cb) {
     process.nextTick(cb);
   };
   w.on('error', common.mustCall());
-  w.on('prefinish', () => {
+  w.on('prefinish', function () {
     w.write("shouldn't write in prefinish listener");
   });
   w.end();
 }
 {
-  const w = new stream.Writable();
-  w._write = (chunk, encoding, cb) => {
+  var _w = new stream.Writable();
+  _w._write = function (chunk, encoding, cb) {
     process.nextTick(cb);
   };
-  w.on('error', common.mustCall());
-  w.on('finish', () => {
-    w.write("shouldn't write in finish listener");
+  _w.on('error', common.mustCall());
+  _w.on('finish', function () {
+    _w.write("shouldn't write in finish listener");
   });
-  w.end();
+  _w.end();
 }
 ;
 (function () {
@@ -154,4 +154,6 @@ const stream = require('../../');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});
