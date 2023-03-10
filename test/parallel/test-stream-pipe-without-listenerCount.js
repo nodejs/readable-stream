@@ -1,13 +1,13 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const stream = require('../../');
-const r = new stream.Stream();
+var common = require('../common');
+var stream = require('../../');
+var r = new stream.Stream();
 r.listenerCount = undefined;
-const w = new stream.Stream();
+var w = new stream.Stream();
 w.listenerCount = undefined;
 w.on('pipe', function () {
   r.emit('error', new Error('Readable Error'));
@@ -24,4 +24,6 @@ r.pipe(w);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

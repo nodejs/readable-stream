@@ -22,10 +22,10 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
+var common = require('../common');
+var assert = require('assert/');
 
 // This test verifies that:
 // 1. unshift() does not cause colliding _read() calls.
@@ -34,19 +34,19 @@ const assert = require('assert/');
 // 3. push() after the EOF signaling null is an error.
 // 4. _read() is not called after pushing the EOF null chunk.
 
-const stream = require('../../');
-const hwm = 10;
-const r = stream.Readable({
+var stream = require('../../');
+var hwm = 10;
+var r = stream.Readable({
   highWaterMark: hwm
 });
-const chunks = 10;
-const data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
-for (let i = 0; i < data.length; i++) {
-  const c = 'asdf'.charCodeAt(i % 4);
+var chunks = 10;
+var data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
+for (var i = 0; i < data.length; i++) {
+  var c = 'asdf'.charCodeAt(i % 4);
   data[i] = c;
 }
-let pos = 0;
-let pushedNull = false;
+var pos = 0;
+var pushedNull = false;
 r._read = function (n) {
   assert(!pushedNull, '_read after null push');
 
@@ -54,7 +54,7 @@ r._read = function (n) {
   push(!(chunks % 3));
   function push(fast) {
     assert(!pushedNull, 'push() after null push');
-    const c = pos >= data.length ? null : data.slice(pos, pos + n);
+    var c = pos >= data.length ? null : data.slice(pos, pos + n);
     pushedNull = c === null;
     if (fast) {
       pos += n;
@@ -78,8 +78,8 @@ function pushError() {
     message: 'stream.push() after EOF'
   });
 }
-const w = stream.Writable();
-const written = [];
+var w = stream.Writable();
+var written = [];
 w._write = function (chunk, encoding, cb) {
   written.push(chunk.toString());
   cb();
@@ -95,7 +95,7 @@ r.on('end', common.mustCall(function () {
   w.end();
 }));
 r.on('readable', function () {
-  let chunk;
+  var chunk;
   while (null !== (chunk = r.read(10))) {
     w.write(chunk);
     if (chunk.length > 4) r.unshift(bufferShim.from('1234'));
@@ -106,14 +106,14 @@ w.on('finish', common.mustCall(function () {
   // The first got pulled out before the first unshift('1234'), so it's
   // lacking that piece.
   assert.strictEqual(written[0], 'asdfasdfas');
-  let asdf = 'd';
-  console.error(`0: ${written[0]}`);
-  for (let i = 1; i < written.length; i++) {
-    console.error(`${i.toString(32)}: ${written[i]}`);
-    assert.strictEqual(written[i].slice(0, 4), '1234');
-    for (let j = 4; j < written[i].length; j++) {
-      const c = written[i].charAt(j);
-      assert.strictEqual(c, asdf);
+  var asdf = 'd';
+  console.error("0: ".concat(written[0]));
+  for (var _i = 1; _i < written.length; _i++) {
+    console.error("".concat(_i.toString(32), ": ").concat(written[_i]));
+    assert.strictEqual(written[_i].slice(0, 4), '1234');
+    for (var j = 4; j < written[_i].length; j++) {
+      var _c = written[_i].charAt(j);
+      assert.strictEqual(_c, asdf);
       switch (asdf) {
         case 'a':
           asdf = 's';
@@ -143,4 +143,6 @@ process.on('exit', function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,18 +1,20 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const _require = require('../../'),
+var _require = require('../../'),
   Readable = _require.Readable;
-const common = require('../common');
-let ticks = 18;
-let expectedData = 19;
-const rs = new Readable({
+var common = require('../common');
+var ticks = 18;
+var expectedData = 19;
+var rs = new Readable({
   objectMode: true,
-  read: () => {
-    if (ticks-- > 0) return process.nextTick(() => rs.push({}));
+  read: function read() {
+    if (ticks-- > 0) return process.nextTick(function () {
+      return rs.push({});
+    });
     rs.push({});
     rs.push(null);
   }
@@ -22,7 +24,7 @@ readAndPause();
 function readAndPause() {
   // Does a on(data) -> pause -> wait -> resume -> on(data) ... loop.
   // Expects on(data) to never fire if the stream is paused.
-  const ondata = common.mustCall(data => {
+  var ondata = common.mustCall(function (data) {
     rs.pause();
     expectedData--;
     if (expectedData <= 0) return;
@@ -43,4 +45,6 @@ function readAndPause() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

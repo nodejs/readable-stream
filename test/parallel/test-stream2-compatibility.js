@@ -1,5 +1,17 @@
 "use strict";
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,43 +34,61 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const R = require('../../lib/_stream_readable');
-const W = require('../../lib/_stream_writable');
-const assert = require('assert/');
-let ondataCalled = 0;
-class TestReader extends R {
-  constructor() {
-    super();
-    this._buffer = bufferShim.alloc(100, 'x');
-    this.on('data', () => {
+var R = require('../../lib/_stream_readable');
+var W = require('../../lib/_stream_writable');
+var assert = require('assert/');
+var ondataCalled = 0;
+var TestReader = /*#__PURE__*/function (_R) {
+  _inherits(TestReader, _R);
+  var _super = _createSuper(TestReader);
+  function TestReader() {
+    var _this;
+    _classCallCheck(this, TestReader);
+    _this = _super.call(this);
+    _this._buffer = bufferShim.alloc(100, 'x');
+    _this.on('data', function () {
       ondataCalled++;
     });
+    return _this;
   }
-  _read(n) {
-    this.push(this._buffer);
-    this._buffer = bufferShim.alloc(0);
-  }
-}
-const reader = new TestReader();
+  _createClass(TestReader, [{
+    key: "_read",
+    value: function _read(n) {
+      this.push(this._buffer);
+      this._buffer = bufferShim.alloc(0);
+    }
+  }]);
+  return TestReader;
+}(R);
+var reader = new TestReader();
 setImmediate(function () {
   assert.strictEqual(ondataCalled, 1);
   require('tap').pass();
   reader.push(null);
 });
-class TestWriter extends W {
-  constructor() {
-    super();
-    this.write('foo');
-    this.end();
+var TestWriter = /*#__PURE__*/function (_W) {
+  _inherits(TestWriter, _W);
+  var _super2 = _createSuper(TestWriter);
+  function TestWriter() {
+    var _this2;
+    _classCallCheck(this, TestWriter);
+    _this2 = _super2.call(this);
+    _this2.write('foo');
+    _this2.end();
+    return _this2;
   }
-  _write(chunk, enc, cb) {
-    cb();
-  }
-}
-const writer = new TestWriter();
+  _createClass(TestWriter, [{
+    key: "_write",
+    value: function _write(chunk, enc, cb) {
+      cb();
+    }
+  }]);
+  return TestWriter;
+}(W);
+var writer = new TestWriter();
 process.on('exit', function () {
   assert.strictEqual(reader.readable, false);
   assert.strictEqual(writer.writable, false);
@@ -72,4 +102,6 @@ process.on('exit', function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

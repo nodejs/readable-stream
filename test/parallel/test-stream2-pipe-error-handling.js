@@ -22,75 +22,75 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const stream = require('../../');
+var assert = require('assert/');
+var stream = require('../../');
 {
-  let count = 1000;
-  const source = new stream.Readable();
+  var count = 1000;
+  var source = new stream.Readable();
   source._read = function (n) {
     n = Math.min(count, n);
     count -= n;
     source.push(bufferShim.allocUnsafe(n));
   };
-  let unpipedDest;
+  var unpipedDest;
   source.unpipe = function (dest) {
     unpipedDest = dest;
     stream.Readable.prototype.unpipe.call(this, dest);
   };
-  const dest = new stream.Writable();
+  var dest = new stream.Writable();
   dest._write = function (chunk, encoding, cb) {
     cb();
   };
   source.pipe(dest);
-  let gotErr = null;
+  var gotErr = null;
   dest.on('error', function (err) {
     gotErr = err;
   });
-  let unpipedSource;
+  var unpipedSource;
   dest.on('unpipe', function (src) {
     unpipedSource = src;
   });
-  const err = new Error('This stream turned into bacon.');
+  var err = new Error('This stream turned into bacon.');
   dest.emit('error', err);
   assert.strictEqual(gotErr, err);
   assert.strictEqual(unpipedSource, source);
   assert.strictEqual(unpipedDest, dest);
 }
 {
-  let count = 1000;
-  const source = new stream.Readable();
-  source._read = function (n) {
-    n = Math.min(count, n);
-    count -= n;
-    source.push(bufferShim.allocUnsafe(n));
+  var _count = 1000;
+  var _source = new stream.Readable();
+  _source._read = function (n) {
+    n = Math.min(_count, n);
+    _count -= n;
+    _source.push(bufferShim.allocUnsafe(n));
   };
-  let unpipedDest;
-  source.unpipe = function (dest) {
-    unpipedDest = dest;
+  var _unpipedDest;
+  _source.unpipe = function (dest) {
+    _unpipedDest = dest;
     stream.Readable.prototype.unpipe.call(this, dest);
   };
-  const dest = new stream.Writable();
-  dest._write = function (chunk, encoding, cb) {
+  var _dest = new stream.Writable();
+  _dest._write = function (chunk, encoding, cb) {
     cb();
   };
-  source.pipe(dest);
-  let unpipedSource;
-  dest.on('unpipe', function (src) {
-    unpipedSource = src;
+  _source.pipe(_dest);
+  var _unpipedSource;
+  _dest.on('unpipe', function (src) {
+    _unpipedSource = src;
   });
-  const err = new Error('This stream turned into bacon.');
-  let gotErr = null;
+  var _err = new Error('This stream turned into bacon.');
+  var _gotErr = null;
   try {
-    dest.emit('error', err);
+    _dest.emit('error', _err);
   } catch (e) {
-    gotErr = e;
+    _gotErr = e;
   }
-  assert.strictEqual(gotErr, err);
-  assert.strictEqual(unpipedSource, source);
-  assert.strictEqual(unpipedDest, dest);
+  assert.strictEqual(_gotErr, _err);
+  assert.strictEqual(_unpipedSource, _source);
+  assert.strictEqual(_unpipedDest, _dest);
 }
 ;
 (function () {
@@ -100,4 +100,6 @@ const stream = require('../../');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,57 +1,61 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Readable = _require.Readable,
   Writable = _require.Writable,
   PassThrough = _require.PassThrough;
 {
-  let ticks = 17;
-  const rs = new Readable({
+  var ticks = 17;
+  var rs = new Readable({
     objectMode: true,
-    read: () => {
-      if (ticks-- > 0) return process.nextTick(() => rs.push({}));
+    read: function read() {
+      if (ticks-- > 0) return process.nextTick(function () {
+        return rs.push({});
+      });
       rs.push({});
       rs.push(null);
     }
   });
-  const ws = new Writable({
+  var ws = new Writable({
     highWaterMark: 0,
     objectMode: true,
-    write: (data, end, cb) => setImmediate(cb)
+    write: function write(data, end, cb) {
+      return setImmediate(cb);
+    }
   });
   rs.on('end', common.mustCall());
   ws.on('finish', common.mustCall());
   rs.pipe(ws);
 }
 {
-  let missing = 8;
-  const rs = new Readable({
+  var missing = 8;
+  var _rs = new Readable({
     objectMode: true,
-    read: () => {
-      if (missing--) rs.push({});else rs.push(null);
+    read: function read() {
+      if (missing--) _rs.push({});else _rs.push(null);
     }
   });
-  const pt = rs.pipe(new PassThrough({
+  var pt = _rs.pipe(new PassThrough({
     objectMode: true,
     highWaterMark: 2
   })).pipe(new PassThrough({
     objectMode: true,
     highWaterMark: 2
   }));
-  pt.on('end', () => {
+  pt.on('end', function () {
     wrapper.push(null);
   });
-  const wrapper = new Readable({
+  var wrapper = new Readable({
     objectMode: true,
-    read: () => {
-      process.nextTick(() => {
-        let data = pt.read();
+    read: function read() {
+      process.nextTick(function () {
+        var data = pt.read();
         if (data === null) {
-          pt.once('readable', () => {
+          pt.once('readable', function () {
             data = pt.read();
             if (data !== null) wrapper.push(data);
           });
@@ -72,4 +76,6 @@ const _require = require('../../'),
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

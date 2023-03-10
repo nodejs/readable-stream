@@ -1,14 +1,14 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const Readable = require('../../').Readable;
-const _read = common.mustCall(function _read(n) {
+var common = require('../common');
+var Readable = require('../../').Readable;
+var _read = common.mustCall(function _read(n) {
   this.push(null);
 });
-const r = new Readable({
+var r = new Readable({
   read: _read
 });
 r.resume();
@@ -20,4 +20,6 @@ r.resume();
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

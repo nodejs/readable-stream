@@ -15,12 +15,12 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert');
-const gcTrackerMap = new WeakMap();
-const gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
+var common = require('../common');
+var assert = require('assert');
+var gcTrackerMap = new WeakMap();
+var gcTrackerTag = 'NODE_TEST_COMMON_GC_TRACKER';
 function onGC(obj, gcListener) {
-  const async_hooks =
+  var async_hooks =
   /*require('async_hooks');
   const onGcAsyncHook = async_hooks.createHook({
   init: common.mustCallAtLeast(function(id, type) {

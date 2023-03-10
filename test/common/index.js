@@ -1,5 +1,15 @@
 "use strict";
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
@@ -39,12 +49,12 @@ var objectKeys = objectKeys || function (obj) {
 };
 /*</replacement>*/
 
-const process = global.process; // Some tests tamper with the process global.
-const path = require('path');
-const fs = require('fs');
-const assert = require('assert');
-const os = require('os');
-const _require = require('child_process'),
+var process = global.process; // Some tests tamper with the process global.
+var path = require('path');
+var fs = require('fs');
+var assert = require('assert');
+var os = require('os');
+var _require = require('child_process'),
   exec = _require.exec,
   execSync = _require.execSync,
   spawnSync = _require.spawnSync;
@@ -54,47 +64,49 @@ var util = require('core-util-is');
 util.inherits = require('inherits');
 /*</replacement>*/
 
-const Timer = {
+var Timer = {
   now: function now() {}
 };
-const tmpdir = require('./tmpdir');
-const _process$binding = process.binding('config'),
+var tmpdir = require('./tmpdir');
+var _process$binding = process.binding('config'),
   bits = _process$binding.bits,
   hasIntl = _process$binding.hasIntl;
-const noop = () => {};
-const hasCrypto = true;
-const isMainThread = (() => {
+var noop = function noop() {};
+var hasCrypto = true;
+var isMainThread = function () {
   if (false) {
     return require('worker_threads').isMainThread;
   }
   // Worker module not enabled → only a single main thread exists.
   return true;
-})();
+}();
 
 // Check for flags. Skip this for workers (both, the `cluster` module and
 // `worker_threads`) and child processes.
 if (false && isMainThread && module.parent && require('cluster').isMaster) {
   // The copyright notice is relatively big and the flags could come afterwards.
-  const bytesToRead = 1500;
-  const buffer = Buffer.allocUnsafe(bytesToRead);
-  const fd = fs.openSync(module.parent.filename, 'r');
-  const bytesRead = fs.readSync(fd, buffer, 0, bytesToRead);
+  var bytesToRead = 1500;
+  var buffer = Buffer.allocUnsafe(bytesToRead);
+  var fd = fs.openSync(module.parent.filename, 'r');
+  var bytesRead = fs.readSync(fd, buffer, 0, bytesToRead);
   fs.closeSync(fd);
-  const source = buffer.toString('utf8', 0, bytesRead);
-  const flagStart = source.indexOf('// Flags: --') + 10;
+  var source = buffer.toString('utf8', 0, bytesRead);
+  var flagStart = source.indexOf('// Flags: --') + 10;
   if (flagStart !== 9) {
-    let flagEnd = source.indexOf('\n', flagStart);
+    var flagEnd = source.indexOf('\n', flagStart);
     // Normalize different EOL.
     if (source[flagEnd - 1] === '\r') {
       flagEnd--;
     }
-    const flags = source.substring(flagStart, flagEnd).replace(/_/g, '-').split(' ');
-    const args = process.execArgv.map(arg => arg.replace(/_/g, '-'));
+    var flags = source.substring(flagStart, flagEnd).replace(/_/g, '-').split(' ');
+    var args = process.execArgv.map(function (arg) {
+      return arg.replace(/_/g, '-');
+    });
     var _iterator = _createForOfIteratorHelper(flags),
       _step;
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        const flag = _step.value;
+        var flag = _step.value;
         if (!args.includes(flag) &&
         // If the binary was built without-ssl then the crypto flags are
         // invalid (bad option). The test itself should handle this case.
@@ -102,7 +114,7 @@ if (false && isMainThread && module.parent && require('cluster').isMaster) {
         // If the binary is build without `intl` the inspect option is
         // invalid. The test itself should handle this case.
         process.config.variables.v8_enable_inspector !== 0 || !flag.startsWith('--inspect'))) {
-          throw new Error(`Test has to be started with the flag: '${flag}'`);
+          throw new Error("Test has to be started with the flag: '".concat(flag, "'"));
         }
       }
     } catch (err) {
@@ -112,38 +124,38 @@ if (false && isMainThread && module.parent && require('cluster').isMaster) {
     }
   }
 }
-const isWindows = process.platform === 'win32';
-const isAIX = process.platform === 'aix';
-const isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
-const isSunOS = process.platform === 'sunos';
-const isFreeBSD = process.platform === 'freebsd';
-const isOpenBSD = process.platform === 'openbsd';
-const isLinux = process.platform === 'linux';
-const isOSX = process.platform === 'darwin';
-const enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
-const cpus = os.cpus().length === 0 ? [{
+var isWindows = process.platform === 'win32';
+var isAIX = process.platform === 'aix';
+var isLinuxPPCBE = process.platform === 'linux' && process.arch === 'ppc64' && os.endianness() === 'BE';
+var isSunOS = process.platform === 'sunos';
+var isFreeBSD = process.platform === 'freebsd';
+var isOpenBSD = process.platform === 'openbsd';
+var isLinux = process.platform === 'linux';
+var isOSX = process.platform === 'darwin';
+var enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
+var cpus = os.cpus().length === 0 ? [{
   speed: 1000
 }] : os.cpus();
-const enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
-const rootDir = isWindows ? 'c:\\' : '/';
-const buildType = 'readable-stream';
+var enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
+var rootDir = isWindows ? 'c:\\' : '/';
+var buildType = 'readable-stream';
 
 // If env var is set then enable async_hook hooks for all tests.
 if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
-  const destroydIdsList = {};
-  const destroyListList = {};
-  const initHandles = {};
-  const async_wrap = process.binding('async_wrap');
-  process.on('exit', () => {
+  var destroydIdsList = {};
+  var destroyListList = {};
+  var initHandles = {};
+  var async_wrap = process.binding('async_wrap');
+  process.on('exit', function () {
     // iterate through handles to make sure nothing crashes
-    for (const k in initHandles) util.inspect(initHandles[k]);
+    for (var k in initHandles) util.inspect(initHandles[k]);
   });
-  const _queueDestroyAsyncId = async_wrap.queueDestroyAsyncId;
+  var _queueDestroyAsyncId = async_wrap.queueDestroyAsyncId;
   async_wrap.queueDestroyAsyncId = function queueDestroyAsyncId(id) {
     if (destroyListList[id] !== undefined) {
       process._rawDebug(destroyListList[id]);
       process._rawDebug();
-      throw new Error(`same id added to destroy list twice (${id})`);
+      throw new Error("same id added to destroy list twice (".concat(id, ")"));
     }
     destroyListList[id] = new Error().stack;
     _queueDestroyAsyncId(id);
@@ -172,32 +184,32 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
   }).enable();*/
 }
 
-let opensslCli = null;
-let inFreeBSDJail = null;
-let localhostIPv4 = null;
-const localIPv6Hosts = isLinux ? [
+var opensslCli = null;
+var inFreeBSDJail = null;
+var localhostIPv4 = null;
+var localIPv6Hosts = isLinux ? [
 // Debian/Ubuntu
 'ip6-localhost', 'ip6-loopback',
 // SUSE
 'ipv6-localhost', 'ipv6-loopback',
 // Typically universal
 'localhost'] : ['localhost'];
-const PIPE = (() => {
-  const localRelative = path.relative(process.cwd(), `${tmpdir.path}/`);
-  const pipePrefix = isWindows ? '\\\\.\\pipe\\' : localRelative;
-  const pipeName = `node-test.${process.pid}.sock`;
+var PIPE = function () {
+  var localRelative = path.relative(process.cwd(), "".concat(tmpdir.path, "/"));
+  var pipePrefix = isWindows ? '\\\\.\\pipe\\' : localRelative;
+  var pipeName = "node-test.".concat(process.pid, ".sock");
   return path.join(pipePrefix, pipeName);
-})();
-const hasIPv6 = (() => {
-  const iFaces = os.networkInterfaces();
-  const re = isWindows ? /Loopback Pseudo-Interface/ : /lo/;
-  return objectKeys(iFaces).some(name => {
-    return re.test(name) && iFaces[name].some(_ref => {
-      let family = _ref.family;
+}();
+var hasIPv6 = function () {
+  var iFaces = os.networkInterfaces();
+  var re = isWindows ? /Loopback Pseudo-Interface/ : /lo/;
+  return objectKeys(iFaces).some(function (name) {
+    return re.test(name) && iFaces[name].some(function (_ref) {
+      var family = _ref.family;
       return family === 'IPv6';
     });
   });
-})();
+}();
 
 /*
  * Check that when running a test with
@@ -205,33 +217,33 @@ const hasIPv6 = (() => {
  * the process aborts.
  */
 function childShouldThrowAndAbort() {
-  let testCmd = '';
+  var testCmd = '';
   if (!isWindows) {
     // Do not create core files, as it can take a lot of disk space on
     // continuous testing and developers' machines
     testCmd += 'ulimit -c 0 && ';
   }
-  testCmd += `"${process.argv[0]}" --abort-on-uncaught-exception `;
-  testCmd += `"${process.argv[1]}" child`;
-  const child = exec(testCmd);
+  testCmd += "\"".concat(process.argv[0], "\" --abort-on-uncaught-exception ");
+  testCmd += "\"".concat(process.argv[1], "\" child");
+  var child = exec(testCmd);
   child.on('exit', function onExit(exitCode, signal) {
-    const errMsg = 'Test should have aborted ' + `but instead exited with exit code ${exitCode}` + ` and signal ${signal}`;
+    var errMsg = 'Test should have aborted ' + "but instead exited with exit code ".concat(exitCode) + " and signal ".concat(signal);
     assert(nodeProcessAborted(exitCode, signal), errMsg);
   });
 }
 function createZeroFilledFile(filename) {
-  const fd = fs.openSync(filename, 'w');
+  var fd = fs.openSync(filename, 'w');
   fs.ftruncateSync(fd, 10 * 1024 * 1024);
   fs.closeSync(fd);
 }
-const pwdCommand = isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
+var pwdCommand = isWindows ? ['cmd.exe', ['/d', '/c', 'cd']] : ['pwd', []];
 function platformTimeout(ms) {
   if (process.features.debug) ms = 2 * ms;
   if (global.__coverage__) ms = 4 * ms;
   if (isAIX) return 2 * ms; // default localhost speed is slower on AIX
 
   if (process.arch !== 'arm') return ms;
-  const armv = process.config.variables.arm_version;
+  var armv = process.config.variables.arm_version;
   if (armv === '6') return 7 * ms; // ARMv6
 
   if (armv === '7') return 2 * ms; // ARMv7
@@ -239,7 +251,7 @@ function platformTimeout(ms) {
   return ms; // ARMv8+
 }
 
-let knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
+var knownGlobals = [Buffer, clearImmediate, clearInterval, clearTimeout, global, process, setImmediate, setInterval, setTimeout];
 if (global.gc) {
   knownGlobals.push(global.gc);
 }
@@ -260,8 +272,8 @@ if (global.COUNTER_NET_SERVER_CONNECTION) {
   knownGlobals.push(COUNTER_HTTP_CLIENT_RESPONSE);
 }
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
-  const knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
-  allowGlobals(...knownFromEnv);
+  var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
+  allowGlobals.apply(void 0, _toConsumableArray(knownFromEnv));
 }
 function allowGlobals() {
   for (var _len = arguments.length, whitelist = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -282,33 +294,35 @@ if (global.__coverage__) knownGlobals.push(__coverage__);
 }); /*</replacement>*/
 
 function leakedGlobals() {
-  const leaked = [];
-  for (const val in global) {
+  var leaked = [];
+  for (var val in global) {
     if (!knownGlobals.includes(global[val])) {
       leaked.push(val);
     }
   }
   if (global.__coverage__) {
-    return leaked.filter(varname => !/^(?:cov_|__cov)/.test(varname));
+    return leaked.filter(function (varname) {
+      return !/^(?:cov_|__cov)/.test(varname);
+    });
   } else {
     return leaked;
   }
 }
 process.on('exit', function () {
-  const leaked = leakedGlobals();
+  var leaked = leakedGlobals();
   if (leaked.length > 0) {
-    assert.fail(`Unexpected global(s) found: ${leaked.join(', ')}`);
+    assert.fail("Unexpected global(s) found: ".concat(leaked.join(', ')));
   }
 });
-const mustCallChecks = [];
+var mustCallChecks = [];
 function runCallChecks(exitCode) {
   if (exitCode !== 0) return;
-  const failed = mustCallChecks.filter(function (context) {
+  var failed = mustCallChecks.filter(function (context) {
     if ('minimum' in context) {
-      context.messageSegment = `at least ${context.minimum}`;
+      context.messageSegment = "at least ".concat(context.minimum);
       return context.actual < context.minimum;
     } else {
-      context.messageSegment = `exactly ${context.exact}`;
+      context.messageSegment = "exactly ".concat(context.exact);
       return context.actual !== context.exact;
     }
   });
@@ -325,8 +339,9 @@ function mustCallAtLeast(fn, minimum) {
   return _mustCallInner(fn, minimum, 'minimum');
 }
 function _mustCallInner(fn) {
-  let criteria = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  let field = arguments.length > 2 ? arguments[2] : undefined;
+  var _context;
+  var criteria = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var field = arguments.length > 2 ? arguments[2] : undefined;
   if (process._exiting) throw new Error('Cannot use common.mustCall*() in process exit handler');
   if (typeof fn === 'number') {
     criteria = fn;
@@ -334,13 +349,8 @@ function _mustCallInner(fn) {
   } else if (fn === undefined) {
     fn = noop;
   }
-  if (typeof criteria !== 'number') throw new TypeError(`Invalid ${field} value: ${criteria}`);
-  const context = {
-    [field]: criteria,
-    actual: 0,
-    stack: new Error().stack,
-    name: fn.name || '<anonymous>'
-  };
+  if (typeof criteria !== 'number') throw new TypeError("Invalid ".concat(field, " value: ").concat(criteria));
+  var context = (_context = {}, _defineProperty(_context, field, criteria), _defineProperty(_context, "actual", 0), _defineProperty(_context, "stack", new Error().stack), _defineProperty(_context, "name", fn.name || '<anonymous>'), _context);
 
   // add the exit listener only once to avoid listener leak warnings
   if (mustCallChecks.length === 0) process.on('exit', runCallChecks);
@@ -351,11 +361,11 @@ function _mustCallInner(fn) {
   };
 }
 function hasMultiLocalhost() {
-  const _process$binding2 = process.binding('tcp_wrap'),
+  var _process$binding2 = process.binding('tcp_wrap'),
     TCP = _process$binding2.TCP,
     TCPConstants = _process$binding2.constants;
-  const t = new TCP(TCPConstants.SOCKET);
-  const ret = t.bind('127.0.0.2', 0);
+  var t = new TCP(TCPConstants.SOCKET);
+  var ret = t.bind('127.0.0.2', 0);
   t.close();
   return ret === 0;
 }
@@ -372,9 +382,9 @@ function canCreateSymLink() {
     // whoami.exe needs to be the one from System32
     // If unix tools are in the path, they can shadow the one we want,
     // so use the full path while executing whoami
-    const whoamiPath = path.join(process.env.SystemRoot, 'System32', 'whoami.exe');
+    var whoamiPath = path.join(process.env.SystemRoot, 'System32', 'whoami.exe');
     try {
-      const output = execSync(`${whoamiPath} /priv`, {
+      var output = execSync("".concat(whoamiPath, " /priv"), {
         timout: 1000
       });
       return output.includes('SeCreateSymbolicLinkPrivilege');
@@ -386,9 +396,11 @@ function canCreateSymLink() {
   return true;
 }
 function getCallSite(top) {
-  const originalStackFormatter = Error.prepareStackTrace;
-  Error.prepareStackTrace = (err, stack) => `${stack[0].getFileName()}:${stack[0].getLineNumber()}`;
-  const err = new Error();
+  var originalStackFormatter = Error.prepareStackTrace;
+  Error.prepareStackTrace = function (err, stack) {
+    return "".concat(stack[0].getFileName(), ":").concat(stack[0].getLineNumber());
+  };
+  var err = new Error();
   Error.captureStackTrace(err, top);
   // with the V8 Error API, the stack is not formatted until it is accessed
   err.stack;
@@ -396,13 +408,13 @@ function getCallSite(top) {
   return err.stack;
 }
 function mustNotCall(msg) {
-  const callSite = getCallSite(mustNotCall);
+  var callSite = getCallSite(mustNotCall);
   return function mustNotCall() {
-    assert.fail(`${msg || 'function should not have been called'} at ${callSite}`);
+    assert.fail("".concat(msg || 'function should not have been called', " at ").concat(callSite));
   };
 }
 function printSkipMessage(msg) {
-  console.log(`1..0 # Skipped: ${msg}`);
+  console.log("1..0 # Skipped: ".concat(msg));
 }
 function skip(msg) {
   printSkipMessage(msg);
@@ -415,14 +427,14 @@ function skip(msg) {
 function nodeProcessAborted(exitCode, signal) {
   // Depending on the compiler used, node will exit with either
   // exit code 132 (SIGILL), 133 (SIGTRAP) or 134 (SIGABRT).
-  let expectedExitCodes = [132, 133, 134];
+  var expectedExitCodes = [132, 133, 134];
 
   // On platforms using KSH as the default shell (like SmartOS),
   // when a process aborts, KSH exits with an exit code that is
   // greater than 256, and thus the exit code emitted with the 'exit'
   // event is null and the signal is set to either SIGILL, SIGTRAP,
   // or SIGABRT (depending on the compiler).
-  const expectedSignals = ['SIGILL', 'SIGTRAP', 'SIGABRT'];
+  var expectedSignals = ['SIGILL', 'SIGTRAP', 'SIGABRT'];
 
   // On Windows, 'aborts' are of 2 types, depending on the context:
   // (i) Forced access violation, if --abort-on-uncaught-exception is on
@@ -445,8 +457,8 @@ function nodeProcessAborted(exitCode, signal) {
   }
 }
 function busyLoop(time) {
-  const startTime = Timer.now();
-  const stopTime = startTime + time;
+  var startTime = Timer.now();
+  var stopTime = startTime + time;
   while (Timer.now() < stopTime) {}
 }
 function isAlive(pid) {
@@ -458,11 +470,11 @@ function isAlive(pid) {
   }
 }
 function _expectWarning(name, expected) {
-  const map = new Map(expected);
-  return mustCall(warning => {
+  var map = new Map(expected);
+  return mustCall(function (warning) {
     assert.strictEqual(warning.name, name);
-    assert.ok(map.has(warning.message), `unexpected error message: "${warning.message}"`);
-    const code = map.get(warning.message);
+    assert.ok(map.has(warning.message), "unexpected error message: \"".concat(warning.message, "\""));
+    var code = map.get(warning.message);
     assert.strictEqual(warning.code, code);
     // Remove a warning message after it is seen so that we guarantee that we
     // get each message only once.
@@ -476,9 +488,9 @@ function expectWarningByName(name, expected, code) {
   process.on('warning', _expectWarning(name, expected));
 }
 function expectWarningByMap(warningMap) {
-  const catchWarning = {};
-  forEach(objectKeys(warningMap), name => {
-    let expected = warningMap[name];
+  var catchWarning = {};
+  forEach(objectKeys(warningMap), function (name) {
+    var expected = warningMap[name];
     if (!Array.isArray(expected)) {
       throw new Error('warningMap entries must be arrays consisting of two ' + 'entries: [message, warningCode]');
     }
@@ -490,7 +502,9 @@ function expectWarningByMap(warningMap) {
     }
     catchWarning[name] = _expectWarning(name, expected);
   });
-  process.on('warning', warning => catchWarning[warning.name](warning));
+  process.on('warning', function (warning) {
+    return catchWarning[warning.name](warning);
+  });
 }
 
 // accepts a warning name and description or array of descriptions or a map
@@ -503,24 +517,21 @@ function expectWarning(nameOrMap, expected, code) {
     expectWarningByMap(nameOrMap);
   }
 }
-class Comparison {
-  constructor(obj, keys) {
-    var _iterator2 = _createForOfIteratorHelper(keys),
-      _step2;
-    try {
-      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        const key = _step2.value;
-        if (key in obj) this[key] = obj[key];
-      }
-    } catch (err) {
-      _iterator2.e(err);
-    } finally {
-      _iterator2.f();
+var Comparison = /*#__PURE__*/_createClass(function Comparison(obj, keys) {
+  _classCallCheck(this, Comparison);
+  var _iterator2 = _createForOfIteratorHelper(keys),
+    _step2;
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var key = _step2.value;
+      if (key in obj) this[key] = obj[key];
     }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
   }
-}
-
-// Useful for testing expected internal/error objects
+}); // Useful for testing expected internal/error objects
 function expectsError(fn, settings, exact) {
   if (typeof fn !== 'function') {
     exact = settings;
@@ -531,23 +542,23 @@ function expectsError(fn, settings, exact) {
     if (arguments.length !== 1) {
       // Do not use `assert.strictEqual()` to prevent `util.inspect` from
       // always being called.
-      assert.fail(`Expected one argument, got ${util.inspect(arguments)}`);
+      assert.fail("Expected one argument, got ".concat(util.inspect(arguments)));
     }
-    const descriptor = Object.getOwnPropertyDescriptor(error, 'message');
+    var descriptor = Object.getOwnPropertyDescriptor(error, 'message');
     // The error message should be non-enumerable
     assert.strictEqual(descriptor.enumerable, false);
-    let innerSettings = settings;
+    var innerSettings = settings;
     if ('type' in settings) {
-      const type = settings.type;
+      var type = settings.type;
       if (type !== Error && !Error.isPrototypeOf(type)) {
         throw new TypeError('`settings.type` must inherit from `Error`');
       }
-      let constructor = error.constructor;
-      if (constructor.name === 'NodeError' && type.name !== 'NodeError') {
-        constructor = Object.getPrototypeOf(error.constructor);
+      var _constructor = error.constructor;
+      if (_constructor.name === 'NodeError' && type.name !== 'NodeError') {
+        _constructor = Object.getPrototypeOf(error.constructor);
       }
       // Add the `type` to the error to properly compare and visualize it.
-      if (!('type' in error)) error.type = constructor;
+      if (!('type' in error)) error.type = _constructor;
     }
     if ('message' in settings && typeof settings.message === 'object' && settings.message.test(error.message)) {
       // Make a copy so we are able to modify the settings.
@@ -557,19 +568,19 @@ function expectsError(fn, settings, exact) {
     }
 
     // Check all error properties.
-    const keys = objectKeys(settings);
+    var keys = objectKeys(settings);
     var _iterator3 = _createForOfIteratorHelper(keys),
       _step3;
     try {
       for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-        const key = _step3.value;
+        var key = _step3.value;
         if (!require('deep-strict-equal')(error[key], innerSettings[key])) {
           // Create placeholder objects to create a nice output.
-          const a = new Comparison(error, keys);
-          const b = new Comparison(innerSettings, keys);
-          const tmpLimit = Error.stackTraceLimit;
+          var a = new Comparison(error, keys);
+          var b = new Comparison(innerSettings, keys);
+          var tmpLimit = Error.stackTraceLimit;
           Error.stackTraceLimit = 0;
-          const err = new assert.AssertionError({
+          var err = new assert.AssertionError({
             actual: a,
             expected: b,
             operator: 'strictEqual',
@@ -613,14 +624,14 @@ function skipIfWorker() {
   }
 }
 function getArrayBufferViews(buf) {
-  const buffer = buf.buffer,
+  var buffer = buf.buffer,
     byteOffset = buf.byteOffset,
     byteLength = buf.byteLength;
-  const out = [];
-  const arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
+  var out = [];
+  var arrayBufferViews = [Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView];
   for (var _i = 0, _arrayBufferViews = arrayBufferViews; _i < _arrayBufferViews.length; _i++) {
-    const type = _arrayBufferViews[_i];
-    const _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
+    var type = _arrayBufferViews[_i];
+    var _type$BYTES_PER_ELEME = type.BYTES_PER_ELEMENT,
       BYTES_PER_ELEMENT = _type$BYTES_PER_ELEME === void 0 ? 1 : _type$BYTES_PER_ELEME;
     if (byteLength % BYTES_PER_ELEMENT === 0) {
       out.push(new type(buffer, byteOffset, byteLength / BYTES_PER_ELEMENT));
@@ -629,11 +640,11 @@ function getArrayBufferViews(buf) {
   return out;
 }
 function getBufferSources(buf) {
-  return [...getArrayBufferViews(buf), new Uint8Array(buf).buffer];
+  return [].concat(_toConsumableArray(getArrayBufferViews(buf)), [new Uint8Array(buf).buffer]);
 }
 
 // Crash the process on unhandled rejections.
-const crashOnUnhandledRejection = err => {
+var crashOnUnhandledRejection = function crashOnUnhandledRejection(err) {
   throw err;
 };
 process.on('unhandledRejection', crashOnUnhandledRejection);
@@ -642,10 +653,10 @@ function disableCrashOnUnhandledRejection() {
 }
 function getTTYfd() {
   // Do our best to grab a tty fd.
-  const tty = require('tty');
+  var tty = require('tty');
   // Don't attempt fd 0 as it is not writable on Windows.
   // Ref: ef2861961c3d9e9ed6972e1e84d969683b25cf95
-  const ttyFd = [1, 2, 4, 5].find(tty.isatty);
+  var ttyFd = [1, 2, 4, 5].find(tty.isatty);
   if (ttyFd === undefined) {
     try {
       return fs.openSync('/dev/tty');
@@ -657,7 +668,7 @@ function getTTYfd() {
   return ttyFd;
 }
 function runWithInvalidFD(func) {
-  let fd = 1 << 30;
+  var fd = 1 << 30;
   // Get first known bad file descriptor. 1 << 30 is usually unlikely to
   // be an valid one.
   try {
@@ -668,52 +679,52 @@ function runWithInvalidFD(func) {
   printSkipMessage('Could not generate an invalid fd');
 }
 module.exports = {
-  allowGlobals,
-  buildType,
-  busyLoop,
-  canCreateSymLink,
-  childShouldThrowAndAbort,
-  createZeroFilledFile,
-  disableCrashOnUnhandledRejection,
-  enoughTestCpu,
-  enoughTestMem,
-  expectsError,
-  expectWarning,
-  getArrayBufferViews,
-  getBufferSources,
-  getCallSite,
-  getTTYfd,
-  hasIntl,
-  hasCrypto,
-  hasIPv6,
-  hasMultiLocalhost,
-  isAIX,
-  isAlive,
-  isFreeBSD,
-  isLinux,
-  isLinuxPPCBE,
-  isMainThread,
-  isOpenBSD,
-  isOSX,
-  isSunOS,
-  isWindows,
-  localIPv6Hosts,
-  mustCall,
-  mustCallAtLeast,
-  mustNotCall,
-  nodeProcessAborted,
+  allowGlobals: allowGlobals,
+  buildType: buildType,
+  busyLoop: busyLoop,
+  canCreateSymLink: canCreateSymLink,
+  childShouldThrowAndAbort: childShouldThrowAndAbort,
+  createZeroFilledFile: createZeroFilledFile,
+  disableCrashOnUnhandledRejection: disableCrashOnUnhandledRejection,
+  enoughTestCpu: enoughTestCpu,
+  enoughTestMem: enoughTestMem,
+  expectsError: expectsError,
+  expectWarning: expectWarning,
+  getArrayBufferViews: getArrayBufferViews,
+  getBufferSources: getBufferSources,
+  getCallSite: getCallSite,
+  getTTYfd: getTTYfd,
+  hasIntl: hasIntl,
+  hasCrypto: hasCrypto,
+  hasIPv6: hasIPv6,
+  hasMultiLocalhost: hasMultiLocalhost,
+  isAIX: isAIX,
+  isAlive: isAlive,
+  isFreeBSD: isFreeBSD,
+  isLinux: isLinux,
+  isLinuxPPCBE: isLinuxPPCBE,
+  isMainThread: isMainThread,
+  isOpenBSD: isOpenBSD,
+  isOSX: isOSX,
+  isSunOS: isSunOS,
+  isWindows: isWindows,
+  localIPv6Hosts: localIPv6Hosts,
+  mustCall: mustCall,
+  mustCallAtLeast: mustCallAtLeast,
+  mustNotCall: mustNotCall,
+  nodeProcessAborted: nodeProcessAborted,
   noWarnCode: undefined,
-  PIPE,
-  platformTimeout,
-  printSkipMessage,
-  pwdCommand,
-  rootDir,
-  runWithInvalidFD,
-  skip,
-  skipIf32Bits,
-  skipIfEslintMissing,
-  skipIfInspectorDisabled,
-  skipIfWorker,
+  PIPE: PIPE,
+  platformTimeout: platformTimeout,
+  printSkipMessage: printSkipMessage,
+  pwdCommand: pwdCommand,
+  rootDir: rootDir,
+  runWithInvalidFD: runWithInvalidFD,
+  skip: skip,
+  skipIf32Bits: skipIf32Bits,
+  skipIfEslintMissing: skipIfEslintMissing,
+  skipIfInspectorDisabled: skipIfInspectorDisabled,
+  skipIfWorker: skipIfWorker,
   get localhostIPv6() {
     return '::1';
   },
@@ -755,7 +766,7 @@ module.exports = {
       opensslCli = path.join(path.dirname(process.execPath), 'openssl-cli');
     }
     if (exports.isWindows) opensslCli += '.exe';
-    const opensslCmd = spawnSync(opensslCli, ['version']);
+    var opensslCmd = spawnSync(opensslCli, ['version']);
     if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
       // openssl command cannot be executed
       opensslCli = false;

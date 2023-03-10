@@ -22,19 +22,19 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const Readable = require('../../').Readable;
+var common = require('../common');
+var Readable = require('../../').Readable;
 
 // This tests synchronous read callbacks and verifies that even if they nest
 // heavily the process handles it without an error
 
-const r = new Readable();
-const N = 256 * 1024;
-let reads = 0;
+var r = new Readable();
+var N = 256 * 1024;
+var reads = 0;
 r._read = function (n) {
-  const chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
+  var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
   r.push(chunk);
 };
 r.on('readable', function onReadable() {
@@ -51,4 +51,6 @@ r.read(0);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

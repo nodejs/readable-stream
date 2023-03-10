@@ -22,28 +22,28 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const fromList = require('../../lib/_stream_readable')._fromList;
-const BufferList = require('../../lib/internal/streams/buffer_list');
-const util = require('util');
+var assert = require('assert/');
+var fromList = require('../../lib/_stream_readable')._fromList;
+var BufferList = require('../../lib/internal/streams/buffer_list');
+var util = require('util');
 function bufferListFromArray(arr) {
-  const bl = new BufferList();
-  for (let i = 0; i < arr.length; ++i) bl.push(arr[i]);
+  var bl = new BufferList();
+  for (var i = 0; i < arr.length; ++i) bl.push(arr[i]);
   return bl;
 }
 {
   // Verify behavior with buffers
-  let list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
+  var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
   list = bufferListFromArray(list);
   assert.strictEqual(util.inspect([list], {
     compact: false
   }).indexOf('BufferList') > 0, true);
 
   // read more than the first element.
-  let ret = fromList(6, {
+  var ret = fromList(6, {
     buffer: list,
     length: 16
   });
@@ -75,43 +75,43 @@ function bufferListFromArray(arr) {
 }
 {
   // Verify behavior with strings
-  let list = ['foog', 'bark', 'bazy', 'kuel'];
-  list = bufferListFromArray(list);
+  var _list2 = ['foog', 'bark', 'bazy', 'kuel'];
+  _list2 = bufferListFromArray(_list2);
 
   // read more than the first element.
-  let ret = fromList(6, {
-    buffer: list,
+  var _ret = fromList(6, {
+    buffer: _list2,
     length: 16,
     decoder: true
   });
-  assert.strictEqual(ret, 'foogba');
+  assert.strictEqual(_ret, 'foogba');
 
   // read exactly the first element.
-  ret = fromList(2, {
-    buffer: list,
+  _ret = fromList(2, {
+    buffer: _list2,
     length: 10,
     decoder: true
   });
-  assert.strictEqual(ret, 'rk');
+  assert.strictEqual(_ret, 'rk');
 
   // read less than the first element.
-  ret = fromList(2, {
-    buffer: list,
+  _ret = fromList(2, {
+    buffer: _list2,
     length: 8,
     decoder: true
   });
-  assert.strictEqual(ret, 'ba');
+  assert.strictEqual(_ret, 'ba');
 
   // read more than we have.
-  ret = fromList(100, {
-    buffer: list,
+  _ret = fromList(100, {
+    buffer: _list2,
     length: 6,
     decoder: true
   });
-  assert.strictEqual(ret, 'zykuel');
+  assert.strictEqual(_ret, 'zykuel');
 
   // all consumed.
-  assert.deepStrictEqual(list, new BufferList());
+  assert.deepStrictEqual(_list2, new BufferList());
 }
 ;
 (function () {
@@ -121,4 +121,6 @@ function bufferListFromArray(arr) {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

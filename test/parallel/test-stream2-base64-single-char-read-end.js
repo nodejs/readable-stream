@@ -22,18 +22,18 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const R = require('../../lib/_stream_readable');
-const W = require('../../lib/_stream_writable');
-const assert = require('assert/');
-const src = new R({
+var R = require('../../lib/_stream_readable');
+var W = require('../../lib/_stream_writable');
+var assert = require('assert/');
+var src = new R({
   encoding: 'base64'
 });
-const dst = new W();
-let hasRead = false;
-const accum = [];
+var dst = new W();
+var hasRead = false;
+var accum = [];
 src._read = function (n) {
   if (!hasRead) {
     hasRead = true;
@@ -52,7 +52,7 @@ src.on('end', function () {
   clearTimeout(timeout);
 });
 src.pipe(dst);
-const timeout = setTimeout(function () {
+var timeout = setTimeout(function () {
   assert.fail('timed out waiting for _write');
 }, 100);
 ;
@@ -63,4 +63,6 @@ const timeout = setTimeout(function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

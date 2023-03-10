@@ -22,11 +22,11 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const stream = require('../../');
-const assert = require('assert/');
+var stream = require('../../');
+var assert = require('assert/');
 function Writable() {
   this.writable = true;
   require('stream').Stream.call(this);
@@ -39,12 +39,12 @@ function Readable() {
 }
 Object.setPrototypeOf(Readable.prototype, require('stream').Stream.prototype);
 Object.setPrototypeOf(Readable, require('stream').Stream);
-let passed = false;
-const w = new Writable();
+var passed = false;
+var w = new Writable();
 w.on('pipe', function (src) {
   passed = true;
 });
-const r = new Readable();
+var r = new Readable();
 r.pipe(w);
 assert.ok(passed);
 ;
@@ -55,4 +55,6 @@ assert.ok(passed);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,12 +1,12 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const Writable = stream.Writable;
+var assert = require('assert/');
+var stream = require('../../');
+var Writable = stream.Writable;
 
 // Test the buffering behavior of Writable streams.
 //
@@ -15,11 +15,11 @@ const Writable = stream.Writable;
 //
 // node version target: 0.12
 
-const expectedChunks = ['please', 'buffer', 'me', 'kindly'];
-const inputChunks = expectedChunks.slice(0);
-let seenChunks = [];
-let seenEnd = false;
-const w = new Writable();
+var expectedChunks = ['please', 'buffer', 'me', 'kindly'];
+var inputChunks = expectedChunks.slice(0);
+var seenChunks = [];
+var seenEnd = false;
+var w = new Writable();
 // lets arrange to store the chunks
 w._write = function (chunk, encoding, cb) {
   // stream end event is not seen before the last write
@@ -30,14 +30,14 @@ w._write = function (chunk, encoding, cb) {
   cb();
 };
 // lets record the stream end event
-w.on('finish', () => {
+w.on('finish', function () {
   seenEnd = true;
 });
 function writeChunks(remainingChunks, callback) {
-  const writeChunk = remainingChunks.shift();
-  let writeState;
+  var writeChunk = remainingChunks.shift();
+  var writeState;
   if (writeChunk) {
-    setImmediate(() => {
+    setImmediate(function () {
       writeState = w.write(writeChunk);
       // we were not told to stop writing
       assert.ok(writeState);
@@ -59,7 +59,7 @@ seenChunks = [];
 w.cork();
 
 // write the bufferedChunks
-writeChunks(inputChunks, () => {
+writeChunks(inputChunks, function () {
   // should not have seen anything yet
   assert.strictEqual(seenChunks.length, 0);
 
@@ -73,15 +73,15 @@ writeChunks(inputChunks, () => {
   assert.strictEqual(seenChunks.length, 4);
 
   // did the chunks match
-  for (let i = 0, l = expectedChunks.length; i < l; i++) {
-    const seen = seenChunks[i];
+  for (var i = 0, l = expectedChunks.length; i < l; i++) {
+    var seen = seenChunks[i];
     // there was a chunk
     assert.ok(seen);
-    const expected = bufferShim.from(expectedChunks[i]);
+    var expected = bufferShim.from(expectedChunks[i]);
     // it was what we expected
     assert.deepEqual(seen, expected);
   }
-  setImmediate(() => {
+  setImmediate(function () {
     // stream should have ended in next tick
     assert.ok(seenEnd);
   });
@@ -94,4 +94,6 @@ writeChunks(inputChunks, () => {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

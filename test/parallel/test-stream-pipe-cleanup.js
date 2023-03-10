@@ -22,13 +22,13 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 // This test asserts that Stream.prototype.pipe does not leave listeners
 // hanging on the source or dest.
 require('../common');
-const stream = require('../../');
-const assert = require('assert/');
+var stream = require('../../');
+var assert = require('assert/');
 (function () {
   if (/^v0\.8\./.test(process.version)) return;
   function Writable() {
@@ -56,10 +56,10 @@ const assert = require('assert/');
   }
   Object.setPrototypeOf(Duplex.prototype, Writable.prototype);
   Object.setPrototypeOf(Duplex, Writable);
-  let i = 0;
-  const limit = 100;
-  let w = new Writable();
-  let r;
+  var i = 0;
+  var limit = 100;
+  var w = new Writable();
+  var r;
   for (i = 0; i < limit; i++) {
     r = new Readable();
     r.pipe(w);
@@ -85,7 +85,7 @@ const assert = require('assert/');
   assert.strictEqual(w.listeners('close').length, 0);
   r = new Readable();
   w = new Writable();
-  const d = new Duplex();
+  var d = new Duplex();
   r.pipe(d); // pipeline A
   d.pipe(w); // pipeline B
   assert.strictEqual(r.listeners('end').length, 2); // A.onend, A.cleanup
@@ -123,4 +123,6 @@ const assert = require('assert/');
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

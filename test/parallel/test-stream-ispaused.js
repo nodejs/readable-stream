@@ -22,12 +22,12 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-const readable = new stream.Readable();
+var assert = require('assert/');
+var stream = require('../../');
+var readable = new stream.Readable();
 
 // _read is a noop, here.
 readable._read = Function();
@@ -52,4 +52,6 @@ assert.ok(!readable.isPaused());
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

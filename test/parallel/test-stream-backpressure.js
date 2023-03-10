@@ -1,28 +1,28 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const stream = require('../../');
-let pushes = 0;
-const total = 65500 + 40 * 1024;
-const rs = new stream.Readable({
+var common = require('../common');
+var assert = require('assert/');
+var stream = require('../../');
+var pushes = 0;
+var total = 65500 + 40 * 1024;
+var rs = new stream.Readable({
   read: common.mustCall(function () {
     if (pushes++ === 10) {
       this.push(null);
       return;
     }
-    const length = this._readableState.length;
+    var length = this._readableState.length;
 
     // We are at most doing two full runs of _reads
     // before stopping, because Readable is greedy
     // to keep its buffer full
     assert(length <= total);
     this.push(bufferShim.alloc(65500));
-    for (let i = 0; i < 40; i++) {
+    for (var i = 0; i < 40; i++) {
       this.push(bufferShim.alloc(1024));
     }
 
@@ -30,7 +30,7 @@ const rs = new stream.Readable({
     // but a new call to _read is scheduled anyway.
   }, 11)
 });
-const ws = stream.Writable({
+var ws = stream.Writable({
   write: common.mustCall(function (data, enc, cb) {
     setImmediate(cb);
   }, 41 * 10)
@@ -44,4 +44,6 @@ rs.pipe(ws);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

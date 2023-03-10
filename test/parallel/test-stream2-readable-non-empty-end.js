@@ -22,21 +22,21 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const assert = require('assert/');
-const Readable = require('../../lib/_stream_readable');
-let len = 0;
-const chunks = new Array(10);
-for (let i = 1; i <= 10; i++) {
+var common = require('../common');
+var assert = require('assert/');
+var Readable = require('../../lib/_stream_readable');
+var len = 0;
+var chunks = new Array(10);
+for (var i = 1; i <= 10; i++) {
   chunks[i - 1] = bufferShim.allocUnsafe(i);
   len += i;
 }
-const test = new Readable();
-let n = 0;
+var test = new Readable();
+var n = 0;
 test._read = function (size) {
-  const chunk = chunks[n++];
+  var chunk = chunks[n++];
   setTimeout(function () {
     test.push(chunk === undefined ? null : chunk);
   }, 1);
@@ -45,13 +45,13 @@ test.on('end', thrower);
 function thrower() {
   throw new Error('this should not happen!');
 }
-let bytesread = 0;
+var bytesread = 0;
 test.on('readable', function () {
-  const b = len - bytesread - 1;
-  const res = test.read(b);
+  var b = len - bytesread - 1;
+  var res = test.read(b);
   if (res) {
     bytesread += res.length;
-    console.error(`br=${bytesread} len=${len}`);
+    console.error("br=".concat(bytesread, " len=").concat(len));
     setTimeout(next, 1);
   }
   test.read(0);
@@ -63,7 +63,7 @@ function next() {
   test.on('end', common.mustCall());
 
   // one to get the last byte
-  let r = test.read();
+  var r = test.read();
   assert(r);
   assert.strictEqual(r.length, 1);
   r = test.read();
@@ -77,4 +77,6 @@ function next() {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

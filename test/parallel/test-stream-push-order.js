@@ -22,22 +22,22 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 require('../common');
-const Readable = require('../../').Readable;
-const assert = require('assert/');
-const s = new Readable({
+var Readable = require('../../').Readable;
+var assert = require('assert/');
+var s = new Readable({
   highWaterMark: 20,
   encoding: 'ascii'
 });
-const list = ['1', '2', '3', '4', '5', '6'];
+var list = ['1', '2', '3', '4', '5', '6'];
 s._read = function (n) {
-  const one = list.shift();
+  var one = list.shift();
   if (!one) {
     s.push(null);
   } else {
-    const two = list.shift();
+    var two = list.shift();
     s.push(one);
     s.push(two);
   }
@@ -58,4 +58,6 @@ process.on('exit', function () {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

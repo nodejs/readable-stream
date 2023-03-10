@@ -1,30 +1,34 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Readable = _require.Readable,
   Writable = _require.Writable;
 
 // Tests that calling .unpipe() un-blocks a stream that is paused because
 // it is waiting on the writable side to finish a write().
 
-const rs = new Readable({
+var rs = new Readable({
   highWaterMark: 1,
   // That this gets called at least 20 times is the real test here.
-  read: common.mustCallAtLeast(() => rs.push('foo'), 20)
+  read: common.mustCallAtLeast(function () {
+    return rs.push('foo');
+  }, 20)
 });
-const ws = new Writable({
+var ws = new Writable({
   highWaterMark: 1,
-  write: common.mustCall(() => {
+  write: common.mustCall(function () {
     // Ignore the callback, this write() simply never finishes.
-    setImmediate(() => rs.unpipe(ws));
+    setImmediate(function () {
+      return rs.unpipe(ws);
+    });
   })
 });
-let chunks = 0;
-rs.on('data', common.mustCallAtLeast(() => {
+var chunks = 0;
+rs.on('data', common.mustCallAtLeast(function () {
   chunks++;
   if (chunks >= 20) rs.pause(); // Finish this test.
 }));
@@ -38,4 +42,6 @@ rs.pipe(ws);
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

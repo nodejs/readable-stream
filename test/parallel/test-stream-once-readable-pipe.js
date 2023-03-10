@@ -1,12 +1,12 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var common = require('../common');
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable,
   Writable = _require.Writable;
 
@@ -14,16 +14,16 @@ const _require = require('../../'),
 // on Readable instance it will not disrupt the pipe.
 
 {
-  let receivedData = '';
-  const w = new Writable({
-    write: (chunk, env, callback) => {
+  var receivedData = '';
+  var w = new Writable({
+    write: function write(chunk, env, callback) {
       receivedData += chunk;
       callback();
     }
   });
-  const data = ['foo', 'bar', 'baz'];
-  const r = new Readable({
-    read: () => {}
+  var data = ['foo', 'bar', 'baz'];
+  var r = new Readable({
+    read: function read() {}
   });
   r.once('readable', common.mustCall());
   r.pipe(w);
@@ -31,30 +31,30 @@ const _require = require('../../'),
   r.push(data[1]);
   r.push(data[2]);
   r.push(null);
-  w.on('finish', common.mustCall(() => {
+  w.on('finish', common.mustCall(function () {
     assert.strictEqual(receivedData, data.join(''));
   }));
 }
 {
-  let receivedData = '';
-  const w = new Writable({
-    write: (chunk, env, callback) => {
-      receivedData += chunk;
+  var _receivedData = '';
+  var _w = new Writable({
+    write: function write(chunk, env, callback) {
+      _receivedData += chunk;
       callback();
     }
   });
-  const data = ['foo', 'bar', 'baz'];
-  const r = new Readable({
-    read: () => {}
+  var _data = ['foo', 'bar', 'baz'];
+  var _r = new Readable({
+    read: function read() {}
   });
-  r.pipe(w);
-  r.push(data[0]);
-  r.push(data[1]);
-  r.push(data[2]);
-  r.push(null);
-  r.once('readable', common.mustCall());
-  w.on('finish', common.mustCall(() => {
-    assert.strictEqual(receivedData, data.join(''));
+  _r.pipe(_w);
+  _r.push(_data[0]);
+  _r.push(_data[1]);
+  _r.push(_data[2]);
+  _r.push(null);
+  _r.once('readable', common.mustCall());
+  _w.on('finish', common.mustCall(function () {
+    assert.strictEqual(_receivedData, _data.join(''));
   }));
 }
 ;
@@ -65,4 +65,6 @@ const _require = require('../../'),
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

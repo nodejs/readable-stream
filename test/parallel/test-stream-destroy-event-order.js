@@ -1,23 +1,23 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
 
-const common = require('../common');
-const assert = require('assert/');
-const _require = require('../../'),
+var common = require('../common');
+var assert = require('assert/');
+var _require = require('../../'),
   Readable = _require.Readable;
-const rs = new Readable({
-  read() {}
+var rs = new Readable({
+  read: function read() {}
 });
-let closed = false;
-let errored = false;
-rs.on('close', common.mustCall(() => {
+var closed = false;
+var errored = false;
+rs.on('close', common.mustCall(function () {
   closed = true;
   assert(errored);
 }));
-rs.on('error', common.mustCall(err => {
+rs.on('error', common.mustCall(function (err) {
   errored = true;
   assert(!closed);
 }));
@@ -30,4 +30,6 @@ rs.destroy(new Error('kaboom'));
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

@@ -1,30 +1,30 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('assert/'),
+var common = require('../common');
+var _require = require('assert/'),
   strictEqual = _require.strictEqual;
-const _require2 = require('../../'),
+var _require2 = require('../../'),
   Transform = _require2.Transform;
-const t = new Transform();
+var t = new Transform();
 t.on('error', common.expectsError({
   type: Error,
   code: 'ERR_METHOD_NOT_IMPLEMENTED',
   message: 'The _transform() method is not implemented'
 }));
 t.end(bufferShim.from('blerg'));
-const _transform = common.mustCall((chunk, _, next) => {
+var _transform = common.mustCall(function (chunk, _, next) {
   next();
 });
-const _final = common.mustCall(next => {
+var _final = common.mustCall(function (next) {
   next();
 });
-const _flush = common.mustCall(next => {
+var _flush = common.mustCall(function (next) {
   next();
 });
-const t2 = new Transform({
+var t2 = new Transform({
   transform: _transform,
   flush: _flush,
   final: _final
@@ -42,4 +42,6 @@ t2.resume();
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});

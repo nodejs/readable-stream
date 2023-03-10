@@ -1,16 +1,16 @@
 "use strict";
 
 /*<replacement>*/
-const bufferShim = require('safe-buffer').Buffer;
+var bufferShim = require('safe-buffer').Buffer;
 /*</replacement>*/
-const common = require('../common');
-const _require = require('../../'),
+var common = require('../common');
+var _require = require('../../'),
   Readable = _require.Readable,
   PassThrough = _require.PassThrough;
 function test(r) {
-  const wrapper = new Readable({
-    read: () => {
-      let data = r.read();
+  var wrapper = new Readable({
+    read: function read() {
+      var data = r.read();
       if (data) {
         wrapper.push(data);
         return;
@@ -32,27 +32,29 @@ function test(r) {
   wrapper.once('end', common.mustCall());
 }
 {
-  const source = new Readable({
-    read: () => {}
+  var source = new Readable({
+    read: function read() {}
   });
   source.push('foo');
   source.push('bar');
   source.push(null);
-  const pt = source.pipe(new PassThrough());
+  var pt = source.pipe(new PassThrough());
   test(pt);
 }
 {
   // This is the underlying cause of the above test case.
-  const pushChunks = ['foo', 'bar'];
-  const r = new Readable({
-    read: () => {
-      const chunk = pushChunks.shift();
+  var pushChunks = ['foo', 'bar'];
+  var r = new Readable({
+    read: function read() {
+      var chunk = pushChunks.shift();
       if (chunk) {
         // synchronous call
         r.push(chunk);
       } else {
         // asynchronous call
-        process.nextTick(() => r.push(null));
+        process.nextTick(function () {
+          return r.push(null);
+        });
       }
     }
   });
@@ -66,4 +68,6 @@ function test(r) {
 var _list = process.listeners('uncaughtException');
 process.removeAllListeners('uncaughtException');
 _list.pop();
-_list.forEach(e => process.on('uncaughtException', e));
+_list.forEach(function (e) {
+  return process.on('uncaughtException', e);
+});
