@@ -301,6 +301,8 @@ export const replacements = {
     testParallelTicksReenableConsoleLog,
     testParallelTickSaveHook
   ],
+  'test/parallel/test-stream3-pipeline-async-iterator.js': [internalStreamsNoRequireAbortController],
+  'test/parallel/test-stream-compose-operator.js': [internalStreamsNoRequireAbortController],
   'test/parallel/test-stream2-readable-from-list.js': [testParallelReadableBufferListInspect],
   'README.md': [readmeInfo, readmeLink]
 }
