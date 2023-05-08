@@ -744,6 +744,23 @@ testClosed(
         .end()
     })
 }
+{
+  const stream = new Duplex({
+    write(chunk, enc, cb) {
+      setImmediate(cb)
+    }
+  })
+  stream.end('foo')
+  finished(
+    stream,
+    {
+      readable: false
+    },
+    common.mustCall((err) => {
+      assert(!err)
+    })
+  )
+}
 
 /* replacement start */
 process.on('beforeExit', (code) => {

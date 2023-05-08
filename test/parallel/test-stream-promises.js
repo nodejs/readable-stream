@@ -89,6 +89,73 @@ assert.strictEqual(finished, promisify(stream.finished))
     })
     .then(common.mustCall())
 }
+{
+  const streamObj = new Readable()
+  assert.throws(
+    () => {
+      // Passing cleanup option not as boolean
+      // should throw error
+      finished(streamObj, {
+        cleanup: 2
+      })
+    },
+    {
+      code: 'ERR_INVALID_ARG_TYPE'
+    }
+  )
+}
+
+// Below code should not throw any errors as the
+// streamObj is `Stream` and cleanup is boolean
+{
+  const streamObj = new Readable()
+  finished(streamObj, {
+    cleanup: true
+  })
+}
+
+// Cleanup function should not be called when cleanup is set to false
+// listenerCount should be 1 after calling finish
+{
+  const streamObj = new Writable()
+  assert.strictEqual(streamObj.listenerCount('end'), 0)
+  finished(streamObj, {
+    cleanup: false
+  }).then(
+    common.mustCall(() => {
+      assert.strictEqual(streamObj.listenerCount('end'), 1)
+    })
+  )
+  streamObj.end()
+}
+
+// Cleanup function should be called when cleanup is set to true
+// listenerCount should be 0 after calling finish
+{
+  const streamObj = new Writable()
+  assert.strictEqual(streamObj.listenerCount('end'), 0)
+  finished(streamObj, {
+    cleanup: true
+  }).then(
+    common.mustCall(() => {
+      assert.strictEqual(streamObj.listenerCount('end'), 0)
+    })
+  )
+  streamObj.end()
+}
+
+// Cleanup function should not be called when cleanup has not been set
+// listenerCount should be 1 after calling finish
+{
+  const streamObj = new Writable()
+  assert.strictEqual(streamObj.listenerCount('end'), 0)
+  finished(streamObj).then(
+    common.mustCall(() => {
+      assert.strictEqual(streamObj.listenerCount('end'), 1)
+    })
+  )
+  streamObj.end()
+}
 
 /* replacement start */
 process.on('beforeExit', (code) => {

@@ -21,7 +21,7 @@ const async_hooks = require('async_hooks')
 const checkTickCreated = common.mustCall()
 const hook = async_hooks
   .createHook({
-    init(id, type, triggerId, resoure) {
+    init(id, type, triggerId, resource) {
       if (type === 'TickObject') checkTickCreated()
     }
   })

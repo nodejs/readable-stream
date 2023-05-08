@@ -13,10 +13,10 @@ async function runTest() {
     new PassThrough({
       objectMode: true
     }),
-    common.mustCall(() => {})
+    common.mustCall()
   )
 }
-runTest().then(common.mustCall(() => {}))
+runTest().then(common.mustCall())
 
 /* replacement start */
 process.on('beforeExit', (code) => {
