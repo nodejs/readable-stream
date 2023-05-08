@@ -216,6 +216,10 @@ const testParallelTicksReenableConsoleLog = ['silentConsole.log\\(i\\);', 'conso
 
 const testParallelTickSaveHook = ['async_hooks.createHook\\(\\{', 'const hook = async_hooks.createHook({']
 
+const removefromWebReadableMethod = ['Readable.fromWeb = function\\s\\s*\\([^)]*\\)\\s*{[^}]*}', '']
+
+const removetoWebReadableMethod = ['Readable.toWeb = function\\s\\s*\\([^)]*\\)\\s*{[^}]*}', '']
+
 const readmeInfo = ['(This package is a mirror of the streams implementations in Node.js) (\\d+.\\d+.\\d+).', '$1 $2.']
 
 const readmeLink = ['(\\[Node.js website\\]\\(https://nodejs.org/dist/v)(\\d+.\\d+.\\d+)', '$1$2']
@@ -231,6 +235,10 @@ export const replacements = {
   'lib/internal/streams/(operators|pipeline).+': [
     internalStreamsAbortControllerPolyfill,
     internalStreamsNoRequireAbortController
+  ],
+  'lib/internal/streams/readable.js': [
+    removefromWebReadableMethod,
+    removetoWebReadableMethod
   ],
   'lib/internal/streams/.+': [
     internalStreamsRequireErrors,
