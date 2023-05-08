@@ -1,7 +1,7 @@
-import { createRequire } from 'module';
+import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url);
-const common = require('./index.js');
+const require = createRequire(import.meta.url)
+const common = require('./index.js')
 
 const {
   isMainThread,
@@ -49,10 +49,10 @@ const {
   getBufferSources,
   getTTYfd,
   runWithInvalidFD,
-  spawnPromisified,
-} = common;
+  spawnPromisified
+} = common
 
-const getPort = () => common.PORT;
+const getPort = () => common.PORT
 
 export {
   isMainThread,
@@ -102,5 +102,5 @@ export {
   runWithInvalidFD,
   createRequire,
   spawnPromisified,
-  getPort,
-};
+  getPort
+}
