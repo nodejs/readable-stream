@@ -25,7 +25,9 @@ export const skippedSources = [
   'test/parallel/test-stream-readable-async-iterators.js',
   'test/parallel/test-stream-wrap-drain.js',
   'test/parallel/test-stream-wrap-encoding.js',
-  'test/parallel/test-stream-wrap.js'
+  'test/parallel/test-stream-wrap.js',
+  'test/parallel/test-stream-toWeb-allows-server-response.js',
+  'test/parallel/test-readable-from-web-enqueue-then-close.js'
 ]
 
 export const aliases = {}

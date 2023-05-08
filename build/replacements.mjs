@@ -17,6 +17,16 @@ const internalStreamsAbortControllerPolyfill = [
   `
 ]
 
+const internalStreamsAbortControllerPolyfill2 = [
+  "'use strict'",
+  `
+  'use strict'
+
+  const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;
+
+  `
+]
+
 const internalStreamsNoRequireBlob = [
   "const \\{\\n  isBlob,\\n\\} = require\\('internal/blob'\\);",
   `
@@ -50,6 +60,8 @@ const internalStreamsRequireRelativeDuplex = ['instanceof Stream.Duplex', "insta
 const internalStreamsRequireStream = ["require\\('stream'\\)", "require('../../stream')"]
 
 const internalStreamsRequireStreams = ["require\\('internal/streams/([^']+)'\\)", "require('./$1')"]
+
+const streamSlashPromisesToStreamDotPromises= ["require\\('(node:)?stream/promises'\\)", "require('../../lib/stream').promises"]
 
 const internalStreamsRequireUtil = [
   "require\\('internal/util(?:/(?:debuglog|inspect))?'\\)",
@@ -300,6 +312,13 @@ export const replacements = {
   'test/parallel/test-stream-writable-samecb-singletick.js': [
     testParallelTicksReenableConsoleLog,
     testParallelTickSaveHook
+  ],
+  'test/parallel/test-stream3-pipeline-async-iterator.js': [
+    internalStreamsAbortControllerPolyfill2,
+    streamSlashPromisesToStreamDotPromises
+  ],
+  'test/parallel/test-stream-compose-operator.js': [
+    internalStreamsAbortControllerPolyfill2
   ],
   'test/parallel/test-stream2-readable-from-list.js': [testParallelReadableBufferListInspect],
   'README.md': [readmeInfo, readmeLink]

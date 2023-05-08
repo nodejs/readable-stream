@@ -7,7 +7,7 @@ const silentConsole = {
 }
 const common = require('../common')
 const assert = require('assert')
-const { Duplex, Readable, Writable, pipeline } = require('../../lib/ours/index')
+const { Duplex, Readable, Writable, pipeline, PassThrough } = require('../../lib/ours/index')
 const Blob = globalThis.Blob || require('buffer').Blob
 {
   const d = Duplex.from({
@@ -178,7 +178,7 @@ const Blob = globalThis.Blob || require('buffer').Blob
       }
       assert.strictEqual(ret, 'abcdefghi')
     },
-    common.mustCall(() => {})
+    common.mustSucceed()
   )
 }
 
@@ -330,6 +330,34 @@ if (typeof Blob !== 'undefined') {
     })
   )
   duplex.write('test')
+}
+{
+  const through = new PassThrough({
+    objectMode: true
+  })
+  let res = ''
+  const d = Readable.from(['foo', 'bar'], {
+    objectMode: true
+  }).pipe(
+    Duplex.from({
+      writable: through,
+      readable: through
+    })
+  )
+  d.on('data', (data) => {
+    d.pause()
+    setImmediate(() => {
+      d.resume()
+    })
+    res += data
+  })
+    .on(
+      'end',
+      common.mustCall(() => {
+        assert.strictEqual(res, 'foobar')
+      })
+    )
+    .on('close', common.mustCall())
 }
 
 /* replacement start */

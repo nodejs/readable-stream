@@ -15,7 +15,7 @@ const { Readable, Duplex, pipeline } = require('../../lib/ours/index')
 // Refs: https://github.com/nodejs/node/issues/24456
 
 const readable = new Readable({
-  read: common.mustCall(() => {})
+  read: common.mustCall()
 })
 const duplex = new Duplex({
   write(chunk, enc, cb) {

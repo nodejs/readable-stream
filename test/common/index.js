@@ -33,7 +33,7 @@ const path = require('path')
 const { inspect } = require('util')
 const { isMainThread } = require('worker_threads')
 const tmpdir = require('./tmpdir')
-const bits = ['arm64', 'mips', 'mipsel', 'ppc64', 'riscv64', 's390x', 'x64'].includes(process.arch) ? 64 : 32
+const bits = ['arm64', 'loong64', 'mips', 'mipsel', 'ppc64', 'riscv64', 's390x', 'x64'].includes(process.arch) ? 64 : 32
 const hasIntl = !!process.config.variables.v8_enable_i18n_support
 const { atob, btoa } = require('buffer')
 
@@ -110,6 +110,7 @@ const isFreeBSD = process.platform === 'freebsd'
 const isOpenBSD = process.platform === 'openbsd'
 const isLinux = process.platform === 'linux'
 const isOSX = process.platform === 'darwin'
+const isAsan = process.env.ASAN !== undefined
 const isPi = (() => {
   try {
     var _exec
@@ -119,10 +120,11 @@ const isPi = (() => {
     const cpuinfo = fs.readFileSync('/proc/cpuinfo', {
       encoding: 'utf8'
     })
-    return (
+    const ok =
       ((_exec = /^Hardware\s*:\s*(.*)$/im.exec(cpuinfo)) === null || _exec === undefined ? undefined : _exec[1]) ===
       'BCM2835'
-    )
+    ;/^/.test('') // Clear RegExp.$_, some tests expect it to be empty.
+    return ok
   } catch {
     return false
   }
@@ -826,6 +828,7 @@ const common = {
   invalidArgTypeHelper,
   isAIX,
   isAlive,
+  isAsan,
   isDumbTerminal,
   isFreeBSD,
   isLinux,

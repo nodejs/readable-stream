@@ -171,10 +171,7 @@ const { Readable } = require('../../lib/ours/index')
   }
   const stream = new ArrayReader()
   stream.once('readable', common.mustCall(onRead))
-  stream.on(
-    'end',
-    common.mustCall(() => {})
-  )
+  stream.on('end', common.mustCall())
 }
 
 /* replacement start */

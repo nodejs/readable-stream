@@ -91,15 +91,17 @@ function E(code, message, Base) {
       value: Base.name,
       writable: true,
       enumerable: false,
-      configurable: true,
+      configurable: true
     },
     toString: {
-      value() { return `${this.name} [${code}]: ${this.message}`; },
+      value() {
+        return `${this.name} [${code}]: ${this.message}`
+      },
       writable: true,
       enumerable: false,
-      configurable: true,
-    }    
-  });
+      configurable: true
+    }
+  })
   NodeError.prototype.code = code
   NodeError.prototype[kIsNodeError] = true
 
