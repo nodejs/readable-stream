@@ -51,6 +51,8 @@ const internalStreamsRequireStream = ["require\\('stream'\\)", "require('../../s
 
 const internalStreamsRequireStreams = ["require\\('internal/streams/([^']+)'\\)", "require('./$1')"]
 
+const streamSlashPromisesToStreamDotPromises= ["require\\('(node:)?stream/promises'\\)", "require('../../lib/stream').promises"]
+
 const internalStreamsRequireUtil = [
   "require\\('internal/util(?:/(?:debuglog|inspect))?'\\)",
   "require('../../ours/util')"
@@ -301,7 +303,10 @@ export const replacements = {
     testParallelTicksReenableConsoleLog,
     testParallelTickSaveHook
   ],
-  'test/parallel/test-stream3-pipeline-async-iterator.js': [internalStreamsNoRequireAbortController],
+  'test/parallel/test-stream3-pipeline-async-iterator.js': [
+    internalStreamsNoRequireAbortController,
+    streamSlashPromisesToStreamDotPromises
+  ],
   'test/parallel/test-stream-compose-operator.js': [internalStreamsNoRequireAbortController],
   'test/parallel/test-stream2-readable-from-list.js': [testParallelReadableBufferListInspect],
   'README.md': [readmeInfo, readmeLink]

@@ -7,7 +7,7 @@ const silentConsole = {
   log() {},
   error() {}
 }
-const { pipeline } = require('node:stream/promises')
+const { pipeline } = require('../../lib/stream').promises
 {
   // Ensure that async iterators can act as readable and writable streams
   async function* myCustomReadable() {
