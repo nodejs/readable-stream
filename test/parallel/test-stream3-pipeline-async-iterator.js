@@ -2,6 +2,7 @@
 
 'use strict'
 
+const AbortController = globalThis.AbortController || require('abort-controller').AbortController
 const tap = require('tap')
 const silentConsole = {
   log() {},

@@ -17,6 +17,16 @@ const internalStreamsAbortControllerPolyfill = [
   `
 ]
 
+const internalStreamsAbortControllerPolyfill2 = [
+  "'use strict'",
+  `
+  'use strict'
+
+  const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;
+
+  `
+]
+
 const internalStreamsNoRequireBlob = [
   "const \\{\\n  isBlob,\\n\\} = require\\('internal/blob'\\);",
   `
@@ -304,10 +314,12 @@ export const replacements = {
     testParallelTickSaveHook
   ],
   'test/parallel/test-stream3-pipeline-async-iterator.js': [
-    internalStreamsNoRequireAbortController,
+    internalStreamsAbortControllerPolyfill2,
     streamSlashPromisesToStreamDotPromises
   ],
-  'test/parallel/test-stream-compose-operator.js': [internalStreamsNoRequireAbortController],
+  'test/parallel/test-stream-compose-operator.js': [
+    internalStreamsAbortControllerPolyfill2
+  ],
   'test/parallel/test-stream2-readable-from-list.js': [testParallelReadableBufferListInspect],
   'README.md': [readmeInfo, readmeLink]
 }
