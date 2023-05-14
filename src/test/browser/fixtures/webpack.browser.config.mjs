@@ -13,6 +13,6 @@ export default {
   target: 'web',
   performance: false,
   resolve: {
-    aliasFields: ['browser'],
+    aliasFields: ['browser']
   }
 }
