@@ -20,15 +20,8 @@ export default {
       banner: 'function setImmediate(fn, ...args) { setTimeout(() => fn(...args), 1) }',
       raw: true
     }),
-    new webpack.ProvidePlugin({
-      process: require.resolve('process')
-    })
   ],
   resolve: {
     aliasFields: ['browser'],
-    fallback: {
-      crypto: require.resolve('crypto-browserify'),
-      path: require.resolve('path-browserify')
-    }
   }
 }
