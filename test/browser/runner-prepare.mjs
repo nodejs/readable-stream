@@ -98,6 +98,7 @@ async function main() {
     case 'webpack':
       await run('webpack -c test/browser/fixtures/webpack.browser.config.mjs')
       await run('webpack -c test/browser/fixtures/webpack.node.config.mjs')
+      await run('webpack -c test/browser/fixtures/webpack.config.mjs')
   }
 }
 
