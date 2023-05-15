@@ -39,6 +39,7 @@
     "test:prepare": "node test/browser/runner-prepare.mjs",
     "test:browsers": "node test/browser/runner-browser.mjs",
     "test:bundlers": "node test/browser/runner-node.mjs",
+    "test:readable-stream-only": "node readable-stream-test/runner-prepare.mjs",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src lib test",
     "lint": "eslint src"
