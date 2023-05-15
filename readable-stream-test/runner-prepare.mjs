@@ -72,6 +72,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  process.error(e)
+  error(e)
   process.exit(1)
 })
