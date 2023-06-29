@@ -236,6 +236,8 @@ const readmeInfo = ['(This package is a mirror of the streams implementations in
 
 const readmeLink = ['(\\[Node.js website\\]\\(https://nodejs.org/dist/v)(\\d+.\\d+.\\d+)', '$1$2']
 
+const streamRequire = [ "require\\('stream'\\)", "require('../../lib/stream.js')" ]
+
 export const replacements = {
   'lib/_stream.+': [legacyStreamsRequireStream],
   'lib/internal/streams/duplexify.+': [
@@ -288,7 +290,7 @@ export const replacements = {
     streamIndexRequireUtil,
     streamIndexRequireInternal
   ],
-  'lib/stream/.+': [streamsRequireErrors, streamsRequirePrimordials, streamsRequireInternal],
+  'lib/stream/.+': [streamsRequireErrors, streamsRequirePrimordials, streamsRequireInternal, streamRequire],
   'test/common/index.js': [testCommonKnownGlobals],
   'test/parallel/.+': [
     testParallelIncludeTap,
