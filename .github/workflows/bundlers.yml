@@ -17,7 +17,9 @@ jobs:
         bundler: ['browserify', 'esbuild', 'rollup', 'webpack']
         exclude:
           - os: windows-latest
-            node-version: [12.x, 14.x]
+            node-version: 12.x
+          - os: windows-latest
+            node-version: 14.x
     steps:
       - name: Checkout
         uses: actions/checkout@v3
