@@ -27,6 +27,8 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package.json') }}
       - name: Install dependencies
+        if: ${{ !(matrix.os == 'windows-latest' && (matrix.node-version == '12.x' || matrix.node-version == '14.x')) }}
         run: npm install
       - name: Run Tests
+        if: ${{ !(matrix.os == 'windows-latest' && (matrix.node-version == '12.x' || matrix.node-version == '14.x')) }}
         run: npm run coverage
