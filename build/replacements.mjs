@@ -9,6 +9,8 @@ const internalStreamsBufferPolyfill = [
   `
 ]
 
+const noNodeColon = ["node:", '']
+
 const internalStreamsAbortControllerPolyfill = [
   "'use strict'",
   `
@@ -364,7 +366,8 @@ export const replacements = {
     testParallelBindings,
     testParallelHasOwn,
     testParallelSilentConsole,
-    testParallelTimersPromises
+    testParallelTimersPromises,
+    noNodeColon
   ],
   'test/parallel/test-stream-duplex-from.js': [
     testParallelDuplexFromBlob,
