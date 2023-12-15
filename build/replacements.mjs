@@ -275,9 +275,19 @@ const duplexFromTestWebStreamNeutralizeWritable = [
   'makeATestWritableStreamOff(writeFunc) {'
 ]
 
-const polyfillAddAbortSignal = [
+const polyfillAddAbortListener = [
   'require\\(\'events\'\\).addAbortListener',
   'require(\'../../ours/util\').addAbortListener'
+]
+
+const abortSignalAny = [
+  'AbortSignal.any',
+  'require(\'../../ours/util\').AbortSignalAny'
+]
+
+const asyncDisposeTest = [
+  'Symbol.asyncDispose',
+  'require(\'../../lib/ours/primordials\').SymbolAsyncDispose'
 ]
 
 export const replacements = {
@@ -292,10 +302,11 @@ export const replacements = {
     internalStreamsAbortControllerPolyfill,
     internalStreamsNoRequireAbortController,
     internalStreamsNoRequireAbortController2,
-    internalStreamsWeakHandler2
+    internalStreamsWeakHandler2,
+    abortSignalAny
   ],
   'lib/internal/streams/add-abort-signal.js': [
-    polyfillAddAbortSignal
+    polyfillAddAbortListener
   ],
   'lib/internal/streams/readable.js': [
     removefromWebReadableMethod,
@@ -314,7 +325,8 @@ export const replacements = {
     internalStreamsRequireWebStream,
     internalStreamsRequireInternal,
     internalStreamsWeakHandler,
-    internalStreamsInspectCustom
+    internalStreamsInspectCustom,
+    polyfillAddAbortListener
   ],
   'lib/internal/validators.js': [
     internalValidatorsRequireAssert,
@@ -362,6 +374,7 @@ export const replacements = {
     removeWebStreamsFromDuplexFromTest
   ],
   'test/parallel/test-stream-finished.js': [testParallelFinishedEvent],
+  'test/parallel/test-stream-readable-dispose.js': [asyncDisposeTest],
   'test/parallel/test-stream-flatMap.js': [testParallelFlatMapWinLineSeparator],
   'test/parallel/test-stream-preprocess.js': [testParallelPreprocessWinLineSeparator],
   'test/parallel/test-stream-writable-samecb-singletick.js': [

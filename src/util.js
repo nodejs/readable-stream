@@ -2,6 +2,7 @@
 
 const bufferModule = require('buffer')
 const { kResistStopPropagation, SymbolDispose } = require('./primordials')
+const AbortSignal = global.AbortSignal || require('abort-controller').AbortSignal
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 const Blob = globalThis.Blob || bufferModule.Blob
@@ -160,6 +161,13 @@ module.exports = {
         removeEventListener?.();
       },
     };
+  },
+  AbortSignalAny: AbortSignal.any || function AbortSignalAny(signals) {
+    if (signals[0]) {
+      return signals[0]
+    }
+    const ac = new AbortController()
+    return ac.signal
   }
 }
 
