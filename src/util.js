@@ -164,10 +164,18 @@ module.exports = {
     };
   },
   AbortSignalAny: AbortSignal.any || function AbortSignalAny(signals) {
-    if (signals[0]) {
+    // Fast path if there is only one signal.
+    if (signals.length === 1) {
       return signals[0]
     }
     const ac = new AbortController()
+    const abort = () => ac.abort()
+    signals.forEach(signal => {
+      signal.addEventListener('abort', abort, { once: true })
+    })
+    ac.signal.addEventListener('abort', () => {
+      signals.forEach(signal => signal.removeEventListener('abort', abort))
+    }, { once: true })
     return ac.signal
   }
 }
