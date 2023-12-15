@@ -276,8 +276,8 @@ const duplexFromTestWebStreamNeutralizeWritable = [
 ]
 
 const polyfillAddAbortListener = [
-  'require\\(\'events\'\\).addAbortListener',
-  'require(\'../../ours/util\').addAbortListener'
+  'addAbortListener \\?\\?= require\\(\'events\'\\)\\.addAbortListener',
+  'addAbortListener = addAbortListener || require(\'../../ours/util\').addAbortListener'
 ]
 
 const abortSignalAny = [
