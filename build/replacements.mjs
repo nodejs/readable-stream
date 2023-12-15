@@ -275,6 +275,11 @@ const duplexFromTestWebStreamNeutralizeWritable = [
   'makeATestWritableStreamOff(writeFunc) {'
 ]
 
+const polyfillAddAbortSignal = [
+  'require\\(\'events\'\\).addAbortListener',
+  'require(\'../../ours/util\').addAbortListener'
+]
+
 export const replacements = {
   'lib/_stream.+': [legacyStreamsRequireStream],
   'lib/internal/streams/duplexify.+': [
@@ -288,6 +293,9 @@ export const replacements = {
     internalStreamsNoRequireAbortController,
     internalStreamsNoRequireAbortController2,
     internalStreamsWeakHandler2
+  ],
+  'lib/internal/streams/add-abort-signal.js': [
+    polyfillAddAbortSignal
   ],
   'lib/internal/streams/readable.js': [
     removefromWebReadableMethod,

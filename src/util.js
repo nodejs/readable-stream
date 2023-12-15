@@ -1,6 +1,7 @@
 'use strict'
 
 const bufferModule = require('buffer')
+const { kResistStopPropagation, SymbolDispose } = require('./primordials')
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 const Blob = globalThis.Blob || bufferModule.Blob
@@ -136,6 +137,29 @@ module.exports = {
   isBlob,
   deprecate(fn, message) {
     return fn
+  },
+  addAbortListener: require('events').addAbortListener || function addAbortListener(signal, listener) {
+    if (signal === undefined) {
+      throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal);
+    }
+    // validateAbortSignal(signal, 'signal');
+    // validateFunction(listener, 'listener');
+
+    let removeEventListener;
+    if (signal.aborted) {
+      queueMicrotask(() => listener());
+    } else {
+      signal.addEventListener('abort', listener, { __proto__: null, once: true, [kResistStopPropagation]: true });
+      removeEventListener = () => {
+        signal.removeEventListener('abort', listener);
+      };
+    }
+    return {
+      __proto__: null,
+      [SymbolDispose]() {
+        removeEventListener?.();
+      },
+    };
   }
 }
 
