@@ -69,6 +69,7 @@ async function extract(nodeVersion, tarFile) {
   })
 
   await finished(tarFile.pipe(parser))
+  info('extraction done')
   return contents
 }
 

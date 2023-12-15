@@ -72,6 +72,9 @@ module.exports = {
   PromiseReject(err) {
     return Promise.reject(err)
   },
+  PromiseResolve(val) {
+    return Promise.resolve(val)
+  },
   ReflectApply: Reflect.apply,
   RegExpPrototypeTest(self, value) {
     return self.test(value)
@@ -95,8 +98,11 @@ module.exports = {
   SymbolAsyncIterator: Symbol.asyncIterator,
   SymbolHasInstance: Symbol.hasInstance,
   SymbolIterator: Symbol.iterator,
+  SymbolDispose: Symbol.dispose || Symbol('Symbol.dispose'),
+  SymbolAsyncDispose: Symbol.asyncDispose || Symbol('Symbol.asyncDispose'),
   TypedArrayPrototypeSet(self, buf, len) {
     return self.set(buf, len)
   },
+  Boolean: Boolean,
   Uint8Array
 }

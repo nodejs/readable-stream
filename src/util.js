@@ -133,7 +133,10 @@ module.exports = {
       return ArrayBuffer.isView(arr)
     }
   },
-  isBlob
+  isBlob,
+  deprecate(fn, message) {
+    return fn
+  }
 }
 
 module.exports.promisify.custom = Symbol.for('nodejs.util.promisify.custom')

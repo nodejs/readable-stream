@@ -42,6 +42,11 @@ const internalStreamsNoRequireAbortController = [
   'const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;'
 ]
 
+const internalStreamsNoRequireAbortController2 = [
+  'const \\{ AbortController, AbortSignal \\} = .+',
+  'const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;'
+]
+
 const internalStreamsRequireInternal = ["require\\('internal/([^']+)'\\)", "require('../$1')"]
 
 const internalStreamsRequireErrors = ["require\\('internal/errors'\\)", "require('../../ours/errors')"]
@@ -74,7 +79,12 @@ const internalStreamsRequireWebStream = ["require\\('internal/webstreams/adapter
 
 const internalStreamsWeakHandler = [
   "const \\{ kWeakHandler \\} = require\\('../event_target'\\);",
-  "const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
+  "require\\('../event_target'\\);const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
+]
+
+const internalStreamsWeakHandler2 = [
+  "const \\{ kWeakHandler, kResistStopPropagation \\} = .*;",
+  "const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');\nconst kResistStopPropagation = require('../../ours/primordials').Symbol('kResistStopPropagation');"
 ]
 
 const internalValidatorsNoCoalesceAssignment = [
@@ -142,6 +152,7 @@ const testCommonKnownGlobals = [
       typeof AbortController !== 'undefined' ? AbortController : require('abort-controller').AbortController,
       typeof AbortSignal !== 'undefined' ? AbortSignal : require('abort-controller').AbortSignal,
       typeof EventTarget !== 'undefined' ? EventTarget : require('event-target-shim').EventTarget,
+      typeof navigator !== 'undefined' ? navigator : {},
   `
 ]
 
@@ -238,6 +249,32 @@ const readmeLink = ['(\\[Node.js website\\]\\(https://nodejs.org/dist/v)(\\d+.\\
 
 const streamRequire = [ "require\\('stream'\\)", "require('../../lib/stream.js')" ]
 
+const removeWebStreamsFromDuplexFromTest= [
+  'const { ReadableStream, WritableStream } = .+;',
+  `function makeATestReadableStream(value) {
+  return Readable.from([value])
+}
+function makeATestWritableStream(writeFunc) {
+  return new Writable({
+    write(chunk, enc, cb) {
+      writeFunc(chunk)
+      cb()
+    }
+  })
+}
+`
+]
+
+const duplexFromTestWebStreamNeutralizeReadable = [
+  'makeATestReadableStream\\(value\\) {',
+  'makeATestReadableStreamOff(value) {'
+]
+
+const duplexFromTestWebStreamNeutralizeWritable = [
+  'makeATestWritableStream\\(writeFunc\\) {',
+  'makeATestWritableStreamOff(writeFunc) {'
+]
+
 export const replacements = {
   'lib/_stream.+': [legacyStreamsRequireStream],
   'lib/internal/streams/duplexify.+': [
@@ -248,7 +285,9 @@ export const replacements = {
   ],
   'lib/internal/streams/(operators|pipeline).+': [
     internalStreamsAbortControllerPolyfill,
-    internalStreamsNoRequireAbortController
+    internalStreamsNoRequireAbortController,
+    internalStreamsNoRequireAbortController2,
+    internalStreamsWeakHandler2
   ],
   'lib/internal/streams/readable.js': [
     removefromWebReadableMethod,
@@ -307,7 +346,13 @@ export const replacements = {
     testParallelSilentConsole,
     testParallelTimersPromises
   ],
-  'test/parallel/test-stream-duplex-from.js': [testParallelDuplexFromBlob, testParallelDuplexSkipWithoutBlob],
+  'test/parallel/test-stream-duplex-from.js': [
+    testParallelDuplexFromBlob,
+    testParallelDuplexSkipWithoutBlob,
+    duplexFromTestWebStreamNeutralizeReadable,
+    duplexFromTestWebStreamNeutralizeWritable,
+    removeWebStreamsFromDuplexFromTest
+  ],
   'test/parallel/test-stream-finished.js': [testParallelFinishedEvent],
   'test/parallel/test-stream-flatMap.js': [testParallelFlatMapWinLineSeparator],
   'test/parallel/test-stream-preprocess.js': [testParallelPreprocessWinLineSeparator],
