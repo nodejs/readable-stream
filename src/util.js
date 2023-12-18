@@ -19,6 +19,19 @@ const isBlob =
       }
 /* eslint-enable indent */
 
+const validateAbortSignal = (signal, name) => {
+  if (signal !== undefined &&
+      (signal === null ||
+       typeof signal !== 'object' ||
+       !('aborted' in signal))) {
+    throw new ERR_INVALID_ARG_TYPE(name, 'AbortSignal', signal);
+  }
+};
+const validateFunction = (value, name) => {
+  if (typeof value !== 'function')
+    throw new ERR_INVALID_ARG_TYPE(name, 'Function', value);
+};
+
 // This is a simplified version of AggregateError
 class AggregateError extends Error {
   constructor(errors) {
@@ -144,8 +157,8 @@ module.exports = {
     if (signal === undefined) {
       throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal);
     }
-    // validateAbortSignal(signal, 'signal');
-    // validateFunction(listener, 'listener');
+    validateAbortSignal(signal, 'signal');
+    validateFunction(listener, 'listener');
 
     let removeEventListener;
     if (signal.aborted) {
@@ -171,6 +184,7 @@ module.exports = {
     const ac = new AbortController()
     const abort = () => ac.abort()
     signals.forEach(signal => {
+      validateAbortSignal(signal, 'signals')
       signal.addEventListener('abort', abort, { once: true })
     })
     ac.signal.addEventListener('abort', () => {
