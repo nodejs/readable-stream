@@ -19,7 +19,7 @@ const silentConsole = {
 }
 const common = require('../common')
 const { Readable } = require('../../lib/ours/index')
-const { deepStrictEqual, rejects, throws } = require('assert')
+const { deepStrictEqual, rejects, throws, strictEqual } = require('assert')
 const { from } = Readable
 const fromAsync = (...args) => from(...args).map(async (x) => x)
 const naturals = () =>
@@ -61,6 +61,30 @@ const naturals = () =>
     deepStrictEqual(await naturals().drop(10).take(10).toArray(), next10)
     deepStrictEqual(await naturals().take(5).take(1).toArray(), [1])
   })().then(common.mustCall())
+}
+
+// Don't wait for next item in the original stream when already consumed the requested take amount
+{
+  let reached = false
+  let resolve
+  const promise = new Promise((res) => (resolve = res))
+  const stream = from(
+    (async function* () {
+      yield 1
+      await promise
+      reached = true
+      yield 2
+    })()
+  )
+  stream
+    .take(1)
+    .toArray()
+    .then(
+      common.mustCall(() => {
+        strictEqual(reached, false)
+      })
+    )
+    .finally(() => resolve())
 }
 {
   // Coercion

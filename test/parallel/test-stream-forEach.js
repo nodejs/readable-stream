@@ -135,7 +135,8 @@ const { once } = require('events')
     },
     {
       signal: ac.signal,
-      concurrency: 2
+      concurrency: 2,
+      highWaterMark: 0
     }
   )
   // pump
@@ -182,7 +183,7 @@ const { once } = require('events')
 {
   const stream = Readable.from([1, 2, 3, 4, 5])
   Object.defineProperty(stream, 'map', {
-    value: common.mustNotCall(() => {})
+    value: common.mustNotCall()
   })
   // Check that map isn't getting called.
   stream.forEach(() => true)

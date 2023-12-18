@@ -19,10 +19,7 @@ stream.on(
     message: 'May not write null values to stream'
   })
 )
-stream.on(
-  'data',
-  mustNotCall((chunk) => {})
-)
+stream.on('data', mustNotCall())
 stream.on('end', mustNotCall())
 
 /* replacement start */

@@ -9,6 +9,8 @@ const internalStreamsBufferPolyfill = [
   `
 ]
 
+const noNodeColon = ["node:", '']
+
 const internalStreamsAbortControllerPolyfill = [
   "'use strict'",
   `
@@ -39,6 +41,11 @@ const internalStreamsInspectCustom = ['inspect.custom', "Symbol.for('nodejs.util
 
 const internalStreamsNoRequireAbortController = [
   'const \\{ AbortController \\} = .+',
+  'const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;'
+]
+
+const internalStreamsNoRequireAbortController2 = [
+  'const \\{ AbortController, AbortSignal \\} = .+',
   'const AbortController = globalThis.AbortController || require(\'abort-controller\').AbortController;'
 ]
 
@@ -74,7 +81,12 @@ const internalStreamsRequireWebStream = ["require\\('internal/webstreams/adapter
 
 const internalStreamsWeakHandler = [
   "const \\{ kWeakHandler \\} = require\\('../event_target'\\);",
-  "const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
+  "require\\('../event_target'\\);const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
+]
+
+const internalStreamsWeakHandler2 = [
+  "const \\{ kWeakHandler, kResistStopPropagation \\} = .*;",
+  "const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');\nconst kResistStopPropagation = require('../../ours/primordials').Symbol('kResistStopPropagation');"
 ]
 
 const internalValidatorsNoCoalesceAssignment = [
@@ -142,6 +154,7 @@ const testCommonKnownGlobals = [
       typeof AbortController !== 'undefined' ? AbortController : require('abort-controller').AbortController,
       typeof AbortSignal !== 'undefined' ? AbortSignal : require('abort-controller').AbortSignal,
       typeof EventTarget !== 'undefined' ? EventTarget : require('event-target-shim').EventTarget,
+      typeof navigator !== 'undefined' ? navigator : {},
   `
 ]
 
@@ -238,6 +251,47 @@ const readmeLink = ['(\\[Node.js website\\]\\(https://nodejs.org/dist/v)(\\d+.\\
 
 const streamRequire = [ "require\\('stream'\\)", "require('../../lib/stream.js')" ]
 
+const removeWebStreamsFromDuplexFromTest= [
+  'const { ReadableStream, WritableStream } = .+;',
+  `function makeATestReadableStream(value) {
+  return Readable.from([value])
+}
+function makeATestWritableStream(writeFunc) {
+  return new Writable({
+    write(chunk, enc, cb) {
+      writeFunc(chunk)
+      cb()
+    }
+  })
+}
+`
+]
+
+const duplexFromTestWebStreamNeutralizeReadable = [
+  'makeATestReadableStream\\(value\\) {',
+  'makeATestReadableStreamOff(value) {'
+]
+
+const duplexFromTestWebStreamNeutralizeWritable = [
+  'makeATestWritableStream\\(writeFunc\\) {',
+  'makeATestWritableStreamOff(writeFunc) {'
+]
+
+const polyfillAddAbortListener = [
+  'addAbortListener \\?\\?= require\\(\'events\'\\)\\.addAbortListener',
+  'addAbortListener = addAbortListener || require(\'../../ours/util\').addAbortListener'
+]
+
+const abortSignalAny = [
+  'AbortSignal.any',
+  'require(\'../../ours/util\').AbortSignalAny'
+]
+
+const asyncDisposeTest = [
+  'Symbol.asyncDispose',
+  'require(\'../../lib/ours/primordials\').SymbolAsyncDispose'
+]
+
 export const replacements = {
   'lib/_stream.+': [legacyStreamsRequireStream],
   'lib/internal/streams/duplexify.+': [
@@ -248,7 +302,13 @@ export const replacements = {
   ],
   'lib/internal/streams/(operators|pipeline).+': [
     internalStreamsAbortControllerPolyfill,
-    internalStreamsNoRequireAbortController
+    internalStreamsNoRequireAbortController,
+    internalStreamsNoRequireAbortController2,
+    internalStreamsWeakHandler2,
+    abortSignalAny
+  ],
+  'lib/internal/streams/add-abort-signal.js': [
+    polyfillAddAbortListener
   ],
   'lib/internal/streams/readable.js': [
     removefromWebReadableMethod,
@@ -267,7 +327,8 @@ export const replacements = {
     internalStreamsRequireWebStream,
     internalStreamsRequireInternal,
     internalStreamsWeakHandler,
-    internalStreamsInspectCustom
+    internalStreamsInspectCustom,
+    polyfillAddAbortListener
   ],
   'lib/internal/validators.js': [
     internalValidatorsRequireAssert,
@@ -305,10 +366,18 @@ export const replacements = {
     testParallelBindings,
     testParallelHasOwn,
     testParallelSilentConsole,
-    testParallelTimersPromises
+    testParallelTimersPromises,
+    noNodeColon
   ],
-  'test/parallel/test-stream-duplex-from.js': [testParallelDuplexFromBlob, testParallelDuplexSkipWithoutBlob],
+  'test/parallel/test-stream-duplex-from.js': [
+    testParallelDuplexFromBlob,
+    testParallelDuplexSkipWithoutBlob,
+    duplexFromTestWebStreamNeutralizeReadable,
+    duplexFromTestWebStreamNeutralizeWritable,
+    removeWebStreamsFromDuplexFromTest
+  ],
   'test/parallel/test-stream-finished.js': [testParallelFinishedEvent],
+  'test/parallel/test-stream-readable-dispose.js': [asyncDisposeTest],
   'test/parallel/test-stream-flatMap.js': [testParallelFlatMapWinLineSeparator],
   'test/parallel/test-stream-preprocess.js': [testParallelPreprocessWinLineSeparator],
   'test/parallel/test-stream-writable-samecb-singletick.js': [
