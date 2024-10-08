@@ -335,7 +335,7 @@ E(
       received = addNumericalSeparator(String(input))
     } else if (typeof input === 'bigint') {
       received = String(input)
-      const limit = BigInt("2") ** BigInt("32")
+      const limit = BigInt(2) ** BigInt(32)
       if (input > limit || input < -limit) {
         received = addNumericalSeparator(received)
       }
