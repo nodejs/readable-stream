@@ -77,6 +77,8 @@
     "tape": "^5.5.3",
     "tar": "^6.1.11",
     "undici": "^5.1.1",
+    "vite": "^5.4.9",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
   },
