@@ -39,6 +39,7 @@
     "test:prepare": "node test/browser/runner-prepare.mjs",
     "test:browsers": "node test/browser/runner-browser.mjs",
     "test:bundlers": "node test/browser/runner-node.mjs",
+    "test:vite": "node test/browser/runner-vite.mjs",
     "test:readable-stream-only": "node readable-stream-test/runner-prepare.mjs",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src lib test",
@@ -77,6 +78,9 @@
     "tape": "^5.5.3",
     "tar": "^6.1.11",
     "undici": "^5.1.1",
+    "vite": "^5.4.9",
+    "vite-plugin-commonjs": "^0.10.3",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
   },
