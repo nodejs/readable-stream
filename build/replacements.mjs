@@ -81,7 +81,7 @@ const internalStreamsRequireWebStream = ["require\\('internal/webstreams/adapter
 
 const internalStreamsWeakHandler = [
   "const \\{ kWeakHandler \\} = require\\('../event_target'\\);",
-  "require\\('../event_target'\\);const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
+  "require('../event_target');const kWeakHandler = require('../../ours/primordials').Symbol('kWeak');"
 ]
 
 const internalStreamsWeakHandler2 = [
