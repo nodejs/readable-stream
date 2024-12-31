@@ -195,6 +195,7 @@ async function main() {
   contents.push(['lib/ours/errors.js', await readFile('src/errors.js', 'utf-8')])
   contents.push(['lib/ours/primordials.js', await readFile('src/primordials.js', 'utf-8')])
   contents.push(['lib/ours/util.js', await readFile('src/util.js', 'utf-8')])
+  contents.push(['lib/ours/util/inspect.js', await readFile('src/util/inspect.js', 'utf-8')])
 
   for (const file of await readdir('src/test/ours')) {
     contents.push([`test/ours/${file}`, await readFile(`src/test/ours/${file}`, 'utf-8')])
