@@ -1,6 +1,9 @@
 'use strict'
 
 const bufferModule = require('buffer')
+const {
+  codes: { ERR_INVALID_ARG_TYPE }
+} = require('./errors')
 const { kResistStopPropagation, SymbolDispose } = require('./primordials')
 const AbortSignal = globalThis.AbortSignal || require('abort-controller').AbortSignal
 const AbortController = globalThis.AbortController || require('abort-controller').AbortController
