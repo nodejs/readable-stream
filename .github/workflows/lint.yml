@@ -28,5 +28,11 @@ jobs:
           key: node-modules-${{ hashFiles('package.json') }}
       - name: Install dependencies
         run: npm install
+      - name: Build
+        run: npm run build
+      - name: Check generated files
+        run: |
+          # Check if diff is empty
+          git diff --exit-code --stat ${{ github.sha }} -- lib/
       - name: Check for lint issues
         run: npm run lint
