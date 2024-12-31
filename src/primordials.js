@@ -3,7 +3,7 @@
 /*
   This file is a reduced and adapted version of the main lib/internal/per_context/primordials.js file defined at
 
-  https://github.com/nodejs/node/blob/master/lib/internal/per_context/primordials.js
+  https://github.com/nodejs/node/blob/main/lib/internal/per_context/primordials.js
 
   Don't try to replace with the original file and keep it up to date with the upstream file.
 */
