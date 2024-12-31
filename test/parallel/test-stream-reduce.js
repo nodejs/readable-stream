@@ -93,7 +93,6 @@ function sum(p, c) {
             if (c === 3) {
               await new Promise(() => {}) // Explicitly do not pass signal here
             }
-
             return Promise.resolve()
           },
           0,
@@ -120,7 +119,6 @@ function sum(p, c) {
             if (c === 3) {
               await new Promise(() => {}) // Explicitly do not pass signal here
             }
-
             return Promise.resolve()
           },
           0,
@@ -153,7 +151,6 @@ function sum(p, c) {
             if (c === 3) {
               await new Promise(() => {}) // Explicitly do not pass signal here
             }
-
             return Promise.resolve()
           },
           0,

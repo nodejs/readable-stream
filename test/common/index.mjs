@@ -1,7 +1,7 @@
-import { createRequire } from 'module';
+import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url);
-const common = require('./index.js');
+const require = createRequire(import.meta.url)
+const common = require('./index.js')
 
 const {
   allowGlobals,
@@ -50,10 +50,10 @@ const {
   skipIfDumbTerminal,
   skipIfEslintMissing,
   skipIfInspectorDisabled,
-  spawnPromisified,
-} = common;
+  spawnPromisified
+} = common
 
-const getPort = () => common.PORT;
+const getPort = () => common.PORT
 
 export {
   allowGlobals,
@@ -104,5 +104,5 @@ export {
   skipIfDumbTerminal,
   skipIfEslintMissing,
   skipIfInspectorDisabled,
-  spawnPromisified,
-};
+  spawnPromisified
+}

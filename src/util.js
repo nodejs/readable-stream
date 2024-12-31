@@ -24,13 +24,12 @@ const validateAbortSignal = (signal, name) => {
       (signal === null ||
        typeof signal !== 'object' ||
        !('aborted' in signal))) {
-    throw new ERR_INVALID_ARG_TYPE(name, 'AbortSignal', signal);
+    throw new ERR_INVALID_ARG_TYPE(name, 'AbortSignal', signal)
   }
-};
+}
 const validateFunction = (value, name) => {
-  if (typeof value !== 'function')
-    throw new ERR_INVALID_ARG_TYPE(name, 'Function', value);
-};
+  if (typeof value !== 'function') { throw new ERR_INVALID_ARG_TYPE(name, 'Function', value) }
+}
 
 // This is a simplified version of AggregateError
 class AggregateError extends Error {
@@ -155,26 +154,26 @@ module.exports = {
   },
   addAbortListener: require('events').addAbortListener || function addAbortListener(signal, listener) {
     if (signal === undefined) {
-      throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal);
+      throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal)
     }
-    validateAbortSignal(signal, 'signal');
-    validateFunction(listener, 'listener');
+    validateAbortSignal(signal, 'signal')
+    validateFunction(listener, 'listener')
 
-    let removeEventListener;
+    let removeEventListener
     if (signal.aborted) {
-      queueMicrotask(() => listener());
+      queueMicrotask(() => listener())
     } else {
-      signal.addEventListener('abort', listener, { __proto__: null, once: true, [kResistStopPropagation]: true });
+      signal.addEventListener('abort', listener, { __proto__: null, once: true, [kResistStopPropagation]: true })
       removeEventListener = () => {
-        signal.removeEventListener('abort', listener);
-      };
+        signal.removeEventListener('abort', listener)
+      }
     }
     return {
       __proto__: null,
       [SymbolDispose]() {
-        removeEventListener?.();
-      },
-    };
+        removeEventListener?.()
+      }
+    }
   },
   AbortSignalAny: AbortSignal.any || function AbortSignalAny(signals) {
     // Fast path if there is only one signal.

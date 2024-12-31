@@ -146,6 +146,8 @@ const streamsRequireInternal = ["require\\('internal/(.+)'\\)", "require('../int
 
 const streamsRequirePrimordials = ['= primordials', "= require('../ours/primordials')"]
 
+const stringDecoderRequirePackage = ["require\\('string_decoder'\\)", "require('string_decoder/')"]
+
 const testCommonKnownGlobals = [
   'let knownGlobals = \\[(\\n\\s+)',
   `
@@ -312,7 +314,8 @@ export const replacements = {
   ],
   'lib/internal/streams/readable.js': [
     removefromWebReadableMethod,
-    removetoWebReadableMethod
+    removetoWebReadableMethod,
+    stringDecoderRequirePackage
   ],
   'lib/internal/streams/.+': [
     internalStreamsRequireErrors,
