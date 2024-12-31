@@ -1,7 +1,7 @@
 'use strict'
 
 const { format, inspect } = require('./util/inspect')
-const { AggregateError: CustomAggregateError } = require('./util')
+const { AggregateError: CustomAggregateError } = require('./primordials')
 
 /*
   This file is a reduced and adapted version of the main lib/internal/errors.js file defined at
