@@ -20,15 +20,14 @@ const isBlob =
 /* eslint-enable indent */
 
 const validateAbortSignal = (signal, name) => {
-  if (signal !== undefined &&
-      (signal === null ||
-       typeof signal !== 'object' ||
-       !('aborted' in signal))) {
+  if (signal !== undefined && (signal === null || typeof signal !== 'object' || !('aborted' in signal))) {
     throw new ERR_INVALID_ARG_TYPE(name, 'AbortSignal', signal)
   }
 }
 const validateFunction = (value, name) => {
-  if (typeof value !== 'function') { throw new ERR_INVALID_ARG_TYPE(name, 'Function', value) }
+  if (typeof value !== 'function') {
+    throw new ERR_INVALID_ARG_TYPE(name, 'Function', value)
+  }
 }
 
 // This is a simplified version of AggregateError
@@ -152,45 +151,53 @@ module.exports = {
   deprecate(fn, message) {
     return fn
   },
-  addAbortListener: require('events').addAbortListener || function addAbortListener(signal, listener) {
-    if (signal === undefined) {
-      throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal)
-    }
-    validateAbortSignal(signal, 'signal')
-    validateFunction(listener, 'listener')
+  addAbortListener:
+    require('events').addAbortListener ||
+    function addAbortListener(signal, listener) {
+      if (signal === undefined) {
+        throw new ERR_INVALID_ARG_TYPE('signal', 'AbortSignal', signal)
+      }
+      validateAbortSignal(signal, 'signal')
+      validateFunction(listener, 'listener')
 
-    let removeEventListener
-    if (signal.aborted) {
-      queueMicrotask(() => listener())
-    } else {
-      signal.addEventListener('abort', listener, { __proto__: null, once: true, [kResistStopPropagation]: true })
-      removeEventListener = () => {
-        signal.removeEventListener('abort', listener)
+      let removeEventListener
+      if (signal.aborted) {
+        queueMicrotask(() => listener())
+      } else {
+        signal.addEventListener('abort', listener, { __proto__: null, once: true, [kResistStopPropagation]: true })
+        removeEventListener = () => {
+          signal.removeEventListener('abort', listener)
+        }
       }
-    }
-    return {
-      __proto__: null,
-      [SymbolDispose]() {
-        removeEventListener?.()
+      return {
+        __proto__: null,
+        [SymbolDispose]() {
+          removeEventListener?.()
+        }
       }
+    },
+  AbortSignalAny:
+    AbortSignal.any ||
+    function AbortSignalAny(signals) {
+      // Fast path if there is only one signal.
+      if (signals.length === 1) {
+        return signals[0]
+      }
+      const ac = new AbortController()
+      const abort = () => ac.abort()
+      signals.forEach((signal) => {
+        validateAbortSignal(signal, 'signals')
+        signal.addEventListener('abort', abort, { once: true })
+      })
+      ac.signal.addEventListener(
+        'abort',
+        () => {
+          signals.forEach((signal) => signal.removeEventListener('abort', abort))
+        },
+        { once: true }
+      )
+      return ac.signal
     }
-  },
-  AbortSignalAny: AbortSignal.any || function AbortSignalAny(signals) {
-    // Fast path if there is only one signal.
-    if (signals.length === 1) {
-      return signals[0]
-    }
-    const ac = new AbortController()
-    const abort = () => ac.abort()
-    signals.forEach(signal => {
-      validateAbortSignal(signal, 'signals')
-      signal.addEventListener('abort', abort, { once: true })
-    })
-    ac.signal.addEventListener('abort', () => {
-      signals.forEach(signal => signal.removeEventListener('abort', abort))
-    }, { once: true })
-    return ac.signal
-  }
 }
 
 module.exports.promisify.custom = Symbol.for('nodejs.util.promisify.custom')
