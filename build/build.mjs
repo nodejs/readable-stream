@@ -13,7 +13,6 @@ import { aliases, skippedSources, sources } from './files.mjs'
 import { footers } from './footers.mjs'
 import { headers } from './headers.mjs'
 import { replacements } from './replacements.mjs'
-import pkg from '../package.json' with { type: "json" };
 
 const baseMatcher = /^(?:lib|test)/
 const strictMatcher = /^(['"']use strict.+)/
@@ -163,7 +162,7 @@ async function main() {
     return process.exit(1)
   }
 
-  const nodeVersion = process.argv[2] || pkg.config.node.version;
+  const nodeVersion = process.argv[2]
 
   if (!nodeVersion?.match(/^\d+\.\d+\.\d+/)) {
     console.error('Usage: build.js xx.yy.zz [node.tar.gz]')
