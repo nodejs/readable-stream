@@ -35,7 +35,6 @@ class TestWriter extends stream.Writable {
     // Super slow write stream (callback never called)
   }
 }
-
 const dest = new TestWriter()
 class TestReader extends stream.Readable {
   constructor() {

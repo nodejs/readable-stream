@@ -24,7 +24,6 @@ function test(r) {
       })
     }
   })
-
   r.once('end', function () {
     wrapper.push(null)
   })

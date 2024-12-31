@@ -866,7 +866,6 @@ const common = {
   get enoughTestMem() {
     return require('os').totalmem() > 0x70000000 /* 1.75 Gb */
   },
-
   get hasFipsCrypto() {
     return hasCrypto && require('crypto').getFips()
   },

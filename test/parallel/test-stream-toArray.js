@@ -80,7 +80,6 @@ const assert = require('assert')
           if (x === 3) {
             await new Promise(() => {}) // Explicitly do not pass signal here
           }
-
           return Promise.resolve(x)
         })
         await stream.toArray({

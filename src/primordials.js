@@ -103,6 +103,6 @@ module.exports = {
   TypedArrayPrototypeSet(self, buf, len) {
     return self.set(buf, len)
   },
-  Boolean: Boolean,
+  Boolean,
   Uint8Array
 }

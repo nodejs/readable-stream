@@ -41,7 +41,6 @@ process.nextTick(
     readable.resume() // Make sure the 'end' event gets emitted.
   })
 )
-
 readable.on(
   'end',
   common.mustCall(() => {

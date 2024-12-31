@@ -1,7 +1,7 @@
-import { mustCall } from '../common/index.mjs';
-import { Readable }from '../../lib/ours/index.js';
-import assert from 'assert';
-import tap from 'tap';
+import { mustCall } from '../common/index.mjs'
+import { Readable } from '../../lib/ours/index.js'
+import assert from 'assert'
+import tap from 'tap'
 
 // These tests are manually ported from the draft PR for the test262 test suite
 // Authored by Rick Waldron in https://github.com/tc39/test262/pull/2818/files
@@ -46,132 +46,129 @@ import tap from 'tap';
 // * Ecma International Standards hereafter means Ecma International Standards
 // as well as Ecma Technical Reports
 
-
 // Note all the tests that check AsyncIterator's prototype itself and things
 // that happen before stream conversion were not ported.
 {
   // asIndexedPairs/is-function
-  assert.strictEqual(typeof Readable.prototype.asIndexedPairs, 'function');
+  assert.strictEqual(typeof Readable.prototype.asIndexedPairs, 'function')
   // asIndexedPairs/indexed-pairs.js
-  const iterator = Readable.from([0, 1]);
-  const indexedPairs = iterator.asIndexedPairs();
+  const iterator = Readable.from([0, 1])
+  const indexedPairs = iterator.asIndexedPairs()
 
   for await (const [i, v] of indexedPairs) {
-    assert.strictEqual(i, v);
+    assert.strictEqual(i, v)
   }
   // asIndexedPairs/length.js
-  assert.strictEqual(Readable.prototype.asIndexedPairs.length, 0);
-  const descriptor = Object.getOwnPropertyDescriptor(
-    Readable.prototype,
-    'asIndexedPairs'
-  );
-  assert.strictEqual(descriptor.enumerable, false);
-  assert.strictEqual(descriptor.configurable, true);
-  assert.strictEqual(descriptor.writable, true);
+  assert.strictEqual(Readable.prototype.asIndexedPairs.length, 0)
+  const descriptor = Object.getOwnPropertyDescriptor(Readable.prototype, 'asIndexedPairs')
+  assert.strictEqual(descriptor.enumerable, false)
+  assert.strictEqual(descriptor.configurable, true)
+  assert.strictEqual(descriptor.writable, true)
 }
 {
   // drop/length
-  assert.strictEqual(Readable.prototype.drop.length, 1);
-  const descriptor = Object.getOwnPropertyDescriptor(
-    Readable.prototype,
-    'drop'
-  );
-  assert.strictEqual(descriptor.enumerable, false);
-  assert.strictEqual(descriptor.configurable, true);
-  assert.strictEqual(descriptor.writable, true);
+  assert.strictEqual(Readable.prototype.drop.length, 1)
+  const descriptor = Object.getOwnPropertyDescriptor(Readable.prototype, 'drop')
+  assert.strictEqual(descriptor.enumerable, false)
+  assert.strictEqual(descriptor.configurable, true)
+  assert.strictEqual(descriptor.writable, true)
   // drop/limit-equals-total
-  const iterator = Readable.from([1, 2]).drop(2);
-  const result = await iterator[Symbol.asyncIterator]().next();
-  assert.deepStrictEqual(result, { done: true, value: undefined });
+  const iterator = Readable.from([1, 2]).drop(2)
+  const result = await iterator[Symbol.asyncIterator]().next()
+  assert.deepStrictEqual(result, { done: true, value: undefined })
   // drop/limit-greater-than-total.js
-  const iterator2 = Readable.from([1, 2]).drop(3);
-  const result2 = await iterator2[Symbol.asyncIterator]().next();
-  assert.deepStrictEqual(result2, { done: true, value: undefined });
+  const iterator2 = Readable.from([1, 2]).drop(3)
+  const result2 = await iterator2[Symbol.asyncIterator]().next()
+  assert.deepStrictEqual(result2, { done: true, value: undefined })
   // drop/limit-less-than-total.js
-  const iterator3 = Readable.from([1, 2]).drop(1);
-  const result3 = await iterator3[Symbol.asyncIterator]().next();
-  assert.deepStrictEqual(result3, { done: false, value: 2 });
+  const iterator3 = Readable.from([1, 2]).drop(1)
+  const result3 = await iterator3[Symbol.asyncIterator]().next()
+  assert.deepStrictEqual(result3, { done: false, value: 2 })
   // drop/limit-rangeerror
-  assert.throws(() => Readable.from([1]).drop(-1), RangeError);
+  assert.throws(() => Readable.from([1]).drop(-1), RangeError)
   assert.throws(() => {
     Readable.from([1]).drop({
       valueOf() {
-        throw new Error('boom');
+        throw new Error('boom')
       }
-    });
-  }, /boom/);
+    })
+  }, /boom/)
   // drop/limit-tointeger
-  const two = await Readable.from([1, 2]).drop({ valueOf: () => 1 }).toArray();
-  assert.deepStrictEqual(two, [2]);
+  const two = await Readable.from([1, 2])
+    .drop({ valueOf: () => 1 })
+    .toArray()
+  assert.deepStrictEqual(two, [2])
   // drop/name
-  assert.strictEqual(Readable.prototype.drop.name, 'drop');
+  assert.strictEqual(Readable.prototype.drop.name, 'drop')
   // drop/non-constructible
-  assert.throws(() => new Readable.prototype.drop(1), TypeError);
+  assert.throws(() => new Readable.prototype.drop(1), TypeError)
   // drop/proto
-  const proto = Object.getPrototypeOf(Readable.prototype.drop);
-  assert.strictEqual(proto, Function.prototype);
+  const proto = Object.getPrototypeOf(Readable.prototype.drop)
+  assert.strictEqual(proto, Function.prototype)
 }
 {
   // every/abrupt-iterator-close
-  const stream = Readable.from([1, 2, 3]);
-  const e = new Error();
-  await assert.rejects(stream.every(mustCall(() => {
-    throw e;
-  }, 1)), e);
+  const stream = Readable.from([1, 2, 3])
+  const e = new Error()
+  await assert.rejects(
+    stream.every(
+      mustCall(() => {
+        throw e
+      }, 1)
+    ),
+    e
+  )
 }
 {
   // every/callable-fn
-  await assert.rejects(Readable.from([1, 2]).every({}), TypeError);
+  await assert.rejects(Readable.from([1, 2]).every({}), TypeError)
 }
 {
   // every/callable
-  Readable.prototype.every.call(Readable.from([]), () => {});
+  Readable.prototype.every.call(Readable.from([]), () => {})
   // eslint-disable-next-line array-callback-return
-  Readable.from([]).every(() => {});
+  Readable.from([]).every(() => {})
   assert.throws(() => {
-    const r = Readable.from([]);
-    new r.every(() => {});
-  }, TypeError);
+    const r = Readable.from([])
+    new r.every(() => {})
+  }, TypeError)
 }
 
 {
   // every/false
-  const iterator = Readable.from([1, 2, 3]);
-  const result = await iterator.every((v) => v === 1);
-  assert.strictEqual(result, false);
+  const iterator = Readable.from([1, 2, 3])
+  const result = await iterator.every((v) => v === 1)
+  assert.strictEqual(result, false)
 }
 {
   // every/every
-  const iterator = Readable.from([1, 2, 3]);
-  const result = await iterator.every((v) => true);
-  assert.strictEqual(result, true);
+  const iterator = Readable.from([1, 2, 3])
+  const result = await iterator.every((v) => true)
+  assert.strictEqual(result, true)
 }
 
 {
   // every/is-function
-  assert.strictEqual(typeof Readable.prototype.every, 'function');
+  assert.strictEqual(typeof Readable.prototype.every, 'function')
 }
 {
   // every/length
-  assert.strictEqual(Readable.prototype.every.length, 1);
+  assert.strictEqual(Readable.prototype.every.length, 1)
   // every/name
-  assert.strictEqual(Readable.prototype.every.name, 'every');
+  assert.strictEqual(Readable.prototype.every.name, 'every')
   // every/propdesc
-  const descriptor = Object.getOwnPropertyDescriptor(
-    Readable.prototype,
-    'every'
-  );
-  assert.strictEqual(descriptor.enumerable, false);
-  assert.strictEqual(descriptor.configurable, true);
-  assert.strictEqual(descriptor.writable, true);
+  const descriptor = Object.getOwnPropertyDescriptor(Readable.prototype, 'every')
+  assert.strictEqual(descriptor.enumerable, false)
+  assert.strictEqual(descriptor.configurable, true)
+  assert.strictEqual(descriptor.writable, true)
 }
 
-  /* replacement start */
-  process.on('beforeExit', (code) => {
-    if(code === 0) {
-      tap.pass('test succeeded');
-    } else {
-      tap.fail(`test failed - exited code ${code}`);
-    }
-  });
-  /* replacement end */
+/* replacement start */
+process.on('beforeExit', (code) => {
+  if (code === 0) {
+    tap.pass('test succeeded')
+  } else {
+    tap.fail(`test failed - exited code ${code}`)
+  }
+})
+/* replacement end */

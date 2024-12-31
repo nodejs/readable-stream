@@ -33,7 +33,7 @@
     "./lib/ours/index.js": "./lib/ours/browser.js"
   },
   "scripts": {
-    "build": "node build/build.mjs",
+    "build": "node build/build.mjs 18.19.0",
     "postbuild": "prettier -w lib test",
     "test": "tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "test:prepare": "node test/browser/runner-prepare.mjs",

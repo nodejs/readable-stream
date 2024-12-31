@@ -47,7 +47,6 @@ module.exports = function (test) {
           old.emit('data', item)
           // console.log('after emit', chunks, flowing);
         }
-
         if (chunks <= 0) {
           oldEnded = true
           // console.log('old end', chunks, flowing);

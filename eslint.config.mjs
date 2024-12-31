@@ -21,7 +21,7 @@ export default [
       'space-before-function-paren': 0,
       curly: [2, 'all'],
       'local/no-big-int': 'error',
+      'no-undef': 'warn',
     },
   },
 ]
-
