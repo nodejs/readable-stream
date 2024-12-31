@@ -15,7 +15,7 @@ import { headers } from './headers.mjs'
 import { replacements } from './replacements.mjs'
 
 const baseMatcher = /^(?:lib|test)/
-const strictMatcher = /^(['"']use strict.+)/
+const strictMatcher = /^(['"]use strict.+)/m
 
 function highlightFile(file, color) {
   return `\x1b[${color}m${file.replace(process.cwd() + '/', '')}\x1b[0m`
