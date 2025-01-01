@@ -34,5 +34,7 @@ jobs:
         run: |
           # Check if diff is empty
           git diff --exit-code --stat ${{ github.sha }} -- lib/
+      - name: Check format
+        run: npm run test:format
       - name: Check for lint issues
         run: npm run lint

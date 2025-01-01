@@ -42,6 +42,7 @@
     "test:readable-stream-only": "node readable-stream-test/runner-prepare.mjs",
     "coverage": "c8 -c ./c8.json tap --rcfile=./tap.yml test/parallel/test-*.js test/ours/test-*.js",
     "format": "prettier -w src lib test",
+    "test:format": "prettier -c src lib test",
     "lint": "eslint src"
   },
   "dependencies": {
