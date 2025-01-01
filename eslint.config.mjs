@@ -1,7 +1,7 @@
 import { FlatCompat } from '@eslint/eslintrc'
-const compat = new FlatCompat()
-
 import eslintPluginLocal from './eslint-plugin-local/index.mjs'
+
+const compat = new FlatCompat()
 
 export default [
   // standard,
@@ -10,9 +10,9 @@ export default [
     files: ['**/**.js', '**/**.mjs'],
     languageOptions: {
       sourceType: 'module',
-      ecmaVersion: 'latest',
+      ecmaVersion: 'latest'
     },
-    plugins: { 'local': eslintPluginLocal },
+    plugins: { local: eslintPluginLocal },
     rules: {
       /*
         This is inserted to make this compatible with prettier.
@@ -21,7 +21,7 @@ export default [
       'space-before-function-paren': 0,
       curly: [2, 'all'],
       'local/no-big-int': 'error',
-      'no-undef': 'warn',
-    },
-  },
+      'no-undef': 'warn'
+    }
+  }
 ]
