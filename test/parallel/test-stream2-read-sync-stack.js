@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var Readable = require('../../').Readable;
 var r = new Readable();
 var N = 256 * 1024;
@@ -10,14 +12,13 @@ var N = 256 * 1024;
 process.maxTickDepth = N + 2;
 
 var reads = 0;
-r._read = function(n) {
-  var chunk = reads++ === N ? null : new Buffer(1);
+r._read = function (n) {
+  var chunk = reads++ === N ? null : bufferShim.allocUnsafe(1);
   r.push(chunk);
 };
 
 r.on('readable', function onReadable() {
-  if (!(r._readableState.length % 256))
-    console.error('readable', r._readableState.length);
+  if (!(r._readableState.length % 256)) console.error('readable', r._readableState.length);
   r.read(N * 2);
 });
 
@@ -28,7 +29,7 @@ r.on('end', function onEnd() {
 
 r.read(0);
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert(ended);
   console.log('ok');
 });

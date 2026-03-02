@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Readable = require('../../').Readable;
 var util = require('util');
@@ -11,18 +13,18 @@ function MyStream(options) {
   this._chunks = 3;
 }
 
-MyStream.prototype._read = function(n) {
+MyStream.prototype._read = function (n) {
   switch (this._chunks--) {
     case 0:
       return this.push(null);
     case 1:
-      return setTimeout(function() {
+      return setTimeout(function () {
         this.push('last chunk');
       }.bind(this), 100);
     case 2:
       return this.push('second to last chunk');
     case 3:
-      return process.nextTick(function() {
+      return process.nextTick(function () {
         this.push('first chunk');
       }.bind(this));
     default:
@@ -32,15 +34,16 @@ MyStream.prototype._read = function(n) {
 
 var ms = new MyStream();
 var results = [];
-ms.on('readable', function() {
+ms.on('readable', function () {
   var chunk;
-  while (null !== (chunk = ms.read()))
+  while (null !== (chunk = ms.read())) {
     results.push(chunk + '');
+  }
 });
 
-var expect = [ 'first chunksecond to last chunk', 'last chunk' ];
-process.on('exit', function() {
+var expect = ['first chunksecond to last chunk', 'last chunk'];
+process.on('exit', function () {
   assert.equal(ms._chunks, -1);
-  assert.deepEqual(results, expect);
+  assert.deepStrictEqual(results, expect);
   console.log('ok');
 });

@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var stream = require('../../');
 var Readable = stream.Readable;
@@ -13,21 +15,15 @@ var expectEndingData = expectTotalData;
 
 var r = new Readable({ highWaterMark: 1000 });
 var chunks = totalChunks;
-r._read = function(n) {
-  if (!(chunks % 2))
-    setImmediate(push);
-  else if (!(chunks % 3))
-    process.nextTick(push);
-  else
-    push();
+r._read = function (n) {
+  if (!(chunks % 2)) setImmediate(push);else if (!(chunks % 3)) process.nextTick(push);else push();
 };
 
 var totalPushed = 0;
 function push() {
-  var chunk = chunks-- > 0 ? new Buffer(chunkSize) : null;
+  var chunk = chunks-- > 0 ? bufferShim.alloc(chunkSize, 'x') : null;
   if (chunk) {
     totalPushed += chunk.length;
-    chunk.fill('x');
   }
   r.push(chunk);
 }
@@ -44,9 +40,7 @@ function readn(n, then) {
   expectEndingData -= n;
   (function read() {
     var c = r.read(n);
-    if (!c)
-      r.once('readable', read);
-    else {
+    if (!c) r.once('readable', read);else {
       assert.equal(c.length, n);
       assert(!r._readableState.flowing);
       then();
@@ -85,11 +79,11 @@ function pipeLittle() {
   console.error('pipe a little');
   var w = new Writable();
   var written = 0;
-  w.on('finish', function() {
+  w.on('finish', function () {
     assert.equal(written, 200);
     setImmediate(read1234);
   });
-  w._write = function(chunk, encoding, cb) {
+  w._write = function (chunk, encoding, cb) {
     written += chunk.length;
     if (written >= 200) {
       r.unpipe(w);
@@ -128,16 +122,15 @@ function resumePause() {
   setImmediate(pipe);
 }
 
-
 function pipe() {
   console.error('pipe the rest');
   var w = new Writable();
   var written = 0;
-  w._write = function(chunk, encoding, cb) {
+  w._write = function (chunk, encoding, cb) {
     written += chunk.length;
     cb();
   };
-  w.on('finish', function() {
+  w.on('finish', function () {
     console.error('written', written, totalPushed);
     assert.equal(written, expectEndingData);
     assert.equal(totalPushed, expectTotalData);

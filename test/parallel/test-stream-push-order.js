@@ -1,7 +1,9 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var Readable = require('../../').Readable;
-var assert = require('assert');
+var assert = require('assert/');
 
 var s = new Readable({
   highWaterMark: 20,
@@ -10,7 +12,7 @@ var s = new Readable({
 
 var list = ['1', '2', '3', '4', '5', '6'];
 
-s._read = function(n) {
+s._read = function (n) {
   var one = list.shift();
   if (!one) {
     s.push(null);
@@ -25,8 +27,7 @@ s.read(0);
 
 // ACTUALLY [1, 3, 5, 6, 4, 2]
 
-process.on('exit', function() {
-  assert.deepEqual(s._readableState.buffer,
-                   ['1', '2', '3', '4', '5', '6']);
+process.on('exit', function () {
+  assert.deepStrictEqual(s._readableState.buffer, ['1', '2', '3', '4', '5', '6']);
   console.log('ok');
 });

@@ -12,7 +12,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
           /(require\(['"])(_stream_)/g
         , '$1./$2'
       ]
-
     , instanceofReplacement = [
           /instanceof Stream\.(\w+)/g
         , function (match, streamType) {
@@ -24,11 +23,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , stringDecoderReplacement = [
           /(require\(['"])(string_decoder)(['"]\))/g
         , '$1$2/$3'
-      ]
-
-    , bufferReplacement = [
-          headRegexp
-        , '$1\n\n/*<replacement>*/\nvar Buffer = require(\'buffer\').Buffer;\n/*</replacement>*/\n'
       ]
 
       // The browser build ends up with a circular dependency, so the require is
@@ -44,15 +38,15 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , altIndexOfUseReplacement  = require('./common-replacements').altIndexOfUseReplacement
 
     , utilReplacement = [
-          /^var util = require\('util'\);/m
-        ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+          /^const util = require\('util'\);/m
+        ,   '\n/*<replacement>*/\nconst util = require(\'core-util-is\');\n'
           + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
       ]
 
     , debugLogReplacement = [
-          /var debug = util.debuglog\('stream'\);/
-      ,   '\n\n/*<replacement>*/\nvar debugUtil = require(\'util\');\n'
-        + 'var debug;\n'
+          /const debug = util.debuglog\('stream'\);/
+      ,   '\n\n/*<replacement>*/\nconst debugUtil = require(\'util\');\n'
+        + 'let debug;\n'
         + 'if (debugUtil && debugUtil.debuglog) {\n'
         + '  debug = debugUtil.debuglog(\'stream\');\n'
         + '} else {\n'
@@ -91,8 +85,8 @@ const headRegexp = /(^module.exports = \w+;?)/m
     , objectKeysReplacement = require('./common-replacements').objectKeysReplacement
 
     , eventEmittterReplacement = [
-        /(require\('events'\)(?:\.EventEmitter)?;)/
-      ,   '$1\n\n/*<replacement>*/\n'
+        /^(const EE = require\('events'\));$/m
+      ,   '/*<replacement>*/\n$1.EventEmitter;\n\n'
         + 'var EElistenerCount = function(emitter, type) {\n'
         + '  return emitter.listeners(type).length;\n'
         + '};\n/*</replacement>*/\n'
@@ -103,8 +97,6 @@ const headRegexp = /(^module.exports = \w+;?)/m
         ,   'EElistenerCount'
         ]
 
-    , constReplacement = require('./common-replacements').constReplacement
-
     , bufferIsEncodingReplacement = [
       /Buffer.isEncoding\((\w+)\)/
     ,   '([\'hex\', \'utf8\', \'utf-8\', \'ascii\', \'binary\', \'base64\',\n'
@@ -113,7 +105,7 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , requireStreamReplacement = [
-      /var Stream = require\('stream'\);/
+      /const Stream = require\('stream'\);/
     ,  '\n\n/*<replacement>*/\n'
       + 'var Stream;\n(function (){try{\n'
       + '  Stream = require(\'st\' + \'ream\');\n'
@@ -131,7 +123,12 @@ const headRegexp = /(^module.exports = \w+;?)/m
 
     , processNextTickImport = [
       headRegexp
-    , '$1\n\n/*<replacement>*/\nvar processNextTick = require(\'process-nextick-args\');\n/*</replacement>*/\n'
+    , `$1
+
+/*<replacement>*/
+  var processNextTick = require(\'process-nextick-args\');
+/*</replacement>*/
+`
     ]
 
     , processNextTickReplacement = [
@@ -140,18 +137,43 @@ const headRegexp = /(^module.exports = \w+;?)/m
     ]
 
     , internalUtilReplacement = [
-          /^var internalUtil = require\('internal\/util'\);/m
-        ,   '\n/*<replacement>*/\nvar internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
+          /^const internalUtil = require\('internal\/util'\);/m
+        ,   '\n/*<replacement>*/\nconst internalUtil = {\n  deprecate: require(\'util-deprecate\')\n};\n'
           + '/*</replacement>*/\n'
+      ],
+      isNode10 = [
+        headRegexp
+      , `$1
+
+/*<replacement>*/
+  var asyncWrite = !process.browser && ['v0.10' , 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : processNextTick;
+/*</replacement>*/
+`
       ]
-    ,
-    letReplacements = [
-        /\blet\b/g
-      , 'var'
+    , fixSyncWrite = [
+      /if \(sync\) {\n\s+processNextTick\(afterWrite, stream, state, finished, cb\);\n\s+}/
+      , `if (sync) {
+      /*<replacement>*/
+        asyncWrite(afterWrite, stream, state, finished, cb);
+      /*</replacement>*/
+    }
+
+      `
     ]
+  , bufferShimFix = [
+    /const Buffer = require\('buffer'\)\.Buffer;/,
+    `const Buffer = require('buffer').Buffer;
+/*<replacement>*/
+  const bufferShim = require('buffer-shims');
+/*</replacement>*/`
+  ]
+  , bufferStaticMethods = [
+    /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
+    `bufferShim.$1`
+  ]
+
 module.exports['_stream_duplex.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
@@ -164,19 +186,16 @@ module.exports['_stream_duplex.js'] = [
 ]
 
 module.exports['_stream_passthrough.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_readable.js'] = [
-    constReplacement
-  , addDuplexRequire
+    addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , bufferReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
   , altIndexOfImplReplacement
@@ -194,23 +213,21 @@ module.exports['_stream_readable.js'] = [
   , processNextTickImport
   , processNextTickReplacement
   , eventEmittterListenerCountReplacement
-  , letReplacements
+  , bufferShimFix
+  , bufferStaticMethods
 ]
 
 module.exports['_stream_transform.js'] = [
-    constReplacement
-  , requireReplacement
+    requireReplacement
   , instanceofReplacement
   , utilReplacement
   , stringDecoderReplacement
 ]
 
 module.exports['_stream_writable.js'] = [
-    constReplacement
-  , addDuplexRequire
+    addDuplexRequire
   , requireReplacement
   , instanceofReplacement
-  , bufferReplacement
   , utilReplacement
   , stringDecoderReplacement
   , debugLogReplacement
@@ -221,7 +238,11 @@ module.exports['_stream_writable.js'] = [
   , [ /^var assert = require\('assert'\);$/m, '' ]
   , requireStreamReplacement
   , isBufferReplacement
+  , isNode10
   , processNextTickImport
   , processNextTickReplacement
   , internalUtilReplacement
+  , fixSyncWrite
+  , bufferShimFix
+  , bufferStaticMethods
 ]

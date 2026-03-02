@@ -1,27 +1,27 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 
 var util = require('util');
 var stream = require('../../');
 
-
-var Read = function() {
+var Read = function () {
   stream.Readable.call(this);
 };
 util.inherits(Read, stream.Readable);
 
-Read.prototype._read = function(size) {
+Read.prototype._read = function (size) {
   this.push('x');
   this.push(null);
 };
 
-
-var Write = function() {
+var Write = function () {
   stream.Writable.call(this);
 };
 util.inherits(Write, stream.Writable);
 
-Write.prototype._write = function(buffer, encoding, cb) {
+Write.prototype._write = function (buffer, encoding, cb) {
   this.emit('error', new Error('boom'));
   this.emit('alldone');
 };
@@ -29,14 +29,13 @@ Write.prototype._write = function(buffer, encoding, cb) {
 var read = new Read();
 var write = new Write();
 
-write.once('error', function(err) {});
-write.once('alldone', function(err) {
+write.once('error', function (err) {});
+write.once('alldone', function (err) {
   console.log('ok');
 });
 
-process.on('exit', function(c) {
+process.on('exit', function (c) {
   console.error('error thrown even with listener');
 });
 
 read.pipe(write);
-

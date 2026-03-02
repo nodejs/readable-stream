@@ -1,12 +1,13 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var stream = require('../../');
 var Readable = stream.Readable;
 var Writable = stream.Writable;
-var assert = require('assert');
+var assert = require('assert/');
 
 var EE = require('events').EventEmitter;
-
 
 // a mock thing a bit like the net.Socket/tcp_wrap.handle interaction
 
@@ -17,24 +18,23 @@ stream = new Readable({
 
 var source = new EE();
 
-stream._read = function() {
+stream._read = function () {
   console.error('stream._read');
   readStart();
 };
 
 var ended = false;
-stream.on('end', function() {
+stream.on('end', function () {
   ended = true;
 });
 
-source.on('data', function(chunk) {
+source.on('data', function (chunk) {
   var ret = stream.push(chunk);
   console.error('data', stream._readableState.length);
-  if (!ret)
-    readStop();
+  if (!ret) readStop();
 });
 
-source.on('end', function() {
+source.on('end', function () {
   stream.push(null);
 });
 
@@ -48,10 +48,9 @@ function readStart() {
 function readStop() {
   console.error('readStop');
   reading = false;
-  process.nextTick(function() {
+  process.nextTick(function () {
     var r = stream.read();
-    if (r !== null)
-      writer.write(r);
+    if (r !== null) writer.write(r);
   });
 }
 
@@ -61,22 +60,15 @@ var writer = new Writable({
 
 var written = [];
 
-var expectWritten =
-  [ 'asdfgasdfgasdfgasdfg',
-    'asdfgasdfgasdfgasdfg',
-    'asdfgasdfgasdfgasdfg',
-    'asdfgasdfgasdfgasdfg',
-    'asdfgasdfgasdfgasdfg',
-    'asdfgasdfgasdfgasdfg' ];
+var expectWritten = ['asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg', 'asdfgasdfgasdfgasdfg'];
 
-writer._write = function(chunk, encoding, cb) {
+writer._write = function (chunk, encoding, cb) {
   console.error('WRITE %s', chunk);
   written.push(chunk);
   process.nextTick(cb);
 };
 
 writer.on('finish', finish);
-
 
 // now emit some chunks.
 
@@ -95,15 +87,12 @@ function data() {
   assert(reading);
   source.emit('data', chunk);
   assert(!reading);
-  if (set++ < 5)
-    setTimeout(data, 10);
-  else
-    end();
+  if (set++ < 5) setTimeout(data, 10);else end();
 }
 
 function finish() {
   console.error('finish');
-  assert.deepEqual(written, expectWritten);
+  assert.deepStrictEqual(written, expectWritten);
   console.log('ok');
 }
 
@@ -111,7 +100,7 @@ function end() {
   source.emit('end');
   assert(!reading);
   writer.end(stream.read());
-  setTimeout(function() {
+  setTimeout(function () {
     assert(ended);
   });
 }

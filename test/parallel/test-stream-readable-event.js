@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Readable = require('../../').Readable;
 
@@ -12,23 +14,23 @@ var Readable = require('../../').Readable;
   });
 
   var _readCalled = false;
-  r._read = function(n) {
+  r._read = function (n) {
     _readCalled = true;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('blerg'));
+  r.push(bufferShim.from('blerg'));
 
   var caughtReadable = false;
-  setTimeout(function() {
+  setTimeout(function () {
     // we're testing what we think we are
     assert(!r._readableState.reading);
-    r.on('readable', function() {
+    r.on('readable', function () {
       caughtReadable = true;
     });
   });
 
-  process.on('exit', function() {
+  process.on('exit', function () {
     // we're testing what we think we are
     assert(!_readCalled);
 
@@ -46,23 +48,23 @@ var Readable = require('../../').Readable;
   });
 
   var _readCalled = false;
-  r._read = function(n) {
+  r._read = function (n) {
     _readCalled = true;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('bl'));
+  r.push(bufferShim.from('bl'));
 
   var caughtReadable = false;
-  setTimeout(function() {
+  setTimeout(function () {
     // assert we're testing what we think we are
     assert(r._readableState.reading);
-    r.on('readable', function() {
+    r.on('readable', function () {
       caughtReadable = true;
     });
   });
 
-  process.on('exit', function() {
+  process.on('exit', function () {
     // we're testing what we think we are
     assert(_readCalled);
 
@@ -79,24 +81,24 @@ var Readable = require('../../').Readable;
   });
 
   var _readCalled = false;
-  r._read = function(n) {
+  r._read = function (n) {
     _readCalled = true;
   };
 
   // This triggers a 'readable' event, which is lost.
-  r.push(new Buffer('blerg'));
+  r.push(bufferShim.from('blerg'));
   r.push(null);
 
   var caughtReadable = false;
-  setTimeout(function() {
+  setTimeout(function () {
     // assert we're testing what we think we are
     assert(!r._readableState.reading);
-    r.on('readable', function() {
+    r.on('readable', function () {
       caughtReadable = true;
     });
   });
 
-  process.on('exit', function() {
+  process.on('exit', function () {
     // we're testing what we think we are
     assert(!_readCalled);
 

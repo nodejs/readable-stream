@@ -6,8 +6,10 @@ const altForEachImplReplacement = require('./common-replacements').altForEachImp
     require('./common-replacements').objectKeysDefine
     , objectKeysReplacement =
     require('./common-replacements').objectKeysReplacement
-    , constReplacement =
-    require('./common-replacements').constReplacement
+    , bufferShimFix =
+    require('./common-replacements').bufferShimFix
+    , bufferStaticMethods =
+    require('./common-replacements').bufferStaticMethods
 
 module.exports.all = [
     [
@@ -32,8 +34,12 @@ module.exports.all = [
         /Stream.(Readable|Writable|Duplex|Transform|PassThrough)/g
       , 'require(\'../../\').$1'
     ]
-  , constReplacement
-
+  , bufferShimFix
+  , bufferStaticMethods
+  ,   [
+        /require\(['"]assert['"]\)/g
+      , 'require(\'assert/\')'
+    ]
 ]
 
 module.exports['test-stream2-basic.js'] = [
@@ -66,7 +72,6 @@ module.exports['common.js'] = [
   , objectKeysReplacement
   , altForEachImplReplacement
   , altForEachUseReplacement
-  , constReplacement
 
   , [
         /(exports.mustCall[\s\S]*)/m
@@ -87,6 +92,7 @@ module.exports['common.js'] = [
 
     // for streams2 on node 0.11
     // and dtrace in 0.10
+    // and coverage in all
   , [
         /^(  for \(var x in global\) \{|function leakedGlobals\(\) \{)$/m
       ,   '  /*<replacement>*/\n'
@@ -96,6 +102,9 @@ module.exports['common.js'] = [
         + '    knownGlobals.push(DTRACE_NET_SOCKET_READ);\n'
         + '  if (typeof DTRACE_NET_SOCKET_WRITE == \'function\')\n'
         + '    knownGlobals.push(DTRACE_NET_SOCKET_WRITE);\n'
+        + '  if (global.__coverage__)\n'
+        + '    knownGlobals.push(__coverage__);\n'
+        + '\'core,__core-js_shared__,Promise,Map,Set,WeakMap,WeakSet,Reflect,System,asap,Observable,regeneratorRuntime,_babelPolyfill\'.split(\',\').filter(function (item) {  return typeof global[item] !== undefined}).forEach(function (item) {knownGlobals.push(global[item])})'
         + '  /*</replacement>*/\n\n$1'
     ]
 
@@ -106,7 +115,7 @@ module.exports['common.js'] = [
         + '\nif (!global.setImmediate) {\n'
         + '  global.setImmediate = function setImmediate(fn) {\n'
 
-        + '    return setTimeout(fn.bind.apply(fn, arguments), 0);\n'
+        + '    return setTimeout(fn.bind.apply(fn, arguments), 4);\n'
         + '  };\n'
         + '}\n'
         + 'if (!global.clearImmediate) {\n'
@@ -135,6 +144,7 @@ module.exports['common.js'] = [
     , [
       /^/,
       `/*<replacement>*/
+      require('babel-polyfill');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/`
@@ -147,21 +157,16 @@ module.exports['common.js'] = [
         /require\(['"]stream['"]\)/g
       , 'require(\'../\')'
     ],
-    [/forEach\(data, line => \{\n\s+this\.emit\('data', line \+ '\\n'\);\n\s+\}\);/m,
-    `var self = this;
-    forEach(data, function(line) {
-      self.emit('data', line + '\\n');
-    });`
-  ],
-    [
-      /(varructor,)/,
-      '// $1'
-    ],
     [
     /^var util = require\('util'\);/m
   ,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
     + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
-  ]
+  ],
+  [
+  /^const util = require\('util'\);/m
+,   '\n/*<replacement>*/\nvar util = require(\'core-util-is\');\n'
+  + 'util.inherits = require(\'inherits\');\n/*</replacement>*/\n'
+]
 ]
 
 // this test has some trouble with the nextTick depth when run
@@ -191,7 +196,12 @@ module.exports['test-stream2-large-read-stall.js'] = [
 module.exports['test-stream-pipe-cleanup.js'] = [
     [
         /(function Writable\(\) \{)/
-      , 'if (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
+      , '(function (){\nif (/^v0\\.8\\./.test(process.version))\n  return\n\n$1'
+    ]
+    ,
+    [
+      /$/
+      ,'}())'
     ]
 ]
 
@@ -218,25 +228,39 @@ module.exports['test-stream-pipe-without-listenerCount.js'] = [
   [
     /require\(\'stream\'\)/g,
     'stream'
-  ],
-  [
-    /const /g,
-    'var '
   ]
 ]
 
-module.exports['test-stream-pipe-cleanup-pause.js'] = [
+module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [
   [
-    /const /g,
-    'var '
+    `const buf = Buffer(5).fill('x');`,
+    `const buf = new Buffer(5);
+  buf.fill('x');`
   ]
 ]
-module.exports['test-stream2-readable-empty-buffer-no-eof.js'] = [[
-  /let /g,
-  'var '],
+
+module.exports['test-stream2-unpipe-drain.js'] = [
   [
-    `var buf = Buffer(5).fill('x');`,
-    `var buf = new Buffer(5);
-  buf.fill('x');`
+    /^/,
+    `(function () {\n`
+  ],
+  [
+    /$/
+    ,'}())'
+  ]
+]
+
+module.exports['test-stream2-decode-partial.js'] = [
+ [
+   /readable\.push\(source\.slice\(4, 6\)\)/
+  ,`readable.push(source.slice(4, source.length));`
+ ]
+]
+
+
+module.exports['test-stream3-cork-uncork.js'] = module.exports['test-stream3-cork-end.js'] = [
+  [
+    /assert\.ok\(seen\.equals\(expected\)\);/,
+    'assert.deepEqual(seen, expected);'
   ]
 ]

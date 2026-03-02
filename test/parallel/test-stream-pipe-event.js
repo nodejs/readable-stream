@@ -1,7 +1,9 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var stream = require('../../');
-var assert = require('assert');
+var assert = require('assert/');
 var util = require('util');
 
 function Writable() {
@@ -19,7 +21,7 @@ util.inherits(Readable, require('stream').Stream);
 var passed = false;
 
 var w = new Writable();
-w.on('pipe', function(src) {
+w.on('pipe', function (src) {
   passed = true;
 });
 

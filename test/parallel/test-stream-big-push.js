@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var stream = require('../../');
 var str = 'asdfasdfasdfasdfasdf';
 
@@ -13,9 +15,9 @@ var reads = 0;
 var eofed = false;
 var ended = false;
 
-r._read = function(n) {
+r._read = function (n) {
   if (reads === 0) {
-    setTimeout(function() {
+    setTimeout(function () {
       r.push(str);
     });
     reads++;
@@ -30,7 +32,7 @@ r._read = function(n) {
   }
 };
 
-r.on('end', function() {
+r.on('end', function () {
   ended = true;
 });
 
@@ -44,7 +46,7 @@ assert.equal(chunk, str);
 chunk = r.read();
 assert.equal(chunk, null);
 
-r.once('readable', function() {
+r.once('readable', function () {
   // this time, we'll get *all* the remaining data, because
   // it's been added synchronously, as the read WOULD take
   // us below the hwm, and so it triggered a _read() again,
@@ -56,7 +58,7 @@ r.once('readable', function() {
   assert.equal(chunk, null);
 });
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert(eofed);
   assert(ended);
   assert.equal(reads, 2);

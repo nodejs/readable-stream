@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var Stream = require('stream').Stream;
 
 (function testErrorListenerCatches() {
@@ -10,7 +12,7 @@ var Stream = require('stream').Stream;
   source.pipe(dest);
 
   var gotErr = null;
-  source.on('error', function(err) {
+  source.on('error', function (err) {
     gotErr = err;
   });
 
@@ -46,15 +48,15 @@ var Stream = require('stream').Stream;
   var removed = false;
   var didTest = false;
 
-  process.on('exit', function() {
+  process.on('exit', function () {
     assert(didTest);
     console.log('ok');
   });
 
-  r._read = function() {
-    setTimeout(function() {
+  r._read = function () {
+    setTimeout(function () {
       assert(removed);
-      assert.throws(function() {
+      assert.throws(function () {
         w.emit('error', new Error('fail'));
       });
       didTest = true;
@@ -81,13 +83,13 @@ var Stream = require('stream').Stream;
   var didTest = false;
   var caught = false;
 
-  process.on('exit', function() {
+  process.on('exit', function () {
     assert(didTest);
     console.log('ok');
   });
 
-  r._read = function() {
-    setTimeout(function() {
+  r._read = function () {
+    setTimeout(function () {
       assert(removed);
       w.emit('error', new Error('fail'));
       didTest = true;
@@ -95,11 +97,11 @@ var Stream = require('stream').Stream;
   };
 
   w.on('error', myOnError);
-  w._write = function() {};
+  w._write = function () {};
 
   r.pipe(w);
   // Removing some OTHER random listener should not do anything
-  w.removeListener('error', function() {});
+  w.removeListener('error', function () {});
   removed = true;
 
   function myOnError(er) {

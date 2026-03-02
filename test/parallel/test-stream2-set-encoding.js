@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var R = require('../../lib/_stream_readable');
 var util = require('util');
 
@@ -15,8 +17,7 @@ function test(name, fn) {
 
 function run() {
   var next = tests.shift();
-  if (!next)
-    return console.error('ok');
+  if (!next) return console.error('ok');
 
   var name = next[0];
   var fn = next[1];
@@ -24,7 +25,7 @@ function run() {
   fn({
     same: assert.deepEqual,
     equal: assert.equal,
-    end: function() {
+    end: function () {
       count--;
       run();
     }
@@ -32,7 +33,7 @@ function run() {
 }
 
 // ensure all tests have run
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(count, 0);
 });
 
@@ -49,8 +50,8 @@ function TestReader(n, opts) {
   this.len = n || 100;
 }
 
-TestReader.prototype._read = function(n) {
-  setTimeout(function() {
+TestReader.prototype._read = function (n) {
+  setTimeout(function () {
 
     if (this.pos >= this.len) {
       // double push(null) to test eos handling
@@ -66,8 +67,7 @@ TestReader.prototype._read = function(n) {
     }
 
     this.pos += n;
-    var ret = new Buffer(n);
-    ret.fill('a');
+    var ret = bufferShim.alloc(n, 'a');
 
     console.log('this.push(ret)', ret);
 
@@ -75,271 +75,157 @@ TestReader.prototype._read = function(n) {
   }.bind(this), 1);
 };
 
-test('setEncoding utf8', function(t) {
+test('setEncoding utf8', function (t) {
   var tr = new TestReader(100);
   tr.setEncoding('utf8');
   var out = [];
-  var expect =
-    [ 'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa' ];
+  var expect = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-
-test('setEncoding hex', function(t) {
+test('setEncoding hex', function (t) {
   var tr = new TestReader(100);
   tr.setEncoding('hex');
   var out = [];
-  var expect =
-    [ '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161' ];
+  var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-test('setEncoding hex with read(13)', function(t) {
+test('setEncoding hex with read(13)', function (t) {
   var tr = new TestReader(100);
   tr.setEncoding('hex');
   var out = [];
-  var expect =
-    [ '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '16161' ];
+  var expect = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
 
   tr.on('readable', function flow() {
     console.log('readable once');
     var chunk;
-    while (null !== (chunk = tr.read(13)))
+    while (null !== (chunk = tr.read(13))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     console.log('END');
     t.same(out, expect);
     t.end();
   });
 });
 
-test('setEncoding base64', function(t) {
+test('setEncoding base64', function (t) {
   var tr = new TestReader(100);
   tr.setEncoding('base64');
   var out = [];
-  var expect =
-    [ 'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYQ==' ];
+  var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-test('encoding: utf8', function(t) {
+test('encoding: utf8', function (t) {
   var tr = new TestReader(100, { encoding: 'utf8' });
   var out = [];
-  var expect =
-    [ 'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa',
-      'aaaaaaaaaa' ];
+  var expect = ['aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa', 'aaaaaaaaaa'];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-
-test('encoding: hex', function(t) {
+test('encoding: hex', function (t) {
   var tr = new TestReader(100, { encoding: 'hex' });
   var out = [];
-  var expect =
-    [ '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161',
-      '6161616161' ];
+  var expect = ['6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161', '6161616161'];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-test('encoding: hex with read(13)', function(t) {
+test('encoding: hex with read(13)', function (t) {
   var tr = new TestReader(100, { encoding: 'hex' });
   var out = [];
-  var expect =
-    [ '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '1616161616161',
-      '6161616161616',
-      '16161' ];
+  var expect = ['6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '1616161616161', '6161616161616', '16161'];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(13)))
+    while (null !== (chunk = tr.read(13))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-test('encoding: base64', function(t) {
+test('encoding: base64', function (t) {
   var tr = new TestReader(100, { encoding: 'base64' });
   var out = [];
-  var expect =
-    [ 'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYWFhYWFh',
-      'YWFhYWFhYW',
-      'FhYQ==' ];
+  var expect = ['YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYWFhYWFh', 'YWFhYWFhYW', 'FhYQ=='];
 
   tr.on('readable', function flow() {
     var chunk;
-    while (null !== (chunk = tr.read(10)))
+    while (null !== (chunk = tr.read(10))) {
       out.push(chunk);
+    }
   });
 
-  tr.on('end', function() {
+  tr.on('end', function () {
     t.same(out, expect);
     t.end();
   });
 });
 
-test('chainable', function(t) {
+test('chainable', function (t) {
   var tr = new TestReader(100);
   t.equal(tr.setEncoding('utf8'), tr);
   t.end();

@@ -5,6 +5,7 @@ const hyperquest  = require('hyperzip')(require('hyperdirect'))
     , fs          = require('fs')
     , path        = require('path')
     , cheerio     = require('cheerio')
+    , babel       = require('babel-core')
     , encoding    = 'utf8'
     , urlRegex = /^https?:\/\//
     , nodeVersion = process.argv[2]
@@ -46,7 +47,18 @@ function processFile (inputLoc, out, replacements) {
     replacements.forEach(function (replacement) {
       data = data.replace.apply(data, replacement)
     })
-
+    if (inputLoc.slice(-3) === '.js') {
+      const transformed = babel.transform(data, {
+        plugins: [
+          'transform-es2015-arrow-functions',
+          'transform-es2015-block-scoping',
+          'transform-es2015-template-literals',
+          'transform-es2015-shorthand-properties',
+          'transform-es2015-for-of'
+        ]
+      })
+      data = transformed.code
+    }
     fs.writeFile(out, data, encoding, function (err) {
       if (err) throw err
 
@@ -89,14 +101,14 @@ hyperquest(testlisturl).pipe(bl(function (err, data) {
 
   var $ = cheerio.load(data.toString())
 
-  $('table.files .js-directory-link').each(function () {
+  $('table.files .js-navigation-open').each(function () {
     var file = $(this).text()
-    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file))
+    if (/^test-stream/.test(file) && !/-wrap(?:-encoding)?\.js$/.test(file) && file !== 'test-stream2-httpclient-response-end.js' && file !== 'test-stream-base-no-abort.js')
       processTestFile(file)
   })
 }))
 
-processFile(docurlpfx + 'stream.markdown', path.join(docourroot, 'stream.markdown'), docReplace)
+processFile(docurlpfx + 'stream.md', path.join(docourroot, 'stream.md'), docReplace)
 
 
 //--------------------------------------------------------------------

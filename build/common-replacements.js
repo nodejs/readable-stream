@@ -40,7 +40,15 @@ module.exports.objectKeysReplacement = [
    , 'objectKeys'
  ]
 
-module.exports.constReplacement = [
-    /\bconst\b/g
-  , 'var'
+
+module.exports.bufferShimFix = [
+  /^('use strict';)$/m,
+  `/*<replacement>*/
+ const bufferShim = require('buffer-shims');
+ /*</replacement>*/`
+]
+
+module.exports.bufferStaticMethods = [
+  /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
+  `bufferShim.$1`
 ]

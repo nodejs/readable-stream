@@ -1,38 +1,40 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var stream = require('../../');
 
 (function testErrorListenerCatches() {
   var count = 1000;
 
   var source = new stream.Readable();
-  source._read = function(n) {
+  source._read = function (n) {
     n = Math.min(count, n);
     count -= n;
-    source.push(new Buffer(n));
+    source.push(bufferShim.allocUnsafe(n));
   };
 
   var unpipedDest;
-  source.unpipe = function(dest) {
+  source.unpipe = function (dest) {
     unpipedDest = dest;
     stream.Readable.prototype.unpipe.call(this, dest);
   };
 
   var dest = new stream.Writable();
-  dest._write = function(chunk, encoding, cb) {
+  dest._write = function (chunk, encoding, cb) {
     cb();
   };
 
   source.pipe(dest);
 
   var gotErr = null;
-  dest.on('error', function(err) {
+  dest.on('error', function (err) {
     gotErr = err;
   });
 
   var unpipedSource;
-  dest.on('unpipe', function(src) {
+  dest.on('unpipe', function (src) {
     unpipedSource = src;
   });
 
@@ -47,27 +49,27 @@ var stream = require('../../');
   var count = 1000;
 
   var source = new stream.Readable();
-  source._read = function(n) {
+  source._read = function (n) {
     n = Math.min(count, n);
     count -= n;
-    source.push(new Buffer(n));
+    source.push(bufferShim.allocUnsafe(n));
   };
 
   var unpipedDest;
-  source.unpipe = function(dest) {
+  source.unpipe = function (dest) {
     unpipedDest = dest;
     stream.Readable.prototype.unpipe.call(this, dest);
   };
 
   var dest = new stream.Writable();
-  dest._write = function(chunk, encoding, cb) {
+  dest._write = function (chunk, encoding, cb) {
     cb();
   };
 
   source.pipe(dest);
 
   var unpipedSource;
-  dest.on('unpipe', function(src) {
+  dest.on('unpipe', function (src) {
     unpipedSource = src;
   });
 

@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 // This test verifies that:
 // 1. unshift() does not cause colliding _read() calls.
@@ -14,7 +16,7 @@ var hwm = 10;
 var r = stream.Readable({ highWaterMark: hwm });
 var chunks = 10;
 
-var data = new Buffer(chunks * hwm + Math.ceil(hwm / 2));
+var data = bufferShim.allocUnsafe(chunks * hwm + Math.ceil(hwm / 2));
 for (var i = 0; i < data.length; i++) {
   var c = 'asdf'.charCodeAt(i % 4);
   data[i] = c;
@@ -22,7 +24,7 @@ for (var i = 0; i < data.length; i++) {
 
 var pos = 0;
 var pushedNull = false;
-r._read = function(n) {
+r._read = function (n) {
   assert(!pushedNull, '_read after null push');
 
   // every third chunk is fast
@@ -37,7 +39,7 @@ r._read = function(n) {
       r.push(c);
       if (c === null) pushError();
     } else {
-      setTimeout(function() {
+      setTimeout(function () {
         pos += n;
         r.push(c);
         if (c === null) pushError();
@@ -47,40 +49,38 @@ r._read = function(n) {
 };
 
 function pushError() {
-  assert.throws(function() {
-    r.push(new Buffer(1));
+  assert.throws(function () {
+    r.push(bufferShim.allocUnsafe(1));
   });
 }
 
-
 var w = stream.Writable();
 var written = [];
-w._write = function(chunk, encoding, cb) {
+w._write = function (chunk, encoding, cb) {
   written.push(chunk.toString());
   cb();
 };
 
 var ended = false;
-r.on('end', function() {
+r.on('end', function () {
   assert(!ended, 'end emitted more than once');
-  assert.throws(function() {
-    r.unshift(new Buffer(1));
+  assert.throws(function () {
+    r.unshift(bufferShim.allocUnsafe(1));
   });
   ended = true;
   w.end();
 });
 
-r.on('readable', function() {
+r.on('readable', function () {
   var chunk;
   while (null !== (chunk = r.read(10))) {
     w.write(chunk);
-    if (chunk.length > 4)
-      r.unshift(new Buffer('1234'));
+    if (chunk.length > 4) r.unshift(bufferShim.from('1234'));
   }
 });
 
 var finished = false;
-w.on('finish', function() {
+w.on('finish', function () {
   finished = true;
   // each chunk should start with 1234, and then be asfdasdfasdf...
   // The first got pulled out before the first unshift('1234'), so it's
@@ -95,16 +95,20 @@ w.on('finish', function() {
       var c = written[i].charAt(j);
       assert.equal(c, asdf);
       switch (asdf) {
-        case 'a': asdf = 's'; break;
-        case 's': asdf = 'd'; break;
-        case 'd': asdf = 'f'; break;
-        case 'f': asdf = 'a'; break;
+        case 'a':
+          asdf = 's';break;
+        case 's':
+          asdf = 'd';break;
+        case 'd':
+          asdf = 'f';break;
+        case 'f':
+          asdf = 'a';break;
       }
     }
   }
 });
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(written.length, 18);
   assert(ended, 'stream ended');
   assert(finished, 'stream finished');

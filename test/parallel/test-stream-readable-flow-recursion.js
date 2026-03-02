@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 // this test verifies that passing a huge number to read(size)
 // will push up the highWaterMark, and cause the stream to read
@@ -15,14 +17,11 @@ process.throwDeprecation = true;
 var stream = new Readable({ highWaterMark: 2 });
 var reads = 0;
 var total = 5000;
-stream._read = function(size) {
+stream._read = function (size) {
   reads++;
   size = Math.min(size, total);
   total -= size;
-  if (size === 0)
-    stream.push(null);
-  else
-    stream.push(new Buffer(size));
+  if (size === 0) stream.push(null);else stream.push(bufferShim.allocUnsafe(size));
 };
 
 var depth = 0;
@@ -31,20 +30,17 @@ function flow(stream, size, callback) {
   depth += 1;
   var chunk = stream.read(size);
 
-  if (!chunk)
-    stream.once('readable', flow.bind(null, stream, size, callback));
-  else
-    callback(chunk);
+  if (!chunk) stream.once('readable', flow.bind(null, stream, size, callback));else callback(chunk);
 
   depth -= 1;
   console.log('flow(' + depth + '): exit');
 }
 
-flow(stream, 5000, function() {
+flow(stream, 5000, function () {
   console.log('complete (' + depth + ')');
 });
 
-process.on('exit', function(code) {
+process.on('exit', function (code) {
   assert.equal(reads, 2);
   // we pushed up the high water mark
   assert.equal(stream._readableState.highWaterMark, 8192);

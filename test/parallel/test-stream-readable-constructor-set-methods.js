@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Readable = require('../../').Readable;
 
@@ -13,7 +15,7 @@ function _read(n) {
 var r = new Readable({ read: _read });
 r.resume();
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(r._read, _read);
   assert(_readCalled);
 });

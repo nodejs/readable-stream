@@ -1,20 +1,22 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var Readable = require('../../lib/_stream_readable');
 
 var len = 0;
 var chunks = new Array(10);
 for (var i = 1; i <= 10; i++) {
-  chunks[i - 1] = new Buffer(i);
+  chunks[i - 1] = bufferShim.allocUnsafe(i);
   len += i;
 }
 
 var test = new Readable();
 var n = 0;
-test._read = function(size) {
+test._read = function (size) {
   var chunk = chunks[n++];
-  setTimeout(function() {
+  setTimeout(function () {
     test.push(chunk === undefined ? null : chunk);
   });
 };
@@ -25,7 +27,7 @@ function thrower() {
 }
 
 var bytesread = 0;
-test.on('readable', function() {
+test.on('readable', function () {
   var b = len - bytesread - 1;
   var res = test.read(b);
   if (res) {
@@ -42,10 +44,10 @@ function next() {
   test.removeListener('end', thrower);
 
   var endEmitted = false;
-  process.on('exit', function() {
+  process.on('exit', function () {
     assert(endEmitted, 'end should be emitted by now');
   });
-  test.on('end', function() {
+  test.on('end', function () {
     endEmitted = true;
   });
 

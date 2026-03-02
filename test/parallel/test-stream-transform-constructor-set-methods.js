@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var Transform = require('../../').Transform;
 
@@ -21,10 +23,10 @@ var t = new Transform({
   flush: _flush
 });
 
-t.end(new Buffer('blerg'));
+t.end(bufferShim.from('blerg'));
 t.resume();
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(t._transform, _transform);
   assert.equal(t._flush, _flush);
   assert(_transformCalled);

@@ -1,9 +1,11 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var stream = require('../../');
 
-var chunk = new Buffer('hallo');
+var chunk = bufferShim.from('hallo');
 
 var util = require('util');
 
@@ -12,7 +14,7 @@ function TestWriter() {
 }
 util.inherits(TestWriter, stream.Writable);
 
-TestWriter.prototype._write = function(buffer, encoding, callback) {
+TestWriter.prototype._write = function (buffer, encoding, callback) {
   callback(null);
 };
 
@@ -25,7 +27,7 @@ function TestReader() {
 }
 util.inherits(TestReader, stream.Readable);
 
-TestReader.prototype._read = function(size) {
+TestReader.prototype._read = function (size) {
   this.push(chunk);
 };
 
@@ -46,7 +48,7 @@ assert.equal(dest.listeners('close').length, 0);
 assert.equal(dest.listeners('finish').length, 0);
 
 console.error(src._readableState);
-process.on('exit', function() {
+process.on('exit', function () {
   src._readableState.buffer.length = 0;
   console.error(src._readableState);
   assert(src._readableState.length >= src._readableState.highWaterMark);

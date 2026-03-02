@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var gotEnd = false;
 
 // Make sure we don't miss the end event for paused 0-length streams
@@ -8,25 +10,25 @@ var gotEnd = false;
 var Readable = require('../../').Readable;
 var stream = new Readable();
 var calledRead = false;
-stream._read = function() {
+stream._read = function () {
   assert(!calledRead);
   calledRead = true;
   this.push(null);
 };
 
-stream.on('data', function() {
+stream.on('data', function () {
   throw new Error('should not ever get data');
 });
 stream.pause();
 
-setTimeout(function() {
-  stream.on('end', function() {
+setTimeout(function () {
+  stream.on('end', function () {
     gotEnd = true;
   });
   stream.resume();
 });
 
-process.on('exit', function() {
+process.on('exit', function () {
   assert(gotEnd);
   assert(calledRead);
   console.log('ok');

@@ -1,8 +1,10 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
 var Readable = require('../../lib/_stream_readable');
 var Writable = require('../../lib/_stream_writable');
-var assert = require('assert');
+var assert = require('assert/');
 
 // tiny node-tap lookalike.
 var tests = [];
@@ -15,16 +17,15 @@ function test(name, fn) {
 
 function run() {
   var next = tests.shift();
-  if (!next)
-    return console.error('ok');
+  if (!next) return console.error('ok');
 
   var name = next[0];
   var fn = next[1];
   console.log('# %s', name);
   fn({
-    same: assert.deepEqual,
+    same: assert.deepStrictEqual,
     equal: assert.equal,
-    end: function() {
+    end: function () {
       count--;
       run();
     }
@@ -32,7 +33,7 @@ function run() {
 }
 
 // ensure all tests have run
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(count, 0);
 });
 
@@ -41,11 +42,11 @@ process.nextTick(run);
 function toArray(callback) {
   var stream = new Writable({ objectMode: true });
   var list = [];
-  stream.write = function(chunk) {
+  stream.write = function (chunk) {
     list.push(chunk);
   };
 
-  stream.end = function() {
+  stream.end = function () {
     callback(list);
   };
 
@@ -55,7 +56,7 @@ function toArray(callback) {
 function fromArray(list) {
   var r = new Readable({ objectMode: true });
   r._read = noop;
-  forEach(list, function(chunk) {
+  forEach(list, function (chunk) {
     r.push(chunk);
   });
   r.push(null);
@@ -65,100 +66,91 @@ function fromArray(list) {
 
 function noop() {}
 
-test('can read objects from stream', function(t) {
-  var r = fromArray([{ one: '1'}, { two: '2' }]);
+test('can read objects from stream', function (t) {
+  var r = fromArray([{ one: '1' }, { two: '2' }]);
 
   var v1 = r.read();
   var v2 = r.read();
   var v3 = r.read();
 
-  assert.deepEqual(v1, { one: '1' });
-  assert.deepEqual(v2, { two: '2' });
-  assert.deepEqual(v3, null);
+  assert.deepStrictEqual(v1, { one: '1' });
+  assert.deepStrictEqual(v2, { two: '2' });
+  assert.deepStrictEqual(v3, null);
 
   t.end();
 });
 
-test('can pipe objects into stream', function(t) {
-  var r = fromArray([{ one: '1'}, { two: '2' }]);
+test('can pipe objects into stream', function (t) {
+  var r = fromArray([{ one: '1' }, { two: '2' }]);
 
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, [
-      { one: '1' },
-      { two: '2' }
-    ]);
+  r.pipe(toArray(function (list) {
+    assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
 
     t.end();
   }));
 });
 
-test('read(n) is ignored', function(t) {
-  var r = fromArray([{ one: '1'}, { two: '2' }]);
+test('read(n) is ignored', function (t) {
+  var r = fromArray([{ one: '1' }, { two: '2' }]);
 
   var value = r.read(2);
 
-  assert.deepEqual(value, { one: '1' });
+  assert.deepStrictEqual(value, { one: '1' });
 
   t.end();
 });
 
-test('can read objects from _read (sync)', function(t) {
+test('can read objects from _read (sync)', function (t) {
   var r = new Readable({ objectMode: true });
-  var list = [{ one: '1'}, { two: '2' }];
-  r._read = function(n) {
+  var list = [{ one: '1' }, { two: '2' }];
+  r._read = function (n) {
     var item = list.shift();
     r.push(item || null);
   };
 
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, [
-      { one: '1' },
-      { two: '2' }
-    ]);
+  r.pipe(toArray(function (list) {
+    assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
 
     t.end();
   }));
 });
 
-test('can read objects from _read (async)', function(t) {
+test('can read objects from _read (async)', function (t) {
   var r = new Readable({ objectMode: true });
-  var list = [{ one: '1'}, { two: '2' }];
-  r._read = function(n) {
+  var list = [{ one: '1' }, { two: '2' }];
+  r._read = function (n) {
     var item = list.shift();
-    process.nextTick(function() {
+    process.nextTick(function () {
       r.push(item || null);
     });
   };
 
-  r.pipe(toArray(function(list) {
-    assert.deepEqual(list, [
-      { one: '1' },
-      { two: '2' }
-    ]);
+  r.pipe(toArray(function (list) {
+    assert.deepStrictEqual(list, [{ one: '1' }, { two: '2' }]);
 
     t.end();
   }));
 });
 
-test('can read strings as objects', function(t) {
+test('can read strings as objects', function (t) {
   var r = new Readable({
     objectMode: true
   });
   r._read = noop;
   var list = ['one', 'two', 'three'];
-  forEach(list, function(str) {
+  forEach(list, function (str) {
     r.push(str);
   });
   r.push(null);
 
-  r.pipe(toArray(function(array) {
-    assert.deepEqual(array, list);
+  r.pipe(toArray(function (array) {
+    assert.deepStrictEqual(array, list);
 
     t.end();
   }));
 });
 
-test('read(0) for object streams', function(t) {
+test('read(0) for object streams', function (t) {
   var r = new Readable({
     objectMode: true
   });
@@ -167,14 +159,14 @@ test('read(0) for object streams', function(t) {
   r.push('foobar');
   r.push(null);
 
-  r.pipe(toArray(function(array) {
-    assert.deepEqual(array, ['foobar']);
+  r.pipe(toArray(function (array) {
+    assert.deepStrictEqual(array, ['foobar']);
 
     t.end();
   }));
 });
 
-test('falsey values', function(t) {
+test('falsey values', function (t) {
   var r = new Readable({
     objectMode: true
   });
@@ -185,14 +177,14 @@ test('falsey values', function(t) {
   r.push('');
   r.push(null);
 
-  r.pipe(toArray(function(array) {
-    assert.deepEqual(array, [false, 0, '']);
+  r.pipe(toArray(function (array) {
+    assert.deepStrictEqual(array, [false, 0, '']);
 
     t.end();
   }));
 });
 
-test('high watermark _read', function(t) {
+test('high watermark _read', function (t) {
   var r = new Readable({
     highWaterMark: 6,
     objectMode: true
@@ -200,11 +192,11 @@ test('high watermark _read', function(t) {
   var calls = 0;
   var list = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-  r._read = function(n) {
+  r._read = function (n) {
     calls++;
   };
 
-  forEach(list, function(c) {
+  forEach(list, function (c) {
     r.push(c);
   });
 
@@ -224,12 +216,12 @@ test('high watermark _read', function(t) {
   t.end();
 });
 
-test('high watermark push', function(t) {
+test('high watermark push', function (t) {
   var r = new Readable({
     highWaterMark: 6,
     objectMode: true
   });
-  r._read = function(n) {};
+  r._read = function (n) {};
   for (var i = 0; i < 6; i++) {
     var bool = r.push(i);
     assert.equal(bool, i === 5 ? false : true);
@@ -238,15 +230,15 @@ test('high watermark push', function(t) {
   t.end();
 });
 
-test('can write objects to stream', function(t) {
+test('can write objects to stream', function (t) {
   var w = new Writable({ objectMode: true });
 
-  w._write = function(chunk, encoding, cb) {
-    assert.deepEqual(chunk, { foo: 'bar' });
+  w._write = function (chunk, encoding, cb) {
+    assert.deepStrictEqual(chunk, { foo: 'bar' });
     cb();
   };
 
-  w.on('finish', function() {
+  w.on('finish', function () {
     t.end();
   });
 
@@ -254,17 +246,17 @@ test('can write objects to stream', function(t) {
   w.end();
 });
 
-test('can write multiple objects to stream', function(t) {
+test('can write multiple objects to stream', function (t) {
   var w = new Writable({ objectMode: true });
   var list = [];
 
-  w._write = function(chunk, encoding, cb) {
+  w._write = function (chunk, encoding, cb) {
     list.push(chunk);
     cb();
   };
 
-  w.on('finish', function() {
-    assert.deepEqual(list, [0, 1, 2, 3, 4]);
+  w.on('finish', function () {
+    assert.deepStrictEqual(list, [0, 1, 2, 3, 4]);
 
     t.end();
   });
@@ -277,19 +269,19 @@ test('can write multiple objects to stream', function(t) {
   w.end();
 });
 
-test('can write strings as objects', function(t) {
+test('can write strings as objects', function (t) {
   var w = new Writable({
     objectMode: true
   });
   var list = [];
 
-  w._write = function(chunk, encoding, cb) {
+  w._write = function (chunk, encoding, cb) {
     list.push(chunk);
     process.nextTick(cb);
   };
 
-  w.on('finish', function() {
-    assert.deepEqual(list, ['0', '1', '2', '3', '4']);
+  w.on('finish', function () {
+    assert.deepStrictEqual(list, ['0', '1', '2', '3', '4']);
 
     t.end();
   });
@@ -302,22 +294,22 @@ test('can write strings as objects', function(t) {
   w.end();
 });
 
-test('buffers finish until cb is called', function(t) {
+test('buffers finish until cb is called', function (t) {
   var w = new Writable({
     objectMode: true
   });
   var called = false;
 
-  w._write = function(chunk, encoding, cb) {
+  w._write = function (chunk, encoding, cb) {
     assert.equal(chunk, 'foo');
 
-    process.nextTick(function() {
+    process.nextTick(function () {
       called = true;
       cb();
     });
   };
 
-  w.on('finish', function() {
+  w.on('finish', function () {
     assert.equal(called, true);
 
     t.end();
@@ -327,7 +319,7 @@ test('buffers finish until cb is called', function(t) {
   w.end();
 });
 
-function forEach (xs, f) {
+function forEach(xs, f) {
   for (var i = 0, l = xs.length; i < l; i++) {
     f(xs[i], i);
   }

@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 
 var stream = require('../../');
 var util = require('util');
@@ -12,13 +14,13 @@ function MyWritable(fn, options) {
 
 util.inherits(MyWritable, stream.Writable);
 
-MyWritable.prototype._write = function(chunk, encoding, callback) {
+MyWritable.prototype._write = function (chunk, encoding, callback) {
   this.fn(Buffer.isBuffer(chunk), typeof chunk, encoding);
   callback();
 };
 
 (function decodeStringsTrue() {
-  var m = new MyWritable(function(isBuffer, type, enc) {
+  var m = new MyWritable(function (isBuffer, type, enc) {
     assert(isBuffer);
     assert.equal(type, 'object');
     assert.equal(enc, 'buffer');
@@ -29,7 +31,7 @@ MyWritable.prototype._write = function(chunk, encoding, callback) {
 })();
 
 (function decodeStringsFalse() {
-  var m = new MyWritable(function(isBuffer, type, enc) {
+  var m = new MyWritable(function (isBuffer, type, enc) {
     assert(!isBuffer);
     assert.equal(type, 'string');
     assert.equal(enc, 'utf8');

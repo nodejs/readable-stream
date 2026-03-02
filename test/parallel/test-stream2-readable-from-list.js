@@ -1,6 +1,8 @@
-'use strict';
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
 require('../common');
-var assert = require('assert');
+var assert = require('assert/');
 var fromList = require('../../lib/_stream_readable')._fromList;
 
 // tiny node-tap lookalike.
@@ -14,8 +16,7 @@ function test(name, fn) {
 
 function run() {
   var next = tests.shift();
-  if (!next)
-    return console.error('ok');
+  if (!next) return console.error('ok');
 
   var name = next[0];
   var fn = next[1];
@@ -23,7 +24,7 @@ function run() {
   fn({
     same: assert.deepEqual,
     equal: assert.equal,
-    end: function() {
+    end: function () {
       count--;
       run();
     }
@@ -31,18 +32,14 @@ function run() {
 }
 
 // ensure all tests have run
-process.on('exit', function() {
+process.on('exit', function () {
   assert.equal(count, 0);
 });
 
 process.nextTick(run);
 
-
-test('buffers', function(t) {
-  var list = [ new Buffer('foog'),
-               new Buffer('bark'),
-               new Buffer('bazy'),
-               new Buffer('kuel') ];
+test('buffers', function (t) {
+  var list = [bufferShim.from('foog'), bufferShim.from('bark'), bufferShim.from('bazy'), bufferShim.from('kuel')];
 
   // read more than the first element.
   var ret = fromList(6, { buffer: list, length: 16 });
@@ -66,11 +63,8 @@ test('buffers', function(t) {
   t.end();
 });
 
-test('strings', function(t) {
-  var list = [ 'foog',
-               'bark',
-               'bazy',
-               'kuel' ];
+test('strings', function (t) {
+  var list = ['foog', 'bark', 'bazy', 'kuel'];
 
   // read more than the first element.
   var ret = fromList(6, { buffer: list, length: 16, decoder: true });
