@@ -23,10 +23,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Use Node.js 16
+      - name: Use Node.js 22
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
       - name: Restore cached dependencies
         uses: actions/cache@v3
         with:
