@@ -55,6 +55,11 @@ const internalStreamsRequireErrors = ["require\\('internal/errors'\\)", "require
 
 const internalStreamsRequireEventEmitter = ['const EE =', 'const { EventEmitter: EE } =']
 
+const internalStreamsLegacyListenerCount = [
+  "EE\\.listenerCount\\(this, 'error'\\) === 0",
+  "this.listenerCount?.('error') === 0"
+]
+
 const internalStreamsRequirePrimordials = ['= primordials', "= require('../../ours/primordials')"]
 
 const internalStreamsRequireRelativeUtil = [
@@ -157,6 +162,7 @@ const testCommonKnownGlobals = [
       typeof AbortSignal !== 'undefined' ? AbortSignal : require('abort-controller').AbortSignal,
       typeof EventTarget !== 'undefined' ? EventTarget : require('event-target-shim').EventTarget,
       typeof navigator !== 'undefined' ? navigator : {},
+      typeof sessionStorage !== 'undefined' ? sessionStorage : {},
   `
 ]
 
@@ -213,6 +219,12 @@ const testParallelReadableBufferListInspect = [
 ]
 
 const testParallelRequireStream = ["require\\('stream'\\)", "require('../../lib/ours/index')"]
+
+const testParallelStreamBaseTypecheckingError = [
+  "code: 'ERR_INVALID_ARG_TYPE',\\n\\s+message: 'Second argument must be a buffer'",
+  `code: /^ERR_(?:INVALID_ARG_TYPE|UNKNOWN_ENCODING)$/,
+            message: /^(?:Second argument must be a buffer|Unknown encoding: buffer)$/`
+]
 
 const testParallelRequireStreamConsumer = ["require\\('stream/consumer'\\)", "require('../../lib/stream/consumer')"]
 
@@ -317,6 +329,7 @@ export const replacements = {
     removetoWebReadableMethod,
     stringDecoderRequirePackage
   ],
+  'lib/internal/streams/legacy.js': [internalStreamsLegacyListenerCount],
   'lib/internal/streams/.+': [
     internalStreamsRequireErrors,
     internalStreamsRequireEventEmitter,
@@ -358,6 +371,7 @@ export const replacements = {
   'test/common/index.js': [testCommonKnownGlobals],
   'test/parallel/.+': [
     testParallelIncludeTap,
+    testParallelStreamBaseTypecheckingError,
     testParallelRequireStream,
     testParallelRequireStreamConsumer,
     testParallelRequireStreamInternals,
