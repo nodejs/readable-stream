@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/nodejs/readable-stream"
+    "url": "https://github.com/nodejs/readable-stream"
   },
   "bugs": {
     "url": "https://github.com/nodejs/readable-stream/issues"
@@ -61,7 +61,7 @@
     "@rollup/plugin-inject": "^4.0.4",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@sinonjs/fake-timers": "^9.1.2",
-    "ajv": "^8.8.2",
+    "ajv": "^8.20.0",
     "browserify": "^17.0.0",
     "c8": "^7.11.2",
     "esbuild": "^0.19.9",

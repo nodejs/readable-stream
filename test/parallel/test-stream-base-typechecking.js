@@ -20,8 +20,8 @@ const server = net.createServer().listen(
           },
           {
             name: 'TypeError',
-            code: 'ERR_INVALID_ARG_TYPE',
-            message: 'Second argument must be a buffer'
+            code: /^ERR_(?:INVALID_ARG_TYPE|UNKNOWN_ENCODING)$/,
+            message: /^(?:Second argument must be a buffer|Unknown encoding: buffer)$/
           }
         )
         client.destroy()

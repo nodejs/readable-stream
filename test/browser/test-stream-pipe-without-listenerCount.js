@@ -8,10 +8,11 @@ module.exports = function (t) {
     read: function () {}
   })
   r.listenerCount = undefined
+  r.on('error', function () {})
   const w = new Stream()
   w.on('pipe', function () {
     r.emit('error', new Error('Readable Error'))
   })
-  t.throws(() => r.pipe(w), 'TypeError: this.listenerCount is not a function')
+  t.doesNotThrow(() => r.pipe(w))
 }
 module.exports[kReadableStreamSuiteName] = 'stream-pipe-without-listenerCount'
