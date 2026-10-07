@@ -255,6 +255,7 @@ let knownGlobals = [
   typeof AbortSignal !== 'undefined' ? AbortSignal : require('abort-controller').AbortSignal,
   typeof EventTarget !== 'undefined' ? EventTarget : require('event-target-shim').EventTarget,
   typeof navigator !== 'undefined' ? navigator : {},
+  typeof sessionStorage !== 'undefined' ? sessionStorage : {},
   atob,
   btoa,
   clearImmediate,
