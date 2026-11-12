@@ -11,7 +11,7 @@ function checkError(err, Base, name, code, message) {
 }
 
 // Update this numbers based on the number of checkError below multiplied by the assertions within checkError
-t.plan(17 * 4)
+t.plan(19 * 4 + 1)
 
 checkError(
   new errors.ERR_INVALID_ARG_VALUE('name', 0),
@@ -101,6 +101,16 @@ checkError(
   'Error',
   'ERR_MULTIPLE_CALLBACK',
   'Callback called multiple times'
+)
+const multipleCallback = errors.ERR_MULTIPLE_CALLBACK()
+checkError(multipleCallback, Error, 'Error', 'ERR_MULTIPLE_CALLBACK', 'Callback called multiple times')
+t.ok(multipleCallback instanceof errors.ERR_MULTIPLE_CALLBACK)
+checkError(
+  errors.ERR_INVALID_ARG_VALUE('name', 0),
+  TypeError,
+  'TypeError',
+  'ERR_INVALID_ARG_VALUE',
+  "The argument 'name' is invalid. Received 0"
 )
 
 checkError(new errors.ERR_STREAM_CANNOT_PIPE(), Error, 'Error', 'ERR_STREAM_CANNOT_PIPE', 'Cannot pipe, not readable')

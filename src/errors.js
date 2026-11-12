@@ -106,7 +106,19 @@ function E(code, message, Base) {
   NodeError.prototype.code = code
   NodeError.prototype[kIsNodeError] = true
 
-  codes[code] = NodeError
+  // Node 18 calls `ERR_MULTIPLE_CALLBACK()` from `_final` with no `new`.
+  // A class throws TypeError before this body runs, and that throw escapes
+  // a callback scheduled with `nextTick`, so the process dies instead of
+  // emitting ERR_MULTIPLE_CALLBACK. The function builds the same instance
+  // either way. `new` still returns it because a constructor that returns
+  // an object uses that object.
+  function createNodeError(...args) {
+    return new NodeError(...args)
+  }
+  Object.setPrototypeOf(createNodeError, NodeError)
+  createNodeError.prototype = NodeError.prototype
+
+  codes[code] = createNodeError
 }
 
 function hideStackFrames(fn) {
